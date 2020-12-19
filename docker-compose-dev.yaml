@@ -16,11 +16,11 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
     networks:
-      gotrue_mesh:
+      auth_mesh:
         aliases:
           - gotrue_db
 volumes:
    db_volume: {}
 
 networks:
-  gotrue_mesh: {}
+  auth_mesh: {}

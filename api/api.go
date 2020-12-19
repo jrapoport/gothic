@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"regexp"
 	"time"
@@ -36,8 +37,17 @@ type API struct {
 	version string
 }
 
-// ListenAndServe starts the REST API
-func (a *API) ListenAndServeREST(hostAndPort string) {
+// ListenAndServeREST starts the REST API
+// let's wrap this instead
+func ListenAndServeREST(a *API, globalConfig *conf.GlobalConfiguration) {
+	go func() {
+		addr := fmt.Sprintf("%v:%v", globalConfig.API.Host, globalConfig.API.RestPort)
+		logrus.Infof("GoTrue REST API started on: %s", addr)
+		a.ListenAndServe(addr)
+	}()
+}
+
+func (a *API) ListenAndServe(hostAndPort string) {
 	log := logrus.WithField("component", "api")
 	server := &http.Server{
 		Addr:    hostAndPort,

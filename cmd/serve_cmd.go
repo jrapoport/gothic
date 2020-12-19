@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -34,26 +33,22 @@ func serve(globalConfig *conf.GlobalConfiguration, config *conf.Configuration) {
 // listenAndServe starts the API servers
 func listenAndServe(ctx context.Context, globalConfig *conf.GlobalConfiguration) {
 
-	db := openDB(globalConfig)
+	db, closeDB := openDB(globalConfig)
+	defer closeDB()
 	a := api.NewAPIWithVersion(ctx, globalConfig, db, Version)
 	log := logrus.WithField("component", "api")
 
-	done := make(chan struct{})
-	defer close(done)
-	go func() {
-		addr := fmt.Sprintf("%v:%v", globalConfig.API.Host, globalConfig.API.RestPort)
-		logrus.Infof("GoTrue REST API started on: %s", addr)
-		a.ListenAndServeREST(addr)
-	}()
-
+	api.ListenAndServeREST(a, globalConfig)
 	servers.ListenAndServeRPC(a, globalConfig)
 
+	done := make(chan struct{})
+	defer close(done)
 	util.WaitForTermination(log, done)
 
 	log.Info("shutting down...")
 }
 
-func openDB(globalConfig *conf.GlobalConfiguration) (db *storage.Connection) {
+func openDB(globalConfig *conf.GlobalConfiguration) (db *storage.Connection, closeDB func()) {
 	// try a couple times to connect to the database
 	var err error
 	for i := 1; i <= 3; i++ {
@@ -67,5 +62,10 @@ func openDB(globalConfig *conf.GlobalConfiguration) (db *storage.Connection) {
 	if err != nil {
 		logrus.Fatalf("Error opening database: %+v", err)
 	}
+
+	closeDB = func() {
+
+	}
+
 	return
 }
