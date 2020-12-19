@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
 
-  gotrue:
+  auth:
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
       - "3001:3001"
       - "8081:8081"
     networks:
-      gotrue_mesh:
+      auth_mesh:
         aliases:
           - host.docker.internal
     restart: unless-stopped
@@ -33,11 +33,11 @@ services:
      - "9001:8080"
      - "9901:9901"
     networks:
-      gotrue_mesh: {}
+      auth_mesh: {}
     restart: unless-stopped
     # make this work on linux
     # extra_hosts:
     #  host.docker.internal: 172.17.0.1
 
 networks:
-  gotrue_mesh: {}
+  auth_mesh: {}
