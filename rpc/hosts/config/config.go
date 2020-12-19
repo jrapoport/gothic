@@ -26,14 +26,12 @@ func (r *rpcConfigHost) Settings(_ context.Context,
 	s := r.API.Settings(nil)
 	b, err := json.Marshal(s)
 	if err != nil {
-		return nil, r.RpcErrorf(codes.Internal, "%w", err)
+		return nil, r.RpcErrorf(codes.Internal, "%v", err)
 	}
 	var res SettingsResponse
 	err = proto.Unmarshal(b, &res)
 	if err != nil {
-		return nil, r.RpcErrorf(codes.Internal, "%w", err)
+		return nil, r.RpcErrorf(codes.Internal, "%v", err)
 	}
 	return &res, nil
-
-	return &SettingsResponse{}, nil
 }

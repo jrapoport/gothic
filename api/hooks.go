@@ -225,7 +225,7 @@ func triggerHook(ctx context.Context, hookURL *url.URL, secret string, method jw
 	w := Webhook{
 		WebhookConfig: &config.Webhook,
 		jwtSecret:     secret,
-		jwtMethod: 	   method,
+		jwtMethod:     method,
 		instanceID:    instanceID,
 		claims:        claims,
 		payload:       data,
