@@ -3,7 +3,7 @@
 This project was originally forked from the
 [https://github.com/netlify/gotrue](https://github.com/netlify/gotrue).
 
-The purpose was to adopt newer, more developer friendly technologies like [Grom](https://gorm.io/),
+The purpose was to adopt newer, more developer friendly technologies like [Gorm](https://gorm.io/),
 [gRPC](https://grpc.io/), and [gRPC Web](https://github.com/grpc/grpc-web); newer versions
 of critical libraries like [JWT v4](https://github.com/dgrijalva/jwt-go); and migrate away from
 older libraries that are deprecated with [security flaws](https://github.com/gobuffalo/uuid).
