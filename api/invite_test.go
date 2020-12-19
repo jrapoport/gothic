@@ -70,8 +70,8 @@ func (ts *InviteTestSuite) makeSuperAdmin(email string) string {
 	_, err = jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(ts.Config.JWT.Secret), nil
 	},
-	jwt.WithAudience(ts.Config.JWT.Aud),
-	jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
+		jwt.WithAudience(ts.Config.JWT.Aud),
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 	require.NoError(ts.T(), err, "Error parsing token")
 
 	return token

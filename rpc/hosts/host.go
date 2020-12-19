@@ -10,7 +10,6 @@ import (
 	"net"
 )
 
-
 /*
 var
 
@@ -26,12 +25,12 @@ type RpcHost struct {
 	*api.API
 	*logrus.Entry
 	hostAndPort string
-	servers []RegisterRpcServer
+	servers     []RegisterRpcServer
 }
 
 func NewRpcHost(a *api.API, name string, hostAndPort string, servers []RegisterRpcServer) *RpcHost {
 	log := logrus.WithField("server", name)
-	return &RpcHost{a, log,  hostAndPort,servers}
+	return &RpcHost{a, log, hostAndPort, servers}
 }
 
 func (h *RpcHost) ListenAndServe(opts ...grpc.ServerOption) {
@@ -69,4 +68,3 @@ func (h *RpcHost) RpcError(c codes.Code, msg string) error {
 	h.Error(err)
 	return err
 }
-

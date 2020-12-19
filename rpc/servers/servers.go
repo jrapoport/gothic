@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ListenAndServeRPC(a *api.API, globalConfig  *conf.GlobalConfiguration) {
+func ListenAndServeRPC(a *api.API, globalConfig *conf.GlobalConfiguration) {
 	go func() {
 		addr := fmt.Sprintf("%v:%v", globalConfig.API.Host, globalConfig.API.RpcPort)
 		logrus.Infof("GoTrue RPC API started on: %s", addr)
