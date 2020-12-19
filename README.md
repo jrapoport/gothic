@@ -1,3 +1,33 @@
+## Project History
+
+This project was originally forked from the
+[https://github.com/netlify/gotrue](https://github.com/netlify/gotrue).
+
+The purpose was to adopt newer, more developer friendly technologies like [Grom](https://gorm.io/),
+[gRPC](https://grpc.io/), and [gRPC Web](https://github.com/grpc/grpc-web); newer versions
+of critical libraries like [JWT v4](https://github.com/dgrijalva/jwt-go); and migrate away from
+older libraries that are deprecated with [security flaws](https://github.com/gobuffalo/uuid).
+
+These changes allow for advances like self-contained database migration, expanded database driver
+support (e.g., PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to
+modify and use the microservice outside of Netlify tool chain, and in a more active development environment.
+
+While the Netlify team did a good job with the original microservice, their use in production means they
+cannot easily adopt these kinds of significant changes. In many cases, they will likely never make them given the
+impacts to their tooling, deployment, and production systems — which makes perfect sense for their situation.
+
+I'd like to thank Netlify team for their hard work on the original version of
+this microservice.
+
+# GoTrue - User management for APIs
+
+GoTrue is a small open-source API written in golang, that can act as a self-standing
+API service for handling user registration and authentication for JAM projects.
+
+It's based on OAuth2 and JWT and will handle user signup, authentication and custom
+user data.
+
+
 # GoTrue - User management for APIs
 
 GoTrue is a small open-source API written in golang, that can act as a self-standing
@@ -38,16 +68,26 @@ Header on which to rate limit the `/token` endpoint.
 
 ```properties
 GOTRUE_API_HOST=localhost
-PORT=9999
+REST_PORT=9999 # the http REST server port
+RPC_PORT=3001 # the gRPC server port
+RPCWEB_PORT=6001 # the gRPC Web server port
 ```
 
 `API_HOST` - `string`
 
 Hostname to listen on.
 
-`PORT` (no prefix) / `API_PORT` - `number`
+`REST_PORT` (no prefix) / `GOTRUE_API_REST_PORT` - `number`
 
-Port number to listen on. Defaults to `8081`.
+Port number for the HTTP REST API server to listen on. Defaults to `8081`.
+
+`RPC_PORT` (no prefix) / `GOTRUE_API_RPC_PORT` - `number`
+
+Port number for the gRPC API server to listen on. Defaults to `3001`.
+
+`RPCWEB_PORT` (no prefix) / `GOTRUE_API_RPCWEB_PORT` - `number`
+
+Port number for the gRPC Web API server to listen on. Defaults to `6001`.
 
 `API_ENDPOINT` - `string` _Multi-instance mode only_
 
@@ -61,7 +101,8 @@ If you wish to inherit a request ID from the incoming request, specify the name 
 
 ```properties
 GOTRUE_DB_DRIVER=mysql
-DATABASE_URL=root@localhost/gotrue
+DATABASE_URL=root@localhost
+GOTRUE_DB_DATABASE=gotrue
 ```
 
 `DB_DRIVER` - `string` **required**
@@ -72,17 +113,20 @@ Chooses what dialect of database you want. Must be `mysql`.
 
 Connection string for the database.
 
+`GOTRUE_DB_DATABASE` - `string`
+
+The name of the database to create automatically. Defaults to `gotrue`.
+
 `DB_NAMESPACE` - `string`
 
 Adds a prefix to all table names.
 
 **Migrations Note**
 
-Migrations are not applied automatically, so you will need to run them after
-you've built gotrue.
-
-* If built locally: `./gotrue migrate`
-* Using Docker: `docker run --rm gotrue gotrue migrate`
+Migrations *WILL BE* applied automatically if you start with 
+```
+GOTRUE_DB_AUTOMIGRATE=true
+```
 
 ### Logging
 
@@ -134,6 +178,7 @@ The name to use for the service.
 
 ```properties
 GOTRUE_JWT_SECRET=supersecretvalue
+GOTRUE_JWT_METHOD=HS256
 GOTRUE_JWT_EXP=3600
 GOTRUE_JWT_AUD=netlify
 ```
@@ -141,6 +186,10 @@ GOTRUE_JWT_AUD=netlify
 `JWT_SECRET` - `string` **required**
 
 The secret used to sign JWT tokens with.
+
+`JWT_METHOD` - `string`
+
+The method used to sign JWT tokens. Defaults to `HS256` (HMAC256).
 
 `JWT_EXP` - `number`
 
