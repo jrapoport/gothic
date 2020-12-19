@@ -19,6 +19,10 @@ impacts to their tooling, deployment, and production systems — which makes per
 I'd like to thank Netlify team for their hard work on the original version of
 this microservice.
 
+### NOTE: gRPC / gRPC Web support is in its infancy. 
+Currently only the scaffolding is in place with a few supported methods like healthcheck and settings. The intention 
+is to refactor the API over time to support both REST & gRPC.
+
 # GoTrue - User management for APIs
 
 GoTrue is a small open-source API written in golang, that can act as a self-standing
