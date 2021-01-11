@@ -1,15 +1,15 @@
 package api
 
 import (
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -65,7 +65,7 @@ func performAuthorizationRequest(ts *ExternalTestSuite, provider string, inviteT
 	}
 
 	req := httptest.NewRequest(http.MethodGet, authorizeURL, nil)
-	req.Header.Set("Referer", "https://example.netlify.com/admin")
+	req.Header.Set("Referer", "https://example.gothic.com/admin")
 	w := httptest.NewRecorder()
 	ts.API.handler.ServeHTTP(w, req)
 

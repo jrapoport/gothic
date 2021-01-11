@@ -11,9 +11,9 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -94,7 +94,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 		assert.True(token.Valid)
 		assert.Equal(ts.instanceID.String(), claims.Subject) // not configured for multitenancy
-		assert.Equal("gotrue", claims.Issuer)
+		assert.Equal("gothic", claims.Issuer)
 		assert.WithinDuration(time.Now(), claims.IssuedAt.Time, 5*time.Second)
 
 		// verify the contentss
@@ -113,7 +113,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		require.True(ok)
 		assert.Len(u, 8)
 		// assert.Equal(t, user.ID, u["id"]) TODO
-		assert.Equal("api.netlify.com", u["aud"])
+		assert.Equal("api.gothic.com", u["aud"])
 		assert.Equal("", u["role"])
 		assert.Equal("test@example.com", u["email"])
 

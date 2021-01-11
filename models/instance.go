@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +18,7 @@ func init() {
 
 type Instance struct {
 	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
-	// Netlify UUID
+	// Gothic UUID
 	UUID uuid.UUID `json:"uuid,omitempty" gorm:"type:varchar(255) DEFAULT NULL"`
 
 	BaseConfig *conf.Configuration `json:"config" gorm:"column:raw_base_config"`

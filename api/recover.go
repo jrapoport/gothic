@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 )
 
 // RecoverParams holds the parameters for a password recovery request

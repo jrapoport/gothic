@@ -12,7 +12,7 @@ import (
 	"github.com/didip/tollbooth/v5"
 	"github.com/didip/tollbooth/v5/limiter"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/models"
 )
 
 const (
@@ -21,11 +21,11 @@ const (
 
 type FunctionHooks map[string][]string
 
-type NetlifyMicroserviceClaims struct {
+type GothicMicroserviceClaims struct {
 	jwt.StandardClaims
 	SiteURL       string        `json:"site_url"`
 	InstanceID    string        `json:"id"`
-	NetlifyID     string        `json:"netlify_id"`
+	GothicID     string        `json:"gothic_id"`
 	FunctionHooks FunctionHooks `json:"function_hooks"`
 }
 
@@ -89,7 +89,7 @@ func (a *API) loadInstanceConfig(w http.ResponseWriter, r *http.Request) (contex
 		return nil, badRequestError("Operator signature missing")
 	}
 
-	claims := NetlifyMicroserviceClaims{}
+	claims := GothicMicroserviceClaims{}
 	_, err := jwt.ParseWithClaims(signature, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(a.config.OperatorToken), nil
 	}, jwt.WithValidMethods([]string{cfg.JWT.SigningMethod().Alg()}))
@@ -106,7 +106,7 @@ func (a *API) loadInstanceConfig(w http.ResponseWriter, r *http.Request) (contex
 	}
 
 	logEntrySetField(r, "instance_id", instanceID)
-	logEntrySetField(r, "netlify_id", claims.NetlifyID)
+	logEntrySetField(r, "gothic_id", claims.GothicID)
 	instance, err := models.GetInstance(a.db, instanceID)
 	if err != nil {
 		if models.IsNotFoundError(err) {
@@ -125,7 +125,7 @@ func (a *API) loadInstanceConfig(w http.ResponseWriter, r *http.Request) (contex
 	}
 	logEntrySetField(r, "site_url", config.SiteURL)
 
-	ctx = withNetlifyID(ctx, claims.NetlifyID)
+	ctx = withGothicID(ctx, claims.GothicID)
 	ctx = withFunctionHooks(ctx, claims.FunctionHooks)
 
 	ctx, err = WithInstanceConfig(ctx, config, instanceID)
@@ -163,7 +163,7 @@ func (a *API) extractOperatorRequest(w http.ResponseWriter, req *http.Request) (
 	if token == "" || token != a.config.OperatorToken {
 		return nil, token, unauthorizedError("Request does not include an Operator token")
 	}
-	return withAdminUser(req.Context(), &models.User{ID: uuid.Nil, Email: "operator@netlify.com"}), token, nil
+	return withAdminUser(req.Context(), &models.User{ID: uuid.Nil, Email: "operator@gothic.com"}), token, nil
 }
 
 func (a *API) requireAdminCredentials(w http.ResponseWriter, req *http.Request) (context.Context, error) {

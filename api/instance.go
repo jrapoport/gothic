@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 	"github.com/pkg/errors"
 )
 
@@ -34,8 +34,8 @@ func (a *API) GetAppManifest(w http.ResponseWriter, r *http.Request) error {
 	// TODO update to real manifest
 	return sendJSON(w, http.StatusOK, map[string]string{
 		"version":     a.version,
-		"name":        "GoTrue",
-		"description": "GoTrue is a user registration and authentication API",
+		"name":        "Gothic",
+		"description": "Gothic is a user registration and authentication API",
 	})
 }
 

@@ -170,7 +170,7 @@ func LoadGlobal(filename string) (*GlobalConfiguration, error) {
 	}
 
 	config := new(GlobalConfiguration)
-	if err := envconfig.Process("gotrue", config); err != nil {
+	if err := envconfig.Process("gothic", config); err != nil {
 		return nil, err
 	}
 
@@ -193,7 +193,7 @@ func LoadConfig(filename string) (*Configuration, error) {
 	}
 
 	config := new(Configuration)
-	if err := envconfig.Process("gotrue", config); err != nil {
+	if err := envconfig.Process("gothic", config); err != nil {
 		return nil, err
 	}
 	config.ApplyDefaults()

@@ -12,10 +12,10 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/gofrs/uuid"
 	"github.com/imdario/mergo"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/mailer"
-	"github.com/netlify/gotrue/storage"
-	"github.com/netlify/gotrue/util"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/mailer"
+	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/util"
 	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"github.com/sirupsen/logrus"
@@ -42,7 +42,7 @@ type API struct {
 func ListenAndServeREST(a *API, globalConfig *conf.GlobalConfiguration) {
 	go func() {
 		addr := fmt.Sprintf("%v:%v", globalConfig.API.Host, globalConfig.API.RestPort)
-		logrus.Infof("GoTrue REST API started on: %s", addr)
+		logrus.Infof("Gothic REST API started on: %s", addr)
 		a.ListenAndServe(addr)
 	}()
 }

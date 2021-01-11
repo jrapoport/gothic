@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 	"github.com/netlify/mailme"
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +20,7 @@ type Mailer interface {
 	ValidateEmail(email string) error
 }
 
-// NewMailer returns a new gotrue mailer
+// NewMailer returns a new gothic mailer
 func NewMailer(instanceConfig *conf.Configuration) Mailer {
 	if instanceConfig.SMTP.Host == "" {
 		return &noopMailer{}

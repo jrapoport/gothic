@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/netlify/gotrue/rpc/servers/config;config";
+option go_package = "github.com/jrapoport/gothic/rpc/servers/config;config";
 
 package config;
 
