@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
+	"github.com/jrapoport/gothic/conf"
 )
 
 const (

@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/storage"
-	"github.com/netlify/gotrue/storage/test"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/storage/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -161,27 +161,27 @@ func (ts *UserTestSuite) TestFindUserWithRefreshToken() {
 }
 
 func (ts *UserTestSuite) TestIsDuplicatedEmail() {
-	u := ts.createUserWithEmail("david.calavera@netlify.com")
+	u := ts.createUserWithEmail("test.user@gothic.com")
 
-	e, err := IsDuplicatedEmail(ts.db, u.InstanceID, "david.calavera@netlify.com", "test")
+	e, err := IsDuplicatedEmail(ts.db, u.InstanceID, "test.user@gothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.True(ts.T(), e, "expected email to be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "davidcalavera@netlify.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "testuser@gothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected email to not be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "david@netlify.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "testusergothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected same email to not be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "david.calavera@netlify.com", "other-aud")
+	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "test.user@gothic.com", "other-aud")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected same email to not be duplicated")
 }
 
 func (ts *UserTestSuite) createUser() *User {
-	return ts.createUserWithEmail("david@netlify.com")
+	return ts.createUserWithEmail("testusergothic.com")
 }
 
 func (ts *UserTestSuite) createUserWithEmail(email string) *User {

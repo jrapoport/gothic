@@ -8,11 +8,11 @@ please read the [code of conduct](CODE_OF_CONDUCT.md).
 > Install Go 1.11.1
 > Install Docker to run tests
 
-GoTrue uses the Go Modules support built into Go 1.11 to build. The easiest is to clone GoTrue in a directory outside of GOPATH, as in the following example:
+Gothic uses the Go Modules support built into Go 1.11 to build. The easiest is to clone Gothic in a directory outside of GOPATH, as in the following example:
 
 ```sh
-$ git clone https://github.com/netlify/gotrue
-$ cd gotrue
+$ git clone https://github.com/jrapoport/gothic
+$ cd gothic
 $ make deps
 ```
 
@@ -57,5 +57,5 @@ We actively welcome your pull requests.
 
 ## License
 
-By contributing to Netlify CMS, you agree that your contributions will be licensed
+By contributing to Gothic CMS, you agree that your contributions will be licensed
 under its [MIT license](LICENSE).

@@ -5,14 +5,14 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 )
 
 type contextKey string
 
 func (c contextKey) String() string {
-	return "gotrue api context key " + string(c)
+	return "gothic api context key " + string(c)
 }
 
 const (
@@ -23,7 +23,7 @@ const (
 	instanceIDKey           = contextKey("instance_id")
 	instanceKey             = contextKey("instance")
 	signatureKey            = contextKey("signature")
-	netlifyIDKey            = contextKey("netlify_id")
+	gothicIDKey            = contextKey("gothic_id")
 	externalProviderTypeKey = contextKey("external_provider_type")
 	userKey                 = contextKey("user")
 	externalReferrerKey     = contextKey("external_referrer")
@@ -46,12 +46,12 @@ func getToken(ctx context.Context) *jwt.Token {
 	return obj.(*jwt.Token)
 }
 
-func getClaims(ctx context.Context) *GoTrueClaims {
+func getClaims(ctx context.Context) *GothicClaims {
 	token := getToken(ctx)
 	if token == nil {
 		return nil
 	}
-	return token.Claims.(*GoTrueClaims)
+	return token.Claims.(*GothicClaims)
 }
 
 // withRequestID adds the provided request ID to the context.
@@ -139,14 +139,14 @@ func getSignature(ctx context.Context) string {
 	return obj.(string)
 }
 
-// withNetlifyID adds the provided request ID to the context.
-func withNetlifyID(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, netlifyIDKey, id)
+// withGothicID adds the provided request ID to the context.
+func withGothicID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, gothicIDKey, id)
 }
 
-// getNetlifyID reads the request ID from the context.
-func getNetlifyID(ctx context.Context) string {
-	obj := ctx.Value(netlifyIDKey)
+// getGothicID reads the request ID from the context.
+func getGothicID(ctx context.Context) string {
+	obj := ctx.Value(gothicIDKey)
 	if obj == nil {
 		return ""
 	}
