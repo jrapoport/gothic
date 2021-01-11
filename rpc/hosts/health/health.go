@@ -5,7 +5,7 @@ package health
 import (
 	"context"
 
-	"github.com/netlify/gotrue/rpc/hosts"
+	"github.com/jrapoport/gothic/rpc/hosts"
 )
 
 type rpcHealthHost struct {

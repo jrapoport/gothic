@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
+	"github.com/jrapoport/gothic/conf"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/mocktracer"
 	"github.com/stretchr/testify/assert"

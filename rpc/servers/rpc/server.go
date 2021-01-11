@@ -1,10 +1,10 @@
 package rpc
 
 import (
-	"github.com/netlify/gotrue/api"
-	"github.com/netlify/gotrue/rpc/hosts"
-	"github.com/netlify/gotrue/rpc/hosts/config"
-	"github.com/netlify/gotrue/rpc/hosts/health"
+	"github.com/jrapoport/gothic/api"
+	"github.com/jrapoport/gothic/rpc/hosts"
+	"github.com/jrapoport/gothic/rpc/hosts/config"
+	"github.com/jrapoport/gothic/rpc/hosts/health"
 	"google.golang.org/grpc"
 )
 

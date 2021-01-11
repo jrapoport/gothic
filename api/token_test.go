@@ -2,14 +2,14 @@ package api
 
 import (
 	"bytes"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
+	"github.com/jrapoport/gothic/conf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -25,7 +25,7 @@ type TokenTestSuite struct {
 }
 
 func TestToken(t *testing.T) {
-	os.Setenv("GOTRUE_RATE_LIMIT_HEADER", "My-Custom-Header")
+	os.Setenv("GOTHIC_RATE_LIMIT_HEADER", "My-Custom-Header")
 	api, config, instanceID, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 

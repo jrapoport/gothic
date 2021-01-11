@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/metering"
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/metering"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 )
 
-// GoTrueClaims is a struct thats used for JWT claims
-type GoTrueClaims struct {
+// GothicClaims is a struct thats used for JWT claims
+type GothicClaims struct {
 	jwt.StandardClaims
 	Email        string                 `json:"email"`
 	AppMetaData  map[string]interface{} `json:"app_metadata"`
@@ -167,7 +167,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 }
 
 func generateAccessToken(user *models.User, expiresIn time.Duration, secret string, method jwt.SigningMethod) (string, error) {
-	claims := &GoTrueClaims{
+	claims := &GothicClaims{
 		StandardClaims: jwt.StandardClaims{
 			Subject:   user.ID.String(),
 			Audience:  jwt.ClaimStrings{user.Aud},

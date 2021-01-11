@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/api"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/rpc/servers"
-	"github.com/netlify/gotrue/storage"
-	"github.com/netlify/gotrue/util"
+	"github.com/jrapoport/gothic/api"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/rpc/servers"
+	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

@@ -1,8 +1,8 @@
 package hosts
 
 import (
-	"github.com/netlify/gotrue/api"
-	"github.com/netlify/gotrue/util"
+	"github.com/jrapoport/gothic/api"
+	"github.com/jrapoport/gothic/util"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

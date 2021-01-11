@@ -4,13 +4,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/netlify/gotrue/conf"
+	"github.com/jrapoport/gothic/conf"
 )
 
 var configFile = ""
 
 var rootCmd = cobra.Command{
-	Use: "gotrue",
+	Use: "gothic",
 	Run: func(cmd *cobra.Command, args []string) {
 		execWithConfig(cmd, serve)
 	},

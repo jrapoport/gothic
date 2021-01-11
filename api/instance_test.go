@@ -3,15 +3,15 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gofrs/uuid"
 
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -48,7 +48,7 @@ func (ts *InstanceTestSuite) TestCreate() {
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
 		"uuid":     testUUID,
-		"site_url": "https://example.netlify.com",
+		"site_url": "https://example.gothic.com",
 		"config": map[string]interface{}{
 			"jwt": map[string]interface{}{
 				"secret": "testsecret",

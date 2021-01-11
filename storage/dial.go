@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
+	"github.com/jrapoport/gothic/conf"
 	"github.com/onrik/gorm-logrus"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -37,7 +37,7 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 	}
 
 	if config.DB.Database == "" {
-		config.DB.Driver = "gotrue"
+		config.DB.Driver = "gothic"
 		if config.DB.Namespace != "" {
 			config.DB.Driver += "_" + config.DB.Namespace
 		}

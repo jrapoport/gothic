@@ -1,13 +1,13 @@
 package models_test
 
 import (
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/storage/test"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage/test"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
 
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
 )
 

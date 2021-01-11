@@ -6,7 +6,7 @@ help: ## Show this help.
 all: lint vet test build ## Run the tests and build the binary.
 
 build: ## Build the binary.
-	go build -ldflags "-X github.com/netlify/gotrue/cmd.Version=`git rev-parse HEAD`"
+	go build -ldflags "-X github.com/jrapoport/gothic/cmd.Version=`git rev-parse HEAD`"
 
 rpc:
 	@go generate ./...

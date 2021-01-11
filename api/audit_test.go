@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,8 +11,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"

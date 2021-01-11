@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/netlify/gotrue/cmd"
+	"github.com/jrapoport/gothic/cmd"
 )
 
 func main() {

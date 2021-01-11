@@ -11,14 +11,14 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/api/provider"
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/api/provider"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/sirupsen/logrus"
 )
 
 type ExternalProviderClaims struct {
-	NetlifyMicroserviceClaims
+	GothicMicroserviceClaims
 	Provider    string `json:"provider"`
 	InviteToken string `json:"invite_token,omitempty"`
 	Referrer    string `json:"referrer,omitempty"`
@@ -56,13 +56,13 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 	log.WithField("provider", providerType).Info("Redirecting to external provider")
 
 	token := jwt.NewWithClaims(config.JWT.SigningMethod(), ExternalProviderClaims{
-		NetlifyMicroserviceClaims: NetlifyMicroserviceClaims{
+		GothicMicroserviceClaims: GothicMicroserviceClaims{
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: jwt.At(time.Now().Add(5 * time.Minute)),
 			},
 			SiteURL:    config.SiteURL,
 			InstanceID: getInstanceID(ctx).String(),
-			NetlifyID:  getNetlifyID(ctx),
+			GothicID:  getGothicID(ctx),
 		},
 		Provider:    providerType,
 		InviteToken: inviteToken,
