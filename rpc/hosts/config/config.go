@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/netlify/gotrue/rpc/hosts"
+	"github.com/jrapoport/gothic/rpc/hosts"
 	"google.golang.org/grpc/codes"
 )
 

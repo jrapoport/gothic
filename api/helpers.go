@@ -10,9 +10,9 @@ import (
 	"net/url"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

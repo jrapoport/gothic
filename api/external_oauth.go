@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/netlify/gotrue/api/provider"
+	"github.com/jrapoport/gothic/api/provider"
 	"github.com/sirupsen/logrus"
 )
 

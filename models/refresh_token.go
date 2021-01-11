@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/netlify/gotrue/crypto"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/crypto"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 )
 

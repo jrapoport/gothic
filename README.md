@@ -1,54 +1,52 @@
+# 🦇 Gothic
+
+Gothic is a user registration and authentication microservice written in Go.
+It's based on OAuth2 and JWT and will handle user signup, authentication and
+custom user data.
+
 ## Project History
 
-This project was originally forked from the
-[https://github.com/netlify/gotrue](https://github.com/netlify/gotrue).
+This project was originally forked from 
+[https://github.com/gothic/gothic](https://github.com/gothic/gothic).
 
-The purpose was to adopt newer, more developer friendly technologies like [Gorm](https://gorm.io/),
-[gRPC](https://grpc.io/), and [gRPC Web](https://github.com/grpc/grpc-web); newer versions
-of critical libraries like [JWT v4](https://github.com/dgrijalva/jwt-go); and migrate away from
-older libraries that are deprecated with [security flaws](https://github.com/gobuffalo/uuid).
+The purpose was to adopt newer, more developer friendly technologies like
+[Gorm](https://gorm.io/), [gRPC](https://grpc.io/), and [gRPC
+Web](https://github.com/grpc/grpc-web); newer versions of critical libraries
+like [JWT v4](https://github.com/dgrijalva/jwt-go); and migrate away from older
+libraries that are deprecated with [security
+flaws](https://github.com/gobuffalo/uuid).
 
-These changes allow for advances like self-contained database migration, expanded database driver
-support (e.g., PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to
-modify and use the microservice outside of Netlify tool chain, and in a more active development environment.
+These changes allow for advances like self-contained database migration,
+expanded database driver support (e.g., PostgreSQL), and gRPC support. Broadly
+speaking, they are intended to make it easier to modify and use the microservice
+outside of Netlify tool chain, and in a more active development environment.
 
-While the Netlify team did a good job with the original microservice, their use in production means they
-cannot easily adopt these kinds of significant changes. In many cases, they will likely never make them given the
-impacts to their tooling, deployment, and production systems — which makes perfect sense for their situation.
+While the Netlify team did a good job with the original effort, their use
+in production means they cannot easily adopt these kinds of significant changes.
+In many cases, they will likely never make them given the impacts to their
+tooling, deployment, and production systems — which makes perfect sense for
+their situation.
 
 I'd like to thank Netlify team for their hard work on the original version of
 this microservice.
 
-### NOTE: gRPC / gRPC Web support is in its infancy. 
-Currently only the scaffolding is in place with a few supported methods like healthcheck and settings. The intention 
-is to refactor the API over time to support both REST & gRPC.
+### NOTE: gRPC / gRPC Web support is in its infancy.
 
-# GoTrue - User management for APIs
-
-GoTrue is a small open-source API written in golang, that can act as a self-standing
-API service for handling user registration and authentication for JAM projects.
-
-It's based on OAuth2 and JWT and will handle user signup, authentication and custom
-user data.
-
-
-# GoTrue - User management for APIs
-
-GoTrue is a small open-source API written in golang, that can act as a self-standing
-API service for handling user registration and authentication for JAM projects.
-
-It's based on OAuth2 and JWT and will handle user signup, authentication and custom
-user data.
+Currently only the scaffolding is in place with a few supported methods like
+healthcheck and settings. The intention is to refactor the API over time to
+support both REST & gRPC.
 
 ## Configuration
 
-You may configure GoTrue using either a configuration file named `.env`,
-environment variables, or a combination of both. Environment variables are prefixed with `GOTRUE_`, and will always have precedence over values provided via file.
+You may configure Gothic using either a configuration file named `.env`,
+environment variables, or a combination of both. Environment variables are
+prefixed with `GOTHIC_`, and will always have precedence over values provided
+via file.
 
 ### Top-Level
 
 ```properties
-GOTRUE_SITE_URL=https://example.netlify.com/
+GOTHIC_SITE_URL=https://example.gothic.com/
 ```
 
 `SITE_URL` - `string` **required**
@@ -64,14 +62,14 @@ the payload values can be trusted.
 
 When signup is disabled the only way to create new users is through invites. Defaults to `false`, all signups enabled.
 
-`GOTRUE_RATE_LIMIT_HEADER` - `string`
+`GOTHIC_RATE_LIMIT_HEADER` - `string`
 
 Header on which to rate limit the `/token` endpoint.
 
 ### API
 
 ```properties
-GOTRUE_API_HOST=localhost
+GOTHIC_API_HOST=localhost
 REST_PORT=9999 # the http REST server port
 RPC_PORT=3001 # the gRPC server port
 RPCWEB_PORT=6001 # the gRPC Web server port
@@ -81,15 +79,15 @@ RPCWEB_PORT=6001 # the gRPC Web server port
 
 Hostname to listen on.
 
-`REST_PORT` (no prefix) / `GOTRUE_API_REST_PORT` - `number`
+`REST_PORT` (no prefix) / `GOTHIC_API_REST_PORT` - `number`
 
 Port number for the HTTP REST API server to listen on. Defaults to `8081`.
 
-`RPC_PORT` (no prefix) / `GOTRUE_API_RPC_PORT` - `number`
+`RPC_PORT` (no prefix) / `GOTHIC_API_RPC_PORT` - `number`
 
 Port number for the gRPC API server to listen on. Defaults to `3001`.
 
-`RPCWEB_PORT` (no prefix) / `GOTRUE_API_RPCWEB_PORT` - `number`
+`RPCWEB_PORT` (no prefix) / `GOTHIC_API_RPCWEB_PORT` - `number`
 
 Port number for the gRPC Web API server to listen on. Defaults to `6001`.
 
@@ -104,9 +102,9 @@ If you wish to inherit a request ID from the incoming request, specify the name 
 ### Database
 
 ```properties
-GOTRUE_DB_DRIVER=mysql
+GOTHIC_DB_DRIVER=mysql
 DATABASE_URL=root@localhost
-GOTRUE_DB_DATABASE=gotrue
+GOTHIC_DB_DATABASE=gothic
 ```
 
 `DB_DRIVER` - `string` **required**
@@ -117,9 +115,9 @@ Chooses what dialect of database you want. Must be `mysql`.
 
 Connection string for the database.
 
-`GOTRUE_DB_DATABASE` - `string`
+`GOTHIC_DB_DATABASE` - `string`
 
-The name of the database to create automatically. Defaults to `gotrue`.
+The name of the database to create automatically. Defaults to `gothic`.
 
 `DB_NAMESPACE` - `string`
 
@@ -129,14 +127,14 @@ Adds a prefix to all table names.
 
 Migrations *WILL BE* applied automatically if you start with 
 ```
-GOTRUE_DB_AUTOMIGRATE=true
+GOTHIC_DB_AUTOMIGRATE=true
 ```
 
 ### Logging
 
 ```properties
-LOG_LEVEL=debug # available without GOTRUE prefix (exception)
-GOTRUE_LOG_FILE=/var/log/go/gotrue.log
+LOG_LEVEL=debug # available without GOTHIC prefix (exception)
+GOTHIC_LOG_FILE=/var/log/go/gothic.log
 ```
 
 `LOG_LEVEL` - `string`
@@ -151,11 +149,11 @@ If you wish logs to be written to a file, set `log_file` to a valid file path.
 Currently, only the Datadog tracer is supported.
 
 ```properties
-GOTRUE_TRACING_ENABLED=true
-GOTRUE_TRACING_HOST=127.0.0.1
-GOTRUE_TRACING_PORT=8126
-GOTRUE_TRACING_TAGS="tag1:value1,tag2:value2"
-GOTRUE_SERVICE_NAME="gotrue"
+GOTHIC_TRACING_ENABLED=true
+GOTHIC_TRACING_HOST=127.0.0.1
+GOTHIC_TRACING_PORT=8126
+GOTHIC_TRACING_TAGS="tag1:value1,tag2:value2"
+GOTHIC_SERVICE_NAME="gothic"
 ```
 
 `TRACING_ENABLED` - `bool`
@@ -181,10 +179,10 @@ The name to use for the service.
 ### JSON Web Tokens (JWT)
 
 ```properties
-GOTRUE_JWT_SECRET=supersecretvalue
-GOTRUE_JWT_METHOD=HS256
-GOTRUE_JWT_EXP=3600
-GOTRUE_JWT_AUD=netlify
+GOTHIC_JWT_SECRET=supersecretvalue
+GOTHIC_JWT_METHOD=HS256
+GOTHIC_JWT_EXP=3600
+GOTHIC_JWT_AUD=gothic
 ```
 
 `JWT_SECRET` - `string` **required**
@@ -217,8 +215,8 @@ We support `bitbucket`, `github`, `gitlab`, and `google` for external authentica
 Use the names as the keys underneath `external` to configure each separately.
 
 ```properties
-GOTRUE_EXTERNAL_GITHUB_CLIENT_ID=myappclientid
-GOTRUE_EXTERNAL_GITHUB_SECRET=clientsecretvaluessssh
+GOTHIC_EXTERNAL_GITHUB_CLIENT_ID=myappclientid
+GOTHIC_EXTERNAL_GITHUB_SECRET=clientsecretvaluessssh
 ```
 
 No external providers are required, but you must provide the required values if you choose to enable any.
@@ -249,12 +247,12 @@ Sending email is not required, but highly recommended for password recovery.
 If enabled, you must provide the required values below.
 
 ```properties
-GOTRUE_SMTP_HOST=smtp.mandrillapp.com
-GOTRUE_SMTP_PORT=587
-GOTRUE_SMTP_USER=smtp-delivery@example.com
-GOTRUE_SMTP_PASS=correcthorsebatterystaple
-GOTRUE_SMTP_ADMIN_EMAIL=support@example.com
-GOTRUE_MAILER_SUBJECTS_CONFIRMATION="Please confirm"
+GOTHIC_SMTP_HOST=smtp.mandrillapp.com
+GOTHIC_SMTP_PORT=587
+GOTHIC_SMTP_USER=smtp-delivery@example.com
+GOTHIC_SMTP_PASS=correcthorsebatterystaple
+GOTHIC_SMTP_ADMIN_EMAIL=support@example.com
+GOTHIC_MAILER_SUBJECTS_CONFIRMATION="Please confirm"
 ```
 
 `SMTP_ADMIN_EMAIL` - `string` **required**
@@ -383,7 +381,7 @@ Shared secret to authorize webhook requests. This secret signs the [JSON Web Sig
 
 `WEBHOOK_RETRIES` - `number`
 
-How often GoTrue should try a failed hook.
+How often Gothic should try a failed hook.
 
 `WEBHOOK_TIMEOUT_SEC` - `number`
 
@@ -396,11 +394,11 @@ For example to listen to all events, provide the values `validate,signup,login`.
 
 ## Endpoints
 
-GoTrue exposes the following endpoints:
+Gothic exposes the following endpoints:
 
 * **GET /settings**
 
-  Returns the publicly available settings for this gotrue instance.
+  Returns the publicly available settings for this gothic instance.
 
   ```json
   {

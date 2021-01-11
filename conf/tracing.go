@@ -12,7 +12,7 @@ type TracingConfig struct {
 	Enabled     bool `default:"false"`
 	Host        string
 	Port        string
-	ServiceName string `default:"gotrue" split_words:"true"`
+	ServiceName string `default:"gothic" split_words:"true"`
 	Tags        map[string]string
 }
 

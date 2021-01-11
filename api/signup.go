@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 )
 
 // SignupParams are the parameters the Signup endpoint accepts

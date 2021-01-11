@@ -1,32 +1,32 @@
 {
-  "name": "Gotrue",
+  "name": "Gothic",
   "description": "",
-  "website": "https://www.gotrueapi.org",
-  "repository": "https://github.com/netlify/gotrue",
+  "website": "https://www.gothicapi.org",
+  "repository": "https://github.com/jrapoport/gothic",
   "env": {
     "DATABASE_URL": {},
-    "GOTRUE_DB_DRIVER": {
+    "GOTHIC_DB_DRIVER": {
       "value": "mysql"
     },
-    "GOTRUE_DB_AUTOMIGRATE": {
+    "GOTHIC_DB_AUTOMIGRATE": {
       "value": true
     },
-    "GOTRUE_DB_NAMESPACE": {
+    "GOTHIC_DB_NAMESPACE": {
       "value": "auth"
     },
-    "GOTRUE_JWT_SECRET": {
+    "GOTHIC_JWT_SECRET": {
       "required": true
     },
-    "GOTRUE_SMTP_ADMIN_EMAIL": {},
-    "GOTRUE_SMTP_HOST": {},
-    "GOTRUE_SMTP_PASS": {},
-    "GOTRUE_SMTP_PORT": {},
-    "GOTRUE_MAILER_SITE_URL": {},
-    "GOTRUE_MAILER_SUBJECTS_CONFIRMATION": {},
-    "GOTRUE_MAILER_SUBJECTS_RECOVERY": {},
-    "GOTRUE_MAILER_TEMPLATES_CONFIRMATION": {},
-    "GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE": {},
-    "GOTRUE_MAILER_TEMPLATES_RECOVERY": {},
-    "GOTRUE_MAILER_USER": {}
+    "GOTHIC_SMTP_ADMIN_EMAIL": {},
+    "GOTHIC_SMTP_HOST": {},
+    "GOTHIC_SMTP_PASS": {},
+    "GOTHIC_SMTP_PORT": {},
+    "GOTHIC_MAILER_SITE_URL": {},
+    "GOTHIC_MAILER_SUBJECTS_CONFIRMATION": {},
+    "GOTHIC_MAILER_SUBJECTS_RECOVERY": {},
+    "GOTHIC_MAILER_TEMPLATES_CONFIRMATION": {},
+    "GOTHIC_MAILER_TEMPLATES_EMAIL_CHANGE": {},
+    "GOTHIC_MAILER_TEMPLATES_RECOVERY": {},
+    "GOTHIC_MAILER_USER": {}
   }
 }

@@ -1,4 +1,4 @@
-module github.com/netlify/gotrue
+module github.com/jrapoport/gothic
 
 go 1.15
 
@@ -31,7 +31,7 @@ require (
 	golang.org/x/crypto v0.0.0-20201217014255-9d1352758620
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
-	golang.org/x/tools v0.0.0-20201218024724-ae774e9781d2 // indirect
+	golang.org/x/tools v0.0.0-20210108195828-e2f9c7f1fc8e // indirect
 	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1

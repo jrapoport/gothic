@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

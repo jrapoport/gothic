@@ -18,9 +18,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/netlify/gotrue/conf"
-	"github.com/netlify/gotrue/models"
-	"github.com/netlify/gotrue/storage"
+	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 )
 
 type HookEvent string
@@ -28,7 +28,7 @@ type HookEvent string
 const (
 	headerHookSignature = "x-webhook-signature"
 	defaultHookRetries  = 3
-	gotrueIssuer        = "gotrue"
+	gothicIssuer        = "gothic"
 	ValidateEvent       = "validate"
 	SignupEvent         = "signup"
 	LoginEvent          = "login"
@@ -217,7 +217,7 @@ func triggerHook(ctx context.Context, hookURL *url.URL, secret string, method jw
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt: jwt.Now(),
 			Subject:  instanceID.String(),
-			Issuer:   gotrueIssuer,
+			Issuer:   gothicIssuer,
 		},
 		SHA256: sha,
 	}
