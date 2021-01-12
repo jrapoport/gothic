@@ -41,9 +41,7 @@ func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.GlobalConfiguration
 	if err != nil {
 		return nil, nil, err
 	}
-	globalConfig.DB.Driver = "sqlite"
-	globalConfig.DB.URL = t.TempDir()
-	conn, err := test.SetupDBConnection(globalConfig)
+	conn, err := test.SetupDBConnection(t, globalConfig)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -19,6 +19,10 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const inviteEmail = "invite_test@example.com"
+const inviteAdminEmail = "invite_admin_test@example.com"
+
+
 type InviteTestSuite struct {
 	suite.Suite
 	API    *API
@@ -43,7 +47,7 @@ func (ts *InviteTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 
 	// Setup response recorder with super admin privileges
-	ts.token = ts.makeSuperAdmin("admin@example.com")
+	ts.token = ts.makeSuperAdmin(inviteAdminEmail)
 }
 
 func (ts *InviteTestSuite) makeSuperAdmin(email string) string {
@@ -78,7 +82,7 @@ func (ts *InviteTestSuite) TestInvite() {
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email": "test@example.com",
+		"email": inviteEmail,
 		"data": map[string]interface{}{
 			"a": 1,
 		},
@@ -100,7 +104,7 @@ func (ts *InviteTestSuite) TestInvite_WithoutAccess() {
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email": "test@example.com",
+		"email": inviteEmail,
 		"data": map[string]interface{}{
 			"a": 1,
 		},
@@ -118,7 +122,7 @@ func (ts *InviteTestSuite) TestInvite_WithoutAccess() {
 }
 
 func (ts *InviteTestSuite) TestVerifyInvite() {
-	user, err := models.NewUser("test@example.com", "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -127,7 +131,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, inviteEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -151,7 +155,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 }
 
 func (ts *InviteTestSuite) TestVerifyInvite_NoPassword() {
-	user, err := models.NewUser("test@example.com", "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -160,7 +164,7 @@ func (ts *InviteTestSuite) TestVerifyInvite_NoPassword() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, inviteEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -198,7 +202,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 		case "/api/v4/user":
 			userCount++
 			w.Header().Add("Content-Type", "application/json")
-			fmt.Fprint(w, `{"name":"Gitlab Test","email":"gitlab@example.com","avatar_url":"http://example.com/avatar","confirmed_at": "2020-01-01T00:00:00.000Z"}`)
+			fmt.Fprint(w, `{"name":"Gitlab Test","email":"invite_gitlab@example.com","avatar_url":"http://example.com/avatar","confirmed_at": "2020-01-01T00:00:00.000Z"}`)
 		case "/api/v4/user/emails":
 			w.Header().Add("Content-Type", "application/json")
 			fmt.Fprint(w, `[]`)
@@ -213,7 +217,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	// invite user
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(InviteParams{
-		Email: "gitlab@example.com",
+		Email: "invite_gitlab@example.com",
 	}))
 	req := httptest.NewRequest(http.MethodPost, "http://localhost/invite", &buffer)
 	req.Header.Set("Content-Type", "application/json")
@@ -224,7 +228,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state
@@ -266,7 +270,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Equal(1, userCount)
 
 	// ensure user has been created with metadata
-	user, err = models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err = models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
 	ts.Require().NoError(err)
 	ts.Equal("Gitlab Test", user.UserMetaData["full_name"])
 	ts.Equal("http://example.com/avatar", user.UserMetaData["avatar_url"])
@@ -289,7 +293,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab_MismatchedEmails() {
 		case "/api/v4/user":
 			userCount++
 			w.Header().Add("Content-Type", "application/json")
-			fmt.Fprint(w, `{"name":"Gitlab Test","email":"gitlab+mismatch@example.com","avatar_url":"http://example.com/avatar","confirmed_at": "2020-01-01T00:00:00.000Z"}`)
+			fmt.Fprint(w, `{"name":"Gitlab Test","email":"invite_gitlab+mismatch@example.com","avatar_url":"http://example.com/avatar","confirmed_at": "2020-01-01T00:00:00.000Z"}`)
 		case "/api/v4/user/emails":
 			w.Header().Add("Content-Type", "application/json")
 			fmt.Fprint(w, `[]`)
@@ -304,7 +308,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab_MismatchedEmails() {
 	// invite user
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(InviteParams{
-		Email: "gitlab@example.com",
+		Email: "invite_gitlab@example.com",
 	}))
 	req := httptest.NewRequest(http.MethodPost, "http://localhost/invite", &buffer)
 	req.Header.Set("Content-Type", "application/json")
@@ -315,7 +319,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab_MismatchedEmails() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state

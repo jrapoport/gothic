@@ -19,6 +19,10 @@ type UserTestSuite struct {
 }
 
 func (ts *UserTestSuite) SetupTest() {
+	//storage.TruncateAll(ts.db)
+}
+
+func (ts *UserTestSuite) TearDownTest() {
 	storage.TruncateAll(ts.db)
 }
 
@@ -26,7 +30,7 @@ func TestUser(t *testing.T) {
 	globalConfig, err := conf.LoadGlobal(modelsTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(globalConfig)
+	conn, err := test.SetupDBConnection(t, globalConfig)
 	require.NoError(t, err)
 
 	ts := &UserTestSuite{
@@ -162,7 +166,7 @@ func (ts *UserTestSuite) TestIsDuplicatedEmail() {
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected email to not be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, "testusergothic.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, "testuser@gothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected same email to not be duplicated")
 
@@ -172,7 +176,7 @@ func (ts *UserTestSuite) TestIsDuplicatedEmail() {
 }
 
 func (ts *UserTestSuite) createUser() *User {
-	return ts.createUserWithEmail("testusergothic.com")
+	return ts.createUserWithEmail("testuser@gothic.com")
 }
 
 func (ts *UserTestSuite) createUserWithEmail(email string) *User {
