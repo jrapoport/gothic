@@ -16,7 +16,7 @@ import (
 
 const (
 	apiTestVersion = "1"
-	apiTestConfig  = "../test.env"
+	apiTestConfig  = "../env/test.env"
 )
 
 func init() {

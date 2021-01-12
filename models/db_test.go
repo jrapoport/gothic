@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const modelsTestConfig = "../test.env"
+const modelsTestConfig = "../env/test.env"
 
 func TestTableNameNamespacing(t *testing.T) {
 	cases := []struct {
