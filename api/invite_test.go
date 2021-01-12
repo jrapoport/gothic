@@ -28,7 +28,7 @@ type InviteTestSuite struct {
 }
 
 func TestInvite(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
 	ts := &InviteTestSuite{

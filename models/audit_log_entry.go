@@ -95,8 +95,8 @@ func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterV
 		builder := bytes.NewBufferString("(")
 		values := make([]interface{}, len(filterColumns))
 
-		for idx, col := range filterColumns {
-			builder.WriteString(fmt.Sprintf("payload->>'$.%s' COLLATE utf8mb4_unicode_ci LIKE ?", col))
+		for idx, _ := range filterColumns {
+			builder.WriteString("payload LIKE ?")
 			values[idx] = lf
 
 			if idx+1 < len(filterColumns) {
@@ -104,7 +104,7 @@ func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterV
 			}
 		}
 		builder.WriteString(")")
-
+		fmt.Println(builder.String())
 		q = q.Where(builder.String(), values...)
 	}
 

@@ -27,7 +27,7 @@ type User struct {
 
 	Aud               string     `json:"aud" gorm:"type:varchar(255) DEFAULT NULL"`
 	Role              string     `json:"role" gorm:"type:varchar(255) DEFAULT NULL"`
-	Email             string     `json:"email" gorm:"index:users_instance_id_email_idx;type:varchar(255) DEFAULT NULL"`
+	Email             string     `json:"email" gorm:"type:varchar(255) DEFAULT NULL"`
 	EncryptedPassword string     `json:"-" gorm:"type:varchar(255) DEFAULT NULL"`
 	ConfirmedAt       *time.Time `json:"confirmed_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
 	InvitedAt         *time.Time `json:"invited_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
@@ -64,14 +64,14 @@ func NewUser(email, password, aud string, userData map[string]interface{}) (*Use
 		return nil, err
 	}
 
-	user := &User{
+	u := &User{
 		ID:                id,
 		Aud:               aud,
 		Email:             email,
 		UserMetaData:      userData,
 		EncryptedPassword: pw,
 	}
-	return user, nil
+	return u, nil
 }
 
 func NewSystemUser(aud string) *User {
@@ -223,9 +223,9 @@ func (u *User) Recover(tx *storage.Connection) error {
 }
 
 // CountOtherUsers counts how many other users exist besides the one provided
-func CountOtherUsers(tx *storage.Connection, instanceID, id uuid.UUID) (int, error) {
+func CountOtherUsers(tx *storage.Connection, id uuid.UUID) (int, error) {
 	var userCount int64
-	err := tx.Model(&User{}).Where("instance_id = ? and id != ?", instanceID, id).Count(&userCount).Error
+	err := tx.Model(&User{}).Where("id != ?", id).Count(&userCount).Error
 	return int(userCount), errors.Wrap(err, "error finding registered users")
 }
 
@@ -284,11 +284,20 @@ func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Paginat
 	users := []*User{}
 	q := tx.Model(users).Where("aud = ?", aud)
 
+	// BUG: the free text search of metadata feels odd. need to rethink the metadata approach.
+	//  instead for now we will treat filter like "email filter"
 	if filter != "" {
 		lf := "%" + filter + "%"
-		// we must specify the collation in order to get case insensitive search for the JSON column
-		q = q.Where("(email LIKE ? OR raw_user_meta_data->>'$.full_name' COLLATE utf8mb4_unicode_ci LIKE ?)", lf, lf)
+		q = q.Where("(email LIKE ? OR raw_user_meta_data COLLATE utf8mb4_unicode_ci LIKE ?)",
+			lf, lf)
 	}
+	/*
+		if filter != "" {
+			lf := "%" + filter + "%"
+			// we must specify the collation in order to get case insensitive search for the JSON column
+			q = q.Where("(email LIKE ? OR raw_user_meta_data->>'$.full_name' COLLATE utf8mb4_unicode_ci LIKE ?)", lf, lf)
+		}
+	*/
 
 	if sortParams != nil && len(sortParams.Fields) > 0 {
 		for _, field := range sortParams.Fields {

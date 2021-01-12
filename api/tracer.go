@@ -49,7 +49,7 @@ func tracer(next http.Handler) http.Handler {
 
 		status := trw.statusCode
 
-		// Setting the status as an int doesn't propogate for use in datadog dashboards,
+		// Setting the status as an int doesn't propagate for use in datadog dashboards,
 		// so we convert to a string.
 		span.SetTag(string(ext.HTTPStatusCode), strconv.Itoa(status))
 

@@ -26,7 +26,7 @@ type AuditTestSuite struct {
 }
 
 func TestAudit(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
 	ts := &AuditTestSuite{
@@ -39,7 +39,7 @@ func TestAudit(t *testing.T) {
 
 func (ts *AuditTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
-	ts.token = ts.makeSuperAdmin("test@example.com")
+	ts.token = ts.makeSuperAdmin("admin@example.com")
 }
 
 func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
@@ -84,7 +84,7 @@ func (ts *AuditTestSuite) TestAuditGet() {
 
 	require.Len(ts.T(), logs, 1)
 	require.Contains(ts.T(), logs[0].Payload, "actor_email")
-	assert.Equal(ts.T(), "test@example.com", logs[0].Payload["actor_email"])
+	assert.Equal(ts.T(), "admin@example.com", logs[0].Payload["actor_email"])
 	traits, ok := logs[0].Payload["traits"].(map[string]interface{})
 	require.True(ts.T(), ok)
 	require.Contains(ts.T(), traits, "user_email")
@@ -108,13 +108,17 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 
 		ts.API.handler.ServeHTTP(w, req)
 		require.Equal(ts.T(), http.StatusOK, w.Code)
+		if w.Code != http.StatusOK {
+			ts.T().Log(w.Body.String())
+			ts.T().FailNow()
+		}
 
 		logs := []models.AuditLogEntry{}
 		require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&logs))
 
 		require.Len(ts.T(), logs, 1)
 		require.Contains(ts.T(), logs[0].Payload, "actor_email")
-		assert.Equal(ts.T(), "test@example.com", logs[0].Payload["actor_email"])
+		assert.Equal(ts.T(), "admin@example.com", logs[0].Payload["actor_email"])
 		traits, ok := logs[0].Payload["traits"].(map[string]interface{})
 		require.True(ts.T(), ok)
 		require.Contains(ts.T(), traits, "user_email")

@@ -87,10 +87,11 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 		orm.Exec(fmt.Sprintf(
 			"CREATE DATABASE IF NOT EXISTS %s",
 			config.DB.Database))
+
+		orm.Exec(fmt.Sprintf(
+			"USE %s",
+			config.DB.Database))
 	}
-	orm.Exec(fmt.Sprintf(
-		"USE %s",
-		config.DB.Database))
 
 	conn := &Connection{DB: orm}
 	conn = conn.withContext(context.Background(), config)
