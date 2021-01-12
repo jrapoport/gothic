@@ -28,7 +28,6 @@ type AuditTestSuite struct {
 const auditAdminEmail = "admin@audit.com"
 const auditUserEmail = "user@audit.com"
 
-
 func TestAudit(t *testing.T) {
 	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
