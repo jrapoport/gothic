@@ -20,7 +20,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 	globalConfig, err := conf.LoadGlobal(apiTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(globalConfig)
+	conn, err := test.SetupDBConnection(t, globalConfig)
 	require.NoError(t, err)
 
 	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
@@ -61,7 +61,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 	globalConfig, err := conf.LoadGlobal(apiTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(globalConfig)
+	conn, err := test.SetupDBConnection(t, globalConfig)
 	require.NoError(t, err)
 
 	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)

@@ -25,6 +25,10 @@ type AuditTestSuite struct {
 	token string
 }
 
+const auditAdminEmail = "admin@audit.com"
+const auditUserEmail = "user@audit.com"
+
+
 func TestAudit(t *testing.T) {
 	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
@@ -39,7 +43,7 @@ func TestAudit(t *testing.T) {
 
 func (ts *AuditTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
-	ts.token = ts.makeSuperAdmin("admin@example.com")
+	ts.token = ts.makeSuperAdmin(auditAdminEmail)
 }
 
 func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
@@ -68,7 +72,6 @@ func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
 func (ts *AuditTestSuite) TestAuditGet() {
 	ts.prepareDeleteEvent()
 	// CHECK FOR AUDIT LOG
-
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/admin/audit", nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ts.token))
@@ -84,11 +87,11 @@ func (ts *AuditTestSuite) TestAuditGet() {
 
 	require.Len(ts.T(), logs, 1)
 	require.Contains(ts.T(), logs[0].Payload, "actor_email")
-	assert.Equal(ts.T(), "admin@example.com", logs[0].Payload["actor_email"])
+	assert.Equal(ts.T(), auditAdminEmail, logs[0].Payload["actor_email"])
 	traits, ok := logs[0].Payload["traits"].(map[string]interface{})
 	require.True(ts.T(), ok)
 	require.Contains(ts.T(), traits, "user_email")
-	assert.Equal(ts.T(), "test-delete@example.com", traits["user_email"])
+	assert.Equal(ts.T(), auditUserEmail, traits["user_email"])
 }
 
 func (ts *AuditTestSuite) TestAuditFilters() {
@@ -98,7 +101,7 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 		"/admin/audit?query=action:user_deleted",
 		"/admin/audit?query=type:team",
 		"/admin/audit?query=author:user",
-		"/admin/audit?query=author:@example.com",
+		"/admin/audit?query=author:@audit.com",
 	}
 
 	for _, q := range queries {
@@ -118,17 +121,17 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 
 		require.Len(ts.T(), logs, 1)
 		require.Contains(ts.T(), logs[0].Payload, "actor_email")
-		assert.Equal(ts.T(), "admin@example.com", logs[0].Payload["actor_email"])
+		assert.Equal(ts.T(), auditAdminEmail, logs[0].Payload["actor_email"])
 		traits, ok := logs[0].Payload["traits"].(map[string]interface{})
 		require.True(ts.T(), ok)
 		require.Contains(ts.T(), traits, "user_email")
-		assert.Equal(ts.T(), "test-delete@example.com", traits["user_email"])
+		assert.Equal(ts.T(), auditUserEmail, traits["user_email"])
 	}
 }
 
 func (ts *AuditTestSuite) prepareDeleteEvent() {
 	// DELETE USER
-	u, err := models.NewUser("test-delete@example.com", "test", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(auditUserEmail, "test", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error making new user")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 
