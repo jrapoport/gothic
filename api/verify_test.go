@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,10 +10,13 @@ import (
 
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
+
+const verifyEmail = "verify_test@example.com"
 
 type VerifyTestSuite struct {
 	suite.Suite
@@ -38,13 +40,13 @@ func (ts *VerifyTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 
 	// Create user
-	u, err := models.NewUser("test@example.com", "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(verifyEmail, "password", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
 func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 	u.RecoverySentAt = &time.Time{}
 	require.NoError(ts.T(), ts.API.db.Save(u).Error)
@@ -52,7 +54,7 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email": "test@example.com",
+		"email": verifyEmail,
 	}))
 
 	// Setup request
@@ -64,7 +66,7 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	assert.WithinDuration(ts.T(), time.Now(), *u.RecoverySentAt, 1*time.Second)
@@ -84,7 +86,7 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 	assert.True(ts.T(), u.IsConfirmed())
 }

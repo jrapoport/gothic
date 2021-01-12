@@ -52,11 +52,9 @@ func init() {
 
 // AuditLogEntry is the database model for audit log entries.
 type AuditLogEntry struct {
-	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
-
-	Payload JSONMap `json:"payload" gorm:"type:JSON NULL DEFAULT NULL"`
-
-	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp NULL DEFAULT NULL"`
+	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
+	Payload   JSONMap   `json:"payload"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, traits map[string]interface{}) error {
