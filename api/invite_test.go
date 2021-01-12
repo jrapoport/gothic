@@ -22,7 +22,6 @@ import (
 const inviteEmail = "invite_test@example.com"
 const inviteAdminEmail = "invite_admin_test@example.com"
 
-
 type InviteTestSuite struct {
 	suite.Suite
 	API    *API
