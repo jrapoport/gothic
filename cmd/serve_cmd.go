@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/api"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/rpc/servers"
@@ -23,7 +22,7 @@ var serveCmd = cobra.Command{
 }
 
 func serve(globalConfig *conf.GlobalConfiguration, config *conf.Configuration) {
-	ctx, err := api.WithInstanceConfig(context.Background(), config, uuid.Nil)
+	ctx, err := api.WithConfig(context.Background(), config)
 	if err != nil {
 		logrus.Fatalf("Error loading instance config: %+v", err)
 	}

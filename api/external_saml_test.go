@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/beevik/etree"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/russellhaering/gosaml2/types"
@@ -28,19 +27,17 @@ import (
 
 type ExternalSamlTestSuite struct {
 	suite.Suite
-	API        *API
-	Config     *conf.Configuration
-	instanceID uuid.UUID
+	API    *API
+	Config *conf.Configuration
 }
 
 func TestExternalSaml(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &ExternalSamlTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)
@@ -186,7 +183,7 @@ func (ts *ExternalSamlTestSuite) TestSignupExternalSaml_Callback() {
 	ts.Equal("bearer", v.Get("token_type"))
 
 	// ensure user has been created
-	_, err = models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "saml@example.com", ts.Config.JWT.Aud)
+	_, err = models.FindUserByEmailAndAudience(ts.API.db, "saml@example.com", ts.Config.JWT.Aud)
 	ts.Require().NoError(err)
 }
 

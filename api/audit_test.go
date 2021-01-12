@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
@@ -23,18 +22,16 @@ type AuditTestSuite struct {
 	API    *API
 	Config *conf.Configuration
 
-	token      string
-	instanceID uuid.UUID
+	token string
 }
 
 func TestAudit(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &AuditTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)
@@ -46,7 +43,7 @@ func (ts *AuditTestSuite) SetupTest() {
 }
 
 func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
-	u, err := models.NewUser(ts.instanceID, email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test User"})
+	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test User"})
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true
@@ -127,7 +124,7 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 
 func (ts *AuditTestSuite) prepareDeleteEvent() {
 	// DELETE USER
-	u, err := models.NewUser(ts.instanceID, "test-delete@example.com", "test", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser("test-delete@example.com", "test", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error making new user")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 

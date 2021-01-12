@@ -19,7 +19,6 @@ func TestTableNameNamespacing(t *testing.T) {
 		value    interface{}
 	}{
 		{expected: "test_audit_log_entries", value: []*models.AuditLogEntry{}},
-		{expected: "test_instances", value: []*models.Instance{}},
 		{expected: "test_refresh_tokens", value: []*models.RefreshToken{}},
 		{expected: "test_users", value: []*models.User{}},
 	}

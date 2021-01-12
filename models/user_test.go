@@ -3,7 +3,6 @@ package models
 import (
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/jrapoport/gothic/storage/test"
@@ -38,7 +37,7 @@ func TestUser(t *testing.T) {
 }
 
 func (ts *UserTestSuite) TestUpdateAppMetadata() {
-	u, err := NewUser(uuid.Nil, "", "", "", nil)
+	u, err := NewUser("", "", "", nil)
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), u.UpdateAppMetaData(ts.db, make(map[string]interface{})))
 
@@ -57,7 +56,7 @@ func (ts *UserTestSuite) TestUpdateAppMetadata() {
 }
 
 func (ts *UserTestSuite) TestUpdateUserMetadata() {
-	u, err := NewUser(uuid.Nil, "", "", "", nil)
+	u, err := NewUser("", "", "", nil)
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), u.UpdateUserMetaData(ts.db, make(map[string]interface{})))
 
@@ -86,18 +85,18 @@ func (ts *UserTestSuite) TestFindUserByConfirmationToken() {
 func (ts *UserTestSuite) TestFindUserByEmailAndAudience() {
 	u := ts.createUser()
 
-	n, err := FindUserByEmailAndAudience(ts.db, u.InstanceID, u.Email, "test")
+	n, err := FindUserByEmailAndAudience(ts.db, u.Email, "test")
 	require.NoError(ts.T(), err)
 	require.Equal(ts.T(), u.ID, n.ID)
 
-	_, err = FindUserByEmailAndAudience(ts.db, u.InstanceID, u.Email, "invalid")
+	_, err = FindUserByEmailAndAudience(ts.db, u.Email, "invalid")
 	require.EqualError(ts.T(), err, UserNotFoundError{}.Error())
 }
 
 func (ts *UserTestSuite) TestFindUsersInAudience() {
 	u := ts.createUser()
 
-	n, err := FindUsersInAudience(ts.db, u.InstanceID, u.Aud, nil, nil, "")
+	n, err := FindUsersInAudience(ts.db, u.Aud, nil, nil, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 
@@ -105,7 +104,7 @@ func (ts *UserTestSuite) TestFindUsersInAudience() {
 		Page:    1,
 		PerPage: 50,
 	}
-	n, err = FindUsersInAudience(ts.db, u.InstanceID, u.Aud, &p, nil, "")
+	n, err = FindUsersInAudience(ts.db, u.Aud, &p, nil, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 	assert.Equal(ts.T(), uint64(1), p.Count)
@@ -115,7 +114,7 @@ func (ts *UserTestSuite) TestFindUsersInAudience() {
 			SortField{Name: "created_at", Dir: Descending},
 		},
 	}
-	n, err = FindUsersInAudience(ts.db, u.InstanceID, u.Aud, nil, sp, "")
+	n, err = FindUsersInAudience(ts.db, u.Aud, nil, sp, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 }
@@ -124,14 +123,6 @@ func (ts *UserTestSuite) TestFindUserByID() {
 	u := ts.createUser()
 
 	n, err := FindUserByID(ts.db, u.ID)
-	require.NoError(ts.T(), err)
-	require.Equal(ts.T(), u.ID, n.ID)
-}
-
-func (ts *UserTestSuite) TestFindUserByInstanceIDAndID() {
-	u := ts.createUser()
-
-	n, err := FindUserByInstanceIDAndID(ts.db, u.InstanceID, u.ID)
 	require.NoError(ts.T(), err)
 	require.Equal(ts.T(), u.ID, n.ID)
 }
@@ -161,21 +152,21 @@ func (ts *UserTestSuite) TestFindUserWithRefreshToken() {
 }
 
 func (ts *UserTestSuite) TestIsDuplicatedEmail() {
-	u := ts.createUserWithEmail("test.user@gothic.com")
+	_ = ts.createUserWithEmail("test.user@gothic.com")
 
-	e, err := IsDuplicatedEmail(ts.db, u.InstanceID, "test.user@gothic.com", "test")
+	e, err := IsDuplicatedEmail(ts.db, "test.user@gothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.True(ts.T(), e, "expected email to be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "testuser@gothic.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, "testuser@gothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected email to not be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "testusergothic.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, "testusergothic.com", "test")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected same email to not be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, u.InstanceID, "test.user@gothic.com", "other-aud")
+	e, err = IsDuplicatedEmail(ts.db, "test.user@gothic.com", "other-aud")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected same email to not be duplicated")
 }
@@ -185,7 +176,7 @@ func (ts *UserTestSuite) createUser() *User {
 }
 
 func (ts *UserTestSuite) createUserWithEmail(email string) *User {
-	user, err := NewUser(uuid.Nil, email, "secret", "test", nil)
+	user, err := NewUser(email, "secret", "test", nil)
 	require.NoError(ts.T(), err)
 
 	err = ts.db.Create(user).Error

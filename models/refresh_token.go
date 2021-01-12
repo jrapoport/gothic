@@ -15,12 +15,10 @@ func init() {
 
 // RefreshToken is the database model for refresh tokens.
 type RefreshToken struct {
-	InstanceID uuid.UUID `json:"-" gorm:"index:refresh_tokens_instance_id_idx;index:refresh_tokens_instance_id_user_id_idx;type:varchar(255) DEFAULT NULL"`
-	ID         int64     `gorm:"primaryKey"`
+	ID int64 `gorm:"primaryKey"`
 
-	Token string `gorm:"index:refresh_tokens_token_idx;type:varchar(255) DEFAULT NULL"`
-
-	UserID uuid.UUID `gorm:"index:refresh_tokens_instance_id_user_id_idx;type:varchar(255) DEFAULT NULL"`
+	Token  string    `gorm:"index:refresh_tokens_token_idx;type:varchar(255) DEFAULT NULL"`
+	UserID uuid.UUID `gorm:"index:user_id_idx;type:varchar(255) DEFAULT NULL"`
 
 	Revoked   bool      `gorm:"type:tinyint(1) DEFAULT NULL"`
 	CreatedAt time.Time `gorm:"type:timestamp NULL DEFAULT NULL"`
@@ -37,7 +35,7 @@ func GrantRefreshTokenSwap(tx *storage.Connection, user *User, token *RefreshTok
 	var newToken *RefreshToken
 	err := tx.Transaction(func(rtx *storage.Connection) error {
 		var terr error
-		if terr = NewAuditLogEntry(rtx, user.InstanceID, user, TokenRevokedAction, nil); terr != nil {
+		if terr = NewAuditLogEntry(rtx, user, TokenRevokedAction, nil); terr != nil {
 			return errors.Wrap(terr, "error creating audit log entry")
 		}
 
@@ -52,15 +50,14 @@ func GrantRefreshTokenSwap(tx *storage.Connection, user *User, token *RefreshTok
 }
 
 // Logout deletes all refresh tokens for a user.
-func Logout(tx *storage.Connection, instanceID uuid.UUID, id uuid.UUID) error {
-	return tx.Where("instance_id = ? AND user_id = ?", instanceID, id).Delete(&RefreshToken{}).Error
+func Logout(tx *storage.Connection, uid uuid.UUID) error {
+	return tx.Where("user_id = ?", uid).Delete(&RefreshToken{}).Error
 }
 
 func createRefreshToken(tx *storage.Connection, user *User) (*RefreshToken, error) {
 	token := &RefreshToken{
-		InstanceID: user.InstanceID,
-		UserID:     user.ID,
-		Token:      crypto.SecureToken(),
+		UserID: user.ID,
+		Token:  crypto.SecureToken(),
 	}
 
 	if err := tx.Create(token).Error; err != nil {

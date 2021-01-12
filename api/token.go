@@ -53,10 +53,9 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	cookie := r.Header.Get(useCookieHeader)
 
 	aud := a.requestAud(ctx, r)
-	instanceID := getInstanceID(ctx)
 	config := a.getConfig(ctx)
 
-	user, err := models.FindUserByEmailAndAudience(a.db, instanceID, username, aud)
+	user, err := models.FindUserByEmailAndAudience(a.db, username, aud)
 	if err != nil {
 		if models.IsNotFoundError(err) {
 			return oauthError("invalid_grant", "No user found with that email, or password invalid.")
@@ -75,10 +74,10 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	var token *AccessTokenResponse
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
-		if terr = models.NewAuditLogEntry(tx, instanceID, user, models.LoginAction, nil); terr != nil {
+		if terr = models.NewAuditLogEntry(tx, user, models.LoginAction, nil); terr != nil {
 			return terr
 		}
-		if terr = triggerEventHooks(ctx, tx, LoginEvent, user, instanceID, config); terr != nil {
+		if terr = triggerEventHooks(ctx, tx, LoginEvent, user, config); terr != nil {
 			return terr
 		}
 
@@ -97,14 +96,13 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	if err != nil {
 		return err
 	}
-	metering.RecordLogin("password", user.ID, instanceID)
+	metering.RecordLogin("password", user.ID)
 	return sendJSON(w, http.StatusOK, token)
 }
 
 // RefreshTokenGrant implements the refresh_token grant type flow
 func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	config := a.getConfig(ctx)
-	instanceID := getInstanceID(ctx)
 	tokenStr := r.FormValue("refresh_token")
 	cookie := r.Header.Get(useCookieHeader)
 
@@ -130,7 +128,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
-		if terr = models.NewAuditLogEntry(tx, instanceID, user, models.TokenRefreshedAction, nil); terr != nil {
+		if terr = models.NewAuditLogEntry(tx, user, models.TokenRefreshedAction, nil); terr != nil {
 			return terr
 		}
 
@@ -157,7 +155,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 	if err != nil {
 		return err
 	}
-	metering.RecordLogin("token", user.ID, instanceID)
+	metering.RecordLogin("token", user.ID)
 	return sendJSON(w, http.StatusOK, &AccessTokenResponse{
 		Token:        tokenString,
 		TokenType:    "bearer",

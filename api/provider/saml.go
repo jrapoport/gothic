@@ -17,11 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jrapoport/gothic/models"
-	"github.com/jrapoport/gothic/storage"
-
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage"
 	saml2 "github.com/russellhaering/gosaml2"
 	"github.com/russellhaering/gosaml2/types"
 	dsig "github.com/russellhaering/goxmldsig"
@@ -33,9 +30,8 @@ type SamlProvider struct {
 }
 
 type ConfigX509KeyStore struct {
-	InstanceID uuid.UUID
-	DB         *storage.Connection
-	Conf       conf.SamlProviderConfiguration
+	DB   *storage.Connection
+	Conf conf.SamlProviderConfiguration
 }
 
 func getMetadata(url string) (*types.EntityDescriptor, error) {
@@ -65,7 +61,7 @@ func getMetadata(url string) (*types.EntityDescriptor, error) {
 }
 
 // NewSamlProvider creates a Saml account provider.
-func NewSamlProvider(ext conf.SamlProviderConfiguration, db *storage.Connection, instanceId uuid.UUID) (*SamlProvider, error) {
+func NewSamlProvider(ext conf.SamlProviderConfiguration, db *storage.Connection) (*SamlProvider, error) {
 	if !ext.Enabled {
 		return nil, errors.New("SAML Provider is not enabled")
 	}
@@ -121,9 +117,8 @@ func NewSamlProvider(ext conf.SamlProviderConfiguration, db *storage.Connection,
 	}
 
 	keyStore := &ConfigX509KeyStore{
-		InstanceID: instanceId,
-		DB:         db,
-		Conf:       ext,
+		DB:   db,
+		Conf: ext,
 	}
 
 	sp := &saml2.SAMLServiceProvider{
@@ -222,10 +217,6 @@ func (ks ConfigX509KeyStore) CreateSigningCert() (*rsa.PrivateKey, []byte, error
 }
 
 func (ks ConfigX509KeyStore) SaveConfig(cert []byte, key *rsa.PrivateKey) error {
-	if ks.InstanceID == uuid.Nil {
-		return nil
-	}
-
 	pemCert := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: cert,
@@ -246,18 +237,9 @@ func (ks ConfigX509KeyStore) SaveConfig(cert []byte, key *rsa.PrivateKey) error 
 		return errors.New("Could not encode key")
 	}
 
-	instance, err := models.GetInstance(ks.DB, ks.InstanceID)
-	if err != nil {
-		return err
-	}
-
-	conf := instance.BaseConfig
-	conf.External.Saml.SigningCert = string(certBytes)
-	conf.External.Saml.SigningKey = string(keyBytes)
-
-	if err := instance.UpdateConfig(ks.DB, conf); err != nil {
-		return err
-	}
+	// BUG: is this right?
+	ks.Conf.SigningCert = string(certBytes)
+	ks.Conf.SigningKey = string(keyBytes)
 
 	return nil
 }

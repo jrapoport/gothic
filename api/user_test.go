@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
@@ -22,18 +21,15 @@ type UserTestSuite struct {
 	suite.Suite
 	API    *API
 	Config *conf.Configuration
-
-	instanceID uuid.UUID
 }
 
 func TestUser(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &UserTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)
@@ -43,13 +39,13 @@ func (ts *UserTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 
 	// Create user
-	u, err := models.NewUser(ts.instanceID, "test@example.com", "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser("test@example.com", "password", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
 func (ts *UserTestSuite) TestUser_UpdatePassword() {
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -74,7 +70,7 @@ func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	ts.API.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), w.Code, http.StatusOK)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test@example.com", ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	assert.True(ts.T(), u.Authenticate("newpass"))

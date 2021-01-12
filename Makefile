@@ -19,6 +19,9 @@ deps: ## Install dependencies.
 image: ## Build the Docker image.
 	docker build .
 
+fmt:
+	go fmt ./...
+
 lint: ## Lint the code.
 	golint ./...
 
