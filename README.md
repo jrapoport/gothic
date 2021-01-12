@@ -55,16 +55,13 @@ GOTHIC_SITE_URL=https://example.gothic.com/
 
 `SITE_URL` - `string` **required**
 
-The base URL your site is located at. Currently used in combination with other settings to construct URLs used in emails.
-
-`OPERATOR_TOKEN` - `string` _Multi-instance mode only_
-
-The shared secret with an operator (usually Netlify) for this microservice. Used to verify requests have been proxied through the operator and
-the payload values can be trusted.
+The base URL your site is located at. Currently used in combination with other
+settings to construct URLs used in emails.
 
 `DISABLE_SIGNUP` - `bool`
 
-When signup is disabled the only way to create new users is through invites. Defaults to `false`, all signups enabled.
+When signup is disabled the only way to create new users is through invites.
+Defaults to `false`, all signups enabled.
 
 `GOTHIC_RATE_LIMIT_HEADER` - `string`
 
@@ -95,13 +92,10 @@ Port number for the gRPC API server to listen on. Defaults to `3001`.
 
 Port number for the gRPC Web API server to listen on. Defaults to `6001`.
 
-`API_ENDPOINT` - `string` _Multi-instance mode only_
-
-Controls what endpoint Netlify can access this API on.
-
 `REQUEST_ID_HEADER` - `string`
 
-If you wish to inherit a request ID from the incoming request, specify the name in this value.
+If you wish to inherit a request ID from the incoming request, specify the name
+in this value.
 
 ### Database
 
@@ -143,7 +137,8 @@ GOTHIC_LOG_FILE=/var/log/go/gothic.log
 
 `LOG_LEVEL` - `string`
 
-Controls what log levels are output. Choose from `panic`, `fatal`, `error`, `warn`, `info`, or `debug`. Defaults to `info`.
+Controls what log levels are output. Choose from `panic`, `fatal`, `error`,
+`warn`, `info`, or `debug`. Defaults to `info`.
 
 `LOG_FILE` - `string`
 
@@ -174,7 +169,8 @@ The port for the tracing host.
 
 `TRACING_TAGS` - `string`
 
-A comma separated list of key:value pairs. These key value pairs will be added as tags to all opentracing spans.
+A comma separated list of key:value pairs. These key value pairs will be added
+as tags to all opentracing spans.
 
 `SERVICE_NAME` - `string`
 
@@ -215,15 +211,17 @@ The default group to assign all new users to.
 
 ### External Authentication Providers
 
-We support `bitbucket`, `github`, `gitlab`, and `google` for external authentication.
-Use the names as the keys underneath `external` to configure each separately.
+We support `bitbucket`, `github`, `gitlab`, and `google` for external
+authentication. Use the names as the keys underneath `external` to configure
+each separately.
 
 ```properties
 GOTHIC_EXTERNAL_GITHUB_CLIENT_ID=myappclientid
 GOTHIC_EXTERNAL_GITHUB_SECRET=clientsecretvaluessssh
 ```
 
-No external providers are required, but you must provide the required values if you choose to enable any.
+No external providers are required, but you must provide the required values if
+you choose to enable any.
 
 `EXTERNAL_X_ENABLED` - `bool`
 
@@ -243,7 +241,8 @@ The URI a OAuth2 provider will redirect to with the `code` and `state` values.
 
 `EXTERNAL_X_URL` - `string`
 
-The base URL used for constructing the URLs to request authorization and access tokens. Used by `gitlab` only. Defaults to `https://gitlab.com`.
+The base URL used for constructing the URLs to request authorization and access
+tokens. Used by `gitlab` only. Defaults to `https://gitlab.com`.
 
 ### E-Mail
 
@@ -281,11 +280,14 @@ If the mail server requires authentication, the password to use.
 
 `SMTP_MAX_FREQUENCY` - `number`
 
-Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email. The value is the number of seconds. Defaults to 900 (15 minutes).
+Controls the minimum amount of time that must pass before sending another signup
+confirmation or password reset email. The value is the number of seconds.
+Defaults to 900 (15 minutes).
 
 `MAILER_AUTOCONFIRM` - `bool`
 
-If you do not require email confirmation, you may set this to `true`. Defaults to `false`.
+If you do not require email confirmation, you may set this to `true`. Defaults
+to `false`.
 
 `MAILER_URLPATHS_INVITE` - `string`
 
@@ -317,7 +319,8 @@ Email subject to use for password reset. Defaults to `Reset Your Password`.
 
 `MAILER_SUBJECTS_EMAIL_CHANGE` - `string`
 
-Email subject to use for email change confirmation. Defaults to `Confirm Email Change`.
+Email subject to use for email change confirmation. Defaults to `Confirm Email
+Change`.
 
 `MAILER_TEMPLATES_INVITE` - `string`
 
@@ -329,9 +332,9 @@ Default Content (if template is unavailable):
 ```html
 <h2>You have been invited</h2>
 
-<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>
-<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>
-```
+<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to
+accept the invite:</p> <p><a href="{{ .ConfirmationURL }}">Accept the
+invite</a></p> ```
 
 `MAILER_TEMPLATES_CONFIRMATION` - `string`
 
@@ -363,25 +366,29 @@ Default Content (if template is unavailable):
 
 `MAILER_TEMPLATES_EMAIL_CHANGE` - `string`
 
-URL path to an email template to use when confirming the change of an email address.
-`SiteURL`, `Email`, `NewEmail`, and `ConfirmationURL` variables are available.
+URL path to an email template to use when confirming the change of an email
+address. `SiteURL`, `Email`, `NewEmail`, and `ConfirmationURL` variables are
+available.
 
 Default Content (if template is unavailable):
 
 ```html
 <h2>Confirm Change of Email</h2>
 
-<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
-<p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
-```
+<p>Follow this link to confirm the update of your email from {{ .Email }} to {{
+.NewEmail }}:</p> <p><a href="{{ .ConfirmationURL }}">Change Email</a></p> ```
 
 `WEBHOOK_URL` - `string`
 
-Url of the webhook receiver endpoint. This will be called when events like `validate`, `signup` or `login` occur.
+Url of the webhook receiver endpoint. This will be called when events like
+`validate`, `signup` or `login` occur.
 
 `WEBHOOK_SECRET` - `string`
 
-Shared secret to authorize webhook requests. This secret signs the [JSON Web Signature](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) of the request. You *should* use this to verify the integrity of the request. Otherwise others can feed your webhook receiver with fake data.
+Shared secret to authorize webhook requests. This secret signs the [JSON Web
+Signature](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) of
+the request. You *should* use this to verify the integrity of the request.
+Otherwise others can feed your webhook receiver with fake data.
 
 `WEBHOOK_RETRIES` - `number`
 
@@ -465,8 +472,9 @@ Gothic exposes the following endpoints:
 
 * **POST /verify**
 
-  Verify a registration or a password recovery. Type can be `signup` or `recovery`
-  and the `token` is a token returned from either `/signup` or `/recover`.
+  Verify a registration or a password recovery. Type can be `signup` or
+  `recovery` and the `token` is a token returned from either `/signup` or
+  `/recover`.
 
   ```json
   {
@@ -521,8 +529,9 @@ Gothic exposes the following endpoints:
   grant_type=refresh_token&refresh_token=my-refresh-token
   ```
 
-  Once you have an access token, you can access the methods requiring authentication
-  by settings the `Authorization: Bearer YOUR_ACCESS_TOKEN_HERE` header.
+  Once you have an access token, you can access the methods requiring
+  authentication by settings the `Authorization: Bearer YOUR_ACCESS_TOKEN_HERE`
+  header.
 
   Returns:
 
@@ -553,8 +562,8 @@ Gothic exposes the following endpoints:
 
 * **PUT /user**
 
-  Update a user (Requires authentication). Apart from changing email/password, this
-  method can be used to set custom user data.
+  Update a user (Requires authentication). Apart from changing email/password,
+  this method can be used to set custom user data.
 
   ```json
   {

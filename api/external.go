@@ -17,6 +17,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const TokenString = "gothic"
+
 type ExternalProviderClaims struct {
 	GothicMicroserviceClaims
 	Provider    string `json:"provider"`
@@ -54,7 +56,6 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 	referrer := a.getReferrer(r)
 	log := getLogEntry(r)
 	log.WithField("provider", providerType).Info("Redirecting to external provider")
-
 	token := jwt.NewWithClaims(config.JWT.SigningMethod(), ExternalProviderClaims{
 		GothicMicroserviceClaims: GothicMicroserviceClaims{
 			StandardClaims: jwt.StandardClaims{
@@ -62,13 +63,12 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 			},
 			SiteURL:    config.SiteURL,
 			InstanceID: getInstanceID(ctx).String(),
-			GothicID:  getGothicID(ctx),
 		},
 		Provider:    providerType,
 		InviteToken: inviteToken,
 		Referrer:    referrer,
 	})
-	tokenString, err := token.SignedString([]byte(a.config.OperatorToken))
+	tokenString, err := token.SignedString([]byte(TokenString))
 	if err != nil {
 		return internalServerError("Error creating state").WithInternalError(err)
 	}
@@ -276,7 +276,7 @@ func (a *API) loadExternalState(ctx context.Context, state string) (context.Cont
 	claims := ExternalProviderClaims{}
 	config := a.getConfig(ctx)
 	_, err := jwt.ParseWithClaims(state, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(a.config.OperatorToken), nil
+		return []byte(TokenString), nil
 	}, jwt.WithValidMethods([]string{config.JWT.SigningMethod().Alg()}))
 	if err != nil || claims.Provider == "" {
 		return nil, badRequestError("OAuth state is invalid: %v", err)

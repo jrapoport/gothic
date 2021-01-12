@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,12 +12,6 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/didip/tollbooth/v5"
 	"github.com/didip/tollbooth/v5/limiter"
-	"github.com/gofrs/uuid"
-	"github.com/jrapoport/gothic/models"
-)
-
-const (
-	jwsSignatureHeaderName = "x-nf-sign"
 )
 
 type FunctionHooks map[string][]string
@@ -25,7 +20,6 @@ type GothicMicroserviceClaims struct {
 	jwt.StandardClaims
 	SiteURL       string        `json:"site_url"`
 	InstanceID    string        `json:"id"`
-	GothicID     string        `json:"gothic_id"`
 	FunctionHooks FunctionHooks `json:"function_hooks"`
 }
 
@@ -71,71 +65,6 @@ func addGetBody(w http.ResponseWriter, req *http.Request) (context.Context, erro
 	return req.Context(), nil
 }
 
-func (a *API) loadJWSSignatureHeader(w http.ResponseWriter, r *http.Request) (context.Context, error) {
-	ctx := r.Context()
-	signature := r.Header.Get(jwsSignatureHeaderName)
-	if signature == "" {
-		return nil, badRequestError("Operator microservice headers missing")
-	}
-	return withSignature(ctx, signature), nil
-}
-
-func (a *API) loadInstanceConfig(w http.ResponseWriter, r *http.Request) (context.Context, error) {
-	ctx := r.Context()
-	cfg := a.getConfig(ctx)
-
-	signature := getSignature(ctx)
-	if signature == "" {
-		return nil, badRequestError("Operator signature missing")
-	}
-
-	claims := GothicMicroserviceClaims{}
-	_, err := jwt.ParseWithClaims(signature, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(a.config.OperatorToken), nil
-	}, jwt.WithValidMethods([]string{cfg.JWT.SigningMethod().Alg()}))
-	if err != nil {
-		return nil, badRequestError("Operator microservice signature is invalid: %v", err)
-	}
-
-	if claims.InstanceID == "" {
-		return nil, badRequestError("Instance ID is missing")
-	}
-	instanceID, err := uuid.FromString(claims.InstanceID)
-	if err != nil {
-		return nil, badRequestError("Instance ID is not a valid UUID")
-	}
-
-	logEntrySetField(r, "instance_id", instanceID)
-	logEntrySetField(r, "gothic_id", claims.GothicID)
-	instance, err := models.GetInstance(a.db, instanceID)
-	if err != nil {
-		if models.IsNotFoundError(err) {
-			return nil, notFoundError("Unable to locate site configuration")
-		}
-		return nil, internalServerError("Database error loading instance").WithInternalError(err)
-	}
-
-	config, err := instance.Config()
-	if err != nil {
-		return nil, internalServerError("Error loading environment config").WithInternalError(err)
-	}
-
-	if claims.SiteURL != "" {
-		config.SiteURL = claims.SiteURL
-	}
-	logEntrySetField(r, "site_url", config.SiteURL)
-
-	ctx = withGothicID(ctx, claims.GothicID)
-	ctx = withFunctionHooks(ctx, claims.FunctionHooks)
-
-	ctx, err = WithInstanceConfig(ctx, config, instanceID)
-	if err != nil {
-		return nil, internalServerError("Error loading instance config").WithInternalError(err)
-	}
-
-	return ctx, nil
-}
-
 func (a *API) limitHandler(lmt *limiter.Limiter) middlewareHandler {
 	return func(w http.ResponseWriter, req *http.Request) (context.Context, error) {
 		c := req.Context()
@@ -150,33 +79,15 @@ func (a *API) limitHandler(lmt *limiter.Limiter) middlewareHandler {
 	}
 }
 
-func (a *API) verifyOperatorRequest(w http.ResponseWriter, req *http.Request) (context.Context, error) {
-	c, _, err := a.extractOperatorRequest(w, req)
-	return c, err
-}
-
-func (a *API) extractOperatorRequest(w http.ResponseWriter, req *http.Request) (context.Context, string, error) {
-	token, err := a.extractBearerToken(w, req)
-	if err != nil {
-		return nil, token, err
-	}
-	if token == "" || token != a.config.OperatorToken {
-		return nil, token, unauthorizedError("Request does not include an Operator token")
-	}
-	return withAdminUser(req.Context(), &models.User{ID: uuid.Nil, Email: "operator@gothic.com"}), token, nil
-}
-
 func (a *API) requireAdminCredentials(w http.ResponseWriter, req *http.Request) (context.Context, error) {
-	c, t, err := a.extractOperatorRequest(w, req)
-	if err == nil {
-		return c, nil
-	}
-
-	if t == "" {
+	t, err := a.extractBearerToken(w, req)
+	if err != nil {
 		return nil, err
+	} else if t == "" {
+		return nil, errors.New("bearer token not found")
 	}
 
-	c, err = a.parseJWTClaims(t, req, w)
+	c, err := a.parseJWTClaims(t, req, w)
 	if err != nil {
 		return nil, err
 	}

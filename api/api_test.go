@@ -16,7 +16,7 @@ import (
 
 const (
 	apiTestVersion = "1"
-	apiTestConfig  = "../hack/test.env"
+	apiTestConfig  = "../env/test.env"
 )
 
 func init() {
@@ -30,21 +30,11 @@ func setupAPIForTest() (*API, *conf.Configuration, error) {
 	return setupAPIForTestWithCallback(nil)
 }
 
-func setupAPIForMultiinstanceTest() (*API, *conf.Configuration, error) {
-	cb := func(gc *conf.GlobalConfiguration, c *conf.Configuration, conn *storage.Connection) (uuid.UUID, error) {
-		gc.MultiInstanceMode = true
-		return uuid.Nil, nil
-	}
-
-	return setupAPIForTestWithCallback(cb)
-}
-
 func setupAPIForTestForInstance() (*API, *conf.Configuration, uuid.UUID, error) {
 	instanceID := uuid.Must(uuid.NewV4())
 	cb := func(gc *conf.GlobalConfiguration, c *conf.Configuration, conn *storage.Connection) (uuid.UUID, error) {
 		err := conn.Create(&models.Instance{
 			ID:         instanceID,
-			UUID:       testUUID,
 			BaseConfig: c,
 		}).Error
 		return instanceID, err
