@@ -52,22 +52,20 @@ func init() {
 
 // AuditLogEntry is the database model for audit log entries.
 type AuditLogEntry struct {
-	InstanceID uuid.UUID `json:"-" gorm:"index:audit_logs_instance_id_idx;type:varchar(255) DEFAULT NULL"`
-	ID         uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
+	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
 
 	Payload JSONMap `json:"payload" gorm:"type:JSON NULL DEFAULT NULL"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp NULL DEFAULT NULL"`
 }
 
-func NewAuditLogEntry(tx *storage.Connection, instanceID uuid.UUID, actor *User, action AuditAction, traits map[string]interface{}) error {
+func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, traits map[string]interface{}) error {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return errors.Wrap(err, "Error generating unique id")
 	}
 	l := AuditLogEntry{
-		InstanceID: instanceID,
-		ID:         id,
+		ID: id,
 		Payload: JSONMap{
 			"timestamp":   time.Now().UTC().Format(time.RFC3339),
 			"actor_id":    actor.ID,
@@ -88,8 +86,8 @@ func NewAuditLogEntry(tx *storage.Connection, instanceID uuid.UUID, actor *User,
 	return errors.Wrap(tx.Create(&l).Error, "Database error creating audit log entry")
 }
 
-func FindAuditLogEntries(tx *storage.Connection, instanceID uuid.UUID, filterColumns []string, filterValue string, pageParams *Pagination) ([]*AuditLogEntry, error) {
-	q := tx.Model(AuditLogEntry{}).Order("created_at desc").Where("instance_id = ?", instanceID)
+func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterValue string, pageParams *Pagination) ([]*AuditLogEntry, error) {
+	q := tx.Model(AuditLogEntry{}).Order("created_at desc")
 
 	if len(filterColumns) > 0 && filterValue != "" {
 		lf := "%" + filterValue + "%"

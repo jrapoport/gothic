@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
@@ -23,18 +22,15 @@ type SignupTestSuite struct {
 	suite.Suite
 	API    *API
 	Config *conf.Configuration
-
-	instanceID uuid.UUID
 }
 
 func TestSignup(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &SignupTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 	// defer api.db.Close()
 
@@ -93,7 +89,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 			return []byte(ts.Config.Webhook.Secret), nil
 		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 		assert.True(token.Valid)
-		assert.Equal(ts.instanceID.String(), claims.Subject) // not configured for multitenancy
+		assert.Equal(ts.Config.JWT.Subject, claims.Subject) // not configured for multitenancy
 		assert.Equal("gothic", claims.Issuer)
 		assert.WithinDuration(time.Now(), claims.IssuedAt.Time, 5*time.Second)
 
@@ -107,7 +103,6 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 
 		assert.Equal(3, len(data))
 		assert.Equal("validate", data["event"])
-		assert.Equal(ts.instanceID.String(), data["instance_id"])
 
 		u, ok := data["user"].(map[string]interface{})
 		require.True(ok)
@@ -208,7 +203,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	y := httptest.NewRecorder()
 
 	ts.API.handler.ServeHTTP(y, req)
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test1@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test1@example.com", ts.Config.JWT.Aud)
 	if err == nil {
 		require.NoError(ts.T(), u.Confirm(ts.API.db))
 	}
@@ -224,13 +219,13 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 }
 
 func (ts *SignupTestSuite) TestVerifySignup() {
-	user, err := models.NewUser(ts.instanceID, "test@example.com", "testing", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser("test@example.com", "testing", ts.Config.JWT.Aud, nil)
 	user.ConfirmationToken = "asdf3"
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body

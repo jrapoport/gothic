@@ -6,9 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
-	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/jrapoport/gothic/storage/test"
 	"github.com/stretchr/testify/require"
@@ -30,24 +28,26 @@ func setupAPIForTest() (*API, *conf.Configuration, error) {
 	return setupAPIForTestWithCallback(nil)
 }
 
-func setupAPIForTestForInstance() (*API, *conf.Configuration, uuid.UUID, error) {
-	instanceID := uuid.Must(uuid.NewV4())
-	cb := func(gc *conf.GlobalConfiguration, c *conf.Configuration, conn *storage.Connection) (uuid.UUID, error) {
-		err := conn.Create(&models.Instance{
-			ID:         instanceID,
-			BaseConfig: c,
-		}).Error
-		return instanceID, err
-	}
+func setupAPIForTestForInstance() (*API, *conf.Configuration, error) {
+	// BUG: is this right? seems ok to ditch this.
+	/*
+		cb := func(gc *conf.GlobalConfiguration, c *conf.Configuration, conn *storage.Connection) error {
+			err := conn.Create(&models.Instance{
+				BaseConfig: c,
+			}).Error
+			return err
+		}
 
-	api, conf, err := setupAPIForTestWithCallback(cb)
+		api, conf, err := setupAPIForTestWithCallback(cb)
+	*/
+	api, c, err := setupAPIForTestWithCallback(nil)
 	if err != nil {
-		return nil, nil, uuid.Nil, err
+		return nil, nil, err
 	}
-	return api, conf, instanceID, nil
+	return api, c, nil
 }
 
-func setupAPIForTestWithCallback(cb func(*conf.GlobalConfiguration, *conf.Configuration, *storage.Connection) (uuid.UUID, error)) (*API, *conf.Configuration, error) {
+func setupAPIForTestWithCallback(cb func(*conf.GlobalConfiguration, *conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
 	globalConfig, err := conf.LoadGlobal(apiTestConfig)
 	if err != nil {
 		return nil, nil, err
@@ -63,15 +63,14 @@ func setupAPIForTestWithCallback(cb func(*conf.GlobalConfiguration, *conf.Config
 		return nil, nil, err
 	}
 
-	instanceID := uuid.Nil
 	if cb != nil {
-		instanceID, err = cb(globalConfig, config, conn)
+		err = cb(globalConfig, config, conn)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
 
-	ctx, err := WithInstanceConfig(context.Background(), config, instanceID)
+	ctx, err := WithConfig(context.Background(), config)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -78,7 +78,6 @@ func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params *VerifyParams) (*models.User, error) {
-	instanceID := getInstanceID(ctx)
 	config := a.getConfig(ctx)
 
 	user, err := models.FindUserByConfirmationToken(conn, params.Token)
@@ -102,11 +101,11 @@ func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params
 			}
 		}
 
-		if terr = models.NewAuditLogEntry(tx, instanceID, user, models.UserSignedUpAction, nil); terr != nil {
+		if terr = models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); terr != nil {
 			return terr
 		}
 
-		if terr = triggerEventHooks(ctx, tx, SignupEvent, user, instanceID, config); terr != nil {
+		if terr = triggerEventHooks(ctx, tx, SignupEvent, user, config); terr != nil {
 			return terr
 		}
 
@@ -122,7 +121,6 @@ func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params
 }
 
 func (a *API) recoverVerify(ctx context.Context, conn *storage.Connection, params *VerifyParams) (*models.User, error) {
-	instanceID := getInstanceID(ctx)
 	config := a.getConfig(ctx)
 	user, err := models.FindUserByRecoveryToken(conn, params.Token)
 	if err != nil {
@@ -138,11 +136,11 @@ func (a *API) recoverVerify(ctx context.Context, conn *storage.Connection, param
 			return terr
 		}
 		if !user.IsConfirmed() {
-			if terr = models.NewAuditLogEntry(tx, instanceID, user, models.UserSignedUpAction, nil); terr != nil {
+			if terr = models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); terr != nil {
 				return terr
 			}
 
-			if terr = triggerEventHooks(ctx, tx, SignupEvent, user, instanceID, config); terr != nil {
+			if terr = triggerEventHooks(ctx, tx, SignupEvent, user, config); terr != nil {
 				return terr
 			}
 			if terr = user.Confirm(tx); terr != nil {

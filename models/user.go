@@ -23,8 +23,7 @@ func init() {
 
 // User represents a registered user with email/password authentication
 type User struct {
-	InstanceID uuid.UUID `json:"-" gorm:"index:users_instance_id_idx;index:users_instance_id_email_idx;type:varchar(255) DEFAULT NULL"`
-	ID         uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
+	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
 
 	Aud               string     `json:"aud" gorm:"type:varchar(255) DEFAULT NULL"`
 	Role              string     `json:"role" gorm:"type:varchar(255) DEFAULT NULL"`
@@ -55,7 +54,7 @@ type User struct {
 }
 
 // NewUser initializes a new user from an email, password and user data.
-func NewUser(instanceID uuid.UUID, email, password, aud string, userData map[string]interface{}) (*User, error) {
+func NewUser(email, password, aud string, userData map[string]interface{}) (*User, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, errors.Wrap(err, "Error generating unique id")
@@ -66,7 +65,6 @@ func NewUser(instanceID uuid.UUID, email, password, aud string, userData map[str
 	}
 
 	user := &User{
-		InstanceID:        instanceID,
 		ID:                id,
 		Aud:               aud,
 		Email:             email,
@@ -76,9 +74,8 @@ func NewUser(instanceID uuid.UUID, email, password, aud string, userData map[str
 	return user, nil
 }
 
-func NewSystemUser(instanceID uuid.UUID, aud string) *User {
+func NewSystemUser(aud string) *User {
 	return &User{
-		InstanceID:   instanceID,
 		ID:           SystemUserUUID,
 		Aud:          aud,
 		IsSuperAdmin: true,
@@ -250,18 +247,13 @@ func FindUserByConfirmationToken(tx *storage.Connection, token string) (*User, e
 }
 
 // FindUserByEmailAndAudience finds a user with the matching email and audience.
-func FindUserByEmailAndAudience(tx *storage.Connection, instanceID uuid.UUID, email, aud string) (*User, error) {
-	return findUser(tx, "instance_id = ? and email = ? and aud = ?", instanceID, email, aud)
+func FindUserByEmailAndAudience(tx *storage.Connection, email, aud string) (*User, error) {
+	return findUser(tx, "email = ? and aud = ?", email, aud)
 }
 
 // FindUserByID finds a user matching the provided ID.
 func FindUserByID(tx *storage.Connection, id uuid.UUID) (*User, error) {
 	return findUser(tx, "id = ?", id)
-}
-
-// FindUserByInstanceIDAndID finds a user matching the provided ID.
-func FindUserByInstanceIDAndID(tx *storage.Connection, instanceID, id uuid.UUID) (*User, error) {
-	return findUser(tx, "instance_id = ? and id = ?", instanceID, id)
 }
 
 // FindUserByRecoveryToken finds a user with the matching recovery token.
@@ -288,9 +280,9 @@ func FindUserWithRefreshToken(tx *storage.Connection, token string) (*User, *Ref
 }
 
 // FindUsersInAudience finds users with the matching audience.
-func FindUsersInAudience(tx *storage.Connection, instanceID uuid.UUID, aud string, pageParams *Pagination, sortParams *SortParams, filter string) ([]*User, error) {
+func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Pagination, sortParams *SortParams, filter string) ([]*User, error) {
 	users := []*User{}
-	q := tx.Model(users).Where("instance_id = ? and aud = ?", instanceID, aud)
+	q := tx.Model(users).Where("aud = ?", aud)
 
 	if filter != "" {
 		lf := "%" + filter + "%"
@@ -324,8 +316,8 @@ func FindUsersInAudience(tx *storage.Connection, instanceID uuid.UUID, aud strin
 }
 
 // IsDuplicatedEmail returns whether a user exists with a matching email and audience.
-func IsDuplicatedEmail(tx *storage.Connection, instanceID uuid.UUID, email, aud string) (bool, error) {
-	_, err := FindUserByEmailAndAudience(tx, instanceID, email, aud)
+func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) {
+	_, err := FindUserByEmailAndAudience(tx, email, aud)
 	if err != nil {
 		if IsNotFoundError(err) {
 			return false, nil

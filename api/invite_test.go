@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/assert"
@@ -25,18 +24,16 @@ type InviteTestSuite struct {
 	API    *API
 	Config *conf.Configuration
 
-	token      string
-	instanceID uuid.UUID
+	token string
 }
 
 func TestInvite(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &InviteTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)
@@ -51,11 +48,11 @@ func (ts *InviteTestSuite) SetupTest() {
 
 func (ts *InviteTestSuite) makeSuperAdmin(email string) string {
 	// Cleanup existing user, if they already exist
-	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, email, ts.Config.JWT.Aud); u != nil {
+	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud); u != nil {
 		require.NoError(ts.T(), ts.API.db.Delete(u).Error, "Error deleting user")
 	}
 
-	u, err := models.NewUser(ts.instanceID, email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test User"})
+	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test User"})
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true
@@ -121,7 +118,7 @@ func (ts *InviteTestSuite) TestInvite_WithoutAccess() {
 }
 
 func (ts *InviteTestSuite) TestVerifyInvite() {
-	user, err := models.NewUser(ts.instanceID, "test@example.com", "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser("test@example.com", "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -130,7 +127,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -154,7 +151,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 }
 
 func (ts *InviteTestSuite) TestVerifyInvite_NoPassword() {
-	user, err := models.NewUser(ts.instanceID, "test@example.com", "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser("test@example.com", "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -163,7 +160,7 @@ func (ts *InviteTestSuite) TestVerifyInvite_NoPassword() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -227,7 +224,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state
@@ -269,7 +266,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Equal(1, userCount)
 
 	// ensure user has been created with metadata
-	user, err = models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err = models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
 	ts.Require().NoError(err)
 	ts.Equal("Gitlab Test", user.UserMetaData["full_name"])
 	ts.Equal("http://example.com/avatar", user.UserMetaData["avatar_url"])
@@ -318,7 +315,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab_MismatchedEmails() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, "gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, "gitlab@example.com", ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state

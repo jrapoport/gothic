@@ -17,7 +17,6 @@ type InviteParams struct {
 // Invite is the endpoint for inviting a new user
 func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	instanceID := getInstanceID(ctx)
 	adminUser := getAdminUser(ctx)
 	params := &InviteParams{}
 
@@ -32,7 +31,7 @@ func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	aud := a.requestAud(ctx, r)
-	user, err := models.FindUserByEmailAndAudience(a.db, instanceID, params.Email, aud)
+	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, aud)
 	if err != nil && !models.IsNotFoundError(err) {
 		return internalServerError("Database error finding user").WithInternalError(err)
 	}
@@ -52,7 +51,7 @@ func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
-		if terr := models.NewAuditLogEntry(tx, instanceID, adminUser, models.UserInvitedAction, map[string]interface{}{
+		if terr := models.NewAuditLogEntry(tx, adminUser, models.UserInvitedAction, map[string]interface{}{
 			"user_id":    user.ID,
 			"user_email": user.Email,
 		}); terr != nil {
