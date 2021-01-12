@@ -17,6 +17,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const userEmail = "user_test@example.com"
+
 type UserTestSuite struct {
 	suite.Suite
 	API    *API
@@ -36,16 +38,18 @@ func TestUser(t *testing.T) {
 }
 
 func (ts *UserTestSuite) SetupTest() {
-	storage.TruncateAll(ts.API.db)
-
 	// Create user
-	u, err := models.NewUser("test@example.com", "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(userEmail, "password", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
+func (ts *UserTestSuite) TearDownTest() {
+	storage.TruncateAll(ts.API.db)
+}
+
 func (ts *UserTestSuite) TestUser_UpdatePassword() {
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -70,7 +74,7 @@ func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	ts.API.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), w.Code, http.StatusOK)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	assert.True(ts.T(), u.Authenticate("newpass"))

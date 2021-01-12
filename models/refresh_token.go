@@ -1,12 +1,11 @@
 package models
 
 import (
-	"time"
-
 	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -15,14 +14,10 @@ func init() {
 
 // RefreshToken is the database model for refresh tokens.
 type RefreshToken struct {
-	ID int64 `gorm:"primaryKey"`
-
-	Token  string    `gorm:"index:refresh_tokens_token_idx;type:varchar(255) DEFAULT NULL"`
-	UserID uuid.UUID `gorm:"index:user_id_idx;type:varchar(255) DEFAULT NULL"`
-
-	Revoked   bool      `gorm:"type:tinyint(1) DEFAULT NULL"`
-	CreatedAt time.Time `gorm:"type:timestamp NULL DEFAULT NULL"`
-	UpdatedAt time.Time `gorm:"type:timestamp NULL DEFAULT NULL"`
+	gorm.Model
+	Token   string    `gorm:"index:refresh_tokens_token_idx;type:varchar(255)"`
+	UserID  uuid.UUID `gorm:"index:user_id_idx;"`
+	Revoked bool
 }
 
 // GrantAuthenticatedUser creates a refresh token for the provided user.

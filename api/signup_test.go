@@ -18,6 +18,8 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const signupEmail = "signup_test@example.com"
+
 type SignupTestSuite struct {
 	suite.Suite
 	API    *API
@@ -47,7 +49,7 @@ func (ts *SignupTestSuite) TestSignup() {
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email":    "test@example.com",
+		"email":    signupEmail,
 		"password": "test",
 		"data": map[string]interface{}{
 			"a": 1,
@@ -67,7 +69,7 @@ func (ts *SignupTestSuite) TestSignup() {
 
 	data := models.User{}
 	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&data))
-	assert.Equal(ts.T(), "test@example.com", data.Email)
+	assert.Equal(ts.T(), signupEmail, data.Email)
 	assert.Equal(ts.T(), ts.Config.JWT.Aud, data.Aud)
 	assert.Equal(ts.T(), 1.0, data.UserMetaData["a"])
 	assert.Equal(ts.T(), "email", data.AppMetaData["provider"])
@@ -110,7 +112,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		// assert.Equal(t, user.ID, u["id"]) TODO
 		assert.Equal("api.gothic.com", u["aud"])
 		assert.Equal("", u["role"])
-		assert.Equal("test@example.com", u["email"])
+		assert.Equal(signupEmail, u["email"])
 
 		appmeta, ok := u["app_metadata"].(map[string]interface{})
 		require.True(ok)
@@ -136,7 +138,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 	}
 	var buffer bytes.Buffer
 	require.NoError(json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email":    "test@example.com",
+		"email":    signupEmail,
 		"password": "test",
 		"data": map[string]interface{}{
 			"a": 1,
@@ -160,7 +162,7 @@ func (ts *SignupTestSuite) TestFailingWebhook() {
 	}
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email":    "test@example.com",
+		"email":    signupEmail,
 		"password": "test",
 		"data": map[string]interface{}{
 			"a": 1,
@@ -184,7 +186,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 
 	encode := func() {
 		require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-			"email":    "test1@example.com",
+			"email":    signupEmail,
 			"password": "test1",
 			"data": map[string]interface{}{
 				"a": 1,
@@ -203,7 +205,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	y := httptest.NewRecorder()
 
 	ts.API.handler.ServeHTTP(y, req)
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test1@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, signupEmail, ts.Config.JWT.Aud)
 	if err == nil {
 		require.NoError(ts.T(), u.Confirm(ts.API.db))
 	}
@@ -219,13 +221,13 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 }
 
 func (ts *SignupTestSuite) TestVerifySignup() {
-	user, err := models.NewUser("test@example.com", "testing", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(signupEmail, "testing", ts.Config.JWT.Aud, nil)
 	user.ConfirmationToken = "asdf3"
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, "test@example.com", ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, signupEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body

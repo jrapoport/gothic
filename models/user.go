@@ -23,34 +23,34 @@ func init() {
 
 // User represents a registered user with email/password authentication
 type User struct {
-	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
+	ID uuid.UUID `json:"id" gorm:"primaryKey"`
 
-	Aud               string     `json:"aud" gorm:"type:varchar(255) DEFAULT NULL"`
-	Role              string     `json:"role" gorm:"type:varchar(255) DEFAULT NULL"`
-	Email             string     `json:"email" gorm:"type:varchar(255) DEFAULT NULL"`
-	EncryptedPassword string     `json:"-" gorm:"type:varchar(255) DEFAULT NULL"`
-	ConfirmedAt       *time.Time `json:"confirmed_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
-	InvitedAt         *time.Time `json:"invited_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
+	Aud               string     `json:"aud" gorm:"type:varchar(255)"`
+	Role              string     `json:"role" gorm:"type:varchar(255)"`
+	Email             string     `json:"email" gorm:"type:varchar(320)"`
+	EncryptedPassword string     `json:"-"`
+	ConfirmedAt       *time.Time `json:"confirmed_at,omitempty"`
+	InvitedAt         *time.Time `json:"invited_at,omitempty"`
 
-	ConfirmationToken  string     `json:"-" gorm:"type:varchar(255) DEFAULT NULL"`
-	ConfirmationSentAt *time.Time `json:"confirmation_sent_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
+	ConfirmationToken  string     `json:"-" gorm:"type:varchar(255)"`
+	ConfirmationSentAt *time.Time `json:"confirmation_sent_at,omitempty"`
 
-	RecoveryToken  string     `json:"-" gorm:"type:varchar(255) DEFAULT NULL"`
-	RecoverySentAt *time.Time `json:"recovery_sent_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
+	RecoveryToken  string     `json:"-" gorm:"type:varchar(255)"`
+	RecoverySentAt *time.Time `json:"recovery_sent_at,omitempty"`
 
-	EmailChangeToken  string     `json:"-" gorm:"type:varchar(255) DEFAULT NULL"`
-	EmailChange       string     `json:"new_email,omitempty" gorm:"type:varchar(255) DEFAULT NULL"`
-	EmailChangeSentAt *time.Time `json:"email_change_sent_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
+	EmailChangeToken  string     `json:"-" gorm:"type:varchar(255)"`
+	EmailChange       string     `json:"new_email,omitempty" gorm:"type:varchar(320)"`
+	EmailChangeSentAt *time.Time `json:"email_change_sent_at,omitempty"`
 
-	LastSignInAt *time.Time `json:"last_sign_in_at,omitempty" gorm:"type:timestamp NULL DEFAULT NULL"`
+	LastSignInAt *time.Time `json:"last_sign_in_at,omitempty"`
 
-	AppMetaData  JSONMap `json:"app_metadata" gorm:"column:raw_app_meta_data;type:JSON NULL DEFAULT NULL"`
-	UserMetaData JSONMap `json:"user_metadata" gorm:"column:raw_user_meta_data;type:JSON NULL DEFAULT NULL"`
+	AppMetaData  JSONMap `json:"app_metadata"`
+	UserMetaData JSONMap `json:"user_metadata"`
 
-	IsSuperAdmin bool `json:"-" gorm:"type:tinyint(1) DEFAULT NULL"`
+	IsSuperAdmin bool `json:"-"`
 
-	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp NULL DEFAULT NULL"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"type:timestamp NULL DEFAULT NULL"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 }
 
 // NewUser initializes a new user from an email, password and user data.
@@ -152,7 +152,7 @@ func (u *User) UpdateUserMetaData(tx *storage.Connection, updates map[string]int
 			}
 		}
 	}
-	return tx.Model(&u).Select("raw_user_meta_data").Updates(u).Error
+	return tx.Model(&u).Select("user_meta_data").Updates(u).Error
 }
 
 // UpdateAppMetaData updates all app data from a map of updates
@@ -168,7 +168,7 @@ func (u *User) UpdateAppMetaData(tx *storage.Connection, updates map[string]inte
 			}
 		}
 	}
-	return tx.Model(&u).Select("raw_app_meta_data").Updates(u).Error
+	return tx.Model(&u).Select("app_meta_data").Updates(u).Error
 }
 
 func (u *User) SetEmail(tx *storage.Connection, email string) error {
@@ -284,20 +284,11 @@ func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Paginat
 	users := []*User{}
 	q := tx.Model(users).Where("aud = ?", aud)
 
-	// BUG: the free text search of metadata feels odd. need to rethink the metadata approach.
-	//  instead for now we will treat filter like "email filter"
 	if filter != "" {
 		lf := "%" + filter + "%"
-		q = q.Where("(email LIKE ? OR raw_user_meta_data COLLATE utf8mb4_unicode_ci LIKE ?)",
+		q = q.Where("(email LIKE ? OR user_meta_data COLLATE utf8mb4_unicode_ci LIKE ?)",
 			lf, lf)
 	}
-	/*
-		if filter != "" {
-			lf := "%" + filter + "%"
-			// we must specify the collation in order to get case insensitive search for the JSON column
-			q = q.Where("(email LIKE ? OR raw_user_meta_data->>'$.full_name' COLLATE utf8mb4_unicode_ci LIKE ?)", lf, lf)
-		}
-	*/
 
 	if sortParams != nil && len(sortParams.Fields) > 0 {
 		for _, field := range sortParams.Fields {
