@@ -24,7 +24,7 @@ func (ts *ExternalTestSuite) TestSignupExternalBitbucket() {
 
 	claims := ExternalProviderClaims{}
 	_, err = jwt.ParseWithClaims(q.Get("state"), &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(ts.API.config.OperatorToken), nil
+		return []byte(TokenString), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 	ts.Require().NoError(err)
 

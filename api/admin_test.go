@@ -426,8 +426,7 @@ func (ts *AdminTestSuite) TestAdminUserCreateWithManagementToken() {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/admin/users", &buffer)
 
-	req.Header.Set("Authorization", "Bearer foobar")
-	req.Header.Set("X-JWT-AUD", "op-test-aud")
+	req.Header.Set("Authorization", "Bearer " + ts.token)
 
 	ts.API.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusOK, w.Code)

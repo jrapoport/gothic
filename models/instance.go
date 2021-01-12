@@ -18,9 +18,6 @@ func init() {
 
 type Instance struct {
 	ID uuid.UUID `json:"id" gorm:"primaryKey;type:varchar(255) NOT NULL"`
-	// Gothic UUID
-	UUID uuid.UUID `json:"uuid,omitempty" gorm:"type:varchar(255) DEFAULT NULL"`
-
 	BaseConfig *conf.Configuration `json:"config" gorm:"column:raw_base_config"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp NULL DEFAULT NULL"`
@@ -56,31 +53,4 @@ func GetInstance(tx *storage.Connection, instanceID uuid.UUID) (*Instance, error
 		return nil, errors.Wrap(err, "error finding instance")
 	}
 	return &instance, nil
-}
-
-func GetInstanceByUUID(tx *storage.Connection, uuid uuid.UUID) (*Instance, error) {
-	instance := Instance{}
-	if err := tx.Where("uuid = ?", uuid).First(&instance).Error; err != nil {
-		if errors.Cause(err) == gorm.ErrRecordNotFound {
-			return nil, InstanceNotFoundError{}
-		}
-		return nil, errors.Wrap(err, "error finding instance")
-	}
-	return &instance, nil
-}
-
-func DeleteInstance(conn *storage.Connection, instance *Instance) error {
-	return conn.Transaction(func(tx *storage.Connection) error {
-		delModels := map[string]interface{}{
-			"user":          &User{},
-			"refresh token": &RefreshToken{},
-		}
-		for name, dm := range delModels {
-			if err := tx.Delete(dm, " instance_id = ?", instance.ID).Error; err != nil {
-				return errors.Wrapf(err, "Error deleting %s records", name)
-			}
-		}
-
-		return errors.Wrap(tx.Delete(instance).Error, "Error deleting instance record")
-	})
 }
