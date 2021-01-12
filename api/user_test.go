@@ -24,7 +24,7 @@ type UserTestSuite struct {
 }
 
 func TestUser(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
 	ts := &UserTestSuite{

@@ -36,7 +36,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 		data := map[string]interface{}{}
 		require.NoError(t, json.Unmarshal(raw, &data))
 
-		assert.Len(t, data, 3)
+		assert.Len(t, data, 2)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer svr.Close()
@@ -77,7 +77,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 		data := map[string]interface{}{}
 		require.NoError(t, json.Unmarshal(raw, &data))
 
-		assert.Len(t, data, 3)
+		assert.Len(t, data, 2)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer svr.Close()

@@ -24,35 +24,25 @@ func init() {
 // setupAPIForTest creates a new API to run tests with.
 // Using this function allows us to keep track of the database connection
 // and cleaning up data between tests.
-func setupAPIForTest() (*API, *conf.Configuration, error) {
-	return setupAPIForTestWithCallback(nil)
+func setupAPIForTest(t *testing.T) (*API, *conf.Configuration, error) {
+	return setupAPIForTestWithCallback(t, nil)
 }
 
-func setupAPIForTestForInstance() (*API, *conf.Configuration, error) {
-	// BUG: is this right? seems ok to ditch this.
-	/*
-		cb := func(gc *conf.GlobalConfiguration, c *conf.Configuration, conn *storage.Connection) error {
-			err := conn.Create(&models.Instance{
-				BaseConfig: c,
-			}).Error
-			return err
-		}
-
-		api, conf, err := setupAPIForTestWithCallback(cb)
-	*/
-	api, c, err := setupAPIForTestWithCallback(nil)
+func setupAPIForTestForInstance(t *testing.T) (*API, *conf.Configuration, error) {
+	api, c, err := setupAPIForTestWithCallback(t, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 	return api, c, nil
 }
 
-func setupAPIForTestWithCallback(cb func(*conf.GlobalConfiguration, *conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
+func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.GlobalConfiguration, *conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
 	globalConfig, err := conf.LoadGlobal(apiTestConfig)
 	if err != nil {
 		return nil, nil, err
 	}
-
+	globalConfig.DB.Driver = "sqlite"
+	globalConfig.DB.URL = t.TempDir()
 	conn, err := test.SetupDBConnection(globalConfig)
 	if err != nil {
 		return nil, nil, err
@@ -79,7 +69,7 @@ func setupAPIForTestWithCallback(cb func(*conf.GlobalConfiguration, *conf.Config
 }
 
 func TestEmailEnabledByDefault(t *testing.T) {
-	api, _, err := setupAPIForTest()
+	api, _, err := setupAPIForTest(t)
 	require.NoError(t, err)
 
 	require.False(t, api.config.External.Email.Disabled)

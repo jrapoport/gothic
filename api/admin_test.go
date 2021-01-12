@@ -28,7 +28,7 @@ type AdminTestSuite struct {
 }
 
 func TestAdmin(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
 	ts := &AdminTestSuite{
@@ -42,7 +42,7 @@ func TestAdmin(t *testing.T) {
 func (ts *AdminTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 	ts.Config.External.Email.Disabled = false
-	ts.token = ts.makeSuperAdmin("test@example.com")
+	ts.token = ts.makeSuperAdmin("admin@example.com")
 }
 
 func (ts *AdminTestSuite) makeSuperAdmin(email string) string {
@@ -179,7 +179,7 @@ func (ts *AdminTestSuite) TestAdminUsers_SortAsc() {
 	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&data))
 
 	require.Len(ts.T(), data.Users, 2)
-	assert.Equal(ts.T(), "test@example.com", data.Users[0].Email)
+	assert.Equal(ts.T(), "admin@example.com", data.Users[0].Email)
 	assert.Equal(ts.T(), "test1@example.com", data.Users[1].Email)
 }
 
@@ -208,7 +208,7 @@ func (ts *AdminTestSuite) TestAdminUsers_SortDesc() {
 
 	require.Len(ts.T(), data.Users, 2)
 	assert.Equal(ts.T(), "test1@example.com", data.Users[0].Email)
-	assert.Equal(ts.T(), "test@example.com", data.Users[1].Email)
+	assert.Equal(ts.T(), "admin@example.com", data.Users[1].Email)
 }
 
 // TestAdminUsers tests API /admin/users route
@@ -258,7 +258,7 @@ func (ts *AdminTestSuite) TestAdminUsers_FilterName() {
 	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&data))
 
 	require.Len(ts.T(), data.Users, 1)
-	assert.Equal(ts.T(), "test@example.com", data.Users[0].Email)
+	assert.Equal(ts.T(), "admin@example.com", data.Users[0].Email)
 }
 
 // TestAdminUserCreate tests API /admin/user route (POST)

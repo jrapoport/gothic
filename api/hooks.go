@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -193,9 +192,8 @@ func triggerHook(_ context.Context, hookURL *url.URL, secret string, method jwt.
 	}
 
 	payload := struct {
-		Event      HookEvent    `json:"event"`
-		InstanceID uuid.UUID    `json:"instance_id,omitempty"`
-		User       *models.User `json:"user"`
+		Event HookEvent    `json:"event"`
+		User  *models.User `json:"user"`
 	}{
 		Event: event,
 		User:  user,

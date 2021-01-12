@@ -19,7 +19,6 @@ type FunctionHooks map[string][]string
 type GothicMicroserviceClaims struct {
 	jwt.StandardClaims
 	SiteURL       string        `json:"site_url"`
-	InstanceID    string        `json:"id"`
 	FunctionHooks FunctionHooks `json:"function_hooks"`
 }
 

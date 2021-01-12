@@ -25,7 +25,7 @@ type SignupTestSuite struct {
 }
 
 func TestSignup(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
 	ts := &SignupTestSuite{
@@ -101,7 +101,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		data := map[string]interface{}{}
 		require.NoError(json.Unmarshal(raw, &data))
 
-		assert.Equal(3, len(data))
+		assert.Equal(2, len(data))
 		assert.Equal("validate", data["event"])
 
 		u, ok := data["user"].(map[string]interface{})
