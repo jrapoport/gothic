@@ -47,6 +47,7 @@ type DBConfiguration struct {
 type JWTConfiguration struct {
 	Secret           string `json:"secret" required:"true"`
 	Method           string `json:"method" default:"HS256"`
+	Subject          string `json:"subject" default:"gothic"`
 	Exp              int    `json:"exp"`
 	Aud              string `json:"aud"`
 	AdminGroupName   string `json:"admin_group_name" split_words:"true"`

@@ -11,7 +11,7 @@ import (
 )
 
 func TestSettings_DefaultProviders(t *testing.T) {
-	api, _, _, err := setupAPIForTestForInstance()
+	api, _, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	// Setup request
@@ -35,7 +35,7 @@ func TestSettings_DefaultProviders(t *testing.T) {
 }
 
 func TestSettings_EmailDisabled(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	config.External.Email.Disabled = true
@@ -44,7 +44,7 @@ func TestSettings_EmailDisabled(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "http://localhost/settings", nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	ctx, err := WithInstanceConfig(context.Background(), config, instanceID)
+	ctx, err := WithConfig(context.Background(), config)
 	require.NoError(t, err)
 	req = req.WithContext(ctx)
 
@@ -59,7 +59,7 @@ func TestSettings_EmailDisabled(t *testing.T) {
 }
 
 func TestSettings_ExternalName(t *testing.T) {
-	api, _, _, err := setupAPIForTestForInstance()
+	api, _, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "http://localhost/settings", nil)

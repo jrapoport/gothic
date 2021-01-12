@@ -41,9 +41,8 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	instanceID := getInstanceID(ctx)
 	params.Aud = a.requestAud(ctx, r)
-	user, err := models.FindUserByEmailAndAudience(a.db, instanceID, params.Email, params.Aud)
+	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, params.Aud)
 	if err != nil && !models.IsNotFoundError(err) {
 		return internalServerError("Database error finding user").WithInternalError(err)
 	}
@@ -67,10 +66,10 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		if config.Mailer.Autoconfirm {
-			if terr = models.NewAuditLogEntry(tx, instanceID, user, models.UserSignedUpAction, nil); terr != nil {
+			if terr = models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); terr != nil {
 				return terr
 			}
-			if terr = triggerEventHooks(ctx, tx, SignupEvent, user, instanceID, config); terr != nil {
+			if terr = triggerEventHooks(ctx, tx, SignupEvent, user, config); terr != nil {
 				return terr
 			}
 			if terr = user.Confirm(tx); terr != nil {
@@ -94,10 +93,9 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, params *SignupParams) (*models.User, error) {
-	instanceID := getInstanceID(ctx)
 	config := a.getConfig(ctx)
 
-	user, err := models.NewUser(instanceID, params.Email, params.Password, params.Aud, params.Data)
+	user, err := models.NewUser(params.Email, params.Password, params.Aud, params.Data)
 	if err != nil {
 		return nil, internalServerError("Database error creating user").WithInternalError(err)
 	}
@@ -117,7 +115,7 @@ func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, param
 		if terr := user.SetRole(tx, config.JWT.DefaultGroupName); terr != nil {
 			return internalServerError("Database error updating user").WithInternalError(terr)
 		}
-		if terr := triggerEventHooks(ctx, tx, ValidateEvent, user, instanceID, config); terr != nil {
+		if terr := triggerEventHooks(ctx, tx, ValidateEvent, user, config); terr != nil {
 			return terr
 		}
 		return nil

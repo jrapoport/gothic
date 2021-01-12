@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,19 +19,17 @@ type TokenTestSuite struct {
 	API    *API
 	Config *conf.Configuration
 
-	token      string
-	instanceID uuid.UUID
+	token string
 }
 
 func TestToken(t *testing.T) {
 	os.Setenv("GOTHIC_RATE_LIMIT_HEADER", "My-Custom-Header")
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &TokenTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)

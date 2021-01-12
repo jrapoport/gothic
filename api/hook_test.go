@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage/test"
@@ -24,8 +23,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 	conn, err := test.SetupDBConnection(globalConfig)
 	require.NoError(t, err)
 
-	iid := uuid.Must(uuid.NewV4())
-	user, err := models.NewUser(iid, "test@truth.com", "thisisapassword", "", nil)
+	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
 	require.NoError(t, err)
 
 	var callCount int
@@ -39,7 +37,6 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 		require.NoError(t, json.Unmarshal(raw, &data))
 
 		assert.Len(t, data, 3)
-		assert.Equal(t, iid.String(), data["instance_id"])
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer svr.Close()
@@ -55,7 +52,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, triggerEventHooks(context.Background(), conn, SignupEvent, user, iid, config))
+	require.NoError(t, triggerEventHooks(context.Background(), conn, SignupEvent, user, config))
 
 	assert.Equal(t, 1, callCount)
 }
@@ -67,8 +64,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 	conn, err := test.SetupDBConnection(globalConfig)
 	require.NoError(t, err)
 
-	iid := uuid.Must(uuid.NewV4())
-	user, err := models.NewUser(iid, "test@truth.com", "thisisapassword", "", nil)
+	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
 	require.NoError(t, err)
 
 	var callCount int
@@ -82,7 +78,6 @@ func TestSignupHookFromClaims(t *testing.T) {
 		require.NoError(t, json.Unmarshal(raw, &data))
 
 		assert.Len(t, data, 3)
-		assert.Equal(t, iid.String(), data["instance_id"])
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer svr.Close()
@@ -102,7 +97,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 		"signup": []string{svr.URL},
 	})
 
-	require.NoError(t, triggerEventHooks(ctx, conn, SignupEvent, user, iid, config))
+	require.NoError(t, triggerEventHooks(ctx, conn, SignupEvent, user, config))
 
 	assert.Equal(t, 1, callCount)
 }

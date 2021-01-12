@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 )
@@ -20,8 +19,6 @@ const (
 	requestIDKey            = contextKey("request_id")
 	configKey               = contextKey("config")
 	inviteTokenKey          = contextKey("invite_token")
-	instanceIDKey           = contextKey("instance_id")
-	instanceKey             = contextKey("instance")
 	signatureKey            = contextKey("signature")
 	externalProviderTypeKey = contextKey("external_provider_type")
 	userKey                 = contextKey("user")
@@ -79,34 +76,6 @@ func getConfig(ctx context.Context) *conf.Configuration {
 		return nil
 	}
 	return obj.(*conf.Configuration)
-}
-
-// withInstanceID adds the instance id to the context.
-func withInstanceID(ctx context.Context, id uuid.UUID) context.Context {
-	return context.WithValue(ctx, instanceIDKey, id)
-}
-
-// getInstanceID reads the instance id from the context.
-func getInstanceID(ctx context.Context) uuid.UUID {
-	obj := ctx.Value(instanceIDKey)
-	if obj == nil {
-		return uuid.Nil
-	}
-	return obj.(uuid.UUID)
-}
-
-// withInstance adds the instance id to the context.
-func withInstance(ctx context.Context, i *models.Instance) context.Context {
-	return context.WithValue(ctx, instanceKey, i)
-}
-
-// getInstance reads the instance id from the context.
-func getInstance(ctx context.Context) *models.Instance {
-	obj := ctx.Value(instanceKey)
-	if obj == nil {
-		return nil
-	}
-	return obj.(*models.Instance)
 }
 
 // withUser adds the user id to the context.

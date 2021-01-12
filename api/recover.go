@@ -17,7 +17,6 @@ type RecoverParams struct {
 func (a *API) Recover(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	config := a.getConfig(ctx)
-	instanceID := getInstanceID(ctx)
 	params := &RecoverParams{}
 	jsonDecoder := json.NewDecoder(r.Body)
 	err := jsonDecoder.Decode(params)
@@ -30,7 +29,7 @@ func (a *API) Recover(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	aud := a.requestAud(ctx, r)
-	user, err := models.FindUserByEmailAndAudience(a.db, instanceID, params.Email, aud)
+	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, aud)
 	if err != nil {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
@@ -39,7 +38,7 @@ func (a *API) Recover(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {
-		if terr := models.NewAuditLogEntry(tx, instanceID, user, models.UserRecoveryRequestedAction, nil); terr != nil {
+		if terr := models.NewAuditLogEntry(tx, user, models.UserRecoveryRequestedAction, nil); terr != nil {
 			return terr
 		}
 

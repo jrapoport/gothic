@@ -59,20 +59,18 @@ func getUserFromClaims(ctx context.Context, conn *storage.Connection) (*models.U
 	}
 
 	// System User
-	instanceID := getInstanceID(ctx)
-
 	if len(claims.Audience) <= 0 {
 		return nil, errors.New("Invalid audience")
 	}
 
 	if claims.Subject == models.SystemUserUUID.String() || claims.Subject == models.SystemUserID {
-		return models.NewSystemUser(instanceID, claims.Audience[0]), nil
+		return models.NewSystemUser(claims.Audience[0]), nil
 	}
 	userID, err := uuid.FromString(claims.Subject)
 	if err != nil {
 		return nil, errors.New("Invalid user ID")
 	}
-	return models.FindUserByInstanceIDAndID(conn, instanceID, userID)
+	return models.FindUserByID(conn, userID)
 }
 
 func (a *API) isAdmin(ctx context.Context, u *models.User, aud string) bool {
