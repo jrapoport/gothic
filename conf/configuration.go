@@ -57,20 +57,17 @@ type JWTConfiguration struct {
 type GlobalConfiguration struct {
 	API struct {
 		Host            string
-		RestPort        int `envconfig:"REST_PORT" default:"8081"`
-		RpcPort         int `envconfig:"RPC_PORT" default:"3001"`
-		RpcWebPort      int `envconfig:"RPCWEB_PORT" default:"6001"`
-		Endpoint        string
+		RestPort        int    `envconfig:"REST_PORT" default:"8081"`
+		RpcPort         int    `envconfig:"RPC_PORT" default:"3001"`
+		RpcWebPort      int    `envconfig:"RPCWEB_PORT" default:"6001"`
 		RequestIDHeader string `envconfig:"REQUEST_ID_HEADER"`
 	}
-	DB                DBConfiguration
-	External          ProviderConfiguration
-	Logging           LoggingConfig `envconfig:"LOG"`
-	OperatorToken     string        `split_words:"true" required:"true"`
-	MultiInstanceMode bool
-	Tracing           TracingConfig
-	SMTP              SMTPConfiguration
-	RateLimitHeader   string `split_words:"true"`
+	DB              DBConfiguration
+	External        ProviderConfiguration
+	Logging         LoggingConfig `envconfig:"LOG"`
+	Tracing         TracingConfig
+	SMTP            SMTPConfiguration
+	RateLimitHeader string `split_words:"true"`
 }
 
 // EmailContentConfiguration holds the configuration for emails, both subjects and template URLs.

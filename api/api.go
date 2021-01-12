@@ -91,20 +91,11 @@ func NewAPIWithVersion(ctx context.Context, globalConfig *conf.GlobalConfigurati
 	r.Route("/callback", func(r *router) {
 		r.UseBypass(logger)
 		r.Use(api.loadOAuthState)
-
-		if globalConfig.MultiInstanceMode {
-			r.Use(api.loadInstanceConfig)
-		}
 		r.Get("/", api.ExternalProviderCallback)
 	})
 
 	r.Route("/", func(r *router) {
 		r.UseBypass(logger)
-
-		if globalConfig.MultiInstanceMode {
-			r.Use(api.loadJWSSignatureHeader)
-			r.Use(api.loadInstanceConfig)
-		}
 
 		r.Get("/settings", api.handleSettings)
 
@@ -160,24 +151,6 @@ func NewAPIWithVersion(ctx context.Context, globalConfig *conf.GlobalConfigurati
 			r.Get("/metadata", api.SAMLMetadata)
 		})
 	})
-
-	if globalConfig.MultiInstanceMode {
-		// Operator microservice API
-		r.WithBypass(logger).With(api.verifyOperatorRequest).Get("/", api.GetAppManifest)
-		r.Route("/instances", func(r *router) {
-			r.UseBypass(logger)
-			r.Use(api.verifyOperatorRequest)
-
-			r.Post("/", api.CreateInstance)
-			r.Route("/{instance_id}", func(r *router) {
-				r.Use(api.loadInstance)
-
-				r.Get("/", api.GetInstance)
-				r.Put("/", api.UpdateInstance)
-				r.Delete("/", api.DeleteInstance)
-			})
-		})
-	}
 
 	corsHandler := cors.New(cors.Options{
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
