@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ./dev.env
+      - ./env/dev.env
     expose:
       - "3001"
       - "6001"
