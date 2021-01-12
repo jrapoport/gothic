@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const modelsTestConfig = "../hack/test.env"
+const modelsTestConfig = "../test.env"
 
 type UserTestSuite struct {
 	suite.Suite

@@ -23,7 +23,6 @@ const (
 	instanceIDKey           = contextKey("instance_id")
 	instanceKey             = contextKey("instance")
 	signatureKey            = contextKey("signature")
-	gothicIDKey            = contextKey("gothic_id")
 	externalProviderTypeKey = contextKey("external_provider_type")
 	userKey                 = contextKey("user")
 	externalReferrerKey     = contextKey("external_referrer")
@@ -132,21 +131,6 @@ func withSignature(ctx context.Context, id string) context.Context {
 // getSignature reads the request ID from the context.
 func getSignature(ctx context.Context) string {
 	obj := ctx.Value(signatureKey)
-	if obj == nil {
-		return ""
-	}
-
-	return obj.(string)
-}
-
-// withGothicID adds the provided request ID to the context.
-func withGothicID(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, gothicIDKey, id)
-}
-
-// getGothicID reads the request ID from the context.
-func getGothicID(ctx context.Context) string {
-	obj := ctx.Value(gothicIDKey)
 	if obj == nil {
 		return ""
 	}
