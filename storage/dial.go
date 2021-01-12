@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"path/filepath"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/onrik/gorm-logrus"
 	"github.com/pkg/errors"
@@ -94,7 +93,7 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 		config.DB.Database))
 
 	conn := &Connection{DB: orm}
-	conn = conn.withContext(context.Background(), config, uuid.Nil)
+	conn = conn.withContext(context.Background(), config)
 
 	if !config.DB.AutoMigrate {
 		return conn, nil

@@ -28,9 +28,8 @@ func (a *API) loadUser(w http.ResponseWriter, r *http.Request) (context.Context,
 	}
 
 	logEntrySetField(r, "user_id", userID)
-	instanceID := getInstanceID(r.Context())
 
-	u, err := models.FindUserByInstanceIDAndID(a.db, instanceID, userID)
+	u, err := models.FindUserByID(a.db, userID)
 	if err != nil {
 		if models.IsNotFoundError(err) {
 			return nil, notFoundError("User not found")
@@ -53,7 +52,6 @@ func (a *API) getAdminParams(r *http.Request) (*adminUserParams, error) {
 // adminUsers responds with a list of all users in a given audience
 func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	instanceID := getInstanceID(ctx)
 	aud := a.requestAud(ctx, r)
 
 	pageParams, err := paginate(r)
@@ -68,7 +66,7 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
 
 	filter := r.URL.Query().Get("filter")
 
-	users, err := models.FindUsersInAudience(a.db, instanceID, aud, pageParams, sortParams, filter)
+	users, err := models.FindUsersInAudience(a.db, aud, pageParams, sortParams, filter)
 	if err != nil {
 		return internalServerError("Database error finding users").WithInternalError(err)
 	}
@@ -92,7 +90,6 @@ func (a *API) adminUserUpdate(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	user := getUser(ctx)
 	adminUser := getAdminUser(ctx)
-	instanceID := getInstanceID(ctx)
 	params, err := a.getAdminParams(r)
 	if err != nil {
 		return err
@@ -135,7 +132,7 @@ func (a *API) adminUserUpdate(w http.ResponseWriter, r *http.Request) error {
 			}
 		}
 
-		if terr := models.NewAuditLogEntry(tx, instanceID, adminUser, models.UserModifiedAction, map[string]interface{}{
+		if terr := models.NewAuditLogEntry(tx, adminUser, models.UserModifiedAction, map[string]interface{}{
 			"user_id":    user.ID,
 			"user_email": user.Email,
 		}); terr != nil {
@@ -154,7 +151,6 @@ func (a *API) adminUserUpdate(w http.ResponseWriter, r *http.Request) error {
 // adminUserCreate creates a new user based on the provided data
 func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	instanceID := getInstanceID(ctx)
 	adminUser := getAdminUser(ctx)
 	params, err := a.getAdminParams(r)
 	if err != nil {
@@ -170,13 +166,13 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 		aud = params.Aud
 	}
 
-	if exists, err := models.IsDuplicatedEmail(a.db, instanceID, params.Email, aud); err != nil {
+	if exists, err := models.IsDuplicatedEmail(a.db, params.Email, aud); err != nil {
 		return internalServerError("Database error checking email").WithInternalError(err)
 	} else if exists {
 		return unprocessableEntityError("Email address already registered by another user")
 	}
 
-	user, err := models.NewUser(instanceID, params.Email, params.Password, aud, params.UserMetaData)
+	user, err := models.NewUser(params.Email, params.Password, aud, params.UserMetaData)
 	if err != nil {
 		return internalServerError("Error creating user").WithInternalError(err)
 	}
@@ -187,7 +183,7 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 
 	config := a.getConfig(ctx)
 	err = a.db.Transaction(func(tx *storage.Connection) error {
-		if terr := models.NewAuditLogEntry(tx, instanceID, adminUser, models.UserSignedUpAction, map[string]interface{}{
+		if terr := models.NewAuditLogEntry(tx, adminUser, models.UserSignedUpAction, map[string]interface{}{
 			"user_id":    user.ID,
 			"user_email": user.Email,
 		}); terr != nil {
@@ -226,11 +222,10 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 func (a *API) adminUserDelete(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	user := getUser(ctx)
-	instanceID := getInstanceID(ctx)
 	adminUser := getAdminUser(ctx)
 
 	err := a.db.Transaction(func(tx *storage.Connection) error {
-		if terr := models.NewAuditLogEntry(tx, instanceID, adminUser, models.UserDeletedAction, map[string]interface{}{
+		if terr := models.NewAuditLogEntry(tx, adminUser, models.UserDeletedAction, map[string]interface{}{
 			"user_id":    user.ID,
 			"user_email": user.Email,
 		}); terr != nil {

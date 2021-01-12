@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/api/provider"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
@@ -61,8 +60,7 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: jwt.At(time.Now().Add(5 * time.Minute)),
 			},
-			SiteURL:    config.SiteURL,
-			InstanceID: getInstanceID(ctx).String(),
+			SiteURL: config.SiteURL,
 		},
 		Provider:    providerType,
 		InviteToken: inviteToken,
@@ -85,7 +83,6 @@ func (a *API) ExternalProviderCallback(w http.ResponseWriter, r *http.Request) e
 func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	config := a.getConfig(ctx)
-	instanceID := getInstanceID(ctx)
 
 	providerType := getExternalProviderType(ctx)
 	var userData *provider.UserProvidedData
@@ -109,7 +106,7 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 		var terr error
 		inviteToken := getInviteToken(ctx)
 		if inviteToken != "" {
-			if user, terr = a.processInvite(ctx, tx, userData, instanceID, inviteToken, providerType); terr != nil {
+			if user, terr = a.processInvite(ctx, tx, userData, inviteToken, providerType); terr != nil {
 				return terr
 			}
 		} else {
@@ -119,7 +116,7 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 			var emailData provider.Email
 			for _, e := range userData.Emails {
 				if e.Verified || config.Mailer.Autoconfirm {
-					user, terr = models.FindUserByEmailAndAudience(tx, instanceID, e.Email, aud)
+					user, terr = models.FindUserByEmailAndAudience(tx, e.Email, aud)
 					if terr != nil && !models.IsNotFoundError(terr) {
 						return internalServerError("Error checking for duplicate users").WithInternalError(terr)
 					}
@@ -174,10 +171,10 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 					return nil
 				}
 
-				if terr := models.NewAuditLogEntry(tx, instanceID, user, models.UserSignedUpAction, nil); terr != nil {
+				if terr := models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); terr != nil {
 					return terr
 				}
-				if terr = triggerEventHooks(ctx, tx, SignupEvent, user, instanceID, config); terr != nil {
+				if terr = triggerEventHooks(ctx, tx, SignupEvent, user, config); terr != nil {
 					return terr
 				}
 
@@ -186,10 +183,10 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 					return internalServerError("Error updating user").WithInternalError(terr)
 				}
 			} else {
-				if terr := models.NewAuditLogEntry(tx, instanceID, user, models.LoginAction, nil); terr != nil {
+				if terr := models.NewAuditLogEntry(tx, user, models.LoginAction, nil); terr != nil {
 					return terr
 				}
-				if terr = triggerEventHooks(ctx, tx, LoginEvent, user, instanceID, config); terr != nil {
+				if terr = triggerEventHooks(ctx, tx, LoginEvent, user, config); terr != nil {
 					return terr
 				}
 			}
@@ -218,7 +215,7 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 	return nil
 }
 
-func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userData *provider.UserProvidedData, instanceID uuid.UUID, inviteToken, providerType string) (*models.User, error) {
+func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userData *provider.UserProvidedData, inviteToken, providerType string) (*models.User, error) {
 	config := a.getConfig(ctx)
 	user, err := models.FindUserByConfirmationToken(tx, inviteToken)
 	if err != nil {
@@ -258,10 +255,10 @@ func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userDat
 		return nil, internalServerError("Database error updating user").WithInternalError(err)
 	}
 
-	if err := models.NewAuditLogEntry(tx, instanceID, user, models.InviteAcceptedAction, nil); err != nil {
+	if err := models.NewAuditLogEntry(tx, user, models.InviteAcceptedAction, nil); err != nil {
 		return nil, err
 	}
-	if err := triggerEventHooks(ctx, tx, SignupEvent, user, instanceID, config); err != nil {
+	if err := triggerEventHooks(ctx, tx, SignupEvent, user, config); err != nil {
 		return nil, err
 	}
 
@@ -309,7 +306,7 @@ func (a *API) Provider(ctx context.Context, name string) (provider.Provider, err
 	case "facebook":
 		return provider.NewFacebookProvider(config.External.Facebook)
 	case "saml":
-		return provider.NewSamlProvider(config.External.Saml, a.db, getInstanceID(ctx))
+		return provider.NewSamlProvider(config.External.Saml, a.db)
 	default:
 		return nil, fmt.Errorf("Provider %s could not be found", name)
 	}

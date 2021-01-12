@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/stretchr/testify/require"
@@ -16,19 +15,17 @@ import (
 
 type ExternalTestSuite struct {
 	suite.Suite
-	API        *API
-	Config     *conf.Configuration
-	instanceID uuid.UUID
+	API    *API
+	Config *conf.Configuration
 }
 
 func TestExternal(t *testing.T) {
-	api, config, instanceID, err := setupAPIForTestForInstance()
+	api, config, err := setupAPIForTestForInstance()
 	require.NoError(t, err)
 
 	ts := &ExternalTestSuite{
-		API:        api,
-		Config:     config,
-		instanceID: instanceID,
+		API:    api,
+		Config: config,
 	}
 
 	suite.Run(t, ts)
@@ -43,11 +40,11 @@ func (ts *ExternalTestSuite) SetupTest() {
 
 func (ts *ExternalTestSuite) createUser(email string, name string, avatar string, confirmationToken string) (*models.User, error) {
 	// Cleanup existing user, if they already exist
-	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, email, ts.Config.JWT.Aud); u != nil {
+	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud); u != nil {
 		require.NoError(ts.T(), ts.API.db.Delete(u).Error, "Error deleting user")
 	}
 
-	u, err := models.NewUser(ts.instanceID, email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": name, "avatar_url": avatar})
+	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": name, "avatar_url": avatar})
 
 	if confirmationToken != "" {
 		u.ConfirmationToken = confirmationToken
@@ -114,7 +111,7 @@ func assertAuthorizationSuccess(ts *ExternalTestSuite, u *url.URL, tokenCount in
 	ts.Equal(1, userCount)
 
 	// ensure user has been created with metadata
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, email, ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud)
 	ts.Require().NoError(err)
 	ts.Equal(name, user.UserMetaData["full_name"])
 	ts.Equal(avatar, user.UserMetaData["avatar_url"])
@@ -133,7 +130,7 @@ func assertAuthorizationFailure(ts *ExternalTestSuite, u *url.URL, errorDescript
 	ts.Empty(v.Get("token_type"))
 
 	// ensure user is nil
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, ts.instanceID, email, ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud)
 	ts.Require().Error(err, "User not found")
 	ts.Require().Nil(user)
 }

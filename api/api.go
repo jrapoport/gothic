@@ -10,7 +10,6 @@ import (
 	"github.com/didip/tollbooth/v5"
 	"github.com/didip/tollbooth/v5/limiter"
 	"github.com/go-chi/chi"
-	"github.com/gofrs/uuid"
 	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/mailer"
@@ -174,7 +173,7 @@ func NewAPIFromConfigFile(filename string, version string) (*API, *conf.Configur
 		return nil, nil, err
 	}
 
-	ctx, err := WithInstanceConfig(context.Background(), config, uuid.Nil)
+	ctx, err := WithConfig(context.Background(), config)
 	if err != nil {
 		logrus.Fatalf("Error loading instance config: %+v", err)
 	}
@@ -187,9 +186,8 @@ func NewAPIFromConfigFile(filename string, version string) (*API, *conf.Configur
 	return NewAPIWithVersion(ctx, globalConfig, db, version), config, nil
 }
 
-func WithInstanceConfig(ctx context.Context, config *conf.Configuration, instanceID uuid.UUID) (context.Context, error) {
+func WithConfig(ctx context.Context, config *conf.Configuration) (context.Context, error) {
 	ctx = withConfig(ctx, config)
-	ctx = withInstanceID(ctx, instanceID)
 	return ctx, nil
 }
 
