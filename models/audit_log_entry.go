@@ -81,7 +81,7 @@ func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, t
 		l.Payload["traits"] = traits
 	}
 
-	return errors.Wrap(tx.Create(&l).Error, "Database error creating audit log entry")
+	return errors.Wrap(tx.Create(&l).Error, "Name error creating audit log entry")
 }
 
 func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterValue string, pageParams *Pagination) ([]*AuditLogEntry, error) {

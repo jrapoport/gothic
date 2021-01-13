@@ -3,11 +3,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/jrapoport/gothic/conf"
 	"github.com/spf13/cobra"
 )
-
-var Version string
-var Build string
 
 var versionCmd = cobra.Command{
 	Run: showVersion,
@@ -15,5 +13,5 @@ var versionCmd = cobra.Command{
 }
 
 func showVersion(*cobra.Command, []string) {
-	fmt.Printf("%s (%s)\n", Version, Build)
+	fmt.Printf("%s\n", conf.CurrentVersion())
 }

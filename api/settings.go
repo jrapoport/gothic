@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"net/http"
 )
 
@@ -27,29 +26,24 @@ type Settings struct {
 }
 
 func (a *API) handleSettings(w http.ResponseWriter, r *http.Request) error {
-	return sendJSON(w, http.StatusOK, a.Settings(r.Context()))
+	return sendJSON(w, http.StatusOK, a.Settings())
 }
 
-func (a *API) Settings(ctx context.Context) *Settings {
-	if ctx == nil {
-		ctx = a.ctx
-	}
-	config := a.getConfig(ctx)
-	if config == nil {
-		return nil
-	}
+func (a *API) Settings() *Settings {
+	config := a.config
+	external := a.config.External
 	return &Settings{
 		ExternalProviders: ProviderSettings{
-			Bitbucket: config.External.Bitbucket.Enabled,
-			GitHub:    config.External.Github.Enabled,
-			GitLab:    config.External.Gitlab.Enabled,
-			Google:    config.External.Google.Enabled,
-			Facebook:  config.External.Facebook.Enabled,
-			Email:     !config.External.Email.Disabled,
-			SAML:      config.External.Saml.Enabled,
+			Bitbucket: external.Bitbucket.Enabled,
+			GitHub:    external.Github.Enabled,
+			GitLab:    external.Gitlab.Enabled,
+			Google:    external.Google.Enabled,
+			Facebook:  external.Facebook.Enabled,
+			Email:     !external.Email.Disabled,
+			SAML:      external.Saml.Enabled,
 		},
 		ExternalLabels: ProviderLabels{
-			SAML: config.External.Saml.Name,
+			SAML: external.Saml.Name,
 		},
 		DisableSignup: config.DisableSignup,
 		Autoconfirm:   config.Mailer.Autoconfirm,

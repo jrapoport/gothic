@@ -19,7 +19,6 @@ const (
 	requestIDKey            = contextKey("request_id")
 	configKey               = contextKey("config")
 	inviteTokenKey          = contextKey("invite_token")
-	signatureKey            = contextKey("signature")
 	externalProviderTypeKey = contextKey("external_provider_type")
 	userKey                 = contextKey("user")
 	externalReferrerKey     = contextKey("external_referrer")
@@ -70,14 +69,6 @@ func withConfig(ctx context.Context, config *conf.Configuration) context.Context
 	return context.WithValue(ctx, configKey, config)
 }
 
-func getConfig(ctx context.Context) *conf.Configuration {
-	obj := ctx.Value(configKey)
-	if obj == nil {
-		return nil
-	}
-	return obj.(*conf.Configuration)
-}
-
 // withUser adds the user id to the context.
 func withUser(ctx context.Context, u *models.User) context.Context {
 	return context.WithValue(ctx, userKey, u)
@@ -90,21 +81,6 @@ func getUser(ctx context.Context) *models.User {
 		return nil
 	}
 	return obj.(*models.User)
-}
-
-// withSignature adds the provided request ID to the context.
-func withSignature(ctx context.Context, id string) context.Context {
-	return context.WithValue(ctx, signatureKey, id)
-}
-
-// getSignature reads the request ID from the context.
-func getSignature(ctx context.Context) string {
-	obj := ctx.Value(signatureKey)
-	if obj == nil {
-		return ""
-	}
-
-	return obj.(string)
 }
 
 func withInviteToken(ctx context.Context, token string) context.Context {

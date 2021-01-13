@@ -26,7 +26,7 @@ type Connection struct {
 }
 
 // Dial will connect to that storage engine
-func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
+func Dial(config *conf.Configuration) (*Connection, error) {
 	if config.DB.Driver == "" && config.DB.URL != "" {
 		u, err := url.Parse(config.DB.URL)
 		if err != nil {
@@ -35,7 +35,7 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 		config.DB.Driver = u.Scheme
 	}
 
-	if config.DB.Database == "" {
+	if config.DB.Name == "" {
 		config.DB.Driver = "gothic"
 		if config.DB.Namespace != "" {
 			config.DB.Driver += "_" + config.DB.Namespace
@@ -57,7 +57,7 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 			fallthrough
 		default:
 			u, _ := url.Parse(config.DB.URL)
-			name := fmt.Sprintf("%s.sqlite", config.DB.Database)
+			name := fmt.Sprintf("%s.sqlite", config.DB.Name)
 			file := filepath.Join(u.Path, name)
 			return sqlite.Open(file)
 		}
@@ -86,11 +86,11 @@ func Dial(config *conf.GlobalConfiguration) (*Connection, error) {
 	if config.DB.Driver != "sqlite" && config.DB.Driver != "" {
 		orm.Exec(fmt.Sprintf(
 			"CREATE DATABASE IF NOT EXISTS %s",
-			config.DB.Database))
+			config.DB.Name))
 
 		orm.Exec(fmt.Sprintf(
 			"USE %s",
-			config.DB.Database))
+			config.DB.Name))
 	}
 
 	conn := &Connection{DB: orm}

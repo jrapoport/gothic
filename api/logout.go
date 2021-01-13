@@ -11,7 +11,7 @@ import (
 func (a *API) Logout(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
-	a.clearCookieToken(ctx, w)
+	a.clearCookieToken(w)
 
 	u, err := getUserFromClaims(ctx, a.db)
 	if err != nil {

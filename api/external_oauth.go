@@ -33,7 +33,7 @@ func (a *API) oAuthCallback(ctx context.Context, r *http.Request, providerType s
 		return nil, badRequestError("Authorization code missing")
 	}
 
-	oAuthProvider, err := a.OAuthProvider(ctx, providerType)
+	oAuthProvider, err := a.OAuthProvider(providerType)
 	if err != nil {
 		return nil, badRequestError("Unsupported provider: %+v", err).WithInternalError(err)
 	}
@@ -57,13 +57,13 @@ func (a *API) oAuthCallback(ctx context.Context, r *http.Request, providerType s
 	return userData, nil
 }
 
-func (a *API) OAuthProvider(ctx context.Context, name string) (provider.OAuthProvider, error) {
-	providerCandidate, err := a.Provider(ctx, name)
+func (a *API) OAuthProvider(name string) (provider.OAuthProvider, error) {
+	p, err := a.Provider(name)
 	if err != nil {
 		return nil, err
 	}
 
-	switch p := providerCandidate.(type) {
+	switch p := p.(type) {
 	case provider.OAuthProvider:
 		return p, nil
 	default:
