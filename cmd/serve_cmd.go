@@ -21,8 +21,8 @@ var serveCmd = cobra.Command{
 	},
 }
 
-func serve(globalConfig *conf.GlobalConfiguration, config *conf.Configuration) {
-	ctx, err := api.WithConfig(context.Background(), config)
+func serve(globalConfig *conf.Configuration) {
+	ctx, err := api.WithConfig(context.Background(), globalConfig)
 	if err != nil {
 		logrus.Fatalf("Error loading instance config: %+v", err)
 	}
@@ -30,11 +30,11 @@ func serve(globalConfig *conf.GlobalConfiguration, config *conf.Configuration) {
 }
 
 // listenAndServe starts the API servers
-func listenAndServe(ctx context.Context, globalConfig *conf.GlobalConfiguration) {
+func listenAndServe(ctx context.Context, globalConfig *conf.Configuration) {
 
 	db, closeDB := openDB(globalConfig)
 	defer closeDB()
-	a := api.NewAPIWithVersion(ctx, globalConfig, db, Version)
+	a := api.NewAPI(globalConfig, db)
 	log := logrus.WithField("component", "api")
 
 	api.ListenAndServeREST(a, globalConfig)
@@ -47,7 +47,7 @@ func listenAndServe(ctx context.Context, globalConfig *conf.GlobalConfiguration)
 	log.Info("shutting down...")
 }
 
-func openDB(globalConfig *conf.GlobalConfiguration) (db *storage.Connection, closeDB func()) {
+func openDB(globalConfig *conf.Configuration) (db *storage.Connection, closeDB func()) {
 	// try a couple times to connect to the database
 	var err error
 	for i := 1; i <= 3; i++ {

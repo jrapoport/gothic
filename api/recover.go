@@ -34,7 +34,7 @@ func (a *API) Recover(w http.ResponseWriter, r *http.Request) error {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
 		}
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {

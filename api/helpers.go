@@ -17,11 +17,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func addRequestID(globalConfig *conf.GlobalConfiguration) middlewareHandler {
+func addRequestID(globalConfig *conf.Configuration) middlewareHandler {
 	return func(w http.ResponseWriter, r *http.Request) (context.Context, error) {
 		id := ""
-		if globalConfig.API.RequestIDHeader != "" {
-			id = r.Header.Get(globalConfig.API.RequestIDHeader)
+		if globalConfig.RequestID != "" {
+			id = r.Header.Get(globalConfig.RequestID)
 		}
 		if id == "" {
 			uid, err := uuid.NewV4()
@@ -58,7 +58,7 @@ func getUserFromClaims(ctx context.Context, conn *storage.Connection) (*models.U
 		return nil, errors.New("Invalid claim: id")
 	}
 
-	// System User
+	// System Username
 	if len(claims.Audience) <= 0 {
 		return nil, errors.New("Invalid audience")
 	}
@@ -78,7 +78,7 @@ func (a *API) isAdmin(ctx context.Context, u *models.User, aud string) bool {
 	if aud == "" {
 		aud = config.JWT.Aud
 	}
-	return u.IsSuperAdmin || (aud == u.Aud && u.HasRole(config.JWT.AdminGroupName))
+	return u.IsSuperAdmin || (aud == u.Aud && u.HasRole(config.JWT.AdminGroup))
 }
 
 func (a *API) requestAud(ctx context.Context, r *http.Request) string {

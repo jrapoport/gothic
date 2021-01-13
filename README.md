@@ -53,46 +53,46 @@ via file.
 GOTHIC_SITE_URL=https://example.gothic.com/
 ```
 
-`SITE_URL` - `string` **required**
+`GOTHIC_SITE_URL` - `string` **required**
 
 The base URL your site is located at. Currently used in combination with other
 settings to construct URLs used in emails.
 
-`DISABLE_SIGNUP` - `bool`
+`GOTHIC_DISABLE_SIGNUP` - `bool`
 
 When signup is disabled the only way to create new users is through invites.
 Defaults to `false`, all signups enabled.
 
-`GOTHIC_RATE_LIMIT_HEADER` - `string`
+`GOTHIC_RATE_LIMIT` - `string`
 
 Header on which to rate limit the `/token` endpoint.
 
 ### API
 
 ```properties
-GOTHIC_API_HOST=localhost
-REST_PORT=9999 # the http REST server port
-RPC_PORT=3001 # the gRPC server port
-RPCWEB_PORT=6001 # the gRPC Web server port
+GOTHIC__HOST=localhost
+GOTHIC_REST_PORT=9999 # the http REST server port
+GOTHIC_RPC_PORT=3001 # the gRPC server port
+GOTHIC_RPCWEB_PORT=6001 # the gRPC Web server port
 ```
 
-`API_HOST` - `string`
+`GOTHIC_HOST` - `string`
 
 Hostname to listen on.
 
-`REST_PORT` (no prefix) / `GOTHIC_API_REST_PORT` - `number`
+`GOTHIC_REST_PORT` - `number`
 
 Port number for the HTTP REST API server to listen on. Defaults to `8081`.
 
-`RPC_PORT` (no prefix) / `GOTHIC_API_RPC_PORT` - `number`
+`GOTHIC_RPC_PORT` - `number`
 
 Port number for the gRPC API server to listen on. Defaults to `3001`.
 
-`RPCWEB_PORT` (no prefix) / `GOTHIC_API_RPCWEB_PORT` - `number`
+`GOTHIC_RPCWEB_PORT` - `number`
 
 Port number for the gRPC Web API server to listen on. Defaults to `6001`.
 
-`REQUEST_ID_HEADER` - `string`
+`GORTHIC_REQUEST_ID` - `string`
 
 If you wish to inherit a request ID from the incoming request, specify the name
 in this value.
@@ -101,23 +101,23 @@ in this value.
 
 ```properties
 GOTHIC_DB_DRIVER=mysql
-DATABASE_URL=root@localhost
-GOTHIC_DB_DATABASE=gothic
+GOTHIC_DB_URL=root@localhost
+GOTHIC_DB_NAME=gothic
 ```
 
-`DB_DRIVER` - `string` **required**
+`GOTHIC_DB_DRIVER` - `string` **required**
 
 Chooses what dialect of database you want. Must be `mysql`.
 
-`DATABASE_URL` (no prefix) / `DB_DATABASE_URL` - `string` **required**
+`GOTHIC_DB_URL` `string` **required**
 
 Connection string for the database.
 
-`GOTHIC_DB_DATABASE` - `string`
+`GOTHIC_DB_NAME` - `string`
 
 The name of the database to create automatically. Defaults to `gothic`.
 
-`DB_NAMESPACE` - `string`
+`GOTHIC_DB_NAMESPACE` - `string`
 
 Adds a prefix to all table names.
 
@@ -131,16 +131,16 @@ GOTHIC_DB_AUTOMIGRATE=true
 ### Logging
 
 ```properties
-LOG_LEVEL=debug # available without GOTHIC prefix (exception)
+GOTHIC_LOG_LEVEL=debug # available without GOTHIC prefix (exception)
 GOTHIC_LOG_FILE=/var/log/go/gothic.log
 ```
 
-`LOG_LEVEL` - `string`
+`GOTHIC_LOG_LEVEL` - `string`
 
 Controls what log levels are output. Choose from `panic`, `fatal`, `error`,
 `warn`, `info`, or `debug`. Defaults to `info`.
 
-`LOG_FILE` - `string`
+`GOTHIC_LOG_FILE` - `string`
 
 If you wish logs to be written to a file, set `log_file` to a valid file path.
 
@@ -155,24 +155,24 @@ GOTHIC_TRACING_TAGS="tag1:value1,tag2:value2"
 GOTHIC_SERVICE_NAME="gothic"
 ```
 
-`TRACING_ENABLED` - `bool`
+`GOTHIC_TRACING_ENABLED` - `bool`
 
 Whether tracing is enabled or not. Defaults to `false`.
 
-`TRACING_HOST` - `bool`
+`GOTHIC_TRACING_HOST` - `bool`
 
 The tracing destination.
 
-`TRACING_PORT` - `bool`
+`GOTHIC_TRACING_PORT` - `bool`
 
 The port for the tracing host.
 
-`TRACING_TAGS` - `string`
+`GOTHIC_TRACING_TAGS` - `string`
 
 A comma separated list of key:value pairs. These key value pairs will be added
 as tags to all opentracing spans.
 
-`SERVICE_NAME` - `string`
+`GOTHIC_TRACING_SERVICE_NAME` - `string`
 
 The name to use for the service.
 
@@ -185,27 +185,27 @@ GOTHIC_JWT_EXP=3600
 GOTHIC_JWT_AUD=gothic
 ```
 
-`JWT_SECRET` - `string` **required**
+`GOTHIC_JWT_SECRET` - `string` **required**
 
 The secret used to sign JWT tokens with.
 
-`JWT_METHOD` - `string`
+`GOTHIC_JWT_METHOD` - `string`
 
 The method used to sign JWT tokens. Defaults to `HS256` (HMAC256).
 
-`JWT_EXP` - `number`
+`GOTHIC_JWT_EXP` - `number`
 
 How long tokens are valid for, in seconds. Defaults to 3600 (1 hour).
 
-`JWT_AUD` - `string`
+`GOTHIC_JWT_AUD` - `string`
 
 The default JWT audience. Use audiences to group users.
 
-`JWT_ADMIN_GROUP_NAME` - `string`
+`GOTHIC_JWT_ADMIN_GROUP` - `string`
 
 The name of the admin group (if enabled). Defaults to `admin`.
 
-`JWT_DEFAULT_GROUP_NAME` - `string`
+`GOTHIC_JWT_DEFAULT_GROUP` - `string`
 
 The default group to assign all new users to.
 
@@ -223,23 +223,23 @@ GOTHIC_EXTERNAL_GITHUB_SECRET=clientsecretvaluessssh
 No external providers are required, but you must provide the required values if
 you choose to enable any.
 
-`EXTERNAL_X_ENABLED` - `bool`
+`GOTHIC_EXTERNAL_[PROVIDER]_ENABLED` - `bool`
 
 Whether this external provider is enabled or not
 
-`EXTERNAL_X_CLIENT_ID` - `string` **required**
+`GOTHIC_EXTERNAL_[PROVIDER]_CLIENT_ID` - `string` **required**
 
 The OAuth2 Client ID registered with the external provider.
 
-`EXTERNAL_X_SECRET` - `string` **required**
+`GOTHIC_EXTERNAL_[PROVIDER]_SECRET` - `string` **required**
 
 The OAuth2 Client Secret provided by the external provider when you registered.
 
-`EXTERNAL_X_REDIRECT_URI` - `string` **required for gitlab**
+`GOTHIC_EXTERNAL_[PROVIDER]_REDIRECT_URI` - `string` **required for gitlab**
 
 The URI a OAuth2 provider will redirect to with the `code` and `state` values.
 
-`EXTERNAL_X_URL` - `string`
+`GOTHIC_EXTERNAL_[PROVIDER]_URL` - `string`
 
 The base URL used for constructing the URLs to request authorization and access
 tokens. Used by `gitlab` only. Defaults to `https://gitlab.com`.
@@ -258,71 +258,71 @@ GOTHIC_SMTP_ADMIN_EMAIL=support@example.com
 GOTHIC_MAILER_SUBJECTS_CONFIRMATION="Please confirm"
 ```
 
-`SMTP_ADMIN_EMAIL` - `string` **required**
+`GOTHIC_SMTP_ADMIN_EMAIL` - `string` **required**
 
 The `From` email address for all emails sent.
 
-`SMTP_HOST` - `string` **required**
+`GOTHIC_SMTP_HOST` - `string` **required**
 
 The mail server hostname to send emails through.
 
-`SMTP_PORT` - `number` **required**
+`GOTHIC_SMTP_PORT` - `number` **required**
 
 The port number to connect to the mail server on.
 
-`SMTP_USER` - `string`
+`GOTHIC_SMTP_USER` - `string`
 
 If the mail server requires authentication, the username to use.
 
-`SMTP_PASS` - `string`
+`GOTHIC_SMTP_PASS` - `string`
 
 If the mail server requires authentication, the password to use.
 
-`SMTP_MAX_FREQUENCY` - `number`
+`GOTHIC_SMTP_MAX_FREQUENCY` - `number`
 
 Controls the minimum amount of time that must pass before sending another signup
 confirmation or password reset email. The value is the number of seconds.
 Defaults to 900 (15 minutes).
 
-`MAILER_AUTOCONFIRM` - `bool`
+`GOTHIC_MAILER_AUTOCONFIRM` - `bool`
 
 If you do not require email confirmation, you may set this to `true`. Defaults
 to `false`.
 
-`MAILER_URLPATHS_INVITE` - `string`
+`GOTHIC_MAILER_URLPATHS_INVITE` - `string`
 
 URL path to use in the user invite email. Defaults to `/`.
 
-`MAILER_URLPATHS_CONFIRMATION` - `string`
+`GOTHIC_MAILER_URLPATHS_CONFIRMATION` - `string`
 
 URL path to use in the signup confirmation email. Defaults to `/`.
 
-`MAILER_URLPATHS_RECOVERY` - `string`
+`GOTHIC_MAILER_URLPATHS_RECOVERY` - `string`
 
 URL path to use in the password reset email. Defaults to `/`.
 
-`MAILER_URLPATHS_EMAIL_CHANGE` - `string`
+`GOTHIC_MAILER_URLPATHS_EMAIL_CHANGE` - `string`
 
 URL path to use in the email change confirmation email. Defaults to `/`.
 
-`MAILER_SUBJECTS_INVITE` - `string`
+`GOTHIC_MAILER_SUBJECTS_INVITE` - `string`
 
 Email subject to use for user invite. Defaults to `You have been invited`.
 
-`MAILER_SUBJECTS_CONFIRMATION` - `string`
+`GOTHIC_MAILER_SUBJECTS_CONFIRMATION` - `string`
 
 Email subject to use for signup confirmation. Defaults to `Confirm Your Signup`.
 
-`MAILER_SUBJECTS_RECOVERY` - `string`
+`GOTHIC_MAILER_SUBJECTS_RECOVERY` - `string`
 
 Email subject to use for password reset. Defaults to `Reset Your Password`.
 
-`MAILER_SUBJECTS_EMAIL_CHANGE` - `string`
+`GOTHIC_MAILER_SUBJECTS_EMAIL_CHANGE` - `string`
 
 Email subject to use for email change confirmation. Defaults to `Confirm Email
 Change`.
 
-`MAILER_TEMPLATES_INVITE` - `string`
+`GOTHIC_MAILER_TEMPLATES_INVITE` - `string`
 
 URL path to an email template to use when inviting a user.
 `SiteURL`, `Email`, and `ConfirmationURL` variables are available.
@@ -336,7 +336,7 @@ Default Content (if template is unavailable):
 accept the invite:</p> <p><a href="{{ .ConfirmationURL }}">Accept the
 invite</a></p> ```
 
-`MAILER_TEMPLATES_CONFIRMATION` - `string`
+`GOTHIC_MAILER_TEMPLATES_CONFIRMATION` - `string`
 
 URL path to an email template to use when confirming a signup.
 `SiteURL`, `Email`, and `ConfirmationURL` variables are available.
@@ -364,7 +364,7 @@ Default Content (if template is unavailable):
 <p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>
 ```
 
-`MAILER_TEMPLATES_EMAIL_CHANGE` - `string`
+`GOTHIC_MAILER_TEMPLATES_EMAIL_CHANGE` - `string`
 
 URL path to an email template to use when confirming the change of an email
 address. `SiteURL`, `Email`, `NewEmail`, and `ConfirmationURL` variables are
@@ -378,27 +378,27 @@ Default Content (if template is unavailable):
 <p>Follow this link to confirm the update of your email from {{ .Email }} to {{
 .NewEmail }}:</p> <p><a href="{{ .ConfirmationURL }}">Change Email</a></p> ```
 
-`WEBHOOK_URL` - `string`
+`GOTHIC_WEBHOOK_URL` - `string`
 
 Url of the webhook receiver endpoint. This will be called when events like
 `validate`, `signup` or `login` occur.
 
-`WEBHOOK_SECRET` - `string`
+`GOTHIC_WEBHOOK_SECRET` - `string`
 
 Shared secret to authorize webhook requests. This secret signs the [JSON Web
 Signature](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) of
 the request. You *should* use this to verify the integrity of the request.
 Otherwise others can feed your webhook receiver with fake data.
 
-`WEBHOOK_RETRIES` - `number`
+`GOTHIC_WEBHOOK_RETRIES` - `number`
 
 How often Gothic should try a failed hook.
 
-`WEBHOOK_TIMEOUT_SEC` - `number`
+`GOTHIC_WEBHOOK_TIMEOUT_SEC` - `number`
 
 Time between retries (in seconds).
 
-`WEBHOOK_EVENTS` - `list`
+`GOTHIC_WEBHOOK_EVENTS` - `list`
 
 Which events should trigger a webhook. You can provide a comma separated list.
 For example to listen to all events, provide the values `validate,signup,login`.

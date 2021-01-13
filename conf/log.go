@@ -7,21 +7,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type LoggingConfig struct {
-	Level            string                 `mapstructure:"log_level" json:"log_level"`
-	File             string                 `mapstructure:"log_file" json:"log_file"`
-	DisableColors    bool                   `mapstructure:"disable_colors" split_words:"true" json:"disable_colors"`
-	QuoteEmptyFields bool                   `mapstructure:"quote_empty_fields" split_words:"true" json:"quote_empty_fields"`
-	TSFormat         string                 `mapstructure:"ts_format" json:"ts_format"`
-	Fields           map[string]interface{} `mapstructure:"fields" json:"fields"`
+type LogConfig struct {
+	Level           string                 `json:"log_level" mapstructure:"log_level"`
+	File            string                 `json:"log_file" mapstructure:"log_file"`
+	DisableColors   bool                   `json:"disable_colors" mapstructure:"disable_colors" split_words:"true"`
+	QuoteEmpty      bool                   `json:"quote_empty" mapstructure:"quote_empty_fields" split_words:"true"`
+	TimestampFormat string                 `json:"timestamp_format" mapstructure:"ts_format" split_words:"true"`
+	Fields          map[string]interface{} `json:"fields" mapstructure:"fields"`
 }
 
-func ConfigureLogging(config *LoggingConfig) (*logrus.Entry, error) {
+func ConfigureLog(config *LogConfig) (*logrus.Entry, error) {
 	logger := logrus.New()
 
 	tsFormat := time.RFC3339Nano
-	if config.TSFormat != "" {
-		tsFormat = config.TSFormat
+	if config.TimestampFormat != "" {
+		tsFormat = config.TimestampFormat
 	}
 	// always use the full timestamp
 	logger.SetFormatter(&logrus.TextFormatter{
@@ -29,7 +29,7 @@ func ConfigureLogging(config *LoggingConfig) (*logrus.Entry, error) {
 		DisableTimestamp: false,
 		TimestampFormat:  tsFormat,
 		DisableColors:    config.DisableColors,
-		QuoteEmptyFields: config.QuoteEmptyFields,
+		QuoteEmptyFields: config.QuoteEmpty,
 	})
 
 	// use a file if you want
