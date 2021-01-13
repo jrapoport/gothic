@@ -32,8 +32,8 @@ func NewMailer(instanceConfig *conf.Configuration) Mailer {
 		Mailer: &mailme.Mailer{
 			Host:    instanceConfig.SMTP.Host,
 			Port:    instanceConfig.SMTP.Port,
-			User:    instanceConfig.SMTP.User,
-			Pass:    instanceConfig.SMTP.Pass,
+			User:    instanceConfig.SMTP.Username,
+			Pass:    instanceConfig.SMTP.Password,
 			From:    instanceConfig.SMTP.AdminEmail,
 			BaseURL: instanceConfig.SiteURL,
 			Logger:  logrus.New(),

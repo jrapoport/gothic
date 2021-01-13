@@ -67,11 +67,11 @@ func addGetBody(w http.ResponseWriter, req *http.Request) (context.Context, erro
 func (a *API) limitHandler(lmt *limiter.Limiter) middlewareHandler {
 	return func(w http.ResponseWriter, req *http.Request) (context.Context, error) {
 		c := req.Context()
-		if limitHeader := a.config.RateLimitHeader; limitHeader != "" {
-			key := req.Header.Get(a.config.RateLimitHeader)
+		if limitHeader := a.config.RateLimit; limitHeader != "" {
+			key := req.Header.Get(a.config.RateLimit)
 			err := tollbooth.LimitByKeys(lmt, []string{key})
 			if err != nil {
-				return c, httpError(http.StatusTooManyRequests, "Rate limit exceeded")
+				return c, httpError(http.StatusTooManyRequests, "rate limit exceeded")
 			}
 		}
 		return c, nil
@@ -96,7 +96,7 @@ func (a *API) requireAdminCredentials(w http.ResponseWriter, req *http.Request) 
 
 func (a *API) requireEmailProvider(w http.ResponseWriter, req *http.Request) (context.Context, error) {
 	ctx := req.Context()
-	config := a.getConfig(ctx)
+	config := a.config
 
 	if config.External.Email.Disabled {
 		return nil, badRequestError("Unsupported email provider")

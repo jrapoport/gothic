@@ -17,7 +17,7 @@ import (
 )
 
 func TestSignupHookSendInstanceID(t *testing.T) {
-	globalConfig, err := conf.LoadGlobal(apiTestConfig)
+	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
 	require.NoError(t, err)
 
 	conn, err := test.SetupDBConnection(t, globalConfig)
@@ -58,7 +58,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 }
 
 func TestSignupHookFromClaims(t *testing.T) {
-	globalConfig, err := conf.LoadGlobal(apiTestConfig)
+	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
 	require.NoError(t, err)
 
 	conn, err := test.SetupDBConnection(t, globalConfig)
@@ -88,13 +88,14 @@ func TestSignupHookFromClaims(t *testing.T) {
 
 	config := &conf.Configuration{
 		Webhook: conf.WebhookConfig{
-			Events: []string{"signup"},
+			URL:    svr.URL,
+			Events: []string{SignupEvent},
 		},
 	}
 
 	ctx := context.Background()
 	ctx = withFunctionHooks(ctx, map[string][]string{
-		"signup": []string{svr.URL},
+		"signup": {svr.URL},
 	})
 
 	require.NoError(t, triggerEventHooks(ctx, conn, SignupEvent, user, config))

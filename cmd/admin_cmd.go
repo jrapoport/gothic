@@ -21,18 +21,18 @@ func getAudience(c *conf.Configuration) string {
 }
 
 func adminCmd() *cobra.Command {
-	var adminCmd = &cobra.Command{
+	var admCmd = &cobra.Command{
 		Use: "admin",
 	}
 
-	adminCmd.AddCommand(&adminCreateUserCmd, &adminDeleteUserCmd)
-	adminCmd.PersistentFlags().StringVarP(&audience, "aud", "a", "", "Set the new user's audience")
+	admCmd.AddCommand(&adminCreateUserCmd, &adminDeleteUserCmd)
+	admCmd.PersistentFlags().StringVarP(&audience, "aud", "a", "", "Set the new user's audience")
 
 	adminCreateUserCmd.Flags().BoolVar(&autoconfirm, "confirm", false, "Automatically confirm user without sending an email")
 	adminCreateUserCmd.Flags().BoolVar(&isSuperAdmin, "superadmin", false, "Create user with superadmin privileges")
 	adminCreateUserCmd.Flags().BoolVar(&isAdmin, "admin", false, "Create user with admin privileges")
 
-	return adminCmd
+	return admCmd
 }
 
 var adminCreateUserCmd = cobra.Command{
@@ -66,13 +66,13 @@ var adminEditRoleCmd = cobra.Command{
 	},
 }
 
-func adminCreateUser(globalConfig *conf.GlobalConfiguration, config *conf.Configuration, args []string) {
+func adminCreateUser(globalConfig *conf.Configuration, args []string) {
 	db, err := storage.Dial(globalConfig)
 	if err != nil {
 		logrus.Fatalf("Error opening database: %+v", err)
 	}
 
-	aud := getAudience(config)
+	aud := getAudience(globalConfig)
 	if exists, err := models.IsDuplicatedEmail(db, args[0], aud); exists {
 		logrus.Fatalf("Error creating new user: user already exists")
 	} else if err != nil {
@@ -96,12 +96,12 @@ func adminCreateUser(globalConfig *conf.GlobalConfiguration, config *conf.Config
 				return terr
 			}
 		} else if isAdmin {
-			if terr = user.SetRole(tx, config.JWT.AdminGroupName); terr != nil {
+			if terr = user.SetRole(tx, globalConfig.JWT.AdminGroup); terr != nil {
 				return terr
 			}
 		}
 
-		if config.Mailer.Autoconfirm || autoconfirm {
+		if globalConfig.Mailer.Autoconfirm || autoconfirm {
 			if terr = user.Confirm(tx); terr != nil {
 				return terr
 			}
@@ -115,13 +115,13 @@ func adminCreateUser(globalConfig *conf.GlobalConfiguration, config *conf.Config
 	logrus.Infof("Created user: %s", args[0])
 }
 
-func adminDeleteUser(globalConfig *conf.GlobalConfiguration, config *conf.Configuration, args []string) {
+func adminDeleteUser(globalConfig *conf.Configuration, args []string) {
 	db, err := storage.Dial(globalConfig)
 	if err != nil {
 		logrus.Fatalf("Error opening database: %+v", err)
 	}
 
-	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(config))
+	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(globalConfig))
 	if err != nil {
 		userID := uuid.Must(uuid.FromString(args[0]))
 		user, err = models.FindUserByID(db, userID)
@@ -137,13 +137,13 @@ func adminDeleteUser(globalConfig *conf.GlobalConfiguration, config *conf.Config
 	logrus.Infof("Removed user: %s", args[0])
 }
 
-func adminEditRole(globalConfig *conf.GlobalConfiguration, config *conf.Configuration, args []string) {
+func adminEditRole(globalConfig *conf.Configuration, args []string) {
 	db, err := storage.Dial(globalConfig)
 	if err != nil {
 		logrus.Fatalf("Error opening database: %+v", err)
 	}
 
-	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(config))
+	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(globalConfig))
 	if err != nil {
 		userID := uuid.Must(uuid.FromString(args[0]))
 		user, err = models.FindUserByID(db, userID)
@@ -157,7 +157,7 @@ func adminEditRole(globalConfig *conf.GlobalConfiguration, config *conf.Configur
 	if len(args) > 0 {
 		user.Role = args[0]
 	} else if isAdmin {
-		user.Role = config.JWT.AdminGroupName
+		user.Role = globalConfig.JWT.AdminGroup
 	}
 
 	if err = db.Model(&user).Select("role", "is_super_admin").Updates(user).Error; err != nil {

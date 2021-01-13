@@ -34,7 +34,7 @@ type githubUserEmail struct {
 }
 
 // NewGithubProvider creates a Github account provider.
-func NewGithubProvider(ext conf.OAuthProviderConfiguration) (OAuthProvider, error) {
+func NewGithubProvider(ext conf.OAuthProvider) (OAuthProvider, error) {
 	if err := ext.Validate(); err != nil {
 		return nil, err
 	}

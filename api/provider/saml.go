@@ -31,7 +31,7 @@ type SamlProvider struct {
 
 type ConfigX509KeyStore struct {
 	DB   *storage.Connection
-	Conf conf.SamlProviderConfiguration
+	Conf conf.SamlProvider
 }
 
 func getMetadata(url string) (*types.EntityDescriptor, error) {
@@ -61,7 +61,7 @@ func getMetadata(url string) (*types.EntityDescriptor, error) {
 }
 
 // NewSamlProvider creates a Saml account provider.
-func NewSamlProvider(ext conf.SamlProviderConfiguration, db *storage.Connection) (*SamlProvider, error) {
+func NewSamlProvider(ext conf.SamlProvider, db *storage.Connection) (*SamlProvider, error) {
 	if !ext.Enabled {
 		return nil, errors.New("SAML Provider is not enabled")
 	}

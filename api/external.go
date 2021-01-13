@@ -36,7 +36,7 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 	config := a.getConfig(ctx)
 
 	providerType := r.URL.Query().Get("provider")
-	provider, err := a.Provider(ctx, providerType)
+	p, err := a.Provider(providerType)
 	if err != nil {
 		return badRequestError("Unsupported provider: %+v", err).WithInternalError(err)
 	}
@@ -48,7 +48,7 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 			if models.IsNotFoundError(userErr) {
 				return notFoundError(userErr.Error())
 			}
-			return internalServerError("Database error finding user").WithInternalError(userErr)
+			return internalServerError("Name error finding user").WithInternalError(userErr)
 		}
 	}
 
@@ -71,7 +71,7 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 		return internalServerError("Error creating state").WithInternalError(err)
 	}
 
-	http.Redirect(w, r, provider.AuthCodeURL(tokenString), http.StatusFound)
+	http.Redirect(w, r, p.AuthCodeURL(tokenString), http.StatusFound)
 	return nil
 }
 
@@ -222,7 +222,7 @@ func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userDat
 		if models.IsNotFoundError(err) {
 			return nil, notFoundError(err.Error())
 		}
-		return nil, internalServerError("Database error finding user").WithInternalError(err)
+		return nil, internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	var emailData *provider.Email
@@ -242,7 +242,7 @@ func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userDat
 	if err := user.UpdateAppMetaData(tx, map[string]interface{}{
 		"provider": providerType,
 	}); err != nil {
-		return nil, internalServerError("Database error updating user").WithInternalError(err)
+		return nil, internalServerError("Name error updating user").WithInternalError(err)
 	}
 
 	updates := make(map[string]interface{})
@@ -252,7 +252,7 @@ func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userDat
 		}
 	}
 	if err := user.UpdateUserMetaData(tx, updates); err != nil {
-		return nil, internalServerError("Database error updating user").WithInternalError(err)
+		return nil, internalServerError("Name error updating user").WithInternalError(err)
 	}
 
 	if err := models.NewAuditLogEntry(tx, user, models.InviteAcceptedAction, nil); err != nil {
@@ -286,27 +286,26 @@ func (a *API) loadExternalState(ctx context.Context, state string) (context.Cont
 	}
 
 	ctx = withExternalProviderType(ctx, claims.Provider)
-	return withSignature(ctx, state), nil
+	return ctx, nil
 }
 
 // Provider returns a Provider interface for the given name.
-func (a *API) Provider(ctx context.Context, name string) (provider.Provider, error) {
-	config := a.getConfig(ctx)
+func (a *API) Provider(name string) (provider.Provider, error) {
+	external := a.config.External
 	name = strings.ToLower(name)
-
 	switch name {
 	case "bitbucket":
-		return provider.NewBitbucketProvider(config.External.Bitbucket)
+		return provider.NewBitbucketProvider(external.Bitbucket)
 	case "github":
-		return provider.NewGithubProvider(config.External.Github)
+		return provider.NewGithubProvider(external.Github)
 	case "gitlab":
-		return provider.NewGitlabProvider(config.External.Gitlab)
+		return provider.NewGitlabProvider(external.Gitlab)
 	case "google":
-		return provider.NewGoogleProvider(config.External.Google)
+		return provider.NewGoogleProvider(external.Google)
 	case "facebook":
-		return provider.NewFacebookProvider(config.External.Facebook)
+		return provider.NewFacebookProvider(external.Facebook)
 	case "saml":
-		return provider.NewSamlProvider(config.External.Saml, a.db)
+		return provider.NewSamlProvider(external.Saml, a.db)
 	default:
 		return nil, fmt.Errorf("Provider %s could not be found", name)
 	}
@@ -355,7 +354,7 @@ func getErrorQueryString(err error, errorID string, log logrus.FieldLogger) *url
 
 func (a *API) getExternalRedirectURL(r *http.Request) string {
 	ctx := r.Context()
-	config := a.getConfig(ctx)
+	config := a.config
 	if config.External.RedirectURL != "" {
 		return config.External.RedirectURL
 	}
