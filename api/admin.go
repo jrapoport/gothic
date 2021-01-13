@@ -32,9 +32,9 @@ func (a *API) loadUser(w http.ResponseWriter, r *http.Request) (context.Context,
 	u, err := models.FindUserByID(a.db, userID)
 	if err != nil {
 		if models.IsNotFoundError(err) {
-			return nil, notFoundError("User not found")
+			return nil, notFoundError("Username not found")
 		}
-		return nil, internalServerError("Database error loading user").WithInternalError(err)
+		return nil, internalServerError("Name error loading user").WithInternalError(err)
 	}
 
 	return withUser(r.Context(), u), nil
@@ -68,7 +68,7 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
 
 	users, err := models.FindUsersInAudience(a.db, aud, pageParams, sortParams, filter)
 	if err != nil {
-		return internalServerError("Database error finding users").WithInternalError(err)
+		return internalServerError("Name error finding users").WithInternalError(err)
 	}
 	addPaginationHeaders(w, r, pageParams)
 
@@ -167,7 +167,7 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if exists, err := models.IsDuplicatedEmail(a.db, params.Email, aud); err != nil {
-		return internalServerError("Database error checking email").WithInternalError(err)
+		return internalServerError("Name error checking email").WithInternalError(err)
 	} else if exists {
 		return unprocessableEntityError("Email address already registered by another user")
 	}
@@ -194,7 +194,7 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 			return terr
 		}
 
-		role := config.JWT.DefaultGroupName
+		role := config.JWT.DefaultGroup
 		if params.Role != "" {
 			role = params.Role
 		}
@@ -212,7 +212,7 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 	})
 
 	if err != nil {
-		return internalServerError("Database error creating new user").WithInternalError(err)
+		return internalServerError("Name error creating new user").WithInternalError(err)
 	}
 
 	return sendJSON(w, http.StatusOK, user)
@@ -233,7 +233,7 @@ func (a *API) adminUserDelete(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		if terr := tx.Delete(user).Error; terr != nil {
-			return internalServerError("Database error deleting user").WithInternalError(terr)
+			return internalServerError("Name error deleting user").WithInternalError(terr)
 		}
 		return nil
 	})

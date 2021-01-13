@@ -36,7 +36,7 @@ type bitbucketEmails struct {
 }
 
 // NewBitbucketProvider creates a Bitbucket account provider.
-func NewBitbucketProvider(ext conf.OAuthProviderConfiguration) (OAuthProvider, error) {
+func NewBitbucketProvider(ext conf.OAuthProvider) (OAuthProvider, error) {
 	if err := ext.Validate(); err != nil {
 		return nil, err
 	}

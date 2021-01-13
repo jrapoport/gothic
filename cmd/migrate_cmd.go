@@ -15,7 +15,7 @@ var migrateCmd = cobra.Command{
 }
 
 func migrate(cmd *cobra.Command, args []string) {
-	globalConfig, err := conf.LoadGlobal(configFile)
+	globalConfig, err := conf.LoadConfiguration(configFile)
 	if err != nil {
 		logrus.Fatalf("Failed to load configuration: %+v", err)
 	}

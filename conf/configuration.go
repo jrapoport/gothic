@@ -7,118 +7,31 @@ import (
 	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 )
 
-// OAuthProviderConfiguration holds all config related to external account providers.
-type OAuthProviderConfiguration struct {
-	ClientID    string `json:"client_id" split_words:"true"`
-	Secret      string `json:"secret"`
-	RedirectURI string `json:"redirect_uri" split_words:"true"`
-	URL         string `json:"url"`
-	Enabled     bool   `json:"enabled"`
-}
-
-type EmailProviderConfiguration struct {
-	Disabled bool `json:"disabled"`
-}
-
-type SamlProviderConfiguration struct {
-	Enabled     bool   `json:"enabled"`
-	MetadataURL string `json:"metadata_url" envconfig:"METADATA_URL"`
-	APIBase     string `json:"api_base" envconfig:"API_BASE"`
-	Name        string `json:"name"`
-	SigningCert string `json:"signing_cert" envconfig:"SIGNING_CERT"`
-	SigningKey  string `json:"signing_key" envconfig:"SIGNING_KEY"`
-}
-
-// DBConfiguration holds all the database related configuration.
-type DBConfiguration struct {
-	Driver      string `json:"driver" default:"mysql"`
-	Database    string `json:"database"`
-	URL         string `json:"url" envconfig:"DATABASE_URL" required:"true"`
-	Namespace   string `json:"namespace"`
-	AutoMigrate bool   `json:"automigrate"`
-}
-
-// JWTConfiguration holds all the JWT related configuration.
-type JWTConfiguration struct {
-	Secret           string `json:"secret" required:"true"`
-	Method           string `json:"method" default:"HS256"`
-	Subject          string `json:"subject" default:"gothic"`
-	Exp              int    `json:"exp"`
-	Aud              string `json:"aud"`
-	AdminGroupName   string `json:"admin_group_name" split_words:"true"`
-	DefaultGroupName string `json:"default_group_name" split_words:"true"`
-}
-
-// GlobalConfiguration holds all the configuration that applies to all instances.
-type GlobalConfiguration struct {
-	API struct {
-		Host            string
-		RestPort        int    `envconfig:"REST_PORT" default:"8081"`
-		RpcPort         int    `envconfig:"RPC_PORT" default:"3001"`
-		RpcWebPort      int    `envconfig:"RPCWEB_PORT" default:"6001"`
-		RequestIDHeader string `envconfig:"REQUEST_ID_HEADER"`
-	}
-	DB              DBConfiguration
-	External        ProviderConfiguration
-	Logging         LoggingConfig `envconfig:"LOG"`
-	Tracing         TracingConfig
-	SMTP            SMTPConfiguration
-	RateLimitHeader string `split_words:"true"`
-}
-
-// EmailContentConfiguration holds the configuration for emails, both subjects and template URLs.
-type EmailContentConfiguration struct {
-	Invite       string `json:"invite"`
-	Confirmation string `json:"confirmation"`
-	Recovery     string `json:"recovery"`
-	EmailChange  string `json:"email_change" split_words:"true"`
-}
-
-type ProviderConfiguration struct {
-	Bitbucket   OAuthProviderConfiguration `json:"bitbucket"`
-	Github      OAuthProviderConfiguration `json:"github"`
-	Gitlab      OAuthProviderConfiguration `json:"gitlab"`
-	Google      OAuthProviderConfiguration `json:"google"`
-	Facebook    OAuthProviderConfiguration `json:"facebook"`
-	Email       EmailProviderConfiguration `json:"email"`
-	Saml        SamlProviderConfiguration  `json:"saml"`
-	RedirectURL string                     `json:"redirect_url"`
-}
-
-type SMTPConfiguration struct {
-	MaxFrequency time.Duration `json:"max_frequency" split_words:"true"`
-	Host         string        `json:"host"`
-	Port         int           `json:"port,omitempty" default:"587"`
-	User         string        `json:"user"`
-	Pass         string        `json:"pass,omitempty"`
-	AdminEmail   string        `json:"admin_email" split_words:"true"`
-}
-
-type MailerConfiguration struct {
-	Autoconfirm bool                      `json:"autoconfirm"`
-	Subjects    EmailContentConfiguration `json:"subjects"`
-	Templates   EmailContentConfiguration `json:"templates"`
-	URLPaths    EmailContentConfiguration `json:"url_paths"`
-}
-
-// Configuration holds all the per-instance configuration.
+// Configuration holds all the configuration that applies to all instances.
 type Configuration struct {
-	SiteURL       string                `json:"site_url" split_words:"true" required:"true"`
-	JWT           JWTConfiguration      `json:"jwt"`
-	SMTP          SMTPConfiguration     `json:"smtp"`
-	Mailer        MailerConfiguration   `json:"mailer"`
-	External      ProviderConfiguration `json:"external"`
-	DisableSignup bool                  `json:"disable_signup" split_words:"true"`
-	Webhook       WebhookConfig         `json:"webhook" split_words:"true"`
-	Cookie        struct {
-		Key      string `json:"key"`
-		Duration int    `json:"duration"`
-	} `json:"cookies"`
+	Host       string `json:"host" default:"localhost" `
+	RestPort   int    `json:"rest_port" split_words:"true" default:"8081" `
+	RpcPort    int    `json:"rpc_port" split_words:"true" default:"3001" `
+	RpcWebPort int    `json:"rpcweb_port" envconfig:"RPCWEB_PORT"  default:"6001" `
+
+	SiteURL       string `json:"site_url" split_words:"true" required:"true"`
+	RateLimit     string `json:"rate_limit" split_words:"true"`
+	RequestID     string `json:"request_id" split_words:"true"`
+	DisableSignup bool   `json:"disable_signup" split_words:"true"`
+
+	DB       DatabaseConfig `json:"db"`
+	External ExternalConfig `json:"external"`
+	Log      LogConfig      `json:"log"`
+	Tracing  TracingConfig  `json:"tracing"`
+	JWT      JWTConfig      `json:"jwt"`
+	Webhook  WebhookConfig  `json:"webhook"`
+	Cookies  CookieConfig   `json:"cookies"`
+
+	MailConfig
 }
 
 func loadEnvironment(filename string) error {
@@ -135,57 +48,8 @@ func loadEnvironment(filename string) error {
 	return err
 }
 
-type WebhookConfig struct {
-	URL        string   `json:"url"`
-	Retries    int      `json:"retries"`
-	TimeoutSec int      `json:"timeout_sec"`
-	Secret     string   `json:"secret"`
-	Method     string   `json:"method" default:"HS256"`
-	Events     []string `json:"events"`
-}
-
-func (w *WebhookConfig) SigningMethod() jwt.SigningMethod {
-	m := "HS256"
-	if w.Method != "" {
-		m = w.Method
-	}
-	return jwt.GetSigningMethod(m)
-}
-
-func (w *WebhookConfig) HasEvent(event string) bool {
-	for _, name := range w.Events {
-		if event == name {
-			return true
-		}
-	}
-	return false
-}
-
-// LoadGlobal loads configuration from file and environment variables.
-func LoadGlobal(filename string) (*GlobalConfiguration, error) {
-	if err := loadEnvironment(filename); err != nil {
-		return nil, err
-	}
-
-	config := new(GlobalConfiguration)
-	if err := envconfig.Process("gothic", config); err != nil {
-		return nil, err
-	}
-
-	if _, err := ConfigureLogging(&config.Logging); err != nil {
-		return nil, err
-	}
-
-	ConfigureTracing(&config.Tracing)
-
-	if config.SMTP.MaxFrequency == 0 {
-		config.SMTP.MaxFrequency = 15 * time.Minute
-	}
-	return config, nil
-}
-
-// LoadConfig loads per-instance configuration.
-func LoadConfig(filename string) (*Configuration, error) {
+// LoadConfiguration loads configuration from file and environment variables.
+func LoadConfiguration(filename string) (*Configuration, error) {
 	if err := loadEnvironment(filename); err != nil {
 		return nil, err
 	}
@@ -194,14 +58,26 @@ func LoadConfig(filename string) (*Configuration, error) {
 	if err := envconfig.Process("gothic", config); err != nil {
 		return nil, err
 	}
+
+	if _, err := ConfigureLog(&config.Log); err != nil {
+		return nil, err
+	}
+
+	ConfigureTracing(&config.Tracing)
+
+	if config.SMTP.MaxFrequency == 0 {
+		config.SMTP.MaxFrequency = 15 * time.Minute
+	}
+
 	config.ApplyDefaults()
+
 	return config, nil
 }
 
 // ApplyDefaults sets defaults for a Configuration
 func (config *Configuration) ApplyDefaults() {
-	if config.JWT.AdminGroupName == "" {
-		config.JWT.AdminGroupName = "admin"
+	if config.JWT.AdminGroup == "" {
+		config.JWT.AdminGroup = "admin"
 	}
 
 	if config.JWT.Exp == 0 {
@@ -225,12 +101,12 @@ func (config *Configuration) ApplyDefaults() {
 		config.SMTP.MaxFrequency = 15 * time.Minute
 	}
 
-	if config.Cookie.Key == "" {
-		config.Cookie.Key = "nf_jwt"
+	if config.Cookies.Key == "" {
+		config.Cookies.Key = "nf_jwt"
 	}
 
-	if config.Cookie.Duration == 0 {
-		config.Cookie.Duration = 86400
+	if config.Cookies.Duration == 0 {
+		config.Cookies.Duration = 86400
 	}
 }
 
@@ -257,24 +133,4 @@ func (config *Configuration) Scan(src interface{}) error {
 		source = []byte("{}")
 	}
 	return json.Unmarshal(source, &config)
-}
-
-func (o *OAuthProviderConfiguration) Validate() error {
-	if !o.Enabled {
-		return errors.New("Provider is not enabled")
-	}
-	if o.ClientID == "" {
-		return errors.New("Missing Oauth client ID")
-	}
-	if o.Secret == "" {
-		return errors.New("Missing Oauth secret")
-	}
-	if o.RedirectURI == "" {
-		return errors.New("Missing redirect URI")
-	}
-	return nil
-}
-
-func (c *JWTConfiguration) SigningMethod() jwt.SigningMethod {
-	return jwt.GetSigningMethod(c.Method)
 }

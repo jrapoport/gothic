@@ -10,7 +10,6 @@ import (
 	"github.com/didip/tollbooth/v5"
 	"github.com/didip/tollbooth/v5/limiter"
 	"github.com/go-chi/chi"
-	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/mailer"
 	"github.com/jrapoport/gothic/storage"
@@ -21,26 +20,23 @@ import (
 )
 
 const (
-	audHeaderName  = "X-JWT-AUD"
-	defaultVersion = "unknown version"
+	audHeaderName = "X-JWT-AUD"
 )
 
 var bearerRegexp = regexp.MustCompile(`^(?:B|b)earer (\S+$)`)
 
 // API is the main REST API
 type API struct {
-	ctx     context.Context
 	handler http.Handler
 	db      *storage.Connection
-	config  *conf.GlobalConfiguration
-	version string
+	config  *conf.Configuration
 }
 
 // ListenAndServeREST starts the REST API
 // let's wrap this instead
-func ListenAndServeREST(a *API, globalConfig *conf.GlobalConfiguration) {
+func ListenAndServeREST(a *API, globalConfig *conf.Configuration) {
 	go func() {
-		addr := fmt.Sprintf("%v:%v", globalConfig.API.Host, globalConfig.API.RestPort)
+		addr := fmt.Sprintf("%v:%v", globalConfig.Host, globalConfig.RestPort)
 		logrus.Infof("Gothic REST API started on: %s", addr)
 		a.ListenAndServe(addr)
 	}()
@@ -67,14 +63,9 @@ func (a *API) ListenAndServe(hostAndPort string) {
 	}
 }
 
-// NewAPI instantiates a new REST API
-func NewAPI(globalConfig *conf.GlobalConfiguration, db *storage.Connection) *API {
-	return NewAPIWithVersion(context.Background(), globalConfig, db, defaultVersion)
-}
-
-// NewAPIWithVersion creates a new REST API using the specified version
-func NewAPIWithVersion(ctx context.Context, globalConfig *conf.GlobalConfiguration, db *storage.Connection, version string) *API {
-	api := &API{ctx: ctx, config: globalConfig, db: db, version: version}
+// NewAPI creates a new REST API
+func NewAPI(globalConfig *conf.Configuration, db *storage.Connection) *API {
+	api := &API{config: globalConfig, db: db}
 
 	xffmw, _ := xff.Default()
 	logger := newStructuredLogger(logrus.StandardLogger())
@@ -157,33 +148,10 @@ func NewAPIWithVersion(ctx context.Context, globalConfig *conf.GlobalConfigurati
 		AllowCredentials: true,
 	})
 
+	ctx := withConfig(context.Background(), globalConfig)
+
 	api.handler = corsHandler.Handler(chi.ServerBaseContext(ctx, r))
 	return api
-}
-
-// NewAPIFromConfigFile creates a new REST API using the provided configuration file.
-func NewAPIFromConfigFile(filename string, version string) (*API, *conf.Configuration, error) {
-	globalConfig, err := conf.LoadGlobal(filename)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	config, err := conf.LoadConfig(filename)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	ctx, err := WithConfig(context.Background(), config)
-	if err != nil {
-		logrus.Fatalf("Error loading instance config: %+v", err)
-	}
-
-	db, err := storage.Dial(globalConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return NewAPIWithVersion(ctx, globalConfig, db, version), config, nil
 }
 
 func WithConfig(ctx context.Context, config *conf.Configuration) (context.Context, error) {
@@ -196,25 +164,6 @@ func (a *API) Mailer(ctx context.Context) mailer.Mailer {
 	return mailer.NewMailer(config)
 }
 
-func (a *API) getConfig(ctx context.Context) *conf.Configuration {
-	obj := ctx.Value(configKey)
-	if obj == nil {
-		return nil
-	}
-
-	config := obj.(*conf.Configuration)
-
-	extConfig := (*a.config).External
-	if err := mergo.Merge(&extConfig, config.External, mergo.WithOverride); err != nil {
-		return nil
-	}
-	config.External = extConfig
-
-	smtpConfig := (*a.config).SMTP
-	if err := mergo.Merge(&smtpConfig, config.SMTP, mergo.WithOverride); err != nil {
-		return nil
-	}
-	config.SMTP = smtpConfig
-
-	return config
+func (a *API) getConfig(context.Context) *conf.Configuration {
+	return a.config
 }

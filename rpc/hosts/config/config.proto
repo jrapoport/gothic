@@ -33,3 +33,4 @@ message SettingsResponse {
     bool disable_signup = 3;
     bool autoconfirm = 4;
 }
+

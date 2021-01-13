@@ -9,11 +9,11 @@ import (
 )
 
 type TracingConfig struct {
-	Enabled     bool `default:"false"`
-	Host        string
-	Port        string
-	ServiceName string `default:"gothic" split_words:"true"`
-	Tags        map[string]string
+	Enabled     bool              `json:"enabled" default:"false"`
+	Host        string            `json:"host"`
+	Port        string            `json:"port"`
+	ServiceName string            `json:"service_name" default:"gothic" split_words:"true"`
+	Tags        map[string]string `json:"tags"`
 }
 
 func (tc *TracingConfig) tracingAddr() string {
