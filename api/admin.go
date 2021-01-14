@@ -109,6 +109,9 @@ func (a *API) adminUserUpdate(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		if params.Password != "" {
+			if err = a.validatePassword(params.Password); err != nil {
+				return err
+			}
 			if terr := user.UpdatePassword(tx, params.Password); terr != nil {
 				return terr
 			}

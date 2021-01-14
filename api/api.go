@@ -101,14 +101,16 @@ func NewAPI(globalConfig *conf.Configuration, db *storage.Connection) *API {
 				DefaultExpirationTTL: time.Hour,
 			}).SetBurst(30),
 		)).Post("/token", api.Token)
-		r.Post("/verify", api.Verify)
+		//TODO: make Confirm requireAuthentication (it is what sends out an email)
+		r.With(api.requireEmailProvider).Post("/confirm", api.EmailConfirmation)
+		r.Post("/verify", api.Confirm)
 
 		r.With(api.requireAuthentication).Post("/logout", api.Logout)
 
 		r.Route("/user", func(r *router) {
 			r.Use(api.requireAuthentication)
 			r.Get("/", api.UserGet)
-			r.Put("/", api.UserUpdate)
+			r.With(api.requireConfirmed).Put("/", api.UserUpdate)
 		})
 
 		r.Route("/admin", func(r *router) {
