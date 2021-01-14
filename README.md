@@ -11,7 +11,7 @@ custom user data.
 ## Project History
 
 This project was originally forked from 
-[https://github.com/gothic/gothic](https://github.com/gothic/gothic).
+[Netlify's GoTrue](https://github.com/netlify/gotrue).
 
 The purpose was to adopt newer, more developer friendly technologies like
 [Gorm](https://gorm.io/), [gRPC](https://grpc.io/), and [gRPC
@@ -25,11 +25,10 @@ expanded database driver support (e.g., PostgreSQL), and gRPC support. Broadly
 speaking, they are intended to make it easier to modify and use the microservice
 outside of Netlify tool chain, and in a more active development environment.
 
-While the Netlify team did a good job with the original effort, their use
-in production means they cannot easily adopt these kinds of significant changes.
-In many cases, they will likely never make them given the impacts to their
-tooling, deployment, and production systems — which makes perfect sense for
-their situation.
+While the Netlify team did a good job with GoTrue, their use in production means
+they cannot easily adopt these kinds of significant changes. In many cases, they
+will likely never make them given the impacts to their tooling, deployment, and
+production systems — which makes perfect sense for their situation.
 
 I'd like to thank Netlify team for their hard work on the original version of
 this microservice.
