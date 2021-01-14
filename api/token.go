@@ -15,7 +15,10 @@ import (
 // GothicClaims is a struct thats used for JWT claims
 type GothicClaims struct {
 	jwt.StandardClaims
+	Username     string                 `json:"username"`
 	Email        string                 `json:"email"`
+	Confirmed    bool                   `json:"confirmed"`
+	Verified     bool                   `json:"verified"`
 	AppMetaData  map[string]interface{} `json:"app_metadata"`
 	UserMetaData map[string]interface{} `json:"user_metadata"`
 }
@@ -55,8 +58,10 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	aud := a.requestAud(ctx, r)
 	config := a.getConfig(ctx)
 
-	if err := a.checkRecaptcha(r, config); err != nil {
-		return err
+	if config.Recaptcha.Login {
+		if err := a.checkRecaptcha(r, config); err != nil {
+			return err
+		}
 	}
 
 	user, err := models.FindUserByEmailAndAudience(a.db, username, aud)
@@ -67,9 +72,11 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
-	if !user.IsConfirmed() {
-		return oauthError("invalid_grant", "Email not confirmed")
-	}
+	// NOTE: this is commented out to let users who have not confirmed recover.
+	//  this will reduce orphan accounts if the user drops off after signup.
+	//if !user.IsConfirmed() {
+	//	return oauthError("invalid_grant", "Email not confirmed")
+	//}
 
 	if !user.Authenticate(password) {
 		return oauthError("invalid_grant", "No user found with that email, or password invalid.")
@@ -175,7 +182,10 @@ func generateAccessToken(user *models.User, expiresIn time.Duration, secret stri
 			Audience:  jwt.ClaimStrings{user.Aud},
 			ExpiresAt: jwt.At(time.Now().Add(expiresIn)),
 		},
+		Username:     user.Username,
 		Email:        user.Email,
+		Confirmed:    user.IsConfirmed(),
+		Verified:     user.IsVerified(),
 		AppMetaData:  user.AppMetaData,
 		UserMetaData: user.UserMetaData,
 	}

@@ -193,7 +193,7 @@ func (no noLocalTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	return no.inner.RoundTrip(req)
 }
 
-func SafeRoundtripper(trans http.RoundTripper, log logrus.FieldLogger) http.RoundTripper {
+func SafeRoundTripper(trans http.RoundTripper, log logrus.FieldLogger) http.RoundTripper {
 	if trans == nil {
 		trans = http.DefaultTransport
 	}
@@ -206,8 +206,10 @@ func SafeRoundtripper(trans http.RoundTripper, log logrus.FieldLogger) http.Roun
 	return ret
 }
 
-func SafeHTTPClient(client *http.Client, log logrus.FieldLogger) *http.Client {
-	client.Transport = SafeRoundtripper(client.Transport, log)
-
-	return client
+func dataString(data map[string]interface{}, name string) string {
+	val, ok := data[name]
+	if !ok {
+		return ""
+	}
+	return val.(string)
 }

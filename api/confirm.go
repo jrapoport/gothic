@@ -10,23 +10,23 @@ import (
 )
 
 const (
-	signupVerification   = "signup"
-	recoveryVerification = "recovery"
+	signupConfirmation   = "signup"
+	recoveryConfirmation = "recovery"
 )
 
-// VerifyParams are the parameters the Verify endpoint accepts
-type VerifyParams struct {
+// ConfirmParams are the parameters the Confirm endpoint accepts
+type ConfirmParams struct {
 	Type     string `json:"type"`
 	Token    string `json:"token"`
 	Password string `json:"password"`
 }
 
-// Verify exchanges a confirmation or recovery token to a refresh token
-func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
+// Confirm exchanges a confirmation or recovery token to a refresh token
+func (a *API) Confirm(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	config := a.getConfig(ctx)
 
-	params := &VerifyParams{}
+	params := &ConfirmParams{}
 	cookie := r.Header.Get(useCookieHeader)
 	jsonDecoder := json.NewDecoder(r.Body)
 	if err := jsonDecoder.Decode(params); err != nil {
@@ -34,7 +34,7 @@ func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if params.Token == "" {
-		return unprocessableEntityError("Verify requires a token")
+		return unprocessableEntityError("Confirm requires a token")
 	}
 
 	var (
@@ -46,12 +46,12 @@ func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
 		switch params.Type {
-		case signupVerification:
-			user, terr = a.signupVerify(ctx, tx, params)
-		case recoveryVerification:
-			user, terr = a.recoverVerify(ctx, tx, params)
+		case signupConfirmation:
+			user, terr = a.signupConfirm(ctx, tx, params)
+		case recoveryConfirmation:
+			user, terr = a.recoverConfirm(ctx, tx, params)
 		default:
-			return unprocessableEntityError("Verify requires a verification type")
+			return unprocessableEntityError("Confirm requires a verification type")
 		}
 
 		if terr != nil {
@@ -77,7 +77,7 @@ func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
 	return sendJSON(w, http.StatusOK, token)
 }
 
-func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params *VerifyParams) (*models.User, error) {
+func (a *API) signupConfirm(ctx context.Context, conn *storage.Connection, params *ConfirmParams) (*models.User, error) {
 	config := a.getConfig(ctx)
 
 	user, err := models.FindUserByConfirmationToken(conn, params.Token)
@@ -92,11 +92,11 @@ func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params
 		var terr error
 		if user.EncryptedPassword == "" {
 			if user.InvitedAt != nil {
-				if params.Password == "" {
-					return unprocessableEntityError("Invited users must specify a password")
+				if err = a.validatePassword(params.Password); err != nil {
+					return err
 				}
 				if terr = user.UpdatePassword(tx, params.Password); terr != nil {
-					return internalServerError("Error storing password").WithInternalError(terr)
+					return internalServerError("error storing password").WithInternalError(terr)
 				}
 			}
 		}
@@ -120,7 +120,7 @@ func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params
 	return user, nil
 }
 
-func (a *API) recoverVerify(ctx context.Context, conn *storage.Connection, params *VerifyParams) (*models.User, error) {
+func (a *API) recoverConfirm(ctx context.Context, conn *storage.Connection, params *ConfirmParams) (*models.User, error) {
 	config := a.getConfig(ctx)
 	user, err := models.FindUserByRecoveryToken(conn, params.Token)
 	if err != nil {

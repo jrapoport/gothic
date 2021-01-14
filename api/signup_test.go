@@ -19,6 +19,8 @@ import (
 )
 
 const signupEmail = "signup_test@example.com"
+const signupPassGood = "test~password"
+const signupPassBad = "test"
 
 type SignupTestSuite struct {
 	suite.Suite
@@ -50,9 +52,10 @@ func (ts *SignupTestSuite) TestSignup() {
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
 		"email":    signupEmail,
-		"password": "test",
+		"password": signupPassGood,
 		"data": map[string]interface{}{
 			"a": 1,
+			"recaptcha": "hello",
 		},
 	}))
 
@@ -75,6 +78,56 @@ func (ts *SignupTestSuite) TestSignup() {
 	assert.Equal(ts.T(), "email", data.AppMetaData["provider"])
 }
 
+// TestSignup tests API /signup route
+func (ts *SignupTestSuite) TestSignup_BadPassword() {
+	// Request body
+	var buffer bytes.Buffer
+	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
+		"email":    signupEmail,
+		"password": signupPassBad,
+		"data": map[string]interface{}{
+			"a": 1,
+		},
+	}))
+
+	// Setup request
+	req := httptest.NewRequest(http.MethodPost, "/signup", &buffer)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Setup response recorder
+	w := httptest.NewRecorder()
+
+	ts.API.handler.ServeHTTP(w, req)
+
+	require.NotEqual(ts.T(), http.StatusOK, w.Code)
+}
+
+// TestSignup tests API /signup route
+func (ts *SignupTestSuite) TestSignup_PasswordRegex() {
+	// Request body
+	var buffer bytes.Buffer
+	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
+		"email":    signupEmail,
+		"password": signupPassBad,
+		"data": map[string]interface{}{
+			"a": 1,
+		},
+	}))
+
+	// Setup request
+	req := httptest.NewRequest(http.MethodPost, "/signup", &buffer)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Setup response recorder
+	w := httptest.NewRecorder()
+
+	ts.API.config.PasswordRegex = "^[a-z]{2,}$"
+	ts.API.handler.ServeHTTP(w, req)
+	ts.API.config.PasswordRegex = ""
+
+	require.Equal(ts.T(), http.StatusOK, w.Code)
+}
+
 func (ts *SignupTestSuite) TestWebhookTriggered() {
 	var callCount int
 	require := ts.Require()
@@ -95,8 +148,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		assert.Equal("gothic", claims.Issuer)
 		assert.WithinDuration(time.Now(), claims.IssuedAt.Time, 5*time.Second)
 
-		// verify the contentss
-
+		// verify the contents
 		defer squash(r.Body.Close)
 		raw, err := ioutil.ReadAll(r.Body)
 		require.NoError(err)
@@ -108,7 +160,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 
 		u, ok := data["user"].(map[string]interface{})
 		require.True(ok)
-		assert.Len(u, 8)
+		assert.Len(u, 10)
 		// assert.Equal(t, user.ID, u["id"]) TODO
 		assert.Equal("api.gothic.com", u["aud"])
 		assert.Equal("", u["role"])
@@ -139,7 +191,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 	var buffer bytes.Buffer
 	require.NoError(json.NewEncoder(&buffer).Encode(map[string]interface{}{
 		"email":    signupEmail,
-		"password": "test",
+		"password": signupPassGood,
 		"data": map[string]interface{}{
 			"a": 1,
 		},
@@ -163,7 +215,7 @@ func (ts *SignupTestSuite) TestFailingWebhook() {
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
 		"email":    signupEmail,
-		"password": "test",
+		"password": signupPassGood,
 		"data": map[string]interface{}{
 			"a": 1,
 		},
@@ -187,7 +239,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	encode := func() {
 		require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
 			"email":    signupEmail,
-			"password": "test1",
+			"password": signupPassGood,
 			"data": map[string]interface{}{
 				"a": 1,
 			},
@@ -220,7 +272,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	assert.Equal(ts.T(), float64(http.StatusBadRequest), data["code"])
 }
 
-func (ts *SignupTestSuite) TestVerifySignup() {
+func (ts *SignupTestSuite) TestConfirmSignup() {
 	user, err := models.NewUser(signupEmail, "testing", ts.Config.JWT.Aud, nil)
 	user.ConfirmationToken = "asdf3"
 	require.NoError(ts.T(), err)

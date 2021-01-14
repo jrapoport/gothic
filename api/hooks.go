@@ -14,12 +14,11 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type HookEvent string
@@ -73,7 +72,7 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 	client := http.Client{
 		Timeout: timeout,
 	}
-	client.Transport = SafeRoundtripper(client.Transport, hooklog)
+	client.Transport = SafeRoundTripper(client.Transport, hooklog)
 
 	for i := 0; i < w.Retries; i++ {
 		hooklog = hooklog.WithField("attempt", i+1)
