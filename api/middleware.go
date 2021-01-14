@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/pkg/errors"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -102,5 +102,20 @@ func (a *API) requireEmailProvider(w http.ResponseWriter, req *http.Request) (co
 		return nil, badRequestError("Unsupported email provider")
 	}
 
+	return ctx, nil
+}
+
+func (a *API) requireConfirmed(w http.ResponseWriter, req *http.Request) (context.Context, error) {
+	ctx, err := a.requireAuthentication(w, req)
+	if err != nil {
+		return nil, err
+	}
+	claims := getClaims(ctx)
+	if claims == nil {
+		return nil, errors.New("invalid token")
+	}
+	if !claims.Confirmed {
+		return nil, errors.New("unconfirmed user")
+	}
 	return ctx, nil
 }

@@ -20,7 +20,7 @@ func TestSettings_DefaultProviders(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	api.handler.ServeHTTP(w, req)
-	require.Equal(t, w.Code, http.StatusOK)
+	require.Equal(t, http.StatusOK, w.Code)
 	resp := Settings{}
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 
@@ -50,7 +50,7 @@ func TestSettings_EmailDisabled(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	api.handler.ServeHTTP(w, req)
-	require.Equal(t, w.Code, http.StatusOK)
+	require.Equal(t, http.StatusOK, w.Code)
 	resp := Settings{}
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&resp))
 
@@ -67,7 +67,7 @@ func TestSettings_ExternalName(t *testing.T) {
 	w := httptest.NewRecorder()
 	api.handler.ServeHTTP(w, req)
 
-	require.Equal(t, w.Code, http.StatusOK)
+	require.Equal(t, http.StatusOK, w.Code)
 
 	type SettingsWithExternalName struct {
 		ExternalLabels struct {
@@ -79,5 +79,5 @@ func TestSettings_ExternalName(t *testing.T) {
 	require.NoError(t, err)
 
 	n := resp.ExternalLabels
-	require.Equal(t, n.SAML, "TestSamlName")
+	require.Equal(t, "TestSamlName", n.SAML)
 }

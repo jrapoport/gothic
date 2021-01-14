@@ -22,6 +22,7 @@ type Configuration struct {
 	RateLimit     string `json:"rate_limit" split_words:"true"`
 	RequestID     string `json:"request_id" split_words:"true"`
 	DisableSignup bool   `json:"disable_signup" split_words:"true"`
+	PasswordRegex string `json:"_" split_words:"true" default:"^[a-zA-Z0-9[:punct:]]{8,28}$"`
 
 	DB        DatabaseConfig  `json:"db"`
 	External  ExternalConfig  `json:"external"`

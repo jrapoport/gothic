@@ -2,13 +2,13 @@ package api
 
 import (
 	"bytes"
-	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/jrapoport/gothic/conf"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
