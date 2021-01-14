@@ -19,7 +19,7 @@ func (a *API) loadSAMLState(w http.ResponseWriter, r *http.Request) (context.Con
 }
 
 func (a *API) samlCallback(r *http.Request, ctx context.Context) (*provider.UserProvidedData, error) {
-	config := a.getConfig(ctx)
+	config := a.config
 
 	samlProvider, err := provider.NewSamlProvider(config.External.Saml, a.db)
 	if err != nil {
@@ -57,16 +57,14 @@ func (a *API) samlCallback(r *http.Request, ctx context.Context) (*provider.User
 }
 
 func (a *API) SAMLMetadata(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	config := getConfig(ctx)
-
-	samlProvider, err := provider.NewSamlProvider(config.External.Saml, a.db)
+	external := a.config.External
+	samlProvider, err := provider.NewSamlProvider(external.Saml, a.db)
 	if err != nil {
 		return internalServerError("Could not create SAML Provider: %+v", err).WithInternalError(err)
 	}
 
 	metadata, err := samlProvider.SPMetadata()
 	w.Header().Set("Content-Type", "application/xml")
-	w.Write(metadata)
-	return nil
+	_, err = w.Write(metadata)
+	return err
 }

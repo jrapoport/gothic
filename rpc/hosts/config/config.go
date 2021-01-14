@@ -4,10 +4,9 @@ package config
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/jrapoport/gothic/rpc/hosts"
+	"github.com/segmentio/encoding/json"
 	"google.golang.org/grpc/codes"
 )
 
@@ -23,13 +22,13 @@ func NewConfigHost(h *hosts.RpcHost) *rpcConfigHost {
 
 func (r *rpcConfigHost) Settings(_ context.Context,
 	_ *SettingsRequest) (*SettingsResponse, error) {
-	s := r.API.Settings(nil)
+	s := r.API.Settings()
 	b, err := json.Marshal(s)
 	if err != nil {
 		return nil, r.RpcErrorf(codes.Internal, "%v", err)
 	}
-	var res SettingsResponse
-	err = proto.Unmarshal(b, &res)
+	res := SettingsResponse{}
+	err = json.Unmarshal(b, &res)
 	if err != nil {
 		return nil, r.RpcErrorf(codes.Internal, "%v", err)
 	}

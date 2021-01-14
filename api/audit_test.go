@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -27,7 +27,6 @@ type AuditTestSuite struct {
 
 const auditAdminEmail = "admin@audit.com"
 const auditUserEmail = "user@audit.com"
-
 
 func TestAudit(t *testing.T) {
 	api, config, err := setupAPIForTestForInstance(t)
@@ -47,7 +46,7 @@ func (ts *AuditTestSuite) SetupTest() {
 }
 
 func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
-	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test User"})
+	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test Username"})
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true

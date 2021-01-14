@@ -25,7 +25,7 @@ func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mail
 	}
 	u.ConfirmationSentAt = &now
 	err := tx.Model(&u).Select("confirmation_token", "confirmation_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Database error updating user for confirmation")
+	return errors.Wrap(err, "Name error updating user for confirmation")
 }
 
 func sendInvite(tx *storage.Connection, u *models.User, mailer mailer.Mailer, referrerURL string) error {
@@ -38,7 +38,7 @@ func sendInvite(tx *storage.Connection, u *models.User, mailer mailer.Mailer, re
 	}
 	u.InvitedAt = &now
 	err := tx.Model(&u).Select("confirmation_token", "invited_at").Updates(u).Error
-	return errors.Wrap(err, "Database error updating user for invite")
+	return errors.Wrap(err, "Name error updating user for invite")
 }
 
 func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, mailer mailer.Mailer, maxFrequency time.Duration, referrerURL string) error {
@@ -55,7 +55,7 @@ func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, maile
 	}
 	u.RecoverySentAt = &now
 	err := tx.Model(&u).Select("recovery_token", "recovery_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Database error updating user for recovery")
+	return errors.Wrap(err, "Name error updating user for recovery")
 }
 
 func (a *API) sendEmailChange(tx *storage.Connection, u *models.User, mailer mailer.Mailer, email string, referrerURL string) error {
@@ -72,7 +72,7 @@ func (a *API) sendEmailChange(tx *storage.Connection, u *models.User, mailer mai
 
 	u.EmailChangeSentAt = &now
 	err := tx.Model(&u).Select("email_change_token", "email_change", "email_change_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Database error updating user for email change")
+	return errors.Wrap(err, "Name error updating user for email change")
 }
 
 func (a *API) validateEmail(ctx context.Context, email string) error {

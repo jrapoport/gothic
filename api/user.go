@@ -29,7 +29,7 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 
 	userID, err := uuid.FromString(claims.Subject)
 	if err != nil {
-		return badRequestError("Could not read User ID claim")
+		return badRequestError("Could not read Username ID claim")
 	}
 
 	aud := a.requestAud(ctx, r)
@@ -43,7 +43,7 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
 		}
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	return sendJSON(w, http.StatusOK, user)
@@ -58,13 +58,13 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 	jsonDecoder := json.NewDecoder(r.Body)
 	err := jsonDecoder.Decode(params)
 	if err != nil {
-		return badRequestError("Could not read User Update params: %v", err)
+		return badRequestError("Could not read Username Update params: %v", err)
 	}
 
 	claims := getClaims(ctx)
 	userID, err := uuid.FromString(claims.Subject)
 	if err != nil {
-		return badRequestError("Could not read User ID claim")
+		return badRequestError("Could not read Username ID claim")
 	}
 
 	user, err := models.FindUserByID(a.db, userID)
@@ -72,7 +72,7 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
 		}
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	log := getLogEntry(r)
@@ -119,7 +119,7 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 
 			var exists bool
 			if exists, terr = models.IsDuplicatedEmail(tx, params.Email, user.Aud); terr != nil {
-				return internalServerError("Database error checking email").WithInternalError(terr)
+				return internalServerError("Name error checking email").WithInternalError(terr)
 			} else if exists {
 				return unprocessableEntityError("Email address already registered by another user")
 			}

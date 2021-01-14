@@ -15,24 +15,30 @@ func TestMain(m *testing.M) {
 }
 
 func TestGlobal(t *testing.T) {
+	os.Setenv("GOTHIC_SITE_URL", "https://example.com")
+	os.Setenv("GOTHIC_JWT_SECRET", "i-am-a-secret")
+
 	os.Setenv("GOTHIC_DB_DRIVER", "mysql")
-	os.Setenv("GOTHIC_DB_DATABASE_URL", "fake")
-	os.Setenv("GOTHIC_API_REQUEST_ID_HEADER", "X-Request-ID")
-	gc, err := LoadGlobal("")
+	os.Setenv("GOTHIC_DB_URL", "fake")
+	os.Setenv("GOTHIC_REQUEST_ID", "X-Request-ID")
+	gc, err := LoadConfiguration("")
 	require.NoError(t, err)
 	require.NotNil(t, gc)
-	assert.Equal(t, "X-Request-ID", gc.API.RequestIDHeader)
+	assert.Equal(t, "X-Request-ID", gc.RequestID)
 }
 
 func TestTracing(t *testing.T) {
+	os.Setenv("GOTHIC_SITE_URL", "https://example.com")
+	os.Setenv("GOTHIC_JWT_SECRET", "i-am-a-secret")
+
 	os.Setenv("GOTHIC_DB_DRIVER", "mysql")
-	os.Setenv("GOTHIC_DB_DATABASE_URL", "fake")
+	os.Setenv("GOTHIC_DB_URL", "fake")
 	os.Setenv("GOTHIC_TRACING_SERVICE_NAME", "identity")
 	os.Setenv("GOTHIC_TRACING_PORT", "8126")
 	os.Setenv("GOTHIC_TRACING_HOST", "127.0.0.1")
 	os.Setenv("GOTHIC_TRACING_TAGS", "tag1:value1,tag2:value2")
 
-	gc, _ := LoadGlobal("")
+	gc, _ := LoadConfiguration("")
 	tc := opentracing.GlobalTracer()
 
 	assert.Equal(t, opentracing.NoopTracer{}, tc)

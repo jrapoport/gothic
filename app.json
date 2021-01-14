@@ -4,7 +4,7 @@
   "website": "https://www.gothicapi.org",
   "repository": "https://github.com/jrapoport/gothic",
   "env": {
-    "DATABASE_URL": {},
+    "GOTHIC_DB_URL": {},
     "GOTHIC_DB_DRIVER": {
       "value": "mysql"
     },

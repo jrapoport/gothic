@@ -5,21 +5,20 @@ ENV GOOS=linux
 
 RUN apk add --no-cache make git protobuf
 
-WORKDIR /go/src/github.com/jrapoport/gothic
+WORKDIR /app
 
 # Pulling dependencies
-COPY ./Makefile ./go.* ./
+COPY . .
 RUN make deps
 
 # Building stuff
-COPY . /go/src/github.com/jrapoport/gothic
-RUN make build
+RUN make release
 
 FROM alpine:3.7
 RUN adduser -D -u 1000 gothic
 
 RUN apk add --no-cache ca-certificates
-COPY --from=build /go/src/github.com/jrapoport/gothic/gothic /usr/local/bin/gothic
+COPY --from=build /app/build/release/gothic /usr/local/bin/gothic
 
 USER gothic
 CMD ["gothic"]

@@ -17,7 +17,7 @@ func IsNotFoundError(err error) bool {
 type UserNotFoundError struct{}
 
 func (e UserNotFoundError) Error() string {
-	return "User not found"
+	return "Username not found"
 }
 
 // RefreshTokenNotFoundError represents when a refresh token is not found.
