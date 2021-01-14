@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"net/http"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
 )
@@ -27,7 +27,7 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 		return badRequestError("Could not read claims")
 	}
 
-	userID, err := uuid.FromString(claims.Subject)
+	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return badRequestError("Could not read Username ID claim")
 	}
@@ -62,7 +62,7 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	claims := getClaims(ctx)
-	userID, err := uuid.FromString(claims.Subject)
+	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return badRequestError("Could not read Username ID claim")
 	}

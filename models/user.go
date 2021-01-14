@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 	"github.com/vcraescu/go-paginator/v2"
@@ -55,10 +55,7 @@ type User struct {
 
 // NewUser initializes a new user from an email, password and user data.
 func NewUser(email, password, aud string, userData map[string]interface{}) (*User, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, errors.Wrap(err, "Error generating unique id")
-	}
+	id := uuid.New()
 	pw, err := hashPassword(password)
 	if err != nil {
 		return nil, err

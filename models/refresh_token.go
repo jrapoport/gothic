@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"

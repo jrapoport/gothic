@@ -9,7 +9,7 @@ import (
 	"net/http/httptrace"
 	"net/url"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
@@ -24,11 +24,7 @@ func addRequestID(globalConfig *conf.Configuration) middlewareHandler {
 			id = r.Header.Get(globalConfig.RequestID)
 		}
 		if id == "" {
-			uid, err := uuid.NewV4()
-			if err != nil {
-				return nil, err
-			}
-			id = uid.String()
+			id = uuid.New().String()
 		}
 
 		ctx := r.Context()
@@ -66,7 +62,7 @@ func getUserFromClaims(ctx context.Context, conn *storage.Connection) (*models.U
 	if claims.Subject == models.SystemUserUUID.String() || claims.Subject == models.SystemUserID {
 		return models.NewSystemUser(claims.Audience[0]), nil
 	}
-	userID, err := uuid.FromString(claims.Subject)
+	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return nil, errors.New("Invalid user ID")
 	}

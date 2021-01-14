@@ -1,7 +1,7 @@
 package metering
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
 )
@@ -22,7 +22,7 @@ type adminUserParams struct {
 }
 
 func (a *API) loadUser(w http.ResponseWriter, r *http.Request) (context.Context, error) {
-	userID, err := uuid.FromString(chi.URLParam(r, "user_id"))
+	userID, err := uuid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
 		return nil, badRequestError("user_id must be an UUID")
 	}

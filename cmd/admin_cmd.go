@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
@@ -123,7 +123,7 @@ func adminDeleteUser(globalConfig *conf.Configuration, args []string) {
 
 	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(globalConfig))
 	if err != nil {
-		userID := uuid.Must(uuid.FromString(args[0]))
+		userID := uuid.Must(uuid.Parse(args[0]))
 		user, err = models.FindUserByID(db, userID)
 		if err != nil {
 			logrus.Fatalf("Error finding user (%s): %+v", userID, err)
@@ -145,7 +145,7 @@ func adminEditRole(globalConfig *conf.Configuration, args []string) {
 
 	user, err := models.FindUserByEmailAndAudience(db, args[0], getAudience(globalConfig))
 	if err != nil {
-		userID := uuid.Must(uuid.FromString(args[0]))
+		userID := uuid.Must(uuid.Parse(args[0]))
 		user, err = models.FindUserByID(db, userID)
 		if err != nil {
 			logrus.Fatalf("Error finding user (%s): %+v", userID, err)
