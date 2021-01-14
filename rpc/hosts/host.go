@@ -1,6 +1,8 @@
 package hosts
 
 import (
+	"net"
+
 	"github.com/jrapoport/gothic/api"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/util"
@@ -9,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
-	"net"
 )
 
 /*

@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go/v4"
 	"net/http"
+	"regexp"
 
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
@@ -81,6 +82,9 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
 		if params.Password != "" {
+			if err = a.validatePassword(params.Password); err != nil {
+				return err
+			}
 			if terr = user.UpdatePassword(tx, params.Password); terr != nil {
 				return internalServerError("Error during password storage").WithInternalError(terr)
 			}
@@ -142,4 +146,15 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return sendJSON(w, http.StatusOK, user)
+}
+
+func (a *API) validatePassword(password string) error {
+	rex, err := regexp.Compile(a.config.PasswordRegex)
+	if err != nil {
+		return err
+	}
+	if !rex.MatchString(password) {
+		return unprocessableEntityError("invalid password")
+	}
+	return nil
 }

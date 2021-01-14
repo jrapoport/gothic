@@ -1,18 +1,16 @@
 package api
 
 import (
+	"net"
+	"net/http"
+
 	"github.com/dpapathanasiou/go-recaptcha"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/sirupsen/logrus"
-	"net"
-	"net/http"
 )
 
 func (a *API) checkRecaptcha(r *http.Request, config *conf.Configuration) error {
 	if config.Recaptcha.Key == "" {
-		return nil
-	}
-	if !config.Recaptcha.Login {
 		return nil
 	}
 	recap := r.FormValue("recaptcha")

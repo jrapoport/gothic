@@ -16,19 +16,19 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const verifyEmail = "verify_test@example.com"
+const confirmEmail = "confirm_test@example.com"
 
-type VerifyTestSuite struct {
+type ConfirmTestSuite struct {
 	suite.Suite
 	API    *API
 	Config *conf.Configuration
 }
 
-func TestVerify(t *testing.T) {
+func TestConfirm(t *testing.T) {
 	api, config, err := setupAPIForTestForInstance(t)
 	require.NoError(t, err)
 
-	ts := &VerifyTestSuite{
+	ts := &ConfirmTestSuite{
 		API:    api,
 		Config: config,
 	}
@@ -36,17 +36,17 @@ func TestVerify(t *testing.T) {
 	suite.Run(t, ts)
 }
 
-func (ts *VerifyTestSuite) SetupTest() {
+func (ts *ConfirmTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 
 	// Create user
-	u, err := models.NewUser(verifyEmail, "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(confirmEmail, "password", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
-func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
+func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
+	u, err := models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 	u.RecoverySentAt = &time.Time{}
 	require.NoError(ts.T(), ts.API.db.Save(u).Error)
@@ -54,7 +54,7 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"email": verifyEmail,
+		"email": confirmEmail,
 	}))
 
 	// Setup request
@@ -66,13 +66,13 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	assert.WithinDuration(ts.T(), time.Now(), *u.RecoverySentAt, 1*time.Second)
 	assert.False(ts.T(), u.IsConfirmed())
 
-	// Send Verify request
+	// Send Confirm request
 	var vbuffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&vbuffer).Encode(map[string]interface{}{
 		"type":  "recovery",
@@ -86,7 +86,7 @@ func (ts *VerifyTestSuite) TestVerify_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, verifyEmail, ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 	assert.True(ts.T(), u.IsConfirmed())
 }
