@@ -12,7 +12,7 @@ import (
 func (a *API) requireAuthentication(w http.ResponseWriter, r *http.Request) (context.Context, error) {
 	token, err := a.extractBearerToken(w, r)
 	if err != nil {
-		a.clearCookieToken(r.Context(), w)
+		a.clearCookieToken(w)
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func (a *API) requireAdmin(ctx context.Context, w http.ResponseWriter, r *http.R
 
 	// Make sure user is admin
 	if !a.isAdmin(ctx, adminUser, aud) {
-		return nil, unauthorizedError("User not allowed")
+		return nil, unauthorizedError("Username not allowed")
 	}
 	return withAdminUser(ctx, adminUser), nil
 }
@@ -82,7 +82,7 @@ func (a *API) parseJWTClaims(bearer string, r *http.Request, w http.ResponseWrit
 		jwt.WithAudience(config.JWT.Aud),
 		jwt.WithValidMethods([]string{config.JWT.SigningMethod().Alg()}))
 	if err != nil {
-		a.clearCookieToken(ctx, w)
+		a.clearCookieToken(w)
 		return nil, unauthorizedError("Invalid token: %v", err)
 	}
 

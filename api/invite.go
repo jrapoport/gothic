@@ -33,7 +33,7 @@ func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 	aud := a.requestAud(ctx, r)
 	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, aud)
 	if err != nil && !models.IsNotFoundError(err) {
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 	if user != nil {
 		return unprocessableEntityError("Email address already registered by another user")

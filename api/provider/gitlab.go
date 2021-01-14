@@ -30,7 +30,7 @@ type gitlabUserEmail struct {
 }
 
 // NewGitlabProvider creates a Gitlab account provider.
-func NewGitlabProvider(ext conf.OAuthProviderConfiguration) (OAuthProvider, error) {
+func NewGitlabProvider(ext conf.OAuthProvider) (OAuthProvider, error) {
 	if err := ext.Validate(); err != nil {
 		return nil, err
 	}

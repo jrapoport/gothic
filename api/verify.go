@@ -63,7 +63,7 @@ func (a *API) Verify(w http.ResponseWriter, r *http.Request) error {
 			return terr
 		}
 
-		if cookie != "" && config.Cookie.Duration > 0 {
+		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, token.Token, cookie == useSessionCookie, w); terr != nil {
 				return internalServerError("Failed to set JWT cookie. %s", terr)
 			}
@@ -85,7 +85,7 @@ func (a *API) signupVerify(ctx context.Context, conn *storage.Connection, params
 		if models.IsNotFoundError(err) {
 			return nil, notFoundError(err.Error())
 		}
-		return nil, internalServerError("Database error finding user").WithInternalError(err)
+		return nil, internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	err = conn.Transaction(func(tx *storage.Connection) error {
@@ -127,7 +127,7 @@ func (a *API) recoverVerify(ctx context.Context, conn *storage.Connection, param
 		if models.IsNotFoundError(err) {
 			return nil, notFoundError(err.Error())
 		}
-		return nil, internalServerError("Database error finding user").WithInternalError(err)
+		return nil, internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	err = conn.Transaction(func(tx *storage.Connection) error {
@@ -151,7 +151,7 @@ func (a *API) recoverVerify(ctx context.Context, conn *storage.Connection, param
 	})
 
 	if err != nil {
-		return nil, internalServerError("Database error updating user").WithInternalError(err)
+		return nil, internalServerError("Name error updating user").WithInternalError(err)
 	}
 	return user, nil
 }

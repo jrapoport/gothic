@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"math/rand"
 	"testing"
 	"time"
@@ -13,8 +12,7 @@ import (
 )
 
 const (
-	apiTestVersion = "1"
-	apiTestConfig  = "../env/test.env"
+	apiTestConfig = "../env/test.env"
 )
 
 func init() {
@@ -36,8 +34,8 @@ func setupAPIForTestForInstance(t *testing.T) (*API, *conf.Configuration, error)
 	return api, c, nil
 }
 
-func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.GlobalConfiguration, *conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
-	globalConfig, err := conf.LoadGlobal(apiTestConfig)
+func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
+	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -46,24 +44,14 @@ func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.GlobalConfiguration
 		return nil, nil, err
 	}
 
-	config, err := conf.LoadConfig(apiTestConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	if cb != nil {
-		err = cb(globalConfig, config, conn)
+		err = cb(globalConfig, conn)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
 
-	ctx, err := WithConfig(context.Background(), config)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return NewAPIWithVersion(ctx, globalConfig, conn, apiTestVersion), config, nil
+	return NewAPI(globalConfig, conn), globalConfig, nil
 }
 
 func TestEmailEnabledByDefault(t *testing.T) {

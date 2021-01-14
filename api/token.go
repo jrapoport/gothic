@@ -60,7 +60,7 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 		if models.IsNotFoundError(err) {
 			return oauthError("invalid_grant", "No user found with that email, or password invalid.")
 		}
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	if !user.IsConfirmed() {
@@ -86,7 +86,7 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 			return terr
 		}
 
-		if cookie != "" && config.Cookie.Duration > 0 {
+		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, token.Token, cookie == useSessionCookie, w); terr != nil {
 				return internalServerError("Failed to set JWT cookie. %s", terr)
 			}
@@ -119,7 +119,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 	}
 
 	if token.Revoked {
-		a.clearCookieToken(ctx, w)
+		a.clearCookieToken(w)
 		return oauthError("invalid_grant", "Invalid Refresh Token").WithInternalMessage("Possible abuse attempt: %v", r)
 	}
 
@@ -145,7 +145,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 			return internalServerError("error generating jwt token").WithInternalError(terr)
 		}
 
-		if cookie != "" && config.Cookie.Duration > 0 {
+		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, tokenString, cookie == useSessionCookie, w); terr != nil {
 				return internalServerError("Failed to set JWT cookie. %s", terr)
 			}
@@ -193,7 +193,7 @@ func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, u
 		var terr error
 		refreshToken, terr = models.GrantAuthenticatedUser(tx, user)
 		if terr != nil {
-			return internalServerError("Database error granting user").WithInternalError(terr)
+			return internalServerError("Name error granting user").WithInternalError(terr)
 		}
 
 		tokenString, terr = generateAccessToken(user,
@@ -218,9 +218,9 @@ func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, u
 }
 
 func (a *API) setCookieToken(config *conf.Configuration, tokenString string, session bool, w http.ResponseWriter) error {
-	exp := time.Second * time.Duration(config.Cookie.Duration)
+	exp := time.Second * time.Duration(config.Cookies.Duration)
 	cookie := &http.Cookie{
-		Name:     config.Cookie.Key,
+		Name:     config.Cookies.Key,
 		Value:    tokenString,
 		Secure:   true,
 		HttpOnly: true,
@@ -228,17 +228,17 @@ func (a *API) setCookieToken(config *conf.Configuration, tokenString string, ses
 	}
 	if !session {
 		cookie.Expires = time.Now().Add(exp)
-		cookie.MaxAge = config.Cookie.Duration
+		cookie.MaxAge = config.Cookies.Duration
 	}
 
 	http.SetCookie(w, cookie)
 	return nil
 }
 
-func (a *API) clearCookieToken(ctx context.Context, w http.ResponseWriter) {
-	config := getConfig(ctx)
+func (a *API) clearCookieToken(w http.ResponseWriter) {
+	config := a.config
 	http.SetCookie(w, &http.Cookie{
-		Name:     config.Cookie.Key,
+		Name:     config.Cookies.Key,
 		Value:    "",
 		Expires:  time.Now().Add(-1 * time.Hour * 10),
 		MaxAge:   -1,

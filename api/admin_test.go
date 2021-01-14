@@ -48,7 +48,7 @@ func TestAdmin(t *testing.T) {
 
 func (ts *AdminTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
-	ts.Config.External.Email.Disabled = false
+	ts.API.config.External.Email.Disabled = false
 	ts.token = ts.makeSuperAdmin(adminEmail)
 }
 
@@ -294,7 +294,7 @@ func (ts *AdminTestSuite) TestAdminUserCreate() {
 
 // TestAdminUserGet tests API /admin/user route (GET)
 func (ts *AdminTestSuite) TestAdminUserGet() {
-	u, err := models.NewUser(adminUser1, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test Get User"})
+	u, err := models.NewUser(adminUser1, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test Get Username"})
 	require.NoError(ts.T(), err, "Error making new user")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 
@@ -315,7 +315,7 @@ func (ts *AdminTestSuite) TestAdminUserGet() {
 	assert.NotNil(ts.T(), data["user_metadata"])
 	md := data["user_metadata"].(map[string]interface{})
 	assert.Len(ts.T(), md, 1)
-	assert.Equal(ts.T(), "Test Get User", md["full_name"])
+	assert.Equal(ts.T(), "Test Get Username", md["full_name"])
 }
 
 // TestAdminUserUpdate tests API /admin/user route (UPDATE)
@@ -456,7 +456,7 @@ func (ts *AdminTestSuite) TestAdminUserCreateWithDisabledEmailLogin() {
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ts.token))
 
-	ts.Config.External.Email.Disabled = true
+	ts.API.config.External.Email.Disabled = true
 
 	ts.API.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusBadRequest, w.Code)

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func SetupDBConnection(t *testing.T, globalConfig *conf.GlobalConfiguration) (*storage.Connection, error) {
+func SetupDBConnection(t *testing.T, globalConfig *conf.Configuration) (*storage.Connection, error) {
 	globalConfig.DB.Driver = "sqlite"
 	globalConfig.DB.URL = t.TempDir()
 	conn, err := storage.Dial(globalConfig)

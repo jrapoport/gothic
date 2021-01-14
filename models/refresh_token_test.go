@@ -22,7 +22,7 @@ func (ts *RefreshTokenTestSuite) SetupTest() {
 }
 
 func TestRefreshToken(t *testing.T) {
-	globalConfig, err := conf.LoadGlobal(modelsTestConfig)
+	globalConfig, err := conf.LoadConfiguration(modelsTestConfig)
 	require.NoError(t, err)
 
 	conn, err := test.SetupDBConnection(t, globalConfig)

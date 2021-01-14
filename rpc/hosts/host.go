@@ -2,10 +2,12 @@ package hosts
 
 import (
 	"github.com/jrapoport/gothic/api"
+	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/util"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"net"
 )
@@ -42,6 +44,11 @@ func (h *RpcHost) ListenAndServe(opts ...grpc.ServerOption) {
 	server := grpc.NewServer(opts...)
 	for _, s := range h.servers {
 		s(server, h)
+	}
+
+	if conf.Debug {
+		// Register reflection service on gRPC server.
+		reflection.Register(server)
 	}
 
 	done := make(chan struct{})

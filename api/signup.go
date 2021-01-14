@@ -44,7 +44,7 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 	params.Aud = a.requestAud(ctx, r)
 	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, params.Aud)
 	if err != nil && !models.IsNotFoundError(err) {
-		return internalServerError("Database error finding user").WithInternalError(err)
+		return internalServerError("Name error finding user").WithInternalError(err)
 	}
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {
@@ -55,7 +55,7 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 			}
 
 			if err := user.UpdateUserMetaData(tx, params.Data); err != nil {
-				return internalServerError("Database error updating user").WithInternalError(err)
+				return internalServerError("Name error updating user").WithInternalError(err)
 			}
 		} else {
 			params.Provider = "email"
@@ -73,7 +73,7 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 				return terr
 			}
 			if terr = user.Confirm(tx); terr != nil {
-				return internalServerError("Database error updating user").WithInternalError(terr)
+				return internalServerError("Name error updating user").WithInternalError(terr)
 			}
 		} else {
 			mailer := a.Mailer(ctx)
@@ -97,7 +97,7 @@ func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, param
 
 	user, err := models.NewUser(params.Email, params.Password, params.Aud, params.Data)
 	if err != nil {
-		return nil, internalServerError("Database error creating user").WithInternalError(err)
+		return nil, internalServerError("Name error creating user").WithInternalError(err)
 	}
 	if user.AppMetaData == nil {
 		user.AppMetaData = make(map[string]interface{})
@@ -110,10 +110,10 @@ func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, param
 
 	err = conn.Transaction(func(tx *storage.Connection) error {
 		if terr := tx.Create(user).Error; terr != nil {
-			return internalServerError("Database error saving new user").WithInternalError(terr)
+			return internalServerError("Name error saving new user").WithInternalError(terr)
 		}
-		if terr := user.SetRole(tx, config.JWT.DefaultGroupName); terr != nil {
-			return internalServerError("Database error updating user").WithInternalError(terr)
+		if terr := user.SetRole(tx, config.JWT.DefaultGroup); terr != nil {
+			return internalServerError("Name error updating user").WithInternalError(terr)
 		}
 		if terr := triggerEventHooks(ctx, tx, ValidateEvent, user, config); terr != nil {
 			return terr
