@@ -55,6 +55,10 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	aud := a.requestAud(ctx, r)
 	config := a.getConfig(ctx)
 
+	if err := a.checkRecaptcha(r, config); err != nil {
+		return err
+	}
+
 	user, err := models.FindUserByEmailAndAudience(a.db, username, aud)
 	if err != nil {
 		if models.IsNotFoundError(err) {
