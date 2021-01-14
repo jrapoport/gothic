@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/jrapoport/gothic/conf"
 	"net/http"
+
+	"github.com/jrapoport/gothic/conf"
 )
 
 func (a *API) handleHealthCheck(w http.ResponseWriter, r *http.Request) error {

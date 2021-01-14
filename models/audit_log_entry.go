@@ -16,16 +16,17 @@ type AuditAction string
 type auditLogType string
 
 const (
-	LoginAction                 AuditAction = "login"
-	LogoutAction                AuditAction = "logout"
-	InviteAcceptedAction        AuditAction = "invite_accepted"
-	UserSignedUpAction          AuditAction = "user_signedup"
-	UserInvitedAction           AuditAction = "user_invited"
-	UserDeletedAction           AuditAction = "user_deleted"
-	UserModifiedAction          AuditAction = "user_modified"
-	UserRecoveryRequestedAction AuditAction = "user_recovery_requested"
-	TokenRevokedAction          AuditAction = "token_revoked"
-	TokenRefreshedAction        AuditAction = "token_refreshed"
+	LoginAction                     AuditAction = "login"
+	LogoutAction                    AuditAction = "logout"
+	InviteAcceptedAction            AuditAction = "invite_accepted"
+	UserSignedUpAction              AuditAction = "user_signedup"
+	UserInvitedAction               AuditAction = "user_invited"
+	UserDeletedAction               AuditAction = "user_deleted"
+	UserModifiedAction              AuditAction = "user_modified"
+	UserRecoveryRequestedAction     AuditAction = "user_recovery_requested"
+	UserConfirmationRequestedAction AuditAction = "user_confirmation_requested"
+	TokenRevokedAction              AuditAction = "token_revoked"
+	TokenRefreshedAction            AuditAction = "token_refreshed"
 
 	account auditLogType = "account"
 	team    auditLogType = "team"

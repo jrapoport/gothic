@@ -120,7 +120,7 @@ func (ts *InviteTestSuite) TestInvite_WithoutAccess() {
 	assert.Equal(ts.T(), http.StatusUnauthorized, w.Code)
 }
 
-func (ts *InviteTestSuite) TestVerifyInvite() {
+func (ts *InviteTestSuite) TestConfirmInvite() {
 	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now
@@ -138,7 +138,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
 		"type":     "signup",
 		"token":    u.ConfirmationToken,
-		"password": "testing",
+		"password": "testing!123",
 	}))
 
 	// Setup request
@@ -153,7 +153,7 @@ func (ts *InviteTestSuite) TestVerifyInvite() {
 	assert.Equal(ts.T(), http.StatusOK, w.Code, w.Body.String())
 }
 
-func (ts *InviteTestSuite) TestVerifyInvite_NoPassword() {
+func (ts *InviteTestSuite) TestConfirmInvite_NoPassword() {
 	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
 	now := time.Now()
 	user.InvitedAt = &now

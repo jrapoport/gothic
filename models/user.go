@@ -25,15 +25,23 @@ func init() {
 type User struct {
 	ID uuid.UUID `json:"id" gorm:"primaryKey"`
 
-	Aud               string     `json:"aud" gorm:"type:varchar(255)"`
-	Role              string     `json:"role" gorm:"type:varchar(255)"`
-	Email             string     `json:"email" gorm:"type:varchar(320)"`
-	EncryptedPassword string     `json:"-"`
-	ConfirmedAt       *time.Time `json:"confirmed_at,omitempty"`
-	InvitedAt         *time.Time `json:"invited_at,omitempty"`
+	Username          string `json:"username" gorm:"type:varchar(320)"`
+	Email             string `json:"email" gorm:"type:varchar(320)"`
+	EncryptedPassword string `json:"-"`
+
+	// user must change their password
+	ChangePassword bool `json:"change_password"`
+
+	Aud          string     `json:"aud" gorm:"type:varchar(255)"`
+	Role         string     `json:"role" gorm:"type:varchar(255)"`
+	LastSignInAt *time.Time `json:"last_sign_in_at,omitempty"`
 
 	ConfirmationToken  string     `json:"-" gorm:"type:varchar(255)"`
 	ConfirmationSentAt *time.Time `json:"confirmation_sent_at,omitempty"`
+	ConfirmedAt        *time.Time `json:"confirmed_at,omitempty"`
+
+	// support additional user verification (beyond email)
+	VerifiedAt *time.Time `json:"verified_at,omitempty"`
 
 	RecoveryToken  string     `json:"-" gorm:"type:varchar(255)"`
 	RecoverySentAt *time.Time `json:"recovery_sent_at,omitempty"`
@@ -42,7 +50,7 @@ type User struct {
 	EmailChange       string     `json:"new_email,omitempty" gorm:"type:varchar(320)"`
 	EmailChangeSentAt *time.Time `json:"email_change_sent_at,omitempty"`
 
-	LastSignInAt *time.Time `json:"last_sign_in_at,omitempty"`
+	InvitedAt *time.Time `json:"invited_at,omitempty"`
 
 	AppMetaData  JSONMap `json:"app_metadata"`
 	UserMetaData JSONMap `json:"user_metadata"`
@@ -61,9 +69,20 @@ func NewUser(email, password, aud string, userData map[string]interface{}) (*Use
 		return nil, err
 	}
 
+	username := ""
+	if userData != nil {
+		if val, has := userData["username"]; has {
+			if name, ok := val.(string); ok {
+				username = name
+				delete(userData, "username")
+			}
+		}
+	}
+
 	u := &User{
 		ID:                id,
 		Aud:               aud,
+		Username:          username,
 		Email:             email,
 		UserMetaData:      userData,
 		EncryptedPassword: pw,
@@ -115,12 +134,6 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 		u.LastSignInAt = nil
 	}
 	return nil
-}
-
-// IsConfirmed checks if a user has already being
-// registered and confirmed.
-func (u *User) IsConfirmed() bool {
-	return u.ConfirmedAt != nil
 }
 
 // SetRole sets the users Role to roleName
@@ -188,7 +201,9 @@ func (u *User) UpdatePassword(tx *storage.Connection, password string) error {
 		return err
 	}
 	u.EncryptedPassword = pw
-	return tx.Model(&u).Select("encrypted_password").Updates(u).Error
+	// note that the user has changed their password
+	u.ChangePassword = false
+	return tx.Model(&u).Select("change_password", "encrypted_password").Updates(u).Error
 }
 
 // Authenticate a user from a password
@@ -197,7 +212,7 @@ func (u *User) Authenticate(password string) bool {
 	return err == nil
 }
 
-// Confirm resets the confimation token and the confirm timestamp
+// Confirm resets the email confirmation token and the confirm timestamp
 func (u *User) Confirm(tx *storage.Connection) error {
 	u.ConfirmationToken = ""
 	now := time.Now()
@@ -213,17 +228,29 @@ func (u *User) ConfirmEmailChange(tx *storage.Connection) error {
 	return tx.Model(&u).Select("email", "email_change", "email_change_token").Updates(u).Error
 }
 
+// IsConfirmed checks if a user has confirmed their email address.
+func (u *User) IsConfirmed() bool {
+	return u.ConfirmedAt != nil
+}
+
+// Verify sets the verification timestamp
+func (u *User) Verify(tx *storage.Connection) error {
+	now := time.Now()
+	u.VerifiedAt = &now
+	return tx.Model(&u).Select("verified_at").Updates(u).Error
+}
+
+// IsVerified checks if a user has been verified
+func (u *User) IsVerified() bool {
+	return u.VerifiedAt != nil
+}
+
 // Recover resets the recovery token
 func (u *User) Recover(tx *storage.Connection) error {
 	u.RecoveryToken = ""
+	// make the user also have to set a new password now
+	u.ChangePassword = true
 	return tx.Model(&u).Select("recovery_token").Updates(u).Error
-}
-
-// CountOtherUsers counts how many other users exist besides the one provided
-func CountOtherUsers(tx *storage.Connection, id uuid.UUID) (int, error) {
-	var userCount int64
-	err := tx.Model(&User{}).Where("id != ?", id).Count(&userCount).Error
-	return int(userCount), errors.Wrap(err, "error finding registered users")
 }
 
 func findUser(tx *storage.Connection, query string, args ...interface{}) (*User, error) {
@@ -315,6 +342,23 @@ func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Paginat
 // IsDuplicatedEmail returns whether a user exists with a matching email and audience.
 func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) {
 	_, err := FindUserByEmailAndAudience(tx, email, aud)
+	if err != nil {
+		if IsNotFoundError(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+// FindUserByUsername finds a user with the matching username.
+func FindUserByUsername(tx *storage.Connection, instanceID uuid.UUID, name string) (*User, error) {
+	return findUser(tx, "instance_id = ? and username = ?", instanceID, name)
+}
+
+// IsDuplicatedUsername returns whether a user exists with a matching username and audience.
+func IsDuplicatedUsername(tx *storage.Connection, instanceID uuid.UUID, name string) (bool, error) {
+	_, err := FindUserByUsername(tx, instanceID, name)
 	if err != nil {
 		if IsNotFoundError(err) {
 			return false, nil

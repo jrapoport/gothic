@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/sirupsen/logrus"
 )
 
 // waitForTermination blocks until the system signals termination or done has a value
