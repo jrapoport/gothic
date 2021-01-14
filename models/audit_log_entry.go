@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/pkg/errors"
 	"github.com/vcraescu/go-paginator/v2"
@@ -58,10 +58,7 @@ type AuditLogEntry struct {
 }
 
 func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, traits map[string]interface{}) error {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return errors.Wrap(err, "Error generating unique id")
-	}
+	id := uuid.New()
 	l := AuditLogEntry{
 		ID: id,
 		Payload: JSONMap{
