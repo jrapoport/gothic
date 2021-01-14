@@ -23,13 +23,14 @@ type Configuration struct {
 	RequestID     string `json:"request_id" split_words:"true"`
 	DisableSignup bool   `json:"disable_signup" split_words:"true"`
 
-	DB       DatabaseConfig `json:"db"`
-	External ExternalConfig `json:"external"`
-	Log      LogConfig      `json:"log"`
-	Tracing  TracingConfig  `json:"tracing"`
-	JWT      JWTConfig      `json:"jwt"`
-	Webhook  WebhookConfig  `json:"webhook"`
-	Cookies  CookieConfig   `json:"cookies"`
+	DB        DatabaseConfig  `json:"db"`
+	External  ExternalConfig  `json:"external"`
+	Log       LogConfig       `json:"log"`
+	Tracing   TracingConfig   `json:"tracing"`
+	JWT       JWTConfig       `json:"jwt"`
+	Webhook   WebhookConfig   `json:"webhook"`
+	Cookies   CookieConfig    `json:"cookies"`
+	Recaptcha RecaptchaConfig `json:"recaptcha"`
 
 	MailConfig
 }

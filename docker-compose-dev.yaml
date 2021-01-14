@@ -8,6 +8,7 @@ services:
       - db_volume:/var/lib/mysql
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - CLIENT_MULTI_STATEMENTS=true
     expose:
       - '3306'
     ports:
@@ -15,12 +16,6 @@ services:
     #https://stackoverflow.com/questions/55559386/how-to-fix-mbind-operation-not-permitted-in-mysql-error-log
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
-    networks:
-      auth_mesh:
-        aliases:
-          - gothic_db
+
 volumes:
    db_volume: {}
-
-networks:
-  auth_mesh: {}

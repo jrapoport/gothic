@@ -7,6 +7,7 @@ require (
 	github.com/beevik/etree v1.1.0
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/didip/tollbooth/v5 v5.2.0
+	github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/protobuf v1.4.3
