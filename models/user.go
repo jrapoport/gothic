@@ -250,7 +250,7 @@ func (u *User) Recover(tx *storage.Connection) error {
 	u.RecoveryToken = ""
 	// make the user also have to set a new password now
 	u.ChangePassword = true
-	return tx.Model(&u).Select("recovery_token").Updates(u).Error
+	return tx.Model(&u).Select("change_password","recovery_token").Updates(u).Error
 }
 
 func findUser(tx *storage.Connection, query string, args ...interface{}) (*User, error) {
