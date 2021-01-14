@@ -34,28 +34,45 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 		return badRequestError("Could not read Signup params: %v", err)
 	}
 
-	if params.Password == "" {
-		return unprocessableEntityError("Signup requires a valid password")
+	data := params.Data
+	if data == nil {
+		return badRequestError("signup error: %v", err)
 	}
-	if err := a.validateEmail(ctx, params.Email); err != nil {
+
+	if err = a.checkRecaptcha(r, config); err != nil {
 		return err
+	}
+	delete(params.Data, "recaptcha")
+
+	if err = a.validatePassword(params.Password); err != nil {
+		return err
+	}
+
+	if err = a.validateEmail(ctx, params.Email); err != nil {
+		return err
+	}
+
+	// TODO: make this more efficient
+	taken, err := models.IsDuplicatedEmail(a.db, params.Email, params.Aud)
+	if err != nil || taken {
+		return badRequestError("email taken").WithInternalError(err)
 	}
 
 	params.Aud = a.requestAud(ctx, r)
 	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, params.Aud)
 	if err != nil && !models.IsNotFoundError(err) {
-		return internalServerError("Name error finding user").WithInternalError(err)
+		return internalServerError("name error finding user").WithInternalError(err)
 	}
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
 		if user != nil {
 			if user.IsConfirmed() {
-				return badRequestError("A user with this email address has already been registered")
+				return badRequestError("a user with this email address has already been registered")
 			}
 
-			if err := user.UpdateUserMetaData(tx, params.Data); err != nil {
-				return internalServerError("Name error updating user").WithInternalError(err)
+			if err = user.UpdateUserMetaData(tx, data); err != nil {
+				return internalServerError("name error updating user").WithInternalError(err)
 			}
 		} else {
 			params.Provider = "email"
@@ -79,7 +96,7 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 			mailer := a.Mailer(ctx)
 			referrer := a.getReferrer(r)
 			if terr = sendConfirmation(tx, user, mailer, config.SMTP.MaxFrequency, referrer); terr != nil {
-				return internalServerError("Error sending confirmation mail").WithInternalError(terr)
+				return internalServerError("error sending confirmation mail").WithInternalError(terr)
 			}
 		}
 		return nil

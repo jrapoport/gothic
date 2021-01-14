@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

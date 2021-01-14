@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/jrapoport/gothic/storage"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -41,6 +41,8 @@ func (ts *UserTestSuite) SetupTest() {
 	// Create user
 	u, err := models.NewUser(userEmail, "password", ts.Config.JWT.Aud, nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
+	t := time.Now()
+	u.ConfirmedAt = &t
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
@@ -49,13 +51,14 @@ func (ts *UserTestSuite) TearDownTest() {
 }
 
 func (ts *UserTestSuite) TestUser_UpdatePassword() {
+	const password = "new!password"
 	u, err := models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
 	// Request body
 	var buffer bytes.Buffer
 	require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(map[string]interface{}{
-		"password": "newpass",
+		"password": password,
 	}))
 
 	// Setup request
@@ -72,10 +75,10 @@ func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 	ts.API.handler.ServeHTTP(w, req)
-	require.Equal(ts.T(), w.Code, http.StatusOK)
+	require.Equal(ts.T(), http.StatusOK, w.Code)
 
 	u, err = models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
 	require.NoError(ts.T(), err)
 
-	assert.True(ts.T(), u.Authenticate("newpass"))
+	assert.True(ts.T(), u.Authenticate(password))
 }
