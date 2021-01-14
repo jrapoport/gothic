@@ -11,6 +11,7 @@ type JWTConfig struct {
 	Aud          string `json:"aud"`
 	AdminGroup   string `json:"admin_group" split_words:"true"`
 	DefaultGroup string `json:"default_group" split_words:"true"`
+	MaskEmail    bool `json:"mask_email" split_words:"true"`
 }
 
 func (c *JWTConfig) SigningMethod() jwt.SigningMethod {

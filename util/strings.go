@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func MaskEmailAddress(e string) string {
+func MaskEmail(e string) string {
 	parts := strings.Split(e, "@")
 	if len(parts) < 2 {
 		return ""

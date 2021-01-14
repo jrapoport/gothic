@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/jrapoport/gothic/util"
 	"net/http"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 // GothicClaims is a struct thats used for JWT claims
 type GothicClaims struct {
 	jwt.StandardClaims
-	Username     string                 `json:"username"`
+	Username     string                 `json:"username,omitempty"`
 	Email        string                 `json:"email"`
 	Confirmed    bool                   `json:"confirmed"`
 	Verified     bool                   `json:"verified"`
@@ -146,6 +147,10 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 		newToken, terr = models.GrantRefreshTokenSwap(tx, user, token)
 		if terr != nil {
 			return internalServerError(terr.Error())
+		}
+
+		if a.config.JWT.MaskEmail {
+			user.Email = util.MaskEmail(user.Email)
 		}
 
 		tokenString, terr = generateAccessToken(user,
