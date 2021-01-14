@@ -93,6 +93,8 @@ github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1/go.mod h1:+hnT3ywWDTAFrW5aE+u2Sa/
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/didip/tollbooth/v5 v5.2.0 h1:6AfMZByPqSkKwt8ocKEa6G73beowz6wAeeFgeTVwZHY=
 github.com/didip/tollbooth/v5 v5.2.0/go.mod h1:d9rzwOULswrD3YIrAQmP3bfjxab32Df4IaO6+D25l9g=
+github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804 h1:gFnPvL9HX+Nrb4M2AwzFYqcwGStxYZpuDpFAqpViBG4=
+github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804/go.mod h1:eovtlS/D2AGk8vy2a9sO4XzOyHMHb8jM+WPsf9pkgFo=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=

@@ -1,14 +1,14 @@
 package models_test
 
 import (
-	"github.com/jrapoport/gothic/conf"
-	"github.com/jrapoport/gothic/storage/test"
-	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 	"testing"
 
+	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
+	"github.com/jrapoport/gothic/storage/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const modelsTestConfig = "../env/test.env"

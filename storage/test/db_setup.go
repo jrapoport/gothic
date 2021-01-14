@@ -9,8 +9,10 @@ import (
 )
 
 func SetupDBConnection(t *testing.T, globalConfig *conf.Configuration) (*storage.Connection, error) {
-	globalConfig.DB.Driver = "sqlite"
-	globalConfig.DB.URL = t.TempDir()
+	if globalConfig.DB.Driver == "sqlite" &&
+		globalConfig.DB.URL == "test" {
+		globalConfig.DB.URL = t.TempDir()
+	}
 	conn, err := storage.Dial(globalConfig)
 	assert.NoError(t, err)
 	if err != err {
