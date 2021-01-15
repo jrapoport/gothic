@@ -1,10 +1,11 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +32,8 @@ func GrantRefreshTokenSwap(tx *storage.Connection, user *User, token *RefreshTok
 	err := tx.Transaction(func(rtx *storage.Connection) error {
 		var terr error
 		if terr = NewAuditLogEntry(rtx, user, TokenRevokedAction, nil); terr != nil {
-			return errors.Wrap(terr, "error creating audit log entry")
+			terr = fmt.Errorf("%w granting refresh token", terr)
+			return terr
 		}
 
 		token.Revoked = true
@@ -50,13 +52,14 @@ func Logout(tx *storage.Connection, uid uuid.UUID) error {
 }
 
 func createRefreshToken(tx *storage.Connection, user *User) (*RefreshToken, error) {
-	token := &RefreshToken{
+	t := &RefreshToken{
 		UserID: user.ID,
 		Token:  crypto.SecureToken(),
 	}
 
-	if err := tx.Create(token).Error; err != nil {
-		return nil, errors.Wrap(err, "error creating refresh token")
+	if err := tx.Create(t).Error; err != nil {
+		err = fmt.Errorf("%w creating refresh token", err)
+		return nil, err
 	}
-	return token, nil
+	return t, nil
 }

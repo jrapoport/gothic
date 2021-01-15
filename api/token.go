@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"github.com/jrapoport/gothic/util"
 	"net/http"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/jrapoport/gothic/metering"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/util"
 )
 
 // GothicClaims is a struct thats used for JWT claims
@@ -100,7 +100,7 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 
 		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, token.Token, cookie == useSessionCookie, w); terr != nil {
-				return internalServerError("Failed to set JWT cookie. %s", terr)
+				return internalServerError("failed to set JWT cookie. %s", terr)
 			}
 		}
 		return nil
@@ -163,7 +163,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 
 		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, tokenString, cookie == useSessionCookie, w); terr != nil {
-				return internalServerError("Failed to set JWT cookie. %s", terr)
+				return internalServerError("failed to set JWT cookie. %s", terr)
 			}
 		}
 		return nil

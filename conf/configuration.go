@@ -1,14 +1,12 @@
 package conf
 
 import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
 	"os"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 )
 
 // Configuration holds all the configuration that applies to all instances.
@@ -22,18 +20,20 @@ type Configuration struct {
 	RateLimit     string `json:"rate_limit" split_words:"true"`
 	RequestID     string `json:"request_id" split_words:"true"`
 	DisableSignup bool   `json:"disable_signup" split_words:"true"`
-	PasswordRegex string `json:"_" split_words:"true" default:"^[a-zA-Z0-9[:punct:]]{8,28}$"`
 
-	DB        DatabaseConfig  `json:"db"`
-	External  ExternalConfig  `json:"external"`
-	Log       LogConfig       `json:"log"`
-	Tracing   TracingConfig   `json:"tracing"`
-	JWT       JWTConfig       `json:"jwt"`
-	Webhook   WebhookConfig   `json:"webhook"`
-	Cookies   CookieConfig    `json:"cookies"`
-	Recaptcha RecaptchaConfig `json:"recaptcha"`
+	DB         DatabaseConfig   `json:"db"`
+	External   ExternalConfig   `json:"external"`
+	Logger     LogConfig        `json:"logger"`
+	Tracing    TracingConfig    `json:"tracing"`
+	JWT        JWTConfig        `json:"jwt"`
+	Webhook    WebhookConfig    `json:"webhook"`
+	Cookies    CookieConfig     `json:"cookies"`
+	Recaptcha  RecaptchaConfig  `json:"recaptcha"`
+	Validation ValidationConfig `json:"validation"`
 
 	MailConfig
+
+	Log *logrus.Entry `json:"-" ignored:"true"`
 }
 
 func loadEnvironment(filename string) error {
@@ -61,7 +61,7 @@ func LoadConfiguration(filename string) (*Configuration, error) {
 		return nil, err
 	}
 
-	if _, err := ConfigureLog(&config.Log); err != nil {
+	if err := ConfigureLog(config); err != nil {
 		return nil, err
 	}
 
@@ -112,6 +112,7 @@ func (config *Configuration) ApplyDefaults() {
 	}
 }
 
+/*
 func (config *Configuration) Value() (driver.Value, error) {
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -128,7 +129,7 @@ func (config *Configuration) Scan(src interface{}) error {
 	case []byte:
 		source = v
 	default:
-		return errors.New("Invalid data type for Configuration")
+		return errors.New("invalid data type for Configuration")
 	}
 
 	if len(source) == 0 {
@@ -136,3 +137,4 @@ func (config *Configuration) Scan(src interface{}) error {
 	}
 	return json.Unmarshal(source, &config)
 }
+*/
