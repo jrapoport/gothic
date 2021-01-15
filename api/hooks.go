@@ -239,7 +239,7 @@ func triggerHook(_ context.Context, hookURL *url.URL, secret string, method jwt.
 		webhookRsp := &WebhookResponse{}
 		decoder := json.NewDecoder(body)
 		if err = decoder.Decode(webhookRsp); err != nil {
-			return internalServerError("Webhook returned malformed JSON: %v", err).WithInternalError(err)
+			return internalServerError("Webhook returned malformed Map: %v", err).WithInternalError(err)
 		}
 		return conn.Transaction(func(tx *storage.Connection) error {
 			if webhookRsp.UserMetaData != nil {

@@ -23,7 +23,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
-	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
+	user, err := models.NewUser("test@truth.com", "thisisapassword", nil)
 	require.NoError(t, err)
 
 	var callCount int
@@ -64,7 +64,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
-	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
+	user, err := models.NewUser("test@truth.com", "thisisapassword", nil)
 	require.NoError(t, err)
 
 	var callCount int

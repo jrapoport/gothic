@@ -11,9 +11,13 @@ import (
 
 // Configuration holds all the configuration that applies to all instances.
 type Configuration struct {
+	// Host is adapter to listen on.
 	Host       string `json:"host" default:"localhost" `
+	// RestPort is the port for the REST server to listen on.
 	RestPort   int    `json:"rest_port" split_words:"true" default:"8081" `
+	// RpcPort is the port for the gRPC server to listen on.
 	RpcPort    int    `json:"rpc_port" split_words:"true" default:"3001" `
+	// RpcWebPort is the port for the gRPC-Web server to listen on.
 	RpcWebPort int    `json:"rpcweb_port" envconfig:"RPCWEB_PORT"  default:"6001" `
 
 	SiteURL       string `json:"site_url" split_words:"true" required:"true"`
@@ -21,10 +25,15 @@ type Configuration struct {
 	RequestID     string `json:"request_id" split_words:"true"`
 	DisableSignup bool   `json:"disable_signup" split_words:"true"`
 
+	// DB is the database configuration.
 	DB         DatabaseConfig   `json:"db"`
+	// External is the configuration for external OAuth providers.
 	External   ExternalConfig   `json:"external"`
+	// Logger is the log configuration.
 	Logger     LogConfig        `json:"logger"`
+	// Tracing is the Data Dog trace configuration.
 	Tracing    TracingConfig    `json:"tracing"`
+	// JWT is the JWT configuration.
 	JWT        JWTConfig        `json:"jwt"`
 	Webhook    WebhookConfig    `json:"webhook"`
 	Cookies    CookieConfig     `json:"cookies"`
@@ -77,38 +86,33 @@ func LoadConfiguration(filename string) (*Configuration, error) {
 }
 
 // ApplyDefaults sets defaults for a Configuration
-func (config *Configuration) ApplyDefaults() {
-	if config.JWT.AdminGroup == "" {
-		config.JWT.AdminGroup = "admin"
+func (c *Configuration) ApplyDefaults() {
+	if c.JWT.Aud == "" {
+		c.JWT.Aud = c.SiteURL
 	}
 
-	if config.JWT.Exp == 0 {
-		config.JWT.Exp = 3600
+	if c.Mailer.URLPaths.Invite == "" {
+		c.Mailer.URLPaths.Invite = "/"
+	}
+	if c.Mailer.URLPaths.Confirmation == "" {
+		c.Mailer.URLPaths.Confirmation = "/"
+	}
+	if c.Mailer.URLPaths.Recovery == "" {
+		c.Mailer.URLPaths.Recovery = "/"
+	}
+	if c.Mailer.URLPaths.EmailChange == "" {
+		c.Mailer.URLPaths.EmailChange = "/"
 	}
 
-	if config.Mailer.URLPaths.Invite == "" {
-		config.Mailer.URLPaths.Invite = "/"
-	}
-	if config.Mailer.URLPaths.Confirmation == "" {
-		config.Mailer.URLPaths.Confirmation = "/"
-	}
-	if config.Mailer.URLPaths.Recovery == "" {
-		config.Mailer.URLPaths.Recovery = "/"
-	}
-	if config.Mailer.URLPaths.EmailChange == "" {
-		config.Mailer.URLPaths.EmailChange = "/"
+	if c.SMTP.MaxFrequency == 0 {
+		c.SMTP.MaxFrequency = 15 * time.Minute
 	}
 
-	if config.SMTP.MaxFrequency == 0 {
-		config.SMTP.MaxFrequency = 15 * time.Minute
+	if c.Cookies.Key == "" {
+		c.Cookies.Key = "nf_jwt"
 	}
-
-	if config.Cookies.Key == "" {
-		config.Cookies.Key = "nf_jwt"
-	}
-
-	if config.Cookies.Duration == 0 {
-		config.Cookies.Duration = 86400
+	if c.Cookies.Duration == 0 {
+		c.Cookies.Duration = 86400
 	}
 }
 

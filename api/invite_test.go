@@ -51,20 +51,18 @@ func (ts *InviteTestSuite) SetupTest() {
 
 func (ts *InviteTestSuite) makeSuperAdmin(email string) string {
 	// Cleanup existing user, if they already exist
-	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud); u != nil {
+	if u, _ := models.FindUserByEmail(ts.API.db, email); u != nil {
 		require.NoError(ts.T(), ts.API.db.Delete(u).Error, "Error deleting user")
 	}
 
-	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test Username"})
+	u, err := models.NewUser(email, "test",
+		map[string]interface{}{"full_name": "Test Username"})
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 
-	token, err := generateAccessToken(u,
-		time.Second*time.Duration(ts.Config.JWT.Exp),
-		ts.Config.JWT.Secret,
-		ts.Config.JWT.SigningMethod())
+	token, err := generateAccessToken(u, ts.Config.JWT)
 	require.NoError(ts.T(), err, "Error generating access token")
 
 	_, err = jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
@@ -121,7 +119,7 @@ func (ts *InviteTestSuite) TestInvite_WithoutAccess() {
 }
 
 func (ts *InviteTestSuite) TestConfirmInvite() {
-	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(inviteEmail, "", nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -130,7 +128,7 @@ func (ts *InviteTestSuite) TestConfirmInvite() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, inviteEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, inviteEmail)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -154,7 +152,7 @@ func (ts *InviteTestSuite) TestConfirmInvite() {
 }
 
 func (ts *InviteTestSuite) TestConfirmInvite_NoPassword() {
-	user, err := models.NewUser(inviteEmail, "", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(inviteEmail, "", nil)
 	now := time.Now()
 	user.InvitedAt = &now
 	user.EncryptedPassword = ""
@@ -163,7 +161,7 @@ func (ts *InviteTestSuite) TestConfirmInvite_NoPassword() {
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, inviteEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, inviteEmail)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -227,7 +225,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmail(ts.API.db, "invite_gitlab@example.com")
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state
@@ -269,7 +267,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab() {
 	ts.Equal(1, userCount)
 
 	// ensure user has been created with metadata
-	user, err = models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
+	user, err = models.FindUserByEmail(ts.API.db, "invite_gitlab@example.com")
 	ts.Require().NoError(err)
 	ts.Equal("Gitlab Test", user.UserMetaData["full_name"])
 	ts.Equal("http://example.com/avatar", user.UserMetaData["avatar_url"])
@@ -318,7 +316,7 @@ func (ts *InviteTestSuite) TestInviteExternalGitlab_MismatchedEmails() {
 	ts.Require().Equal(http.StatusOK, w.Code)
 
 	// Find test user
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, "invite_gitlab@example.com", ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmail(ts.API.db, "invite_gitlab@example.com")
 	require.NoError(ts.T(), err)
 
 	// get redirect url w/ state

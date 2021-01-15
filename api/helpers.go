@@ -52,16 +52,16 @@ func getUserFromClaims(ctx context.Context, conn *storage.Connection) (*models.U
 	}
 
 	if claims.Subject == "" {
-		return nil, errors.New("Invalid claim: id")
+		return nil, errors.New("invalid claim: id")
 	}
 
 	// System Username
 	if len(claims.Audience) <= 0 {
-		return nil, errors.New("Invalid audience")
+		return nil, errors.New("invalid audience")
 	}
 
 	if claims.Subject == models.SystemUserUUID.String() || claims.Subject == models.SystemUserID {
-		return models.NewSystemUser(claims.Audience[0]), nil
+		return models.NewSystemUser(), nil
 	}
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
@@ -70,29 +70,9 @@ func getUserFromClaims(ctx context.Context, conn *storage.Connection) (*models.U
 	return models.FindUserByID(conn, userID)
 }
 
-func (a *API) isAdmin(ctx context.Context, u *models.User, aud string) bool {
+func (a *API) isAdmin(ctx context.Context, u *models.User) bool {
 	config := a.getConfig(ctx)
-	if aud == "" {
-		aud = config.JWT.Aud
-	}
-	return u.IsSuperAdmin || (aud == u.Aud && u.HasRole(config.JWT.AdminGroup))
-}
-
-func (a *API) requestAud(ctx context.Context, r *http.Request) string {
-	config := a.getConfig(ctx)
-	// First check for an audience in the header
-	if aud := r.Header.Get(audHeaderName); aud != "" {
-		return aud
-	}
-
-	// Then check the token
-	claims := getClaims(ctx)
-	if claims != nil && len(claims.Audience) > 0 && claims.Audience[0] != "" {
-		return claims.Audience[0]
-	}
-
-	// Finally, return the default of none of the above methods are successful
-	return config.JWT.Aud
+	return u.IsSuperAdmin || u.HasRole(config.JWT.AdminGroup)
 }
 
 func (a *API) getReferrer(r *http.Request) string {

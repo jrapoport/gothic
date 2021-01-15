@@ -53,7 +53,7 @@ func init() {
 // AuditLogEntry is the database model for audit log entries.
 type AuditLogEntry struct {
 	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
-	Payload   JSONMap   `json:"payload"`
+	Payload   Map       `json:"payload"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -61,7 +61,7 @@ func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, t
 	id := uuid.New()
 	l := AuditLogEntry{
 		ID: id,
-		Payload: JSONMap{
+		Payload: Map{
 			"timestamp":   time.Now().UTC().Format(time.RFC3339),
 			"actor_id":    actor.ID,
 			"actor_email": actor.Email,

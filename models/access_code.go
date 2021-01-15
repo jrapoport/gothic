@@ -35,7 +35,7 @@ func IsDuplicatedCode(tx *storage.Connection, code string) (bool, error) {
 	return true, nil
 }
 
-// FindUserByEmailAndAudience finds a user with the matching email and audience.
+// FindUserByEmail finds a user with the matching email and audience.
 func FindAccessCodeByCode(tx *storage.Connection, code string) (*AccessCode, error) {
 	q := tx.Where("code = ?", code)
 	c := &AccessCode{}
