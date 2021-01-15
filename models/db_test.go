@@ -23,10 +23,10 @@ func TestTableNameNamespacing(t *testing.T) {
 		{expected: "test_users", value: []*models.User{}},
 	}
 
-	globalConfig, err := conf.LoadConfiguration(modelsTestConfig)
+	config, err := conf.LoadConfiguration(modelsTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(t, globalConfig)
+	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
 	for _, tc := range cases {

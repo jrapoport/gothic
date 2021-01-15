@@ -112,6 +112,19 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, params *SignupParams) (*models.User, error) {
 	config := a.getConfig(ctx)
 
+	// TODO: make username a 1st class param
+	if params.Data != nil {
+		username := ""
+		if val, has := params.Data["username"]; has {
+			username = val.(string)
+		}
+		if username != "" {
+			if err := a.validateUsername(username); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	user, err := models.NewUser(params.Email, params.Password, params.Aud, params.Data)
 	if err != nil {
 		return nil, internalServerError("Name error creating user").WithInternalError(err)

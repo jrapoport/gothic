@@ -34,9 +34,9 @@ type API struct {
 
 // ListenAndServeREST starts the REST API
 // let's wrap this instead
-func ListenAndServeREST(a *API, globalConfig *conf.Configuration) {
+func ListenAndServeREST(a *API, config *conf.Configuration) {
 	go func() {
-		addr := fmt.Sprintf("%v:%v", globalConfig.Host, globalConfig.RestPort)
+		addr := fmt.Sprintf("%v:%v", config.Host, config.RestPort)
 		logrus.Infof("Gothic REST API started on: %s", addr)
 		a.ListenAndServe(addr)
 	}()
@@ -64,15 +64,15 @@ func (a *API) ListenAndServe(hostAndPort string) {
 }
 
 // NewAPI creates a new REST API
-func NewAPI(globalConfig *conf.Configuration, db *storage.Connection) *API {
-	api := &API{config: globalConfig, db: db}
+func NewAPI(config *conf.Configuration, db *storage.Connection) *API {
+	api := &API{config: config, db: db}
 
 	xffmw, _ := xff.Default()
 	logger := newStructuredLogger(logrus.StandardLogger())
 
 	r := newRouter()
 	r.UseBypass(xffmw.Handler)
-	r.Use(addRequestID(globalConfig))
+	r.Use(addRequestID(config))
 	r.Use(recoverer)
 	r.UseBypass(tracer)
 
@@ -150,7 +150,7 @@ func NewAPI(globalConfig *conf.Configuration, db *storage.Connection) *API {
 		AllowCredentials: true,
 	})
 
-	ctx := withConfig(context.Background(), globalConfig)
+	ctx := withConfig(context.Background(), config)
 
 	api.handler = corsHandler.Handler(chi.ServerBaseContext(ctx, r))
 	return api

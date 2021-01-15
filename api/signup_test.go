@@ -54,7 +54,7 @@ func (ts *SignupTestSuite) TestSignup() {
 		"email":    signupEmail,
 		"password": signupPassGood,
 		"data": map[string]interface{}{
-			"a": 1,
+			"a":         1,
 			"recaptcha": "hello",
 		},
 	}))
@@ -121,9 +121,9 @@ func (ts *SignupTestSuite) TestSignup_PasswordRegex() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 
-	ts.API.config.PasswordRegex = "^[a-z]{2,}$"
+	ts.API.config.Validation.PasswordRegex = "^[a-z]{2,}$"
 	ts.API.handler.ServeHTTP(w, req)
-	ts.API.config.PasswordRegex = ""
+	ts.API.config.Validation.PasswordRegex = ""
 
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 }
@@ -163,7 +163,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		assert.Len(u, 10)
 		// assert.Equal(t, user.ID, u["id"]) TODO
 		assert.Equal("api.gothic.com", u["aud"])
-		assert.Equal("", u["role"])
+		assert.Equal("user", u["role"])
 		assert.Equal(signupEmail, u["email"])
 
 		appmeta, ok := u["app_metadata"].(map[string]interface{})

@@ -17,10 +17,10 @@ import (
 )
 
 func TestSignupHookSendInstanceID(t *testing.T) {
-	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
+	config, err := conf.LoadConfiguration(apiTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(t, globalConfig)
+	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
 	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
@@ -45,7 +45,7 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 	localhost := removeLocalhostFromPrivateIPBlock()
 	defer unshiftPrivateIPBlock(localhost)
 
-	config := &conf.Configuration{
+	config = &conf.Configuration{
 		Webhook: conf.WebhookConfig{
 			URL:    svr.URL,
 			Events: []string{SignupEvent},
@@ -58,10 +58,10 @@ func TestSignupHookSendInstanceID(t *testing.T) {
 }
 
 func TestSignupHookFromClaims(t *testing.T) {
-	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
+	config, err := conf.LoadConfiguration(apiTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(t, globalConfig)
+	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
 	user, err := models.NewUser("test@truth.com", "thisisapassword", "", nil)
@@ -86,7 +86,7 @@ func TestSignupHookFromClaims(t *testing.T) {
 	localhost := removeLocalhostFromPrivateIPBlock()
 	defer unshiftPrivateIPBlock(localhost)
 
-	config := &conf.Configuration{
+	config = &conf.Configuration{
 		Webhook: conf.WebhookConfig{
 			URL:    svr.URL,
 			Events: []string{SignupEvent},

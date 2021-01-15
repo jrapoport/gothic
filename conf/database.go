@@ -6,5 +6,6 @@ type DatabaseConfig struct {
 	URL         string `json:"url" required:"true"`
 	Name        string `json:"name"`
 	Namespace   string `json:"namespace"`
+	MaxRetries  uint   `json:"max_retries" split_words:"true" default:"3"`
 	AutoMigrate bool   `json:"auto_migrate"`
 }

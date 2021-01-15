@@ -2,13 +2,13 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/mailer"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 )
 
 func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mailer, maxFrequency time.Duration, referrerURL string) error {
@@ -21,11 +21,15 @@ func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mail
 	now := time.Now()
 	if err := mailer.ConfirmationMail(u, referrerURL); err != nil {
 		u.ConfirmationToken = oldToken
-		return errors.Wrap(err, "Error sending confirmation email")
+		err = fmt.Errorf("sending confirmation email %w", err)
+		return err
 	}
 	u.ConfirmationSentAt = &now
 	err := tx.Model(&u).Select("confirmation_token", "confirmation_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Name error updating user for confirmation")
+	if err != nil {
+		err = fmt.Errorf("updating user for confirmation %w", err)
+	}
+	return err
 }
 
 func sendInvite(tx *storage.Connection, u *models.User, mailer mailer.Mailer, referrerURL string) error {
@@ -34,11 +38,15 @@ func sendInvite(tx *storage.Connection, u *models.User, mailer mailer.Mailer, re
 	now := time.Now()
 	if err := mailer.InviteMail(u, referrerURL); err != nil {
 		u.ConfirmationToken = oldToken
-		return errors.Wrap(err, "Error sending invite email")
+		err = fmt.Errorf("sending invite email %w", err)
+		return err
 	}
 	u.InvitedAt = &now
 	err := tx.Model(&u).Select("confirmation_token", "invited_at").Updates(u).Error
-	return errors.Wrap(err, "Name error updating user for invite")
+	if err != nil {
+		err = fmt.Errorf("updating user for invite %w", err)
+	}
+	return err
 }
 
 func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, mailer mailer.Mailer, maxFrequency time.Duration, referrerURL string) error {
@@ -51,11 +59,15 @@ func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, maile
 	now := time.Now()
 	if err := mailer.RecoveryMail(u, referrerURL); err != nil {
 		u.RecoveryToken = oldToken
-		return errors.Wrap(err, "Error sending recovery email")
+		err = fmt.Errorf("sending recovery email %w", err)
+		return err
 	}
 	u.RecoverySentAt = &now
 	err := tx.Model(&u).Select("recovery_token", "recovery_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Name error updating user for recovery")
+	if err != nil {
+		err = fmt.Errorf("updating user for recovery %w", err)
+	}
+	return err
 }
 
 func (a *API) sendEmailChange(tx *storage.Connection, u *models.User, mailer mailer.Mailer, email string, referrerURL string) error {
@@ -69,18 +81,21 @@ func (a *API) sendEmailChange(tx *storage.Connection, u *models.User, mailer mai
 		u.EmailChange = oldEmail
 		return err
 	}
-
 	u.EmailChangeSentAt = &now
 	err := tx.Model(&u).Select("email_change_token", "email_change", "email_change_sent_at").Updates(u).Error
-	return errors.Wrap(err, "Name error updating user for email change")
+	if err != nil {
+		err = fmt.Errorf("updating user for email change %w", err)
+	}
+	return err
 }
 
 func (a *API) validateEmail(ctx context.Context, email string) error {
 	if email == "" {
 		return unprocessableEntityError("An email address is required")
 	}
-	mailer := a.Mailer(ctx)
-	if err := mailer.ValidateEmail(email); err != nil {
+	m := a.Mailer(ctx)
+	err := m.ValidateEmail(email)
+	if err != nil {
 		return unprocessableEntityError("Unable to validate email address: " + err.Error())
 	}
 	return nil
