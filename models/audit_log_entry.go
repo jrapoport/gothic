@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 	"github.com/vcraescu/go-paginator/v2"
 	"github.com/vcraescu/go-paginator/v2/adapter"
 )
@@ -79,7 +78,11 @@ func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, t
 		l.Payload["traits"] = traits
 	}
 
-	return errors.Wrap(tx.Create(&l).Error, "Name error creating audit log entry")
+	if err := tx.Create(&l).Error; err != nil {
+		err = fmt.Errorf("%w creating audit log entry", err)
+		return err
+	}
+	return nil
 }
 
 func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterValue string, pageParams *Pagination) ([]*AuditLogEntry, error) {

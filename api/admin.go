@@ -32,9 +32,9 @@ func (a *API) loadUser(w http.ResponseWriter, r *http.Request) (context.Context,
 	u, err := models.FindUserByID(a.db, userID)
 	if err != nil {
 		if models.IsNotFoundError(err) {
-			return nil, notFoundError("Username not found")
+			return nil, notFoundError("user not found")
 		}
-		return nil, internalServerError("Name error loading user").WithInternalError(err)
+		return nil, internalServerError("name error loading user").WithInternalError(err)
 	}
 
 	return withUser(r.Context(), u), nil

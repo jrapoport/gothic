@@ -16,45 +16,47 @@ type LogConfig struct {
 	Fields          map[string]interface{} `json:"fields" mapstructure:"fields"`
 }
 
-func ConfigureLog(config *LogConfig) (*logrus.Entry, error) {
+func ConfigureLog(c *Configuration) error {
+	lc := c.Logger
 	logger := logrus.New()
 
 	tsFormat := time.RFC3339Nano
-	if config.TimestampFormat != "" {
-		tsFormat = config.TimestampFormat
+	if lc.TimestampFormat != "" {
+		tsFormat = lc.TimestampFormat
 	}
 	// always use the full timestamp
 	logger.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:    true,
 		DisableTimestamp: false,
 		TimestampFormat:  tsFormat,
-		DisableColors:    config.DisableColors,
-		QuoteEmptyFields: config.QuoteEmpty,
+		DisableColors:    lc.DisableColors,
+		QuoteEmptyFields: lc.QuoteEmpty,
 	})
 
 	// use a file if you want
-	if config.File != "" {
-		f, errOpen := os.OpenFile(config.File, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0664)
-		if errOpen != nil {
-			return nil, errOpen
+	if lc.File != "" {
+		f, err := os.OpenFile(lc.File, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0664)
+		if err != nil {
+			return err
 		}
 		logger.SetOutput(f)
-		logger.Infof("Set output file to %s", config.File)
+		logger.Infof("Set output file to %s", lc.File)
 	}
 
-	if config.Level != "" {
-		level, err := logrus.ParseLevel(config.Level)
+	if lc.Level != "" {
+		level, err := logrus.ParseLevel(lc.Level)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		logger.SetLevel(level)
 		logger.Debug("Set log level to: " + logger.GetLevel().String())
 	}
 
 	f := logrus.Fields{}
-	for k, v := range config.Fields {
+	for k, v := range lc.Fields {
 		f[k] = v
 	}
-
-	return logger.WithFields(f), nil
+	e := logger.WithFields(f)
+	c.Log = e
+	return nil
 }

@@ -27,10 +27,10 @@ func (ts *UserTestSuite) TearDownTest() {
 }
 
 func TestUser(t *testing.T) {
-	globalConfig, err := conf.LoadConfiguration(modelsTestConfig)
+	config, err := conf.LoadConfiguration(modelsTestConfig)
 	require.NoError(t, err)
 
-	conn, err := test.SetupDBConnection(t, globalConfig)
+	conn, err := test.SetupDBConnection(t, config)
 	require.NoError(t, err)
 
 	ts := &UserTestSuite{

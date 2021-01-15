@@ -26,7 +26,7 @@ func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 		return badRequestError("Could not read Invite params: %v", err)
 	}
 
-	if err := a.validateEmail(ctx, params.Email); err != nil {
+	if err = a.validateEmail(ctx, params.Email); err != nil {
 		return err
 	}
 
@@ -60,8 +60,8 @@ func (a *API) Invite(w http.ResponseWriter, r *http.Request) error {
 
 		mailer := a.Mailer(ctx)
 		referrer := a.getReferrer(r)
-		if err := sendInvite(tx, user, mailer, referrer); err != nil {
-			return internalServerError("Error inviting user").WithInternalError(err)
+		if err = sendInvite(tx, user, mailer, referrer); err != nil {
+			return internalServerError("error inviting user").WithInternalError(err)
 		}
 		return nil
 	})

@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -17,7 +18,6 @@ import (
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -80,7 +80,7 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 
 		req, err := http.NewRequest(http.MethodPost, w.URL, bytes.NewBuffer(w.payload))
 		if err != nil {
-			return nil, internalServerError("Failed to make request object").WithInternalError(err)
+			return nil, internalServerError("failed to make request object").WithInternalError(err)
 		}
 		req.Header.Set("Content-Type", "application/json")
 		watcher, req := watchForConnection(req)
@@ -100,16 +100,16 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 				// timed out - try again?
 				if i == w.Retries-1 {
 					closeBody(rsp)
-					return nil, httpError(http.StatusGatewayTimeout, "Failed to perform webhook in time frame (%v seconds)", timeout.Seconds())
+					return nil, httpError(http.StatusGatewayTimeout, "failed to perform webhook in time frame (%v seconds)", timeout.Seconds())
 				}
 				hooklog.Info("Request timed out")
 				continue
 			} else if watcher.gotConn {
 				closeBody(rsp)
-				return nil, internalServerError("Failed to trigger webhook to %s", w.URL).WithInternalError(err)
+				return nil, internalServerError("failed to trigger webhook to %s", w.URL).WithInternalError(err)
 			} else {
 				closeBody(rsp)
-				return nil, httpError(http.StatusBadGateway, "Failed to connect to %s", w.URL)
+				return nil, httpError(http.StatusBadGateway, "failed to connect to %s", w.URL)
 			}
 		}
 		dur := time.Since(start)
@@ -130,8 +130,8 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 		}
 	}
 
-	hooklog.Infof("Failed to process webhook for %s after %d attempts", w.URL, w.Retries)
-	return nil, unprocessableEntityError("Failed to handle signup webhook")
+	hooklog.Infof("failed to process webhook for %s after %d attempts", w.URL, w.Retries)
+	return nil, unprocessableEntityError("failed to handle signup webhook")
 }
 
 func (w *Webhook) generateSignature() (string, error) {
@@ -153,7 +153,8 @@ func triggerEventHooks(ctx context.Context, conn *storage.Connection, event Hook
 	if config.Webhook.URL != "" {
 		hookURL, err := url.Parse(config.Webhook.URL)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to parse Webhook URL")
+			err = fmt.Errorf("parse webhook url %w", err)
+			return err
 		}
 		if !config.Webhook.HasEvent(string(event)) {
 			return nil
@@ -169,7 +170,8 @@ func triggerEventHooks(ctx context.Context, conn *storage.Connection, event Hook
 	for _, eventHookURL := range fun[string(event)] {
 		hookURL, err := url.Parse(eventHookURL)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to parse Event Function Hook URL")
+			err = fmt.Errorf("parse event function hook url %w", err)
+			return err
 		}
 		err = triggerHook(ctx, hookURL, config.JWT.Secret, config.JWT.SigningMethod(), conn, event, user, config)
 		if err != nil {
@@ -183,7 +185,8 @@ func triggerHook(_ context.Context, hookURL *url.URL, secret string, method jwt.
 	if !hookURL.IsAbs() {
 		siteURL, err := url.Parse(config.SiteURL)
 		if err != nil {
-			return errors.Wrapf(err, "Failed to parse Site URL")
+			err = fmt.Errorf("parse site url %w", err)
+			return err
 		}
 		hookURL.Scheme = siteURL.Scheme
 		hookURL.Host = siteURL.Host
@@ -199,12 +202,12 @@ func triggerHook(_ context.Context, hookURL *url.URL, secret string, method jwt.
 	}
 	data, err := json.Marshal(&payload)
 	if err != nil {
-		return internalServerError("Failed to serialize the data for signup webhook").WithInternalError(err)
+		return internalServerError("failed to serialize the data for signup webhook").WithInternalError(err)
 	}
 
 	sha, err := checksum(data)
 	if err != nil {
-		return internalServerError("Failed to checksum the data for signup webhook").WithInternalError(err)
+		return internalServerError("failed to checksum the data for signup webhook").WithInternalError(err)
 	}
 
 	claims := webhookClaims{

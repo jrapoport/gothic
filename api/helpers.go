@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -13,15 +14,14 @@ import (
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-func addRequestID(globalConfig *conf.Configuration) middlewareHandler {
+func addRequestID(config *conf.Configuration) middlewareHandler {
 	return func(w http.ResponseWriter, r *http.Request) (context.Context, error) {
 		id := ""
-		if globalConfig.RequestID != "" {
-			id = r.Header.Get(globalConfig.RequestID)
+		if config.RequestID != "" {
+			id = r.Header.Get(config.RequestID)
 		}
 		if id == "" {
 			id = uuid.New().String()
@@ -37,7 +37,8 @@ func sendJSON(w http.ResponseWriter, status int, obj interface{}) error {
 	w.Header().Set("Content-Type", "application/json")
 	b, err := json.Marshal(obj)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Error encoding json response: %v", obj))
+		err = fmt.Errorf("encoding json response %w %v", err, obj)
+		return err
 	}
 	w.WriteHeader(status)
 	_, err = w.Write(b)

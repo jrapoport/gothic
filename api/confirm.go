@@ -65,7 +65,7 @@ func (a *API) Confirm(w http.ResponseWriter, r *http.Request) error {
 
 		if cookie != "" && config.Cookies.Duration > 0 {
 			if terr = a.setCookieToken(config, token.Token, cookie == useSessionCookie, w); terr != nil {
-				return internalServerError("Failed to set JWT cookie. %s", terr)
+				return internalServerError("failed to set JWT cookie. %s", terr)
 			}
 		}
 		return nil
