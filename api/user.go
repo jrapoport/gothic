@@ -25,18 +25,16 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 	claims := getClaims(ctx)
 	if claims == nil {
-		return badRequestError("Could not read claims")
+		return badRequestError("could not read claims")
 	}
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		return badRequestError("Could not read Username ID claim")
+		return badRequestError("could not read username id claim")
 	}
 
-	aud := a.requestAud(ctx, r)
-
-	if err = claims.VerifyAudience(jwt.DefaultValidationHelper, aud); err != nil {
-		return badRequestError("Token audience doesn't match request audience")
+	if err = claims.VerifyAudience(jwt.DefaultValidationHelper, a.config.JWT.Aud); err != nil {
+		return badRequestError("token audience doesn't match request audience")
 	}
 
 	user, err := models.FindUserByID(a.db, userID)
@@ -44,7 +42,7 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
 		}
-		return internalServerError("Name error finding user").WithInternalError(err)
+		return internalServerError("name error finding user").WithInternalError(err)
 	}
 
 	return sendJSON(w, http.StatusOK, user)
@@ -53,19 +51,17 @@ func (a *API) UserGet(w http.ResponseWriter, r *http.Request) error {
 // UserUpdate updates fields on a user
 func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	config := a.getConfig(ctx)
-
 	params := &UserUpdateParams{}
 	jsonDecoder := json.NewDecoder(r.Body)
 	err := jsonDecoder.Decode(params)
 	if err != nil {
-		return badRequestError("Could not read Username Update params: %v", err)
+		return badRequestError("could not read Username Update params: %v", err)
 	}
 
 	claims := getClaims(ctx)
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		return badRequestError("Could not read Username ID claim")
+		return badRequestError("could not read username id claim")
 	}
 
 	user, err := models.FindUserByID(a.db, userID)
@@ -73,11 +69,11 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
 		}
-		return internalServerError("Name error finding user").WithInternalError(err)
+		return internalServerError("name error finding user").WithInternalError(err)
 	}
 
 	log := getLogEntry(r)
-	log.Debugf("Checking params for token %v", params)
+	log.Debugf("checking params for token %v", params)
 
 	err = a.db.Transaction(func(tx *storage.Connection) error {
 		var terr error
@@ -86,18 +82,18 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 				return err
 			}
 			if terr = user.UpdatePassword(tx, params.Password); terr != nil {
-				return internalServerError("Error during password storage").WithInternalError(terr)
+				return internalServerError("error during password storage").WithInternalError(terr)
 			}
 		}
 
 		if params.Data != nil {
 			if terr = user.UpdateUserMetaData(tx, params.Data); terr != nil {
-				return internalServerError("Error updating user").WithInternalError(terr)
+				return internalServerError("error updating user").WithInternalError(terr)
 			}
 		}
 
 		if params.AppData != nil {
-			if !a.isAdmin(ctx, user, config.JWT.Aud) {
+			if !a.isAdmin(ctx, user) {
 				return unauthorizedError("Updating app_metadata requires admin privileges")
 			}
 
@@ -122,7 +118,7 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 			}
 
 			var exists bool
-			if exists, terr = models.IsDuplicatedEmail(tx, params.Email, user.Aud); terr != nil {
+			if exists, terr = models.IsDuplicatedEmail(tx, params.Email); terr != nil {
 				return internalServerError("Name error checking email").WithInternalError(terr)
 			} else if exists {
 				return unprocessableEntityError("Email address already registered by another user")

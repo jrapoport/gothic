@@ -44,10 +44,13 @@ func initConfig(*cobra.Command, []string) error {
 	cmdConfig = c
 	return nil
 }
+
+// Execute executes the root command
 func Execute() error {
 	return rootCmd.Execute()
 }
 
+// Main is the application main
 func Main(c *conf.Configuration) error {
 	if conf.Debug {
 		b, err := json.MarshalIndent(cmdConfig, "", "\t")

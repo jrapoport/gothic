@@ -15,7 +15,6 @@ type SignupParams struct {
 	Password string                 `json:"password"`
 	Data     map[string]interface{} `json:"data"`
 	Provider string                 `json:"-"`
-	Aud      string                 `json:"-"`
 }
 
 // Signup is the endpoint for registering a new user
@@ -53,13 +52,12 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// TODO: make this more efficient
-	taken, err := models.IsDuplicatedEmail(a.db, params.Email, params.Aud)
+	taken, err := models.IsDuplicatedEmail(a.db, params.Email)
 	if err != nil || taken {
 		return badRequestError("email taken").WithInternalError(err)
 	}
 
-	params.Aud = a.requestAud(ctx, r)
-	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, params.Aud)
+	user, err := models.FindUserByEmail(a.db, params.Email)
 	if err != nil && !models.IsNotFoundError(err) {
 		return internalServerError("name error finding user").WithInternalError(err)
 	}
@@ -125,7 +123,7 @@ func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, param
 		}
 	}
 
-	user, err := models.NewUser(params.Email, params.Password, params.Aud, params.Data)
+	user, err := models.NewUser(params.Email, params.Password, params.Data)
 	if err != nil {
 		return nil, internalServerError("Name error creating user").WithInternalError(err)
 	}

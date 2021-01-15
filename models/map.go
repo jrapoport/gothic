@@ -2,21 +2,22 @@ package models
 
 import (
 	"database/sql/driver"
-	"encoding/json"
 	"errors"
+
+	"github.com/segmentio/encoding/json"
 )
 
-type JSONMap map[string]interface{}
+type Map map[string]interface{}
 
-func (j JSONMap) Value() (driver.Value, error) {
-	data, err := json.Marshal(j)
+func (m Map) Value() (driver.Value, error) {
+	data, err := json.Marshal(m)
 	if err != nil {
 		return driver.Value(""), err
 	}
 	return driver.Value(string(data)), nil
 }
 
-func (j *JSONMap) Scan(src interface{}) error {
+func (m *Map) Scan(src interface{}) error {
 	var source []byte
 	switch v := src.(type) {
 	case string:
@@ -24,11 +25,10 @@ func (j *JSONMap) Scan(src interface{}) error {
 	case []byte:
 		source = v
 	default:
-		return errors.New("Invalid data type for JSONMap")
+		return errors.New("invalid Map data")
 	}
-
 	if len(source) == 0 {
 		source = []byte("{}")
 	}
-	return json.Unmarshal(source, j)
+	return json.Unmarshal(source, m)
 }

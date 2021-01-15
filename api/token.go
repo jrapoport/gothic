@@ -56,7 +56,6 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	password := r.FormValue("password")
 	cookie := r.Header.Get(useCookieHeader)
 
-	aud := a.requestAud(ctx, r)
 	config := a.getConfig(ctx)
 
 	if config.Recaptcha.Login {
@@ -65,7 +64,7 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 		}
 	}
 
-	user, err := models.FindUserByEmailAndAudience(a.db, username, aud)
+	user, err := models.FindUserByEmail(a.db, username)
 	if err != nil {
 		if models.IsNotFoundError(err) {
 			return oauthError("invalid_grant", "No user found with that email, or password invalid.")
@@ -153,10 +152,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 			user.Email = util.MaskEmail(user.Email)
 		}
 
-		tokenString, terr = generateAccessToken(user,
-			time.Second*time.Duration(config.JWT.Exp),
-			config.JWT.Secret,
-			config.JWT.SigningMethod())
+		tokenString, terr = generateAccessToken(user, config.JWT)
 		if terr != nil {
 			return internalServerError("error generating jwt token").WithInternalError(terr)
 		}
@@ -180,12 +176,13 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 	})
 }
 
-func generateAccessToken(user *models.User, expiresIn time.Duration, secret string, method jwt.SigningMethod) (string, error) {
+func generateAccessToken(user *models.User, c conf.JWTConfig) (string, error) {
+	exp := time.Now().Add(time.Second * time.Duration(c.Exp))
 	claims := &GothicClaims{
 		StandardClaims: jwt.StandardClaims{
 			Subject:   user.ID.String(),
-			Audience:  jwt.ClaimStrings{user.Aud},
-			ExpiresAt: jwt.At(time.Now().Add(expiresIn)),
+			Audience:  jwt.ClaimStrings{c.Aud},
+			ExpiresAt: jwt.At(exp),
 		},
 		Username:     user.Username,
 		Email:        user.Email,
@@ -194,9 +191,8 @@ func generateAccessToken(user *models.User, expiresIn time.Duration, secret stri
 		AppMetaData:  user.AppMetaData,
 		UserMetaData: user.UserMetaData,
 	}
-
-	token := jwt.NewWithClaims(method, claims)
-	return token.SignedString([]byte(secret))
+	token := jwt.NewWithClaims(c.SigningMethod(), claims)
+	return token.SignedString([]byte(c.Secret))
 }
 
 func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, user *models.User) (*AccessTokenResponse, error) {
@@ -215,10 +211,7 @@ func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, u
 			return internalServerError("Name error granting user").WithInternalError(terr)
 		}
 
-		tokenString, terr = generateAccessToken(user,
-			time.Second*time.Duration(config.JWT.Exp),
-			config.JWT.Secret,
-			config.JWT.SigningMethod())
+		tokenString, terr = generateAccessToken(user, config.JWT)
 		if terr != nil {
 			return internalServerError("error generating jwt token").WithInternalError(terr)
 		}

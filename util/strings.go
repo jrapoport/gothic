@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// MaskString replaces sections of the email with mask characters '*'.
 func MaskEmail(e string) string {
 	parts := strings.Split(e, "@")
 	if len(parts) < 2 {
@@ -20,6 +21,7 @@ func MaskEmail(e string) string {
 	return fmt.Sprintf("%s@%s.%s", parts[0], domain[0], domain[1])
 }
 
+// MaskString replaces a section of the string with mask character '*'.
 func MaskString(s string, n int) string {
 	const maskToken = "*"
 	maskLen := n

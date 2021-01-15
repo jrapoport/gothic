@@ -27,7 +27,7 @@ type Connection struct {
 	transaction bool
 }
 
-// Dial will connect to that storage engine
+// Dial will connect to the database.
 func Dial(c *conf.Configuration, l *logrus.Entry) (*Connection, error) {
 	d, err := dialect(c)
 	if err != nil {
@@ -87,6 +87,7 @@ func Dial(c *conf.Configuration, l *logrus.Entry) (*Connection, error) {
 	return conn, nil
 }
 
+// Transaction opens a database transaction and prevents nested transactions.
 func (c *Connection) Transaction(fn func(*Connection) error) error {
 	if c.transaction {
 		return fn(c)

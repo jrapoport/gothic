@@ -22,8 +22,10 @@ func RegisterServer(reg func(s *grpc.Server, srv *RpcHost)) {
 
 */
 
+// RegisterRpcServer is the function prototype for registering an RPC server.
 type RegisterRpcServer func(s *grpc.Server, srv *RpcHost)
 
+// RpcHost represents a gRPC host.
 type RpcHost struct {
 	*api.API
 	*logrus.Entry
@@ -31,6 +33,7 @@ type RpcHost struct {
 	servers     []RegisterRpcServer
 }
 
+// NewRpcHost creates a new RpcHost.
 func NewRpcHost(a *api.API, name string, hostAndPort string, servers []RegisterRpcServer) *RpcHost {
 	log := logrus.WithField("server", name)
 	return &RpcHost{a, log, hostAndPort, servers}
