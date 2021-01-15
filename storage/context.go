@@ -11,16 +11,17 @@ const (
 )
 
 func (c *Connection) withContext(ctx context.Context, global *conf.Configuration) *Connection {
-	ctx = withconfig(ctx, global)
+	ctx = withConfig(ctx, global)
 	return &Connection{DB: c.DB.WithContext(ctx)}
 }
 
 // withConfig adds the tenant configuration to the context.
-func withconfig(ctx context.Context, config *conf.Configuration) context.Context {
+func withConfig(ctx context.Context, config *conf.Configuration) context.Context {
 	return context.WithValue(ctx, configCtxKey, config)
 }
 
-func (c *Connection) Getconfig(ctx context.Context) *conf.Configuration {
+// Config gets configuration that was used to initialize the database context
+func (c *Connection) Config() *conf.Configuration {
 	obj, found := c.Get(configCtxKey)
 	if !found {
 		return nil

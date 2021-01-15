@@ -48,13 +48,13 @@ func createUserRunE(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	exists, err := models.IsDuplicatedEmail(db, email, "")
+	exists, err := models.IsDuplicatedEmail(db, email)
 	if err != nil {
 		return err
 	} else if exists {
 		return errors.New("user already exists")
 	}
-	user, err := models.NewUser(email, password, "", nil)
+	user, err := models.NewUser(email, password, nil)
 	if err != nil {
 		return err
 	}

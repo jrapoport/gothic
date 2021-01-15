@@ -110,13 +110,12 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 				return terr
 			}
 		} else {
-			aud := a.requestAud(ctx, r)
 
 			// search user using all available emails
 			var emailData provider.Email
 			for _, e := range userData.Emails {
 				if e.Verified || config.Mailer.Autoconfirm {
-					user, terr = models.FindUserByEmailAndAudience(tx, e.Email, aud)
+					user, terr = models.FindUserByEmail(tx, e.Email)
 					if terr != nil && !models.IsNotFoundError(terr) {
 						return internalServerError("Error checking for duplicate users").WithInternalError(terr)
 					}
@@ -145,7 +144,6 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 				params := &SignupParams{
 					Provider: providerType,
 					Email:    emailData.Email,
-					Aud:      aud,
 					Data:     make(map[string]interface{}),
 				}
 				for k, v := range userData.Metadata {

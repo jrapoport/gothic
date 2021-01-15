@@ -70,12 +70,11 @@ func (ts *SignupTestSuite) TestSignup() {
 
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 
-	data := models.User{}
-	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&data))
-	assert.Equal(ts.T(), signupEmail, data.Email)
-	assert.Equal(ts.T(), ts.Config.JWT.Aud, data.Aud)
-	assert.Equal(ts.T(), 1.0, data.UserMetaData["a"])
-	assert.Equal(ts.T(), "email", data.AppMetaData["provider"])
+	u := models.User{}
+	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&u))
+	assert.Equal(ts.T(), signupEmail, u.Email)
+	assert.Equal(ts.T(), 1.0, u.UserMetaData["a"])
+	assert.Equal(ts.T(), "email", u.AppMetaData["provider"])
 }
 
 // TestSignup tests API /signup route
@@ -160,9 +159,8 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 
 		u, ok := data["user"].(map[string]interface{})
 		require.True(ok)
-		assert.Len(u, 10)
+		assert.Len(u, 9)
 		// assert.Equal(t, user.ID, u["id"]) TODO
-		assert.Equal("api.gothic.com", u["aud"])
 		assert.Equal("user", u["role"])
 		assert.Equal(signupEmail, u["email"])
 
@@ -257,7 +255,7 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	y := httptest.NewRecorder()
 
 	ts.API.handler.ServeHTTP(y, req)
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, signupEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, signupEmail)
 	if err == nil {
 		require.NoError(ts.T(), u.Confirm(ts.API.db))
 	}
@@ -273,13 +271,13 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 }
 
 func (ts *SignupTestSuite) TestConfirmSignup() {
-	user, err := models.NewUser(signupEmail, "testing", ts.Config.JWT.Aud, nil)
+	user, err := models.NewUser(signupEmail, "testing", nil)
 	user.ConfirmationToken = "asdf3"
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), ts.API.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, signupEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, signupEmail)
 	require.NoError(ts.T(), err)
 
 	// Request body

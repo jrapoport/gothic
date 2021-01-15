@@ -30,7 +30,6 @@ func (a *API) requireAdmin(ctx context.Context, w http.ResponseWriter, r *http.R
 		return nil, unauthorizedError("Invalid admin user").WithInternalError(err)
 	}
 
-	aud := a.requestAud(ctx, r)
 	if r.Body != nil && r.Body != http.NoBody {
 		c, err := addGetBody(w, r)
 		if err != nil {
@@ -47,13 +46,11 @@ func (a *API) requireAdmin(ctx context.Context, w http.ResponseWriter, r *http.R
 		if err != nil {
 			return nil, badRequestError("Could not decode admin user params: %v", err)
 		}
-		if params.Aud != "" {
-			aud = params.Aud
-		}
+
 	}
 
 	// Make sure user is admin
-	if !a.isAdmin(ctx, adminUser, aud) {
+	if !a.isAdmin(ctx, adminUser) {
 		return nil, unauthorizedError("Username not allowed")
 	}
 	return withAdminUser(ctx, adminUser), nil

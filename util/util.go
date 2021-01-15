@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// waitForTermination blocks until the system signals termination or done has a value
+// WaitForTermination blocks until the system signals termination or done has a value
 func WaitForTermination(log logrus.FieldLogger, done <-chan struct{}) {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)

@@ -12,7 +12,6 @@ import (
 )
 
 type adminUserParams struct {
-	Aud          string                 `json:"aud"`
 	Role         string                 `json:"role"`
 	Email        string                 `json:"email"`
 	Password     string                 `json:"password"`
@@ -51,9 +50,6 @@ func (a *API) getAdminParams(r *http.Request) (*adminUserParams, error) {
 
 // adminUsers responds with a list of all users in a given audience
 func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
-	ctx := r.Context()
-	aud := a.requestAud(ctx, r)
-
 	pageParams, err := paginate(r)
 	if err != nil {
 		return badRequestError("Bad Pagination Parameters: %v", err)
@@ -66,7 +62,7 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
 
 	filter := r.URL.Query().Get("filter")
 
-	users, err := models.FindUsersInAudience(a.db, aud, pageParams, sortParams, filter)
+	users, err := models.FindUsers(a.db, pageParams, sortParams, filter)
 	if err != nil {
 		return internalServerError("Name error finding users").WithInternalError(err)
 	}
@@ -74,7 +70,6 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request) error {
 
 	return sendJSON(w, http.StatusOK, map[string]interface{}{
 		"users": users,
-		"aud":   aud,
 	})
 }
 
@@ -164,18 +159,13 @@ func (a *API) adminUserCreate(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	aud := a.requestAud(ctx, r)
-	if params.Aud != "" {
-		aud = params.Aud
-	}
-
-	if exists, err := models.IsDuplicatedEmail(a.db, params.Email, aud); err != nil {
+	if exists, err := models.IsDuplicatedEmail(a.db, params.Email); err != nil {
 		return internalServerError("Name error checking email").WithInternalError(err)
 	} else if exists {
 		return unprocessableEntityError("Email address already registered by another user")
 	}
 
-	user, err := models.NewUser(params.Email, params.Password, aud, params.UserMetaData)
+	user, err := models.NewUser(params.Email, params.Password, params.UserMetaData)
 	if err != nil {
 		return internalServerError("Error creating user").WithInternalError(err)
 	}

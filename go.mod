@@ -31,6 +31,7 @@ require (
 	google.golang.org/grpc v1.34.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.12.1
+	gorm.io/datatypes v1.0.0
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/driver/postgres v1.0.6
 	gorm.io/driver/sqlite v1.1.4

@@ -28,8 +28,7 @@ func (a *API) Recover(w http.ResponseWriter, r *http.Request) error {
 		return unprocessableEntityError("Password recovery requires an email")
 	}
 
-	aud := a.requestAud(ctx, r)
-	user, err := models.FindUserByEmailAndAudience(a.db, params.Email, aud)
+	user, err := models.FindUserByEmail(a.db, params.Email)
 	if err != nil {
 		if models.IsNotFoundError(err) {
 			return notFoundError(err.Error())
