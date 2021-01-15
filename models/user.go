@@ -41,7 +41,6 @@ type User struct {
 	// user must change their password
 	ChangePassword bool `json:"change_password"`
 
-	Aud          string     `json:"aud" gorm:"type:varchar(255)"`
 	Role         string     `json:"role" gorm:"type:varchar(255)"`
 	LastSignInAt *time.Time `json:"last_sign_in_at,omitempty"`
 
@@ -61,8 +60,8 @@ type User struct {
 
 	InvitedAt *time.Time `json:"invited_at,omitempty"`
 
-	AppMetaData  JSONMap `json:"app_metadata"`
-	UserMetaData JSONMap `json:"user_metadata"`
+	AppMetaData  Map `json:"app_metadata"`
+	UserMetaData Map `json:"user_metadata"`
 
 	IsSuperAdmin bool `json:"-"`
 
@@ -71,7 +70,7 @@ type User struct {
 }
 
 // NewUser initializes a new user from an email, password and user data.
-func NewUser(email, password, aud string, userData map[string]interface{}) (*User, error) {
+func NewUser(email, password string, userData map[string]interface{}) (*User, error) {
 	id := uuid.New()
 	pw, err := hashPassword(password)
 	if err != nil {
@@ -89,7 +88,6 @@ func NewUser(email, password, aud string, userData map[string]interface{}) (*Use
 
 	u := &User{
 		ID:                id,
-		Aud:               aud,
 		Username:          username,
 		Email:             email,
 		UserMetaData:      userData,
@@ -98,10 +96,9 @@ func NewUser(email, password, aud string, userData map[string]interface{}) (*Use
 	return u, nil
 }
 
-func NewSystemUser(aud string) *User {
+func NewSystemUser() *User {
 	return &User{
 		ID:           SystemUserUUID,
-		Aud:          aud,
 		IsSuperAdmin: true,
 	}
 }
@@ -110,17 +107,16 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return u.BeforeUpdate(tx)
 }
 
-func (u *User) BeforeUpdate(tx *gorm.DB) error {
+func (u *User) BeforeUpdate(*gorm.DB) error {
 	if u.ID == SystemUserUUID {
-		return errors.New("Cannot persist system user")
+		return errors.New("cannot save system user")
 	}
-
 	return nil
 }
 
-func (u *User) BeforeSave(tx *gorm.DB) error {
+func (u *User) BeforeSave(*gorm.DB) error {
 	if u.ID == SystemUserUUID {
-		return errors.New("Cannot persist system user")
+		return errors.New("cannot save system user")
 	}
 
 	if u.ConfirmedAt != nil && u.ConfirmedAt.IsZero() {
@@ -280,9 +276,9 @@ func FindUserByConfirmationToken(tx *storage.Connection, token string) (*User, e
 	return findUser(tx, "confirmation_token = ?", token)
 }
 
-// FindUserByEmailAndAudience finds a user with the matching email and audience.
-func FindUserByEmailAndAudience(tx *storage.Connection, email, aud string) (*User, error) {
-	return findUser(tx, "email = ? and aud = ?", email, aud)
+// FindUserByEmail finds a user with the matching email.
+func FindUserByEmail(tx *storage.Connection, email string) (*User, error) {
+	return findUser(tx, "email = ?", email)
 }
 
 // FindUserByID finds a user matching the provided ID.
@@ -314,10 +310,10 @@ func FindUserWithRefreshToken(tx *storage.Connection, token string) (*User, *Ref
 	return u, refreshToken, nil
 }
 
-// FindUsersInAudience finds users with the matching audience.
-func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Pagination, sortParams *SortParams, filter string) ([]*User, error) {
+// FindUsers finds users
+func FindUsers(tx *storage.Connection, pageParams *Pagination, sortParams *SortParams, filter string) ([]*User, error) {
 	var users []*User
-	q := tx.Model(users).Where("aud = ?", aud)
+	q := tx.Model(users)
 
 	if filter != "" {
 		lf := "%" + filter + "%"
@@ -350,9 +346,9 @@ func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Paginat
 	return users, err
 }
 
-// IsDuplicatedEmail returns whether a user exists with a matching email and audience.
-func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) {
-	_, err := FindUserByEmailAndAudience(tx, email, aud)
+// IsDuplicatedEmail returns whether a user exists with a matching email.
+func IsDuplicatedEmail(tx *storage.Connection, email string) (bool, error) {
+	_, err := FindUserByEmail(tx, email)
 	if err != nil {
 		if IsNotFoundError(err) {
 			return false, nil
@@ -363,13 +359,13 @@ func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) 
 }
 
 // FindUserByUsername finds a user with the matching username.
-func FindUserByUsername(tx *storage.Connection, instanceID uuid.UUID, name string) (*User, error) {
-	return findUser(tx, "instance_id = ? and username = ?", instanceID, name)
+func FindUserByUsername(tx *storage.Connection, name string) (*User, error) {
+	return findUser(tx, "username = ?", name)
 }
 
-// IsDuplicatedUsername returns whether a user exists with a matching username and audience.
-func IsDuplicatedUsername(tx *storage.Connection, instanceID uuid.UUID, name string) (bool, error) {
-	_, err := FindUserByUsername(tx, instanceID, name)
+// IsDuplicatedUsername returns whether a user exists with a matching username.
+func IsDuplicatedUsername(tx *storage.Connection, name string) (bool, error) {
+	_, err := FindUserByUsername(tx, name)
 	if err != nil {
 		if IsNotFoundError(err) {
 			return false, nil
@@ -380,9 +376,9 @@ func IsDuplicatedUsername(tx *storage.Connection, instanceID uuid.UUID, name str
 }
 
 /*
-// IsDuplicatedEmail returns whether a user exists with a matching email and audience.
-func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) {
-	u, err := FindUserByEmailAndAudience(tx, email, aud)
+// IsDuplicatedEmail returns whether a user exists with a matching email.
+func IsDuplicatedEmail(tx *storage.Connection, email string) (bool, error) {
+	u, err := FindUserByEmail(tx, email)
 	if errors.Is(err, storage.ErrNotFound) {
 		return false, nil
 	} else if err != nil {

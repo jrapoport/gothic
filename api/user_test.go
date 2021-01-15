@@ -39,7 +39,7 @@ func TestUser(t *testing.T) {
 
 func (ts *UserTestSuite) SetupTest() {
 	// Create user
-	u, err := models.NewUser(userEmail, "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(userEmail, "password", nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	t := time.Now()
 	u.ConfirmedAt = &t
@@ -52,7 +52,7 @@ func (ts *UserTestSuite) TearDownTest() {
 
 func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	const password = "new!password"
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, userEmail)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -65,10 +65,7 @@ func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	req := httptest.NewRequest(http.MethodPut, "http://localhost/user", &buffer)
 	req.Header.Set("Content-Type", "application/json")
 
-	token, err := generateAccessToken(u,
-		time.Second*time.Duration(ts.Config.JWT.Exp),
-		ts.Config.JWT.Secret,
-		ts.Config.JWT.SigningMethod())
+	token, err := generateAccessToken(u, ts.Config.JWT)
 	require.NoError(ts.T(), err)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
@@ -77,7 +74,7 @@ func (ts *UserTestSuite) TestUser_UpdatePassword() {
 	ts.API.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, userEmail, ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmail(ts.API.db, userEmail)
 	require.NoError(ts.T(), err)
 
 	assert.True(ts.T(), u.Authenticate(password))

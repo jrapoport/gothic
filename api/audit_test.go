@@ -3,11 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
-
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
@@ -15,6 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 type AuditTestSuite struct {
@@ -46,16 +44,13 @@ func (ts *AuditTestSuite) SetupTest() {
 }
 
 func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
-	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": "Test Username"})
+	u, err := models.NewUser(email, "test", map[string]interface{}{"full_name": "Test Username"})
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 
-	token, err := generateAccessToken(u,
-		time.Second*time.Duration(ts.Config.JWT.Exp),
-		ts.Config.JWT.Secret,
-		ts.Config.JWT.SigningMethod())
+	token, err := generateAccessToken(u, ts.Config.JWT)
 	require.NoError(ts.T(), err, "Error generating access token")
 
 	_, err = jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
@@ -130,7 +125,7 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 
 func (ts *AuditTestSuite) prepareDeleteEvent() {
 	// DELETE USER
-	u, err := models.NewUser(auditUserEmail, "test", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(auditUserEmail, "test", nil)
 	require.NoError(ts.T(), err, "Error making new user")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
 

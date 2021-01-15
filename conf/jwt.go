@@ -7,7 +7,7 @@ type JWTConfig struct {
 	Secret       string `json:"-" required:"true"`
 	Method       string `json:"method" default:"HS256"`
 	Subject      string `json:"subject" default:"gothic"`
-	Exp          int    `json:"exp"`
+	Exp          int    `json:"exp" default:"3600"`
 	Aud          string `json:"aud"`
 	AdminGroup   string `json:"admin_group" split_words:"true" default:"admin"`
 	DefaultGroup string `json:"default_group" split_words:"true" default:"user"`

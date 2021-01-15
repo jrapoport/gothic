@@ -29,7 +29,7 @@ func roleUserRunE(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	user, err := models.FindUserByEmailAndAudience(db, email, "")
+	user, err := models.FindUserByEmail(db, email)
 	if err != nil {
 		c.Log.Warn(err)
 		var uid uuid.UUID

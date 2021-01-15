@@ -40,11 +40,15 @@ func (ts *ExternalTestSuite) SetupTest() {
 
 func (ts *ExternalTestSuite) createUser(email string, name string, avatar string, confirmationToken string) (*models.User, error) {
 	// Cleanup existing user, if they already exist
-	if u, _ := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud); u != nil {
+	if u, _ := models.FindUserByEmail(ts.API.db, email); u != nil {
 		require.NoError(ts.T(), ts.API.db.Delete(u).Error, "Error deleting user")
 	}
 
-	u, err := models.NewUser(email, "test", ts.Config.JWT.Aud, map[string]interface{}{"full_name": name, "avatar_url": avatar})
+	u, err := models.NewUser(email, "test",
+		map[string]interface{}{
+			"full_name":  name,
+			"avatar_url": avatar,
+		})
 
 	if confirmationToken != "" {
 		u.ConfirmationToken = confirmationToken
@@ -111,7 +115,7 @@ func assertAuthorizationSuccess(ts *ExternalTestSuite, u *url.URL, tokenCount in
 	ts.Equal(1, userCount)
 
 	// ensure user has been created with metadata
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmail(ts.API.db, email)
 	ts.Require().NoError(err)
 	ts.Equal(name, user.UserMetaData["full_name"])
 	ts.Equal(avatar, user.UserMetaData["avatar_url"])
@@ -130,7 +134,7 @@ func assertAuthorizationFailure(ts *ExternalTestSuite, u *url.URL, errorDescript
 	ts.Empty(v.Get("token_type"))
 
 	// ensure user is nil
-	user, err := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud)
+	user, err := models.FindUserByEmail(ts.API.db, email)
 	ts.Require().Error(err, "user not found")
 	ts.Require().Nil(user)
 }

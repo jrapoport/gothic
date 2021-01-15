@@ -10,7 +10,7 @@ import (
 func (a *API) loadSAMLState(w http.ResponseWriter, r *http.Request) (context.Context, error) {
 	state := r.FormValue("RelayState")
 	if state == "" {
-		return nil, badRequestError("SAML RelayState is missing")
+		return nil, badRequestError("saml relay state is missing")
 	}
 
 	ctx := r.Context()
@@ -23,29 +23,29 @@ func (a *API) samlCallback(r *http.Request, ctx context.Context) (*provider.User
 
 	samlProvider, err := provider.NewSamlProvider(config.External.Saml, a.db)
 	if err != nil {
-		return nil, badRequestError("Could not initialize SAML provider: %+v", err).WithInternalError(err)
+		return nil, badRequestError("could not initialize saml provider: %+v", err).WithInternalError(err)
 	}
 
 	samlResponse := r.FormValue("SAMLResponse")
 	if samlResponse == "" {
-		return nil, badRequestError("SAML Response is missing")
+		return nil, badRequestError("saml Response is missing")
 	}
 
 	assertionInfo, err := samlProvider.ServiceProvider.RetrieveAssertionInfo(samlResponse)
 	if err != nil {
-		return nil, internalServerError("Parsing SAML assertion failed: %+v", err).WithInternalError(err)
+		return nil, internalServerError("parsing saml assertion failed: %+v", err).WithInternalError(err)
 	}
 
 	if assertionInfo.WarningInfo.InvalidTime {
-		return nil, forbiddenError("SAML response has invalid time")
+		return nil, forbiddenError("saml response has invalid time")
 	}
 
 	if assertionInfo.WarningInfo.NotInAudience {
-		return nil, forbiddenError("SAML response is not in audience")
+		return nil, forbiddenError("saml response is not in audience")
 	}
 
 	if assertionInfo == nil {
-		return nil, internalServerError("SAML Assertion is missing")
+		return nil, internalServerError("saml Assertion is missing")
 	}
 	userData := &provider.UserProvidedData{
 		Emails: []provider.Email{{

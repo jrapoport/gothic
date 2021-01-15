@@ -12,6 +12,7 @@ type rpcServer struct {
 	*hosts.RpcHost
 }
 
+// NewRpcServer creates a new gRPC server.
 func NewRpcServer(a *api.API, hostAndPort string) *rpcServer {
 	s := hosts.NewRpcHost(a, "rpc", hostAndPort, []hosts.RegisterRpcServer{
 		func(s *grpc.Server, srv *hosts.RpcHost) {

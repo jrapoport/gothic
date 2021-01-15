@@ -183,7 +183,7 @@ func (ts *ExternalSamlTestSuite) TestSignupExternalSaml_Callback() {
 	ts.Equal("bearer", v.Get("token_type"))
 
 	// ensure user has been created
-	_, err = models.FindUserByEmailAndAudience(ts.API.db, "saml@example.com", ts.Config.JWT.Aud)
+	_, err = models.FindUserByEmail(ts.API.db, "saml@example.com")
 	ts.Require().NoError(err)
 }
 

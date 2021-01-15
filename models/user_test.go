@@ -41,7 +41,7 @@ func TestUser(t *testing.T) {
 }
 
 func (ts *UserTestSuite) TestUpdateAppMetadata() {
-	u, err := NewUser("", "", "", nil)
+	u, err := NewUser("", "", nil)
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), u.UpdateAppMetaData(ts.db, make(map[string]interface{})))
 
@@ -60,7 +60,7 @@ func (ts *UserTestSuite) TestUpdateAppMetadata() {
 }
 
 func (ts *UserTestSuite) TestUpdateUserMetadata() {
-	u, err := NewUser("", "", "", nil)
+	u, err := NewUser("", "", nil)
 	require.NoError(ts.T(), err)
 	require.NoError(ts.T(), u.UpdateUserMetaData(ts.db, make(map[string]interface{})))
 
@@ -86,21 +86,20 @@ func (ts *UserTestSuite) TestFindUserByConfirmationToken() {
 	require.Equal(ts.T(), u.ID, n.ID)
 }
 
-func (ts *UserTestSuite) TestFindUserByEmailAndAudience() {
+func (ts *UserTestSuite) TestFindUserByEmail() {
 	u := ts.createUser()
 
-	n, err := FindUserByEmailAndAudience(ts.db, u.Email, "test")
+	n, err := FindUserByEmail(ts.db, u.Email)
 	require.NoError(ts.T(), err)
 	require.Equal(ts.T(), u.ID, n.ID)
 
-	_, err = FindUserByEmailAndAudience(ts.db, u.Email, "invalid")
+	_, err = FindUserByEmail(ts.db, u.Email+"m")
 	require.EqualError(ts.T(), err, UserNotFoundError{}.Error())
 }
 
 func (ts *UserTestSuite) TestFindUsersInAudience() {
-	u := ts.createUser()
-
-	n, err := FindUsersInAudience(ts.db, u.Aud, nil, nil, "")
+	_ = ts.createUser()
+	n, err := FindUsers(ts.db, nil, nil, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 
@@ -108,7 +107,7 @@ func (ts *UserTestSuite) TestFindUsersInAudience() {
 		Page:    1,
 		PerPage: 50,
 	}
-	n, err = FindUsersInAudience(ts.db, u.Aud, &p, nil, "")
+	n, err = FindUsers(ts.db, &p, nil, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 	assert.Equal(ts.T(), uint64(1), p.Count)
@@ -118,7 +117,7 @@ func (ts *UserTestSuite) TestFindUsersInAudience() {
 			SortField{Name: "created_at", Dir: Descending},
 		},
 	}
-	n, err = FindUsersInAudience(ts.db, u.Aud, nil, sp, "")
+	n, err = FindUsers(ts.db, nil, sp, "")
 	require.NoError(ts.T(), err)
 	require.Len(ts.T(), n, 1)
 }
@@ -158,21 +157,13 @@ func (ts *UserTestSuite) TestFindUserWithRefreshToken() {
 func (ts *UserTestSuite) TestIsDuplicatedEmail() {
 	_ = ts.createUserWithEmail("test.user@gothic.com")
 
-	e, err := IsDuplicatedEmail(ts.db, "test.user@gothic.com", "test")
+	e, err := IsDuplicatedEmail(ts.db, "test.user@gothic.com")
 	require.NoError(ts.T(), err)
 	require.True(ts.T(), e, "expected email to be duplicated")
 
-	e, err = IsDuplicatedEmail(ts.db, "testuser@gothic.com", "test")
+	e, err = IsDuplicatedEmail(ts.db, "testuser@gothic.com")
 	require.NoError(ts.T(), err)
 	require.False(ts.T(), e, "expected email to not be duplicated")
-
-	e, err = IsDuplicatedEmail(ts.db, "testuser@gothic.com", "test")
-	require.NoError(ts.T(), err)
-	require.False(ts.T(), e, "expected same email to not be duplicated")
-
-	e, err = IsDuplicatedEmail(ts.db, "test.user@gothic.com", "other-aud")
-	require.NoError(ts.T(), err)
-	require.False(ts.T(), e, "expected same email to not be duplicated")
 }
 
 func (ts *UserTestSuite) createUser() *User {
@@ -180,7 +171,7 @@ func (ts *UserTestSuite) createUser() *User {
 }
 
 func (ts *UserTestSuite) createUserWithEmail(email string) *User {
-	user, err := NewUser(email, "secret", "test", nil)
+	user, err := NewUser(email, "secret", nil)
 	require.NoError(ts.T(), err)
 
 	err = ts.db.Create(user).Error

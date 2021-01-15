@@ -40,13 +40,13 @@ func (ts *ConfirmTestSuite) SetupTest() {
 	storage.TruncateAll(ts.API.db)
 
 	// Create user
-	u, err := models.NewUser(confirmEmail, "password", ts.Config.JWT.Aud, nil)
+	u, err := models.NewUser(confirmEmail, "password", nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
 	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
 }
 
 func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
-	u, err := models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
+	u, err := models.FindUserByEmail(ts.API.db, confirmEmail)
 	require.NoError(ts.T(), err)
 	u.RecoverySentAt = &time.Time{}
 	require.NoError(ts.T(), ts.API.db.Save(u).Error)
@@ -66,7 +66,7 @@ func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmail(ts.API.db, confirmEmail)
 	require.NoError(ts.T(), err)
 
 	assert.WithinDuration(ts.T(), time.Now(), *u.RecoverySentAt, 1*time.Second)
@@ -86,7 +86,7 @@ func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
 	ts.API.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmailAndAudience(ts.API.db, confirmEmail, ts.Config.JWT.Aud)
+	u, err = models.FindUserByEmail(ts.API.db, confirmEmail)
 	require.NoError(ts.T(), err)
 	assert.True(ts.T(), u.IsConfirmed())
 }
