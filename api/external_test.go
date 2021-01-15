@@ -131,7 +131,7 @@ func assertAuthorizationFailure(ts *ExternalTestSuite, u *url.URL, errorDescript
 
 	// ensure user is nil
 	user, err := models.FindUserByEmailAndAudience(ts.API.db, email, ts.Config.JWT.Aud)
-	ts.Require().Error(err, "Username not found")
+	ts.Require().Error(err, "user not found")
 	ts.Require().Nil(user)
 }
 

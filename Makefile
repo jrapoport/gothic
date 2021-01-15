@@ -33,7 +33,7 @@ RELEASE_DIR := $(BUILD_DIR)/release
 OUT_DIR := $(DEBUG_DIR)
 OUT_EXE = -o $(OUT_DIR)/$(EXE)
 
-PKG := github.com/jrapoport/gothic/cmd
+PKG := github.com/jrapoport/gothic/conf
 EXE := gothic
 
 VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)

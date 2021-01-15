@@ -149,12 +149,35 @@ func (a *API) UserUpdate(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (a *API) validatePassword(password string) error {
-	rex, err := regexp.Compile(a.config.PasswordRegex)
+	if password == "" {
+		return unprocessableEntityError("password is required")
+	}
+	if a.config.Validation.PasswordRegex == "" {
+		return nil
+	}
+	rex, err := regexp.Compile(a.config.Validation.PasswordRegex)
 	if err != nil {
 		return err
 	}
 	if !rex.MatchString(password) {
 		return unprocessableEntityError("invalid password")
+	}
+	return nil
+}
+
+func (a *API) validateUsername(username string) error {
+	if username == "" {
+		return unprocessableEntityError("username is required")
+	}
+	if a.config.Validation.UsernameRegex == "" {
+		return nil
+	}
+	rex, err := regexp.Compile(a.config.Validation.PasswordRegex)
+	if err != nil {
+		return err
+	}
+	if !rex.MatchString(username) {
+		return unprocessableEntityError("invalid username")
 	}
 	return nil
 }

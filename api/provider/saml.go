@@ -206,7 +206,7 @@ func (ks ConfigX509KeyStore) CreateSigningCert() (*rsa.PrivateKey, []byte, error
 
 	cert, err := x509.CreateCertificate(rand.Reader, certBody, certBody, &key.PublicKey, key)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to create certificate: %+v", err)
+		return nil, nil, fmt.Errorf("failed to create certificate: %+v", err)
 	}
 
 	if err := ks.SaveConfig(cert, key); err != nil {

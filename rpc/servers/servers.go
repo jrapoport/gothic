@@ -10,16 +10,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func ListenAndServeRPC(a *api.API, globalConfig *conf.Configuration) {
+func ListenAndServeRPC(a *api.API, config *conf.Configuration) {
 	go func() {
-		addr := fmt.Sprintf("%v:%v", globalConfig.Host, globalConfig.RpcPort)
+		addr := fmt.Sprintf("%v:%v", config.Host, config.RpcPort)
 		logrus.Infof("Gothic RPC API started on: %s", addr)
 		svr := rpc.NewRpcServer(a, addr)
 		svr.ListenAndServe()
 	}()
 
 	go func() {
-		addr := fmt.Sprintf("%v:%v", globalConfig.Host, globalConfig.RpcWebPort)
+		addr := fmt.Sprintf("%v:%v", config.Host, config.RpcWebPort)
 		logrus.Infof("Gothic RPC Web API started on: %s", addr)
 		svr := web.NewRpcWebServer(a, addr)
 		// TODO: add JWT server options

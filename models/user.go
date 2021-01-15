@@ -1,16 +1,25 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/pkg/errors"
 	"github.com/vcraescu/go-paginator/v2"
 	"github.com/vcraescu/go-paginator/v2/adapter"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+)
+
+type Role string
+
+const (
+	UserRole       Role = "user"
+	AdminRole      Role = "admin"
+	SuperAdminRole Role = "super-admin"
 )
 
 const SystemUserID = "0"
@@ -70,12 +79,11 @@ func NewUser(email, password, aud string, userData map[string]interface{}) (*Use
 	}
 
 	username := ""
+	// TODO: make username a 1st class param
 	if userData != nil {
 		if val, has := userData["username"]; has {
-			if name, ok := val.(string); ok {
-				username = name
-				delete(userData, "username")
-			}
+			username = val.(string)
+			delete(userData, "username")
 		}
 	}
 
@@ -250,16 +258,18 @@ func (u *User) Recover(tx *storage.Connection) error {
 	u.RecoveryToken = ""
 	// make the user also have to set a new password now
 	u.ChangePassword = true
-	return tx.Model(&u).Select("change_password","recovery_token").Updates(u).Error
+	return tx.Model(&u).Select("change_password", "recovery_token").Updates(u).Error
 }
 
+// Deprecated: findUser is going away. we should build the query as part of the tx
 func findUser(tx *storage.Connection, query string, args ...interface{}) (*User, error) {
 	obj := &User{}
 	if err := tx.Where(query, args...).First(obj).Error; err != nil {
-		if errors.Cause(err) == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, UserNotFoundError{}
 		}
-		return nil, errors.Wrap(err, "error finding user")
+		err = fmt.Errorf("%w finding user", err)
+		return nil, err
 	}
 
 	return obj, nil
@@ -289,23 +299,24 @@ func FindUserByRecoveryToken(tx *storage.Connection, token string) (*User, error
 func FindUserWithRefreshToken(tx *storage.Connection, token string) (*User, *RefreshToken, error) {
 	refreshToken := &RefreshToken{}
 	if err := tx.First(refreshToken, "token = ?", token).Error; err != nil {
-		if errors.Cause(err) == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil, RefreshTokenNotFoundError{}
 		}
-		return nil, nil, errors.Wrap(err, "error finding refresh token")
+		err = fmt.Errorf("%w finding refresh token", err)
+		return nil, nil, err
 	}
 
-	user, err := findUser(tx, "id = ?", refreshToken.UserID)
+	u, err := findUser(tx, "id = ?", refreshToken.UserID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return user, refreshToken, nil
+	return u, refreshToken, nil
 }
 
 // FindUsersInAudience finds users with the matching audience.
 func FindUsersInAudience(tx *storage.Connection, aud string, pageParams *Pagination, sortParams *SortParams, filter string) ([]*User, error) {
-	users := []*User{}
+	var users []*User
 	q := tx.Model(users).Where("aud = ?", aud)
 
 	if filter != "" {
@@ -367,3 +378,17 @@ func IsDuplicatedUsername(tx *storage.Connection, instanceID uuid.UUID, name str
 	}
 	return true, nil
 }
+
+/*
+// IsDuplicatedEmail returns whether a user exists with a matching email and audience.
+func IsDuplicatedEmail(tx *storage.Connection, email, aud string) (bool, error) {
+	u, err := FindUserByEmailAndAudience(tx, email, aud)
+	if errors.Is(err, storage.ErrNotFound) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return u != nil, nil
+}
+
+*/

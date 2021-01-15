@@ -35,23 +35,23 @@ func setupAPIForTestForInstance(t *testing.T) (*API, *conf.Configuration, error)
 }
 
 func setupAPIForTestWithCallback(t *testing.T, cb func(*conf.Configuration, *storage.Connection) error) (*API, *conf.Configuration, error) {
-	globalConfig, err := conf.LoadConfiguration(apiTestConfig)
+	config, err := conf.LoadConfiguration(apiTestConfig)
 	if err != nil {
 		return nil, nil, err
 	}
-	conn, err := test.SetupDBConnection(t, globalConfig)
+	conn, err := test.SetupDBConnection(t, config)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	if cb != nil {
-		err = cb(globalConfig, conn)
+		err = cb(config, conn)
 		if err != nil {
 			return nil, nil, err
 		}
 	}
 
-	return NewAPI(globalConfig, conn), globalConfig, nil
+	return NewAPI(config, conn), config, nil
 }
 
 func TestEmailEnabledByDefault(t *testing.T) {
