@@ -46,7 +46,7 @@ BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(shell date
 VER_PKG := $(PKG)
 VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
 DEBUG_TAGS := -tags="debug"
-RELEASE_TAGS := -tags="osusergo,netgo"
+RELEASE_TAGS := -tags="osusergo,netgo,release"
 BUILD_TAGS := $(DEBUG_TAGS)
 
 help: ## Show this help.
@@ -78,7 +78,7 @@ rpc:
 	$(GO_GEN) ./...
 
 test:
-	$(GO_TEST) ./...
+	$(GO_TEST) $(BUILD_TAGS) ./...
 
 build:
 	$(GO_BUILD) $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)

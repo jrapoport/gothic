@@ -10,7 +10,7 @@ import (
 	"github.com/jrapoport/gothic/metering"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/jrapoport/gothic/util"
+	"github.com/jrapoport/gothic/utils"
 )
 
 // GothicClaims is a struct thats used for JWT claims
@@ -54,12 +54,12 @@ func (a *API) Token(w http.ResponseWriter, r *http.Request) error {
 func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	cookie := r.Header.Get(useCookieHeader)
-
 	config := a.getConfig(ctx)
 
 	if config.Recaptcha.Login {
-		if err := a.checkRecaptcha(r, config); err != nil {
+		recaptcha := r.FormValue("recaptcha")
+		ipaddr := a.getClientIP(r)
+		if err := a.checkRecaptcha(ipaddr, recaptcha); err != nil {
 			return err
 		}
 	}
@@ -67,9 +67,9 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	user, err := models.FindUserByEmail(a.db, username)
 	if err != nil {
 		if models.IsNotFoundError(err) {
-			return oauthError("invalid_grant", "No user found with that email, or password invalid.")
+			return oauthError("invalid_grant", "no user found with that email, or password invalid.")
 		}
-		return internalServerError("Name error finding user").WithInternalError(err)
+		return internalServerError("name error finding user").WithInternalError(err)
 	}
 
 	// NOTE: this is commented out to let users who have not confirmed recover.
@@ -79,35 +79,14 @@ func (a *API) ResourceOwnerPasswordGrant(ctx context.Context, w http.ResponseWri
 	//}
 
 	if !user.Authenticate(password) {
-		return oauthError("invalid_grant", "No user found with that email, or password invalid.")
+		return oauthError("invalid_grant", "no user found with that email, or password invalid.")
 	}
 
-	var token *AccessTokenResponse
-	err = a.db.Transaction(func(tx *storage.Connection) error {
-		var terr error
-		if terr = models.NewAuditLogEntry(tx, user, models.LoginAction, nil); terr != nil {
-			return terr
-		}
-		if terr = triggerEventHooks(ctx, tx, LoginEvent, user, config); terr != nil {
-			return terr
-		}
-
-		token, terr = a.issueRefreshToken(ctx, tx, user)
-		if terr != nil {
-			return terr
-		}
-
-		if cookie != "" && config.Cookies.Duration > 0 {
-			if terr = a.setCookieToken(config, token.Token, cookie == useSessionCookie, w); terr != nil {
-				return internalServerError("failed to set JWT cookie. %s", terr)
-			}
-		}
-		return nil
-	})
+	token, err := a.issueAccessToken(ctx, w, r, user)
 	if err != nil {
-		return err
+		return internalServerError("failed to issue access token").WithInternalError(err)
 	}
-	metering.RecordLogin("password", user.ID)
+
 	return sendJSON(w, http.StatusOK, token)
 }
 
@@ -149,7 +128,7 @@ func (a *API) RefreshTokenGrant(ctx context.Context, w http.ResponseWriter, r *h
 		}
 
 		if a.config.JWT.MaskEmail {
-			user.Email = util.MaskEmail(user.Email)
+			user.Email = utils.MaskEmail(user.Email)
 		}
 
 		tokenString, terr = generateAccessToken(user, config.JWT)
@@ -208,7 +187,7 @@ func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, u
 		var terr error
 		refreshToken, terr = models.GrantAuthenticatedUser(tx, user)
 		if terr != nil {
-			return internalServerError("Name error granting user").WithInternalError(terr)
+			return internalServerError("name error granting user").WithInternalError(terr)
 		}
 
 		tokenString, terr = generateAccessToken(user, config.JWT)
@@ -227,6 +206,37 @@ func (a *API) issueRefreshToken(ctx context.Context, conn *storage.Connection, u
 		ExpiresIn:    config.JWT.Exp,
 		RefreshToken: refreshToken.Token,
 	}, nil
+}
+
+func (a *API) issueAccessToken(ctx context.Context, w http.ResponseWriter, r *http.Request, user *models.User) (*AccessTokenResponse, error) {
+	var token *AccessTokenResponse
+	cookie := r.Header.Get(useCookieHeader)
+	err := a.db.Transaction(func(tx *storage.Connection) error {
+		var err error
+		if err = models.NewAuditLogEntry(tx, user, models.LoginAction, nil); err != nil {
+			return err
+		}
+		if err = triggerEventHooks(ctx, tx, LoginEvent, user, a.config); err != nil {
+			return err
+		}
+
+		token, err = a.issueRefreshToken(ctx, tx, user)
+		if err != nil {
+			return err
+		}
+
+		if cookie != "" && a.config.Cookies.Duration > 0 {
+			if err = a.setCookieToken(a.config, token.Token, cookie == useSessionCookie, w); err != nil {
+				return internalServerError("failed to set jwt cookie. %s", err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	metering.RecordLogin("password", user.ID)
+	return token, nil
 }
 
 func (a *API) setCookieToken(config *conf.Configuration, tokenString string, session bool, w http.ResponseWriter) error {

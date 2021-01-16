@@ -13,7 +13,7 @@ import (
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/mailer"
 	"github.com/jrapoport/gothic/storage"
-	"github.com/jrapoport/gothic/util"
+	"github.com/jrapoport/gothic/utils"
 	"github.com/rs/cors"
 	"github.com/sebest/xff"
 	"github.com/sirupsen/logrus"
@@ -42,6 +42,7 @@ func ListenAndServeREST(a *API, config *conf.Configuration) {
 	}()
 }
 
+// Deprecated: ListenAndServe start the http server.
 func (a *API) ListenAndServe(hostAndPort string) {
 	log := logrus.WithField("component", "api")
 	server := &http.Server{
@@ -52,7 +53,7 @@ func (a *API) ListenAndServe(hostAndPort string) {
 	done := make(chan struct{})
 	defer close(done)
 	go func() {
-		util.WaitForTermination(log, done)
+		utils.WaitForTermination(log, done)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 		server.Shutdown(ctx)
@@ -156,11 +157,13 @@ func NewAPI(config *conf.Configuration, db *storage.Connection) *API {
 	return api
 }
 
+// WithConfig turns a context with config
 func WithConfig(ctx context.Context, config *conf.Configuration) (context.Context, error) {
 	ctx = withConfig(ctx, config)
 	return ctx, nil
 }
 
+// Mailer returns a new Mailer
 func (a *API) Mailer(ctx context.Context) mailer.Mailer {
 	config := a.getConfig(ctx)
 	return mailer.NewMailer(config)

@@ -48,13 +48,13 @@ func (a *API) ExternalProviderRedirect(w http.ResponseWriter, r *http.Request) e
 			if models.IsNotFoundError(userErr) {
 				return notFoundError(userErr.Error())
 			}
-			return internalServerError("Name error finding user").WithInternalError(userErr)
+			return internalServerError("name error finding user").WithInternalError(userErr)
 		}
 	}
 
 	referrer := a.getReferrer(r)
 	log := getLogEntry(r)
-	log.WithField("provider", providerType).Info("Redirecting to external provider")
+	log.WithField("provider", providerType).Info("redirecting to external provider")
 	token := jwt.NewWithClaims(config.JWT.SigningMethod(), ExternalProviderClaims{
 		GothicMicroserviceClaims: GothicMicroserviceClaims{
 			StandardClaims: jwt.StandardClaims{
@@ -129,7 +129,7 @@ func (a *API) internalExternalProviderCallback(w http.ResponseWriter, r *http.Re
 
 			if user == nil {
 				if config.DisableSignup {
-					return forbiddenError("Signups not allowed for this instance")
+					return forbiddenError("signups not allowed for this instance")
 				}
 
 				// prefer primary email for new signups
@@ -234,7 +234,7 @@ func (a *API) processInvite(ctx context.Context, tx *storage.Connection, userDat
 	}
 
 	if emailData == nil {
-		return nil, badRequestError("Invited email does not match emails from external provider").WithInternalMessage("invited=%s external=%s", user.Email, strings.Join(emails, ", "))
+		return nil, badRequestError("invited email does not match emails from external provider").WithInternalMessage("invited=%s external=%s", user.Email, strings.Join(emails, ", "))
 	}
 
 	if err := user.UpdateAppMetaData(tx, map[string]interface{}{

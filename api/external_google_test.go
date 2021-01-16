@@ -82,7 +82,7 @@ func (ts *ExternalTestSuite) TestSignupExternalGoogleDisableSignupErrorWhenNoUse
 
 	u := performAuthorization(ts, "google", code, "")
 
-	assertAuthorizationFailure(ts, u, "Signups not allowed for this instance", "access_denied", "google@example.com")
+	assertAuthorizationFailure(ts, u, "signups not allowed for this instance", "access_denied", "google@example.com")
 }
 func (ts *ExternalTestSuite) TestSignupExternalGoogleDisableSignupErrorWhenEmptyEmail() {
 	ts.Config.DisableSignup = true
@@ -95,7 +95,7 @@ func (ts *ExternalTestSuite) TestSignupExternalGoogleDisableSignupErrorWhenEmpty
 
 	u := performAuthorization(ts, "google", code, "")
 
-	assertAuthorizationFailure(ts, u, "Error getting user email from external provider", "server_error", "google@example.com")
+	assertAuthorizationFailure(ts, u, "error getting user email from external provider", "server_error", "google@example.com")
 }
 
 func (ts *ExternalTestSuite) TestSignupExternalGoogleDisableSignupSuccessWithPrimaryEmail() {
@@ -164,5 +164,5 @@ func (ts *ExternalTestSuite) TestInviteTokenExternalGoogleErrorWhenEmailDoesntMa
 
 	u := performAuthorization(ts, "google", code, "invite_token")
 
-	assertAuthorizationFailure(ts, u, "Invited email does not match emails from external provider", "invalid_request", "")
+	assertAuthorizationFailure(ts, u, "invited email does not match emails from external provider", "invalid_request", "")
 }

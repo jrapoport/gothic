@@ -1,9 +1,7 @@
 package api
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/storage"
@@ -14,10 +12,6 @@ import (
 const (
 	apiTestConfig = "../env/test.env"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 // setupAPIForTest creates a new API to run tests with.
 // Using this function allows us to keep track of the database connection

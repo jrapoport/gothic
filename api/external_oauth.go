@@ -51,7 +51,7 @@ func (a *API) oAuthCallback(ctx context.Context, r *http.Request, providerType s
 
 	userData, err := oAuthProvider.GetUserData(ctx, tok)
 	if err != nil {
-		return nil, internalServerError("Error getting user email from external provider").WithInternalError(err)
+		return nil, internalServerError("error getting user email from external provider").WithInternalError(err)
 	}
 
 	return userData, nil
