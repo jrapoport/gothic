@@ -165,6 +165,7 @@ func (p SamlProvider) SPMetadata() ([]byte, error) {
 	return rawMetadata, nil
 }
 
+// GetKeyPair returns a new X509 key pair
 func (ks ConfigX509KeyStore) GetKeyPair() (*rsa.PrivateKey, []byte, error) {
 	if ks.Conf.SigningCert == "" && ks.Conf.SigningKey == "" {
 		return ks.CreateSigningCert()
@@ -186,6 +187,7 @@ func (ks ConfigX509KeyStore) GetKeyPair() (*rsa.PrivateKey, []byte, error) {
 	return privKey, keyPair.Certificate[0], nil
 }
 
+// CreateSigningCert creates a new X509 signing cert
 func (ks ConfigX509KeyStore) CreateSigningCert() (*rsa.PrivateKey, []byte, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {

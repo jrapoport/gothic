@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// RecoverParams holds the parameters for a password recovery request
+// EmailConfirmationParams holds the parameters for an email confirmation request.
 type EmailConfirmationParams struct {
 	Id string `json:"id"`
 }

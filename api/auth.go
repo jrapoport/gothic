@@ -33,14 +33,14 @@ func (a *API) requireAdmin(ctx context.Context, w http.ResponseWriter, r *http.R
 	if r.Body != nil && r.Body != http.NoBody {
 		c, err := addGetBody(w, r)
 		if err != nil {
-			return nil, internalServerError("Error getting body").WithInternalError(err)
+			return nil, internalServerError("error getting body").WithInternalError(err)
 		}
 		ctx = c
 
 		params := adminCheckParams{}
 		bod, err := r.GetBody()
 		if err != nil {
-			return nil, internalServerError("Error getting body").WithInternalError(err)
+			return nil, internalServerError("error getting body").WithInternalError(err)
 		}
 		err = json.NewDecoder(bod).Decode(&params)
 		if err != nil {

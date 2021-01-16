@@ -89,7 +89,7 @@ func (ts *ExternalTestSuite) TestSignupExternalGitLabDisableSignupErrorWhenNoUse
 
 	u := performAuthorization(ts, "gitlab", code, "")
 
-	assertAuthorizationFailure(ts, u, "Signups not allowed for this instance", "access_denied", "gitlab@example.com")
+	assertAuthorizationFailure(ts, u, "signups not allowed for this instance", "access_denied", "gitlab@example.com")
 }
 
 func (ts *ExternalTestSuite) TestSignupExternalGitLabDisableSignupErrorWhenEmptyEmail() {
@@ -104,7 +104,7 @@ func (ts *ExternalTestSuite) TestSignupExternalGitLabDisableSignupErrorWhenEmpty
 
 	u := performAuthorization(ts, "gitlab", code, "")
 
-	assertAuthorizationFailure(ts, u, "Error getting user email from external provider", "server_error", "gitlab@example.com")
+	assertAuthorizationFailure(ts, u, "error getting user email from external provider", "server_error", "gitlab@example.com")
 }
 
 func (ts *ExternalTestSuite) TestSignupExternalGitLabDisableSignupSuccessWithPrimaryEmail() {
@@ -197,5 +197,5 @@ func (ts *ExternalTestSuite) TestInviteTokenExternalGitLabErrorWhenEmailDoesntMa
 
 	u := performAuthorization(ts, "gitlab", code, "invite_token")
 
-	assertAuthorizationFailure(ts, u, "Invited email does not match emails from external provider", "invalid_request", "")
+	assertAuthorizationFailure(ts, u, "invited email does not match emails from external provider", "invalid_request", "")
 }

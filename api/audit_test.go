@@ -6,7 +6,6 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
-	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -17,8 +16,8 @@ import (
 
 type AuditTestSuite struct {
 	suite.Suite
-	API    *API
-	Config *conf.Configuration
+	a *API
+	c *conf.Configuration
 
 	token string
 }
@@ -31,15 +30,16 @@ func TestAudit(t *testing.T) {
 	require.NoError(t, err)
 
 	ts := &AuditTestSuite{
-		API:    api,
-		Config: config,
+		a: api,
+		c: config,
 	}
 
 	suite.Run(t, ts)
 }
 
 func (ts *AuditTestSuite) SetupTest() {
-	storage.TruncateAll(ts.API.db)
+	err := ts.a.db.DropDatabase()
+	assert.NoError(ts.T(), err)
 	ts.token = ts.makeSuperAdmin(auditAdminEmail)
 }
 
@@ -48,15 +48,15 @@ func (ts *AuditTestSuite) makeSuperAdmin(email string) string {
 	require.NoError(ts.T(), err, "Error making new user")
 
 	u.IsSuperAdmin = true
-	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
+	require.NoError(ts.T(), ts.a.db.Create(u).Error, "Error creating user")
 
-	token, err := generateAccessToken(u, ts.Config.JWT)
+	token, err := generateAccessToken(u, ts.c.JWT)
 	require.NoError(ts.T(), err, "Error generating access token")
 
 	_, err = jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte(ts.Config.JWT.Secret), nil
+		return []byte(ts.c.JWT.Secret), nil
 	},
-		jwt.WithAudience(ts.Config.JWT.Aud),
+		jwt.WithAudience(ts.c.JWT.Aud),
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 	require.NoError(ts.T(), err, "Error parsing token")
 
@@ -70,7 +70,7 @@ func (ts *AuditTestSuite) TestAuditGet() {
 	req := httptest.NewRequest(http.MethodGet, "/admin/audit", nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ts.token))
 
-	ts.API.handler.ServeHTTP(w, req)
+	ts.a.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 
 	assert.Equal(ts.T(), "</admin/audit?page=1>; rel=\"last\"", w.HeaderMap.Get("Link"))
@@ -103,7 +103,7 @@ func (ts *AuditTestSuite) TestAuditFilters() {
 		req := httptest.NewRequest(http.MethodGet, q, nil)
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ts.token))
 
-		ts.API.handler.ServeHTTP(w, req)
+		ts.a.handler.ServeHTTP(w, req)
 		require.Equal(ts.T(), http.StatusOK, w.Code)
 		if w.Code != http.StatusOK {
 			ts.T().Log(w.Body.String())
@@ -127,13 +127,13 @@ func (ts *AuditTestSuite) prepareDeleteEvent() {
 	// DELETE USER
 	u, err := models.NewUser(auditUserEmail, "test", nil)
 	require.NoError(ts.T(), err, "Error making new user")
-	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error creating user")
+	require.NoError(ts.T(), ts.a.db.Create(u).Error, "Error creating user")
 
 	// Setup request
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/admin/users/%s", u.ID), nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", ts.token))
 
-	ts.API.handler.ServeHTTP(w, req)
+	ts.a.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 }

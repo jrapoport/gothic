@@ -163,7 +163,7 @@ func (a *API) validatePassword(password string) error {
 
 func (a *API) validateUsername(username string) error {
 	if username == "" {
-		return unprocessableEntityError("username is required")
+		return nil
 	}
 	if a.config.Validation.UsernameRegex == "" {
 		return nil

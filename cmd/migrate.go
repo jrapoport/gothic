@@ -20,7 +20,7 @@ func migrateRunE(*cobra.Command, []string) error {
 		err = fmt.Errorf("database error %w", err)
 		return err
 	}
-	if err = storage.MigrateDatabase(conn); err != nil {
+	if err = conn.MigrateDatabase(); err != nil {
 		err = fmt.Errorf("migration error %w", err)
 		return err
 	}

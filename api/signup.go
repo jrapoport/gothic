@@ -7,6 +7,7 @@ import (
 
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/utils"
 )
 
 // SignupParams are the parameters the Signup endpoint accepts
@@ -23,25 +24,33 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 	config := a.getConfig(ctx)
 
 	if config.DisableSignup {
-		return forbiddenError("Signups not allowed for this instance")
+		return forbiddenError("signup disabled")
 	}
 
 	params := &SignupParams{}
 	jsonDecoder := json.NewDecoder(r.Body)
 	err := jsonDecoder.Decode(params)
 	if err != nil {
-		return badRequestError("Could not read Signup params: %v", err)
+		return badRequestError("invalid params: %v", err)
 	}
 
-	data := params.Data
-	if data == nil {
-		return badRequestError("signup error: %v", err)
+	if recaptcha, ok := params.Data["recaptcha"].(string); ok {
+		ipaddr := a.getClientIP(r)
+		err = a.checkRecaptcha(ipaddr, recaptcha)
+		if err != nil {
+			return err
+		}
+		delete(params.Data, "recaptcha")
 	}
 
-	if err = a.checkRecaptcha(r, config); err != nil {
+	code, ok := params.Data["code"].(string)
+	err = a.CheckSignupCode(code)
+	if err != nil {
 		return err
 	}
-	delete(params.Data, "recaptcha")
+	if ok {
+		delete(params.Data, "code")
+	}
 
 	if err = a.validatePassword(params.Password); err != nil {
 		return err
@@ -51,84 +60,90 @@ func (a *API) Signup(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	// TODO: make this more efficient
+	// This user has already signed up
 	taken, err := models.IsDuplicatedEmail(a.db, params.Email)
 	if err != nil || taken {
 		return badRequestError("email taken").WithInternalError(err)
 	}
 
-	user, err := models.FindUserByEmail(a.db, params.Email)
-	if err != nil && !models.IsNotFoundError(err) {
-		return internalServerError("name error finding user").WithInternalError(err)
-	}
-
+	var user *models.User
 	err = a.db.Transaction(func(tx *storage.Connection) error {
-		var terr error
-		if user != nil {
-			if user.IsConfirmed() {
-				return badRequestError("a user with this email address has already been registered")
-			}
-
-			if err = user.UpdateUserMetaData(tx, data); err != nil {
-				return internalServerError("name error updating user").WithInternalError(err)
-			}
-		} else {
-			params.Provider = "email"
-			user, terr = a.signupNewUser(ctx, tx, params)
-			if terr != nil {
-				return terr
-			}
+		params.Provider = "email"
+		user, err = a.signupNewUser(ctx, tx, params)
+		if err != nil {
+			return err
 		}
 
 		if config.Mailer.Autoconfirm {
-			if terr = models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); terr != nil {
-				return terr
+			if err = models.NewAuditLogEntry(tx, user, models.UserSignedUpAction, nil); err != nil {
+				return err
 			}
-			if terr = triggerEventHooks(ctx, tx, SignupEvent, user, config); terr != nil {
-				return terr
+			if err = triggerEventHooks(ctx, tx, SignupEvent, user, config); err != nil {
+				return err
 			}
-			if terr = user.Confirm(tx); terr != nil {
-				return internalServerError("Name error updating user").WithInternalError(terr)
+			if err = user.Confirm(tx); err != nil {
+				return internalServerError("Name error updating user").WithInternalError(err)
 			}
 		} else {
 			mailer := a.Mailer(ctx)
 			referrer := a.getReferrer(r)
-			if terr = sendConfirmation(tx, user, mailer, config.SMTP.MaxFrequency, referrer); terr != nil {
-				return internalServerError("error sending confirmation mail").WithInternalError(terr)
+			if err = sendConfirmation(tx, user, mailer, config.SMTP.MaxFrequency, referrer); err != nil {
+				return internalServerError("error sending confirmation mail").WithInternalError(err)
 			}
+		}
+		if code == "" {
+			return nil
+		}
+		if err = models.UseSignupCode(tx, code, user); err != nil {
+			return internalServerError("error saving signup code").WithInternalError(err)
 		}
 		return nil
 	})
-
 	if err != nil {
 		return err
 	}
 
-	return sendJSON(w, http.StatusOK, user)
+	token, err := a.issueAccessToken(ctx, w, r, user)
+	if err != nil {
+		return internalServerError("failed to issue access token").WithInternalError(err)
+	}
+
+	return sendJSON(w, http.StatusOK, token)
 }
 
 func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, params *SignupParams) (*models.User, error) {
 	config := a.getConfig(ctx)
 
-	// TODO: make username a 1st class param
-	if params.Data != nil {
-		username := ""
-		if val, has := params.Data["username"]; has {
-			username = val.(string)
+	if a.config.Signup.Defaults {
+		if _, ok := params.Data["username"]; !ok {
+			// we didn't find a user name so we'll make one up that's random and unique
+			params.Data["username"] = a.randomUsername()
 		}
-		if username != "" {
-			if err := a.validateUsername(username); err != nil {
-				return nil, err
-			}
+		if _, ok := params.Data["color"]; !ok {
+			params.Data["color"] = utils.RandomColor()
 		}
+	}
+
+	username, ok := params.Data["username"].(string)
+	if ok {
+		delete(params.Data, "username")
 	}
 
 	user, err := models.NewUser(params.Email, params.Password, params.Data)
 	if err != nil {
 		return nil, internalServerError("Name error creating user").WithInternalError(err)
 	}
+
+	user.Username = username
+
+	// if there is no username this will not return
+	// an error since a username is not required.
+	if err = a.validateUsername(user.Username); err != nil {
+		return nil, err
+	}
+
 	if user.AppMetaData == nil {
-		user.AppMetaData = make(map[string]interface{})
+		user.AppMetaData = map[string]interface{}{}
 	}
 	user.AppMetaData["provider"] = params.Provider
 
@@ -153,4 +168,20 @@ func (a *API) signupNewUser(ctx context.Context, conn *storage.Connection, param
 	}
 
 	return user, nil
+}
+
+func (a *API) randomUsername() string {
+	username := ""
+	for {
+		username = utils.RandomUsername(28)
+		taken, err := models.IsDuplicatedUsername(a.db, username)
+		if err != nil {
+			a.config.Log.Warn(err)
+			break
+		}
+		if !taken {
+			break
+		}
+	}
+	return username
 }

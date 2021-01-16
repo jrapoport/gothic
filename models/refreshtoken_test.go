@@ -17,7 +17,7 @@ type RefreshTokenTestSuite struct {
 }
 
 func (ts *RefreshTokenTestSuite) SetupTest() {
-	err := storage.TruncateAll(ts.db)
+	err := ts.db.DropDatabase()
 	assert.NoError(ts.T(), err)
 }
 
@@ -79,11 +79,11 @@ func (ts *RefreshTokenTestSuite) createUser() *User {
 }
 
 func (ts *RefreshTokenTestSuite) createUserWithEmail(email string) *User {
-	user, err := NewUser(email, "secret", nil)
+	u, err := NewUser(email, "secret", nil)
 	require.NoError(ts.T(), err)
 
-	err = ts.db.Create(user).Error
+	err = ts.db.Create(u).Error
 	require.NoError(ts.T(), err)
 
-	return user
+	return u
 }

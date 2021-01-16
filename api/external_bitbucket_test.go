@@ -86,7 +86,7 @@ func (ts *ExternalTestSuite) TestSignupExternalBitbucketDisableSignupErrorWhenNo
 
 	u := performAuthorization(ts, "bitbucket", code, "")
 
-	assertAuthorizationFailure(ts, u, "Signups not allowed for this instance", "access_denied", "bitbucket@example.com")
+	assertAuthorizationFailure(ts, u, "signups not allowed for this instance", "access_denied", "bitbucket@example.com")
 }
 
 func (ts *ExternalTestSuite) TestSignupExternalBitbucketDisableSignupErrorWhenNoEmail() {
@@ -100,7 +100,7 @@ func (ts *ExternalTestSuite) TestSignupExternalBitbucketDisableSignupErrorWhenNo
 
 	u := performAuthorization(ts, "bitbucket", code, "")
 
-	assertAuthorizationFailure(ts, u, "Error getting user email from external provider", "server_error", "bitbucket@example.com")
+	assertAuthorizationFailure(ts, u, "error getting user email from external provider", "server_error", "bitbucket@example.com")
 
 }
 
@@ -192,5 +192,5 @@ func (ts *ExternalTestSuite) TestInviteTokenExternalBitbucketErrorWhenEmailDoesn
 
 	u := performAuthorization(ts, "bitbucket", code, "invite_token")
 
-	assertAuthorizationFailure(ts, u, "Invited email does not match emails from external provider", "invalid_request", "")
+	assertAuthorizationFailure(ts, u, "invited email does not match emails from external provider", "invalid_request", "")
 }

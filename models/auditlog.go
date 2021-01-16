@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/vcraescu/go-paginator/v2"
 	"github.com/vcraescu/go-paginator/v2/adapter"
@@ -18,7 +19,7 @@ const (
 	LoginAction                     AuditAction = "login"
 	LogoutAction                    AuditAction = "logout"
 	InviteAcceptedAction            AuditAction = "invite_accepted"
-	UserSignedUpAction              AuditAction = "user_signedup"
+	UserSignedUpAction              AuditAction = "user_signed_up"
 	UserInvitedAction               AuditAction = "user_invited"
 	UserDeletedAction               AuditAction = "user_deleted"
 	UserModifiedAction              AuditAction = "user_modified"
@@ -34,16 +35,17 @@ const (
 )
 
 var actionLogTypeMap = map[AuditAction]auditLogType{
-	LoginAction:                 account,
-	LogoutAction:                account,
-	InviteAcceptedAction:        account,
-	UserSignedUpAction:          team,
-	UserInvitedAction:           team,
-	UserDeletedAction:           team,
-	TokenRevokedAction:          token,
-	TokenRefreshedAction:        token,
-	UserModifiedAction:          user,
-	UserRecoveryRequestedAction: user,
+	LoginAction:                     account,
+	LogoutAction:                    account,
+	InviteAcceptedAction:            account,
+	UserSignedUpAction:              team,
+	UserInvitedAction:               team,
+	UserDeletedAction:               team,
+	TokenRevokedAction:              token,
+	TokenRefreshedAction:            token,
+	UserModifiedAction:              user,
+	UserRecoveryRequestedAction:     user,
+	UserConfirmationRequestedAction: user,
 }
 
 func init() {
@@ -52,9 +54,14 @@ func init() {
 
 // AuditLogEntry is the database model for audit log entries.
 type AuditLogEntry struct {
-	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
+	ID        uuid.UUID `json:"id" gorm:"primaryKey;type:char(36)"`
 	Payload   Map       `json:"payload"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+func (a AuditLogEntry) TableName() string {
+	c := conf.Current()
+	return storage.Namespace(c) + "audit_log"
 }
 
 func NewAuditLogEntry(tx *storage.Connection, actor *User, action AuditAction, traits map[string]interface{}) error {
@@ -107,7 +114,7 @@ func FindAuditLogEntries(tx *storage.Connection, filterColumns []string, filterV
 		q = q.Where(builder.String(), values...)
 	}
 
-	logs := []*AuditLogEntry{}
+	var logs []*AuditLogEntry
 	var err error
 	if pageParams != nil {
 		p := paginator.New(adapter.NewGORMAdapter(q), int(pageParams.PerPage))
