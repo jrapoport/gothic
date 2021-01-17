@@ -13,7 +13,6 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
-	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -47,7 +46,8 @@ func TestAdmin(t *testing.T) {
 }
 
 func (ts *AdminTestSuite) SetupTest() {
-	storage.TruncateAll(ts.API.db)
+	err := ts.API.db.DropDatabase()
+	assert.NoError(ts.T(), err)
 	ts.API.config.External.Email.Disabled = false
 	ts.token = ts.makeSuperAdmin(adminEmail)
 }

@@ -16,12 +16,14 @@ import (
 
 type FunctionHooks map[string][]string
 
+// GothicMicroserviceClaims gothic's JWT claims
 type GothicMicroserviceClaims struct {
 	jwt.StandardClaims
 	SiteURL       string        `json:"site_url"`
 	FunctionHooks FunctionHooks `json:"function_hooks"`
 }
 
+// UnmarshalJSON unmarshal from JSON
 func (f *FunctionHooks) UnmarshalJSON(b []byte) error {
 	var raw map[string][]string
 	err := json.Unmarshal(b, &raw)

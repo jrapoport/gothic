@@ -11,12 +11,12 @@ import (
 )
 
 type rpcConfigHost struct {
-	*hosts.RpcHost
+	*hosts.RPCHost
 }
 
 var _ ConfigServer = (*rpcConfigHost)(nil)
 
-func NewConfigHost(h *hosts.RpcHost) *rpcConfigHost {
+func NewConfigHost(h *hosts.RPCHost) *rpcConfigHost {
 	return &rpcConfigHost{h}
 }
 

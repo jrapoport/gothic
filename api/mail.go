@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/mailer"
 	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
+	"github.com/jrapoport/gothic/utils"
 )
 
 func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mailer, maxFrequency time.Duration, referrerURL string) error {
@@ -17,7 +17,7 @@ func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mail
 	}
 
 	oldToken := u.ConfirmationToken
-	u.ConfirmationToken = crypto.SecureToken()
+	u.ConfirmationToken = utils.SecureToken()
 	now := time.Now()
 	if err := mailer.ConfirmationMail(u, referrerURL); err != nil {
 		u.ConfirmationToken = oldToken
@@ -34,7 +34,7 @@ func sendConfirmation(tx *storage.Connection, u *models.User, mailer mailer.Mail
 
 func sendInvite(tx *storage.Connection, u *models.User, mailer mailer.Mailer, referrerURL string) error {
 	oldToken := u.ConfirmationToken
-	u.ConfirmationToken = crypto.SecureToken()
+	u.ConfirmationToken = utils.SecureToken()
 	now := time.Now()
 	if err := mailer.InviteMail(u, referrerURL); err != nil {
 		u.ConfirmationToken = oldToken
@@ -55,7 +55,7 @@ func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, maile
 	}
 
 	oldToken := u.RecoveryToken
-	u.RecoveryToken = crypto.SecureToken()
+	u.RecoveryToken = utils.SecureToken()
 	now := time.Now()
 	if err := mailer.RecoveryMail(u, referrerURL); err != nil {
 		u.RecoveryToken = oldToken
@@ -73,7 +73,7 @@ func (a *API) sendPasswordRecovery(tx *storage.Connection, u *models.User, maile
 func (a *API) sendEmailChange(tx *storage.Connection, u *models.User, mailer mailer.Mailer, email string, referrerURL string) error {
 	oldToken := u.EmailChangeToken
 	oldEmail := u.EmailChange
-	u.EmailChangeToken = crypto.SecureToken()
+	u.EmailChangeToken = utils.SecureToken()
 	u.EmailChange = email
 	now := time.Now()
 	if err := mailer.EmailChangeMail(u, referrerURL); err != nil {

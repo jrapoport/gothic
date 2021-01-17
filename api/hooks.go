@@ -76,7 +76,7 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 
 	for i := 0; i < w.Retries; i++ {
 		hooklog = hooklog.WithField("attempt", i+1)
-		hooklog.Info("Starting to perform signup hook request")
+		hooklog.Info("starting to perform signup hook request")
 
 		req, err := http.NewRequest(http.MethodPost, w.URL, bytes.NewBuffer(w.payload))
 		if err != nil {
@@ -102,7 +102,7 @@ func (w *Webhook) trigger() (io.ReadCloser, error) {
 					closeBody(rsp)
 					return nil, httpError(http.StatusGatewayTimeout, "failed to perform webhook in time frame (%v seconds)", timeout.Seconds())
 				}
-				hooklog.Info("Request timed out")
+				hooklog.Info("request timed out")
 				continue
 			} else if watcher.gotConn {
 				closeBody(rsp)

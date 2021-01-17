@@ -5,7 +5,7 @@ import (
 
 	"github.com/jrapoport/gothic/api"
 	"github.com/jrapoport/gothic/conf"
-	"github.com/jrapoport/gothic/util"
+	"github.com/jrapoport/gothic/utils"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -13,33 +13,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-/*
-var
-
-func RegisterServer(reg func(s *grpc.Server, srv *RpcHost)) {
-	servers = append(servers, reg)
-}
-
-*/
-
 // RegisterRpcServer is the function prototype for registering an RPC server.
-type RegisterRpcServer func(s *grpc.Server, srv *RpcHost)
+type RegisterRpcServer func(s *grpc.Server, srv *RPCHost)
 
-// RpcHost represents a gRPC host.
-type RpcHost struct {
+// RPCHost represents a gRPC host.
+type RPCHost struct {
 	*api.API
 	*logrus.Entry
 	hostAndPort string
 	servers     []RegisterRpcServer
 }
 
-// NewRpcHost creates a new RpcHost.
-func NewRpcHost(a *api.API, name string, hostAndPort string, servers []RegisterRpcServer) *RpcHost {
+// NewRpcHost creates a new RPCHost.
+func NewRpcHost(a *api.API, name string, hostAndPort string, servers []RegisterRpcServer) *RPCHost {
 	log := logrus.WithField("server", name)
-	return &RpcHost{a, log, hostAndPort, servers}
+	return &RPCHost{a, log, hostAndPort, servers}
 }
 
-func (h *RpcHost) ListenAndServe(opts ...grpc.ServerOption) {
+func (h *RPCHost) ListenAndServe(opts ...grpc.ServerOption) {
 	lis, err := net.Listen("tcp", h.hostAndPort)
 	if err != nil {
 		h.WithError(err).Fatal("rpc server listen failed")
@@ -58,7 +49,7 @@ func (h *RpcHost) ListenAndServe(opts ...grpc.ServerOption) {
 	done := make(chan struct{})
 	defer close(done)
 	go func() {
-		util.WaitForTermination(h, done)
+		utils.WaitForTermination(h, done)
 		h.Info("shutting down rpc server...")
 		server.GracefulStop()
 	}()
@@ -68,14 +59,16 @@ func (h *RpcHost) ListenAndServe(opts ...grpc.ServerOption) {
 	}
 }
 
-func (h *RpcHost) RpcErrorf(c codes.Code, format string, a ...interface{}) error {
-	err := status.Errorf(c, format, a...)
+// RpcError wraps an rpc error code.
+func (h *RPCHost) RpcError(c codes.Code, msg string) error {
+	err := status.Error(c, msg)
 	h.Error(err)
 	return err
 }
 
-func (h *RpcHost) RpcError(c codes.Code, msg string) error {
-	err := status.Error(c, msg)
+// RpcErrorf wraps a formatted rpc error code.
+func (h *RPCHost) RpcErrorf(c codes.Code, format string, a ...interface{}) error {
+	err := status.Errorf(c, format, a...)
 	h.Error(err)
 	return err
 }

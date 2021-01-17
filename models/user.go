@@ -32,11 +32,10 @@ func init() {
 
 // User represents a registered user with email/password authentication
 type User struct {
-	ID uuid.UUID `json:"id" gorm:"primaryKey"`
-
-	Username          string `json:"username" gorm:"type:varchar(320)"`
-	Email             string `json:"email" gorm:"type:varchar(320)"`
-	EncryptedPassword string `json:"-"`
+	ID                uuid.UUID `json:"id" gorm:"primaryKey;type:char(36)"`
+	Username          string    `json:"username" gorm:"type:varchar(255)"`
+	Email             string    `json:"email" gorm:"type:varchar(320)"`
+	EncryptedPassword string    `json:"-"`
 
 	// user must change their password
 	ChangePassword bool `json:"change_password"`
@@ -48,7 +47,8 @@ type User struct {
 	ConfirmationSentAt *time.Time `json:"confirmation_sent_at,omitempty"`
 	ConfirmedAt        *time.Time `json:"confirmed_at,omitempty"`
 
-	// support additional user verification (beyond email)
+	// VerifiedAt is there to support additional
+	// verification (beyond email confirmation)
 	VerifiedAt *time.Time `json:"verified_at,omitempty"`
 
 	RecoveryToken  string     `json:"-" gorm:"type:varchar(255)"`
@@ -58,15 +58,16 @@ type User struct {
 	EmailChange       string     `json:"new_email,omitempty" gorm:"type:varchar(320)"`
 	EmailChangeSentAt *time.Time `json:"email_change_sent_at,omitempty"`
 
-	InvitedAt *time.Time `json:"invited_at,omitempty"`
+	SignupCodeID *uint      `json:"signup_code_id"`
+	InvitedAt    *time.Time `json:"invited_at,omitempty"`
 
 	AppMetaData  Map `json:"app_metadata"`
 	UserMetaData Map `json:"user_metadata"`
 
 	IsSuperAdmin bool `json:"-"`
 
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // NewUser initializes a new user from an email, password and user data.
@@ -77,18 +78,8 @@ func NewUser(email, password string, userData map[string]interface{}) (*User, er
 		return nil, err
 	}
 
-	username := ""
-	// TODO: make username a 1st class param
-	if userData != nil {
-		if val, has := userData["username"]; has {
-			username = val.(string)
-			delete(userData, "username")
-		}
-	}
-
 	u := &User{
 		ID:                id,
-		Username:          username,
 		Email:             email,
 		UserMetaData:      userData,
 		EncryptedPassword: pw,
@@ -96,6 +87,7 @@ func NewUser(email, password string, userData map[string]interface{}) (*User, er
 	return u, nil
 }
 
+// NewSystemUser returns a new system user.
 func NewSystemUser() *User {
 	return &User{
 		ID:           SystemUserUUID,
@@ -103,10 +95,12 @@ func NewSystemUser() *User {
 	}
 }
 
+// BeforeCreate runs before create
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return u.BeforeUpdate(tx)
 }
 
+// BeforeUpdate runs before update
 func (u *User) BeforeUpdate(*gorm.DB) error {
 	if u.ID == SystemUserUUID {
 		return errors.New("cannot save system user")
@@ -114,6 +108,7 @@ func (u *User) BeforeUpdate(*gorm.DB) error {
 	return nil
 }
 
+// BeforeSave runs before save
 func (u *User) BeforeSave(*gorm.DB) error {
 	if u.ID == SystemUserUUID {
 		return errors.New("cannot save system user")
@@ -348,14 +343,10 @@ func FindUsers(tx *storage.Connection, pageParams *Pagination, sortParams *SortP
 
 // IsDuplicatedEmail returns whether a user exists with a matching email.
 func IsDuplicatedEmail(tx *storage.Connection, email string) (bool, error) {
-	_, err := FindUserByEmail(tx, email)
-	if err != nil {
-		if IsNotFoundError(err) {
-			return false, nil
-		}
-		return false, err
+	if email == "" {
+		return false, errors.New("invalid email")
 	}
-	return true, nil
+	return storage.Has(tx.Where("email = ?", email), new(User))
 }
 
 // FindUserByUsername finds a user with the matching username.
@@ -374,17 +365,3 @@ func IsDuplicatedUsername(tx *storage.Connection, name string) (bool, error) {
 	}
 	return true, nil
 }
-
-/*
-// IsDuplicatedEmail returns whether a user exists with a matching email.
-func IsDuplicatedEmail(tx *storage.Connection, email string) (bool, error) {
-	u, err := FindUserByEmail(tx, email)
-	if errors.Is(err, storage.ErrNotFound) {
-		return false, nil
-	} else if err != nil {
-		return false, err
-	}
-	return u != nil, nil
-}
-
-*/

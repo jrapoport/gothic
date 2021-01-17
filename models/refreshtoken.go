@@ -2,11 +2,10 @@ package models
 
 import (
 	"fmt"
-
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/crypto"
 	"github.com/jrapoport/gothic/storage"
-	"gorm.io/gorm"
+	"github.com/jrapoport/gothic/utils"
+	"time"
 )
 
 func init() {
@@ -15,10 +14,12 @@ func init() {
 
 // RefreshToken is the database model for refresh tokens.
 type RefreshToken struct {
-	gorm.Model
-	Token   string    `gorm:"index:refresh_tokens_token_idx;type:varchar(255)"`
-	UserID  uuid.UUID `gorm:"index:user_id_idx;"`
-	Revoked bool
+	ID        uint      `gorm:"primarykey"`
+	Token     string    `gorm:"index:refresh_tokens_token_idx;type:varchar(255)"`
+	UserID    uuid.UUID `gorm:"index:user_id_idx;type:char(36)"`
+	Revoked   bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // GrantAuthenticatedUser creates a refresh token for the provided user.
@@ -54,7 +55,7 @@ func Logout(tx *storage.Connection, uid uuid.UUID) error {
 func createRefreshToken(tx *storage.Connection, user *User) (*RefreshToken, error) {
 	t := &RefreshToken{
 		UserID: user.ID,
-		Token:  crypto.SecureToken(),
+		Token:  utils.SecureToken(),
 	}
 
 	if err := tx.Create(t).Error; err != nil {

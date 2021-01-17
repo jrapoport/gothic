@@ -82,7 +82,7 @@ func (ts *ExternalTestSuite) TestSignupExternalFacebookDisableSignupErrorWhenNoU
 
 	u := performAuthorization(ts, "facebook", code, "")
 
-	assertAuthorizationFailure(ts, u, "Signups not allowed for this instance", "access_denied", "facebook@example.com")
+	assertAuthorizationFailure(ts, u, "signups not allowed for this instance", "access_denied", "facebook@example.com")
 }
 func (ts *ExternalTestSuite) TestSignupExternalFacebookDisableSignupErrorWhenEmptyEmail() {
 	ts.Config.DisableSignup = true
@@ -95,7 +95,7 @@ func (ts *ExternalTestSuite) TestSignupExternalFacebookDisableSignupErrorWhenEmp
 
 	u := performAuthorization(ts, "facebook", code, "")
 
-	assertAuthorizationFailure(ts, u, "Error getting user email from external provider", "server_error", "facebook@example.com")
+	assertAuthorizationFailure(ts, u, "error getting user email from external provider", "server_error", "facebook@example.com")
 }
 
 func (ts *ExternalTestSuite) TestSignupExternalFacebookDisableSignupSuccessWithPrimaryEmail() {
@@ -164,5 +164,5 @@ func (ts *ExternalTestSuite) TestInviteTokenExternalFacebookErrorWhenEmailDoesnt
 
 	u := performAuthorization(ts, "facebook", code, "invite_token")
 
-	assertAuthorizationFailure(ts, u, "Invited email does not match emails from external provider", "invalid_request", "")
+	assertAuthorizationFailure(ts, u, "invited email does not match emails from external provider", "invalid_request", "")
 }

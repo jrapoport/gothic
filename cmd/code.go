@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/jrapoport/gothic/api"
+	"github.com/jrapoport/gothic/models"
 	"github.com/jrapoport/gothic/storage"
 	"github.com/spf13/cobra"
 	"text/tabwriter"
@@ -14,7 +15,7 @@ import (
 
 var codeCmd = &cobra.Command{
 	Use:  "code [count]",
-	Long: "generate new access codes",
+	Long: "generate new signup codes ",
 	RunE: codeRunE,
 	Args: cobra.MaximumNArgs(1),
 }
@@ -22,7 +23,6 @@ var codeCmd = &cobra.Command{
 var (
 	codeMulti  bool
 	codeOutput string
-	codeFormat string
 )
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 	fs.StringVarP(&codeOutput, "out", "o", "", "output csv to file path")
 }
 
-func codeRunE(cmd *cobra.Command, args []string) error {
+func codeRunE(_ *cobra.Command, args []string) error {
 	count := 1
 	if len(args) > 0 {
 		var err error
@@ -40,9 +40,9 @@ func codeRunE(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	t := api.CodeTypeSingleUse
+	t := models.SingleUse
 	if codeMulti {
-		t = api.CodeTypeMultiUse
+		t = models.MultiUse
 	}
 	c := cmdConfig
 	db, err := storage.Dial(c, c.Log)
@@ -50,26 +50,15 @@ func codeRunE(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	a := api.NewAPI(c, db)
-	codes, err := a.NewRandomAccessCodes(api.CodeFormatPIN, t, count)
+	codes, err := a.NewSignupCodes(models.PINFormat, t, count)
 	if err != nil {
 		err = fmt.Errorf("error generating codes: %w", err)
 		return err
 	}
 	cnt := len(codes)
 	list := make([]string, cnt)
-	err = db.Transaction(func(tx *storage.Connection) error {
-		for i := 0; i < cnt; i++ {
-			code := codes[i]
-			if err = tx.Create(code).Error; err != nil {
-				return err
-			}
-			list[i] = code.Code
-		}
-		return nil
-	})
-	if err != nil {
-		err = fmt.Errorf("error generating codes: %w", err)
-		return err
+	for i := 0; i < cnt; i++ {
+		list[i] = codes[i].Code
 	}
 	if codeOutput != "" {
 		file, _ := os.Create(codeOutput)
@@ -92,7 +81,7 @@ func codeRunE(cmd *cobra.Command, args []string) error {
 	c.Log.Infof("generated %d codes", cnt)
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 8, 8, 0, '\t', 0)
-	nCols := 8
+	nCols := 10
 	for i := 0; i < cnt; i += nCols {
 		cols := make([]interface{}, nCols)
 		var n int
