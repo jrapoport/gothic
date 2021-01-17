@@ -1,4 +1,4 @@
-// +build !debug
+// +build release
 
 package conf
 

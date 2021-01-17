@@ -19,11 +19,12 @@ type UserTestSuite struct {
 }
 
 func (ts *UserTestSuite) SetupTest() {
-	//storage.TruncateAll(ts.db)
+	//storage.DropDatabase(ts.db)
 }
 
 func (ts *UserTestSuite) TearDownTest() {
-	storage.TruncateAll(ts.db)
+	err := ts.db.DropDatabase()
+	assert.NoError(ts.T(), err)
 }
 
 func TestUser(t *testing.T) {

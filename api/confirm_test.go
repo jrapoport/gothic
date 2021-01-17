@@ -10,7 +10,6 @@ import (
 
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
-	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -20,8 +19,8 @@ const confirmEmail = "confirm_test@example.com"
 
 type ConfirmTestSuite struct {
 	suite.Suite
-	API    *API
-	Config *conf.Configuration
+	a *API
+	c *conf.Configuration
 }
 
 func TestConfirm(t *testing.T) {
@@ -29,27 +28,27 @@ func TestConfirm(t *testing.T) {
 	require.NoError(t, err)
 
 	ts := &ConfirmTestSuite{
-		API:    api,
-		Config: config,
+		a: api,
+		c: config,
 	}
 
 	suite.Run(t, ts)
 }
 
 func (ts *ConfirmTestSuite) SetupTest() {
-	storage.TruncateAll(ts.API.db)
-
+	err := ts.a.db.DropDatabase()
+	assert.NoError(ts.T(), err)
 	// Create user
 	u, err := models.NewUser(confirmEmail, "password", nil)
 	require.NoError(ts.T(), err, "Error creating test user model")
-	require.NoError(ts.T(), ts.API.db.Create(u).Error, "Error saving new test user")
+	require.NoError(ts.T(), ts.a.db.Create(u).Error, "Error saving new test user")
 }
 
 func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
-	u, err := models.FindUserByEmail(ts.API.db, confirmEmail)
+	u, err := models.FindUserByEmail(ts.a.db, confirmEmail)
 	require.NoError(ts.T(), err)
 	u.RecoverySentAt = &time.Time{}
-	require.NoError(ts.T(), ts.API.db.Save(u).Error)
+	require.NoError(ts.T(), ts.a.db.Save(u).Error)
 
 	// Request body
 	var buffer bytes.Buffer
@@ -63,10 +62,10 @@ func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
 
 	// Setup response recorder
 	w := httptest.NewRecorder()
-	ts.API.handler.ServeHTTP(w, req)
+	ts.a.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmail(ts.API.db, confirmEmail)
+	u, err = models.FindUserByEmail(ts.a.db, confirmEmail)
 	require.NoError(ts.T(), err)
 
 	assert.WithinDuration(ts.T(), time.Now(), *u.RecoverySentAt, 1*time.Second)
@@ -83,10 +82,10 @@ func (ts *ConfirmTestSuite) TestConfirm_PasswordRecovery() {
 	req.Header.Set("Content-Type", "application/json")
 
 	w = httptest.NewRecorder()
-	ts.API.handler.ServeHTTP(w, req)
+	ts.a.handler.ServeHTTP(w, req)
 	assert.Equal(ts.T(), http.StatusOK, w.Code)
 
-	u, err = models.FindUserByEmail(ts.API.db, confirmEmail)
+	u, err = models.FindUserByEmail(ts.a.db, confirmEmail)
 	require.NoError(ts.T(), err)
 	assert.True(ts.T(), u.IsConfirmed())
 }

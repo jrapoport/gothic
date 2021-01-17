@@ -9,12 +9,12 @@ import (
 )
 
 type rpcHealthHost struct {
-	*hosts.RpcHost
+	*hosts.RPCHost
 }
 
 var _ HealthServer = (*rpcHealthHost)(nil)
 
-func NewHealthHost(h *hosts.RpcHost) *rpcHealthHost {
+func NewHealthHost(h *hosts.RPCHost) *rpcHealthHost {
 	return &rpcHealthHost{h}
 }
 

@@ -12,7 +12,6 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/conf"
 	"github.com/jrapoport/gothic/models"
-	"github.com/jrapoport/gothic/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -24,26 +23,108 @@ const signupPassBad = "test"
 
 type SignupTestSuite struct {
 	suite.Suite
-	API    *API
-	Config *conf.Configuration
+	api    *API
+	config *conf.Configuration
 }
 
 func TestSignup(t *testing.T) {
-	api, config, err := setupAPIForTestForInstance(t)
-	require.NoError(t, err)
-
-	ts := &SignupTestSuite{
-		API:    api,
-		Config: config,
-	}
-	// defer api.db.Close()
-
+	ts := &SignupTestSuite{}
 	suite.Run(t, ts)
 }
 
 func (ts *SignupTestSuite) SetupTest() {
-	storage.TruncateAll(ts.API.db)
-	ts.Config.Webhook = conf.WebhookConfig{}
+	api, config, err := setupAPIForTestForInstance(ts.T())
+	ts.api = api
+	ts.config = config
+	err = ts.api.db.DropDatabase()
+	assert.NoError(ts.T(), err)
+	ts.config.Webhook = conf.WebhookConfig{}
+}
+
+func (ts *SignupTestSuite) parseResponseToken(w *httptest.ResponseRecorder) *GothicClaims {
+	res := AccessTokenResponse{}
+	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&res))
+	token := res.Token
+	claims := &GothicClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(ts.config.JWT.Secret), nil
+	},
+		jwt.WithAudience(ts.config.JWT.Aud),
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
+	require.NoError(ts.T(), err, "Error parsing token")
+	return claims
+}
+
+func (ts *SignupTestSuite) testSignupRequest(params map[string]interface{}) *httptest.ResponseRecorder {
+	var buffer bytes.Buffer
+	if params != nil {
+		require.NoError(ts.T(), json.NewEncoder(&buffer).Encode(params))
+	}
+	req := httptest.NewRequest(http.MethodPost, "/signup", &buffer)
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	ts.api.handler.ServeHTTP(w, req)
+	return w
+}
+
+func (ts *SignupTestSuite) TestSignup_Disabled() {
+	ts.config.DisableSignup = true
+	params := map[string]interface{}{
+		"email":    signupEmail,
+		"password": signupPassGood,
+		"data": map[string]interface{}{
+			"a": 1,
+		},
+	}
+	w := ts.testSignupRequest(params)
+	assert.Equal(ts.T(), http.StatusForbidden, w.Code)
+}
+
+func (ts *SignupTestSuite) TestSignup_Recaptcha() {
+	ts.config.Recaptcha.Key = recaptchaDebugKey
+	recap := map[string]interface{}{
+		"recaptcha": recaptchaDebugToken,
+	}
+	params := map[string]interface{}{
+		"email":    signupEmail,
+		"password": signupPassGood,
+		"data":     recap,
+	}
+	w := ts.testSignupRequest(params)
+	assert.Equal(ts.T(), http.StatusOK, w.Code)
+	recap["recaptcha"] = "nope"
+	w = ts.testSignupRequest(params)
+	assert.NotEqual(ts.T(), http.StatusOK, w.Code)
+}
+
+func (ts *SignupTestSuite) TestSignup_SignupCode() {
+	var w *httptest.ResponseRecorder
+	ts.config.Signup.Code = true
+	params := map[string]interface{}{
+		"email":    signupEmail,
+		"password": signupPassGood,
+	}
+	noCode := map[string]interface{}{}
+	params["data"] = noCode
+	w = ts.testSignupRequest(params)
+	assert.NotEqual(ts.T(), http.StatusOK, w.Code)
+	badCode := map[string]interface{}{
+		"code": "bad",
+	}
+	params["data"] = badCode
+	w = ts.testSignupRequest(params)
+	assert.NotEqual(ts.T(), http.StatusOK, w.Code)
+	su, err := ts.api.NewSignupCode(models.PINFormat, models.SingleUse)
+	assert.NoError(ts.T(), err)
+	goodCode := map[string]interface{}{
+		"code": su.Code,
+	}
+	params["data"] = goodCode
+	w = ts.testSignupRequest(params)
+	assert.Equal(ts.T(), http.StatusOK, w.Code)
+	params["email"] = "foo" + signupEmail
+	w = ts.testSignupRequest(params)
+	assert.NotEqual(ts.T(), http.StatusOK, w.Code)
 }
 
 // TestSignup tests API /signup route
@@ -54,8 +135,7 @@ func (ts *SignupTestSuite) TestSignup() {
 		"email":    signupEmail,
 		"password": signupPassGood,
 		"data": map[string]interface{}{
-			"a":         1,
-			"recaptcha": "hello",
+			"a": 1,
 		},
 	}))
 
@@ -65,16 +145,12 @@ func (ts *SignupTestSuite) TestSignup() {
 
 	// Setup response recorder
 	w := httptest.NewRecorder()
-
-	ts.API.handler.ServeHTTP(w, req)
-
+	ts.api.handler.ServeHTTP(w, req)
 	require.Equal(ts.T(), http.StatusOK, w.Code)
-
-	u := models.User{}
-	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&u))
-	assert.Equal(ts.T(), signupEmail, u.Email)
-	assert.Equal(ts.T(), 1.0, u.UserMetaData["a"])
-	assert.Equal(ts.T(), "email", u.AppMetaData["provider"])
+	claims := ts.parseResponseToken(w)
+	assert.Equal(ts.T(), signupEmail, claims.Email)
+	assert.Equal(ts.T(), 1.0, claims.UserMetaData["a"])
+	assert.Equal(ts.T(), "email", claims.AppMetaData["provider"])
 }
 
 // TestSignup tests API /signup route
@@ -96,7 +172,7 @@ func (ts *SignupTestSuite) TestSignup_BadPassword() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 
-	ts.API.handler.ServeHTTP(w, req)
+	ts.api.handler.ServeHTTP(w, req)
 
 	require.NotEqual(ts.T(), http.StatusOK, w.Code)
 }
@@ -120,9 +196,9 @@ func (ts *SignupTestSuite) TestSignup_PasswordRegex() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 
-	ts.API.config.Validation.PasswordRegex = "^[a-z]{2,}$"
-	ts.API.handler.ServeHTTP(w, req)
-	ts.API.config.Validation.PasswordRegex = ""
+	ts.api.config.Validation.PasswordRegex = "^[a-z]{2,}$"
+	ts.api.handler.ServeHTTP(w, req)
+	ts.api.config.Validation.PasswordRegex = ""
 
 	require.Equal(ts.T(), http.StatusOK, w.Code)
 }
@@ -140,10 +216,10 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 		signature := r.Header.Get("x-webhook-signature")
 		claims := new(jwt.StandardClaims)
 		token, err := jwt.ParseWithClaims(signature, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(ts.Config.Webhook.Secret), nil
+			return []byte(ts.config.Webhook.Secret), nil
 		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}))
 		assert.True(token.Valid)
-		assert.Equal(ts.Config.JWT.Subject, claims.Subject) // not configured for multitenancy
+		assert.Equal(ts.config.JWT.Subject, claims.Subject)
 		assert.Equal("gothic", claims.Issuer)
 		assert.WithinDuration(time.Now(), claims.IssuedAt.Time, 5*time.Second)
 
@@ -159,7 +235,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 
 		u, ok := data["user"].(map[string]interface{})
 		require.True(ok)
-		assert.Len(u, 9)
+		assert.Len(u, 10)
 		// assert.Equal(t, user.ID, u["id"]) TODO
 		assert.Equal("user", u["role"])
 		assert.Equal(signupEmail, u["email"])
@@ -179,7 +255,7 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 	localhost := removeLocalhostFromPrivateIPBlock()
 	defer unshiftPrivateIPBlock(localhost)
 
-	ts.Config.Webhook = conf.WebhookConfig{
+	ts.config.Webhook = conf.WebhookConfig{
 		URL:        svr.URL,
 		Retries:    1,
 		TimeoutSec: 1,
@@ -198,13 +274,13 @@ func (ts *SignupTestSuite) TestWebhookTriggered() {
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
-	ts.API.handler.ServeHTTP(w, req)
+	ts.api.handler.ServeHTTP(w, req)
 	assert.Equal(http.StatusOK, w.Code)
 	assert.Equal(1, callCount)
 }
 
 func (ts *SignupTestSuite) TestFailingWebhook() {
-	ts.Config.Webhook = conf.WebhookConfig{
+	ts.config.Webhook = conf.WebhookConfig{
 		URL:        "http://notaplace.localhost",
 		Retries:    1,
 		TimeoutSec: 1,
@@ -224,7 +300,7 @@ func (ts *SignupTestSuite) TestFailingWebhook() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 
-	ts.API.handler.ServeHTTP(w, req)
+	ts.api.handler.ServeHTTP(w, req)
 
 	require.Equal(ts.T(), http.StatusBadGateway, w.Code)
 }
@@ -254,14 +330,14 @@ func (ts *SignupTestSuite) TestSignupTwice() {
 	w := httptest.NewRecorder()
 	y := httptest.NewRecorder()
 
-	ts.API.handler.ServeHTTP(y, req)
-	u, err := models.FindUserByEmail(ts.API.db, signupEmail)
+	ts.api.handler.ServeHTTP(y, req)
+	u, err := models.FindUserByEmail(ts.api.db, signupEmail)
 	if err == nil {
-		require.NoError(ts.T(), u.Confirm(ts.API.db))
+		require.NoError(ts.T(), u.Confirm(ts.api.db))
 	}
 
 	encode()
-	ts.API.handler.ServeHTTP(w, req)
+	ts.api.handler.ServeHTTP(w, req)
 
 	data := make(map[string]interface{})
 	require.NoError(ts.T(), json.NewDecoder(w.Body).Decode(&data))
@@ -274,10 +350,10 @@ func (ts *SignupTestSuite) TestConfirmSignup() {
 	user, err := models.NewUser(signupEmail, "testing", nil)
 	user.ConfirmationToken = "asdf3"
 	require.NoError(ts.T(), err)
-	require.NoError(ts.T(), ts.API.db.Create(user).Error)
+	require.NoError(ts.T(), ts.api.db.Create(user).Error)
 
 	// Find test user
-	u, err := models.FindUserByEmail(ts.API.db, signupEmail)
+	u, err := models.FindUserByEmail(ts.api.db, signupEmail)
 	require.NoError(ts.T(), err)
 
 	// Request body
@@ -294,7 +370,7 @@ func (ts *SignupTestSuite) TestConfirmSignup() {
 	// Setup response recorder
 	w := httptest.NewRecorder()
 
-	ts.API.handler.ServeHTTP(w, req)
+	ts.api.handler.ServeHTTP(w, req)
 
 	assert.Equal(ts.T(), http.StatusOK, w.Code, w.Body.String())
 }

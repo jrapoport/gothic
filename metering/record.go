@@ -12,5 +12,5 @@ func RecordLogin(loginType string, userID uuid.UUID) {
 		"action":       "login",
 		"login_method": loginType,
 		"user_id":      userID.String(),
-	}).Info("Login")
+	}).Info("login")
 }

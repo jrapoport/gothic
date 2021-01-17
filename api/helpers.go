@@ -90,6 +90,23 @@ func (a *API) getReferrer(r *http.Request) string {
 	return referrer
 }
 
+func (a *API) getClientIP(r *http.Request) string {
+	addr := r.Header.Get("X-Real-Ip")
+	if addr == "" {
+		addr = r.Header.Get("X-Forwarded-For")
+	}
+	if addr == "" {
+		addr = r.RemoteAddr
+	}
+	addr, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		a.config.Log.Warn(err)
+		return ""
+	}
+	a.config.Log.Infof("client ip: %s", addr)
+	return addr
+}
+
 var privateIPBlocks []*net.IPNet
 
 func init() {
@@ -185,12 +202,4 @@ func SafeRoundTripper(trans http.RoundTripper, log logrus.FieldLogger) http.Roun
 	}
 
 	return ret
-}
-
-func dataString(data map[string]interface{}, name string) string {
-	val, ok := data[name]
-	if !ok {
-		return ""
-	}
-	return val.(string)
 }

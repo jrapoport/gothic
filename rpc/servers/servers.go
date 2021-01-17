@@ -21,7 +21,7 @@ func ListenAndServeRPC(a *api.API, config *conf.Configuration) {
 	go func() {
 		addr := fmt.Sprintf("%v:%v", config.Host, config.RpcWebPort)
 		logrus.Infof("Gothic RPC Web API started on: %s", addr)
-		svr := web.NewRpcWebServer(a, addr)
+		svr := web.NewRPCWebServer(a, addr)
 		// TODO: add JWT server options
 		svr.ListenAndServe()
 	}()

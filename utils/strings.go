@@ -1,11 +1,11 @@
-package util
+package utils
 
 import (
 	"fmt"
 	"strings"
 )
 
-// MaskString replaces sections of the email with mask characters '*'.
+// MaskEmail replaces sections of the email with mask characters '*'.
 func MaskEmail(e string) string {
 	parts := strings.Split(e, "@")
 	if len(parts) < 2 {
