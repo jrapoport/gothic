@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin;admin";
+
+package config;
+
+service Admin {
+  rpc Settings (SettingsRequest) returns (SettingsResponse) {
+  }
+}
+
+message SettingsRequest {
+}
+
+message SettingsResponse {
+  string name = 1;
+  string version = 2;
+  string status = 3;
+  SignupSettings signup = 4;
+  MailSettings mail = 5;
+}
+
+message SignupSettings {
+  bool disabled = 1;
+  bool autoconfirm = 2;
+  ProviderSettings provider = 3;
+}
+
+message ProviderSettings {
+  string internal = 1;
+  map<string, bool> external = 2;
+}
+
+message MailSettings {
+  bool   disabled = 1;
+  string host = 2;
+  int64    port = 3;
+  string authentication = 4;
+  string encryption = 5;
+}

@@ -1,6 +1,16 @@
+PKG := github.com/jrapoport/gothic
+EXE := gothic
+
+BUILD_DIR := build
+DEBUG_DIR := $(BUILD_DIR)/debug
+RELEASE_DIR := $(BUILD_DIR)/release
+
+UNAME_S := $(shell uname -s)
+
 GO_LINT_REPO := golang.org/x/lint/golint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
+GEN_GO_REPO := github.com/golang/protobuf/protoc-gen-go
 
 GO := go
 GO_PATH := $(shell $(GO) env GOPATH)
@@ -17,6 +27,15 @@ GO_TEST := $(GO) test -v
 GO_LINT := $(GO_BIN)/golint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
+GEN_GO := $(GO_BIN)/protoc-gen-go
+
+TEST_FLAGS :=-failfast
+COVERAGE_FILE=coverage.txt
+COVERAGE_FLAGS=-race -covermode=atomic -coverpkg=./... -coverprofile=$(COVERAGE_FILE)
+COVERAGE=0
+ifeq ($(COVERAGE),1)
+	TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
+endif
 
 $(GO_LINT):
 	$(GO_GET) $(GO_LINT_REPO)
@@ -27,14 +46,56 @@ $(GO_SEC):
 $(GO_STATIC):
 	$(GO_GET) $(GO_STATIC_REPO)
 
-BUILD_DIR := build
-DEBUG_DIR := $(BUILD_DIR)/debug
-RELEASE_DIR := $(BUILD_DIR)/release
-OUT_DIR := $(DEBUG_DIR)
-OUT_EXE = -o $(OUT_DIR)/$(EXE)
+$(GEN_GO):
+	$(GO_GET) $(GEN_GO_REPO)
 
-PKG := github.com/jrapoport/gothic/conf
-EXE := gothic
+help: ## Show this help
+	echo $(BUILD_NUM)
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+fmt: ## Format code
+	$(GO_FMT) ./...
+
+vet: ## Run vet
+	$(GO_VET) ./...
+
+lint: $(GO_LINT) ## Run linter
+	$(GO_LINT) ./...
+
+audit: $(GO_SEC) ## Run audit
+	$(GO_SEC) ./...
+
+static: $(GO_STATIC) ## Run static analysis
+	$(GO_STATIC) ./...
+
+tidy: ## Tidy module
+	$(GO_MOD) tidy
+
+deps: tidy ## Install dependencies
+	$(GO_MOD) download
+
+rpc: $(GEN_GO) ## Generate protobufs
+ifeq (, $(shell which protoc))
+ifeq ($(UNAME_S),Linux)
+	apt install -y protobuf-compiler
+endif
+ifeq ($(UNAME_S),Darwin)
+	brew install protobuf
+endif
+endif
+	$(GO_GEN) ./...
+
+test: ## Run tests
+ifeq (, $(shell which docker))
+	curl -fsSL https://get.docker.com -o get-docker.sh
+	sh get-docker.sh
+endif
+	$(GO_TEST) $(BUILD_TAGS) $(TEST_FLAGS) ./...
+
+cover: TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
+cover: test
+	curl -fsSL https://codecov.io/bash | bash
+	$(RM) $(COVERAGE_FILE)
 
 VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)
 ifeq (, $(VERSION_NUM))
@@ -43,74 +104,49 @@ endif
 BUILD_MN := $(shell git log -1 --format=%cd --date=format:'%m')
 BUILD_YR := $(shell git log -1 --format=%cd --date=format:'%y%d')
 BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(shell date +%m) + 64)) $(shell date +%y%d))
-VER_PKG := $(PKG)
+VER_PKG := $(PKG)/config
 VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
-DEBUG_TAGS := -tags="debug"
-RELEASE_TAGS := -tags="osusergo,netgo,release"
-BUILD_TAGS := $(DEBUG_TAGS)
-
-help: ## Show this help.
-	echo $(BUILD_NUM)
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-fmt:
-	$(GO_FMT) ./...
-
-vet:
-	$(GO_VET) ./...
-
-lint: $(GO_LINT)
-	$(GO_LINT) ./...
-
-audit: $(GO_SEC)
-	$(GO_SEC) ./...
-
-static: $(GO_STATIC)
-	$(GO_STATIC) ./...
-
-tidy:
-	$(GO_MOD) tidy
-
-deps: tidy
-	$(GO_MOD) download
-
-rpc:
-	$(GO_GEN) ./...
-
-test:
-	$(GO_TEST) $(BUILD_TAGS) ./...
-
-build:
+DEBUG_TAGS := -tags "debug"
+RELEASE_TAGS := -tags "osusergo,netgo,release"
+BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
+OUT_DIR := $(DEBUG_DIR)
+OUT_EXE = -o $(OUT_DIR)/$(EXE)
+IN_EXE = ./app
+build: ## Debug build
+	echo $(VER_FLAGS)
 	$(GO_BUILD) $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)
 
-# RELEASE
 release: BUILD_TAGS := $(RELEASE_TAGS)
 release: OUT_DIR := $(RELEASE_DIR)
 release: LD_FLAGS := -s -w
 release: CGO_ENABLED=0
-release: build
+release: build ## Production build
 
-# INSTALL
 install: OUT_EXE :=
 install: OUT_CLI :=
 install: GO_BUILD = $(GOINSTALL)
-install: release
+install: release ## Install gothic
 
-all: lint vet test release
+all: lint vet test release ## Lint, vet, test, & release
 
-image: ## Build the Docker image.
+image: ## Build the Docker image
 	docker build .
 
-auth:
-	docker-compose -f docker-compose.yaml up -d auth
+gothic:  ## Start gothic
+	docker-compose -f docker-compose.yaml up -d gothic
 
-envoy:
+envoy: ## Start envoy
 	docker-compose -f docker-compose.yaml up -d envoy
 
-db:
-	docker-compose -f docker-compose-dev.yaml up -d
+mysql: ## Start mysql
+	docker-compose -f docker-compose-dev.yaml up -d mysql
 
-.PHONY: help fmt vet lint audit static tidy deps rpc test \
-		build release install all image auth envoy db
+pg: ## Start postgres
+	docker-compose -f docker-compose-dev.yaml up -d pg
+
+db: mysql ## Start mysql db
+
+.PHONY: help fmt vet lint audit static tidy deps rpc test build \
+		release install all image gothic envoy mysql pg db cover
 
 .DEFAULT_GOAL := build

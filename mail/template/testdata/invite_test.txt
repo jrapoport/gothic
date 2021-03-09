@@ -1,0 +1,16 @@
+-----------------------
+Hi The_real_mr_flibble,
+-----------------------
+
+You have been invited to sign up for Gothic!
+
+You received this message because you have been invited to join your friends on https://www.example.com.
+
+To accept your invite and create your account, please click the button below: http://test.example.com:3000/invite/1234567890asdfghjklqwertyuiopzxcvbnm=
+
+Need help, or have questions? Please contact support. Do not reply to this email.
+
+Thanks,
+Gothic - https://www.example.com
+
+Copyright © 2021 Gothic

@@ -1,0 +1,9 @@
+intros:
+  - Welcome to Gothic!
+actions:
+  - instructions: 'To a friend know, please click here:'
+    button:
+      text: Email Friend
+      link: https://www.example.com/friend?token=invite-a-friend
+outros:
+  - We're very excited to have you on board.

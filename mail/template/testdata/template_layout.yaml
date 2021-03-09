@@ -1,0 +1,6 @@
+name: "template example"
+link: https://template.example.com
+logo: https://template.example.com/logo.png
+copyright: "© Template Example"
+# The {ACTION} placeholder will be replaced with the corresponding text of the supplied action button.
+troubletext: "If the {ACTION} is not working for you, just copy and paste the URL below into your web browser."

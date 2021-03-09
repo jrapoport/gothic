@@ -1,0 +1,143 @@
+package core
+
+import (
+	"testing"
+
+	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/core/users"
+	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/test/tutils"
+	"github.com/jrapoport/gothic/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestAPI_AdminCreateUser(t *testing.T) {
+	em := tutils.RandomEmail()
+	un := utils.RandomUsername()
+	a := apiWithTempDB(t)
+	ctx := testContext(a)
+	a.config.Signup.Username = true
+	a.config.Signup.Default.Username = false
+	_, err := a.AdminCreateUser(nil, "", "", "", nil, false)
+	assert.Error(t, err)
+	ctx.SetUserID(uuid.New())
+	_, err = a.AdminCreateUser(ctx, "", "", "", nil, false)
+	assert.Error(t, err)
+	_, err = a.AdminCreateUser(ctx, "@", "", "", nil, false)
+	assert.Error(t, err)
+	_, err = a.AdminCreateUser(ctx, em, "", "", nil, false)
+	assert.Error(t, err)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, false)
+	assert.Error(t, err)
+	adm := testUser(t, a)
+	adm = promoteUser(t, a, adm)
+	ctx.SetUserID(adm.ID)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, false)
+	assert.Error(t, err)
+	_, err = a.GrantBearerToken(ctx, adm)
+	require.NoError(t, err)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, false)
+	assert.NoError(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleAdmin)
+	require.NoError(t, err)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, false)
+	assert.Error(t, err)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, true)
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleSuper)
+	require.NoError(t, err)
+	_, err = a.AdminCreateUser(ctx, em, un, "", nil, true)
+	assert.Error(t, err)
+	ctx.SetProvider(a.Provider())
+	ctx.SetUserID(adm.ID)
+	em = tutils.RandomEmail()
+	u, err := a.AdminCreateUser(ctx, em, un, "", nil, true)
+	assert.NoError(t, err)
+	require.NotNil(t, u)
+	assert.True(t, u.Valid())
+	assert.True(t, u.IsConfirmed())
+	assert.True(t, u.IsAdmin())
+}
+
+func TestAPI_AdminPromoteUser(t *testing.T) {
+	a := apiWithTempDB(t)
+	ctx := testContext(a)
+	a.config.Signup.Username = true
+	a.config.Signup.Default.Username = false
+	_, err := a.AdminPromoteUser(nil, uuid.Nil)
+	assert.Error(t, err)
+	ctx.SetUserID(uuid.New())
+	_, err = a.AdminPromoteUser(ctx, uuid.Nil)
+	assert.Error(t, err)
+	_, err = a.AdminPromoteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	adm := testUser(t, a)
+	adm = confirmUser(t, a, adm)
+	ctx.SetUserID(adm.ID)
+	_, err = a.AdminPromoteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	_, err = a.GrantBearerToken(ctx, adm)
+	require.NoError(t, err)
+	_, err = a.AdminPromoteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleAdmin)
+	require.NoError(t, err)
+	_, err = a.AdminPromoteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleSuper)
+	require.NoError(t, err)
+	_, err = a.AdminPromoteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	u := testUser(t, a)
+	u = confirmUser(t, a, u)
+	assert.False(t, u.IsAdmin())
+	pu, err := a.AdminPromoteUser(ctx, u.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, pu)
+	assert.Equal(t, u.ID, pu.ID)
+	assert.True(t, pu.Valid())
+	assert.True(t, pu.IsAdmin())
+	_, err = a.AdminPromoteUser(ctx, u.ID)
+	assert.NoError(t, err)
+}
+
+func TestAPI_AdminDeleteUser(t *testing.T) {
+	a := apiWithTempDB(t)
+	ctx := testContext(a)
+	a.config.Signup.Username = true
+	a.config.Signup.Default.Username = false
+	err := a.AdminDeleteUser(nil, uuid.Nil)
+	assert.Error(t, err)
+	ctx.SetUserID(uuid.New())
+	err = a.AdminDeleteUser(ctx, uuid.Nil)
+	assert.Error(t, err)
+	err = a.AdminDeleteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	adm := testUser(t, a)
+	adm = confirmUser(t, a, adm)
+	ctx.SetUserID(adm.ID)
+	err = a.AdminDeleteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	_, err = a.GrantBearerToken(ctx, adm)
+	require.NoError(t, err)
+	err = a.AdminDeleteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleAdmin)
+	require.NoError(t, err)
+	err = a.AdminDeleteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleSuper)
+	require.NoError(t, err)
+	err = a.AdminDeleteUser(ctx, uuid.New())
+	assert.Error(t, err)
+	u := testUser(t, a)
+	assert.False(t, u.IsAdmin())
+	err = a.AdminDeleteUser(ctx, u.ID)
+	assert.NoError(t, err)
+	err = a.AdminDeleteUser(ctx, u.ID)
+	assert.Error(t, err)
+	u, err = a.GetUser(u.ID)
+	assert.Error(t, err)
+	assert.Nil(t, u)
+}

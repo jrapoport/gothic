@@ -2,12 +2,12 @@ version: "3.7"
 
 services:
 
-  auth:
+  gothic:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ./env/dev.env
+      - dev.env
     expose:
       - "3001"
       - "6001"
@@ -25,19 +25,19 @@ services:
     image: grpcweb/envoy:latest
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
     volumes:
-       - ./envoy.yaml:/etc/envoy/envoy.yaml
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
     expose:
       - "8080"
       - "9901"
     ports:
-     - "9001:8080"
-     - "9901:9901"
+      - "9001:8080"
+      - "9901:9901"
     networks:
-      auth_mesh: {}
+      auth_mesh: { }
     restart: unless-stopped
     # make this work on linux
     # extra_hosts:
     #  host.docker.internal: 172.17.0.1
 
 networks:
-  auth_mesh: {}
+  auth_mesh: { }

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/account;account";
+
+package account;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/empty.proto";
+
+import "rpc/response.proto";
+
+service Account {
+  rpc Signup (SignupRequest) returns (rpc.UserResponse) {
+  }
+
+  rpc SendConfirmUser (SendConfirmRequest) returns (google.protobuf.Empty) {
+  }
+
+  rpc ConfirmUser (ConfirmUserRequest) returns (rpc.BearerResponse) {
+  }
+
+  rpc Login (LoginRequest) returns (rpc.UserResponse) {
+  }
+
+  rpc Logout (LogoutRequest) returns (google.protobuf.Empty) {
+  }
+
+  rpc SendResetPassword (ResetPasswordRequest) returns (google.protobuf.Empty) {
+  }
+
+  rpc ConfirmPasswordChange (ConfirmPasswordRequest) returns (rpc.BearerResponse) {
+  }
+
+  rpc RefreshBearerToken (RefreshTokenRequest) returns (rpc.BearerResponse) {
+  }
+}
+
+message SignupRequest {
+  string email = 1;
+  string password = 2;
+  string username = 3;
+  string code = 4;
+  google.protobuf.Struct data = 5;
+}
+
+message SendConfirmRequest {
+  string email = 1;
+}
+
+message ConfirmUserRequest {
+  string token = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LogoutRequest {}
+
+message ResetPasswordRequest{
+  string email = 1;
+}
+
+message ConfirmPasswordRequest{
+  string password = 1;
+  string token = 2;
+}
+
+message RefreshTokenRequest{
+  string token = 1;
+}
