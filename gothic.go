@@ -48,7 +48,13 @@ func Main(c *config.Config) error {
 	if err != nil {
 		return err
 	}
-	defer hosts.Shutdown()
+	defer func() {
+		if err = hosts.Shutdown(); err != nil {
+			c.Log().Error(err)
+			return
+		}
+		c.Log().Infof("%s shut down", c.Name)
+	}()
 	c.Log().Infof("%s %s started", c.Name, c.Version())
 	<-stopCh
 	c.Log().Infof("%s shutting down", c.Name)

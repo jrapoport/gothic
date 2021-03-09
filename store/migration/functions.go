@@ -23,7 +23,6 @@ func NewMigrateFunc(dst interface{}) MigrateFunc {
 // NewMigrateFuncWithIndexes returns a new MigrateFunc for migrating with namespaces indexes.
 func NewMigrateFuncWithIndexes(dst interface{}, indexes []string) MigrateFunc {
 	return func(tx *gorm.DB) error {
-		tx = NamespacedTable(tx, dst)
 		err := tx.AutoMigrate(dst)
 		if err != nil {
 			return err

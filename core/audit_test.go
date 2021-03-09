@@ -88,13 +88,13 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 	setupLogs(t, a.conn)
 	tests := []struct {
 		filters store.Filters
-		comp    func(log *auditlog.LogEntry)
+		comp    func(log *auditlog.AuditLog)
 	}{
 		{
 			store.Filters{
 				key.UserID: testUID.String(),
 			},
-			func(log *auditlog.LogEntry) {
+			func(log *auditlog.AuditLog) {
 				assert.Equal(t, testUID, log.UserID)
 			},
 		},
@@ -102,7 +102,7 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 			store.Filters{
 				key.Action: auditlog.Startup.String(),
 			},
-			func(log *auditlog.LogEntry) {
+			func(log *auditlog.AuditLog) {
 				assert.Equal(t, auditlog.Startup, log.Action)
 			},
 		},
@@ -110,7 +110,7 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 			store.Filters{
 				"dr_suess": "thing1",
 			},
-			func(log *auditlog.LogEntry) {
+			func(log *auditlog.AuditLog) {
 				assert.Equal(t, "thing1", log.Fields["dr_suess"])
 			},
 		},
@@ -119,7 +119,7 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 				key.Type:   auditlog.Account.String(),
 				"dr_suess": "thing1",
 			},
-			func(log *auditlog.LogEntry) {
+			func(log *auditlog.AuditLog) {
 				assert.Equal(t, auditlog.Account, log.Type)
 				assert.Equal(t, "thing1", log.Fields["dr_suess"])
 			},
@@ -129,7 +129,7 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 				"dr_suess": "thing1",
 				"book":     testBook,
 			},
-			func(log *auditlog.LogEntry) {
+			func(log *auditlog.AuditLog) {
 				assert.Equal(t, "thing1", log.Fields["dr_suess"])
 				assert.Equal(t, testBook, log.Fields["book"])
 			},

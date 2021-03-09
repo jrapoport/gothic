@@ -8,12 +8,12 @@ import (
 )
 
 // GetAuditLog returns the log entry for the id.
-func (a *API) GetAuditLog(_ context.Context, id uint) (*auditlog.LogEntry, error) {
+func (a *API) GetAuditLog(_ context.Context, id uint) (*auditlog.AuditLog, error) {
 	return audit.GetLogEntry(a.conn, id)
 }
 
 // SearchAuditLogs searches the audit logs.
-func (a *API) SearchAuditLogs(ctx context.Context, f store.Filters, page *store.Pagination) ([]*auditlog.LogEntry, error) {
+func (a *API) SearchAuditLogs(ctx context.Context, f store.Filters, page *store.Pagination) ([]*auditlog.AuditLog, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}

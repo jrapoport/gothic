@@ -9,7 +9,6 @@ import (
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/migration"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
 	"github.com/jrapoport/gothic/test/tconn"
@@ -40,16 +39,6 @@ func testContext() context.Context {
 	ctx.SetUserID(testUID)
 	ctx.SetAdminID(testUID)
 	return ctx
-}
-
-func testFields() types.Map {
-	ctx := testContext()
-	ctx.SetAdminID(testUID)
-	return types.Map{
-		key.IPAddress: ctx.GetIPAddress(),
-		key.Provider:  ctx.GetProvider(),
-		key.AdminID:   ctx.GetAdminID().String(),
-	}
 }
 
 func testCases() []testCase {
@@ -146,7 +135,7 @@ type createTest struct {
 	fn   logFunc
 }
 
-func testCreate(t *testing.T, conn *store.Connection, test createTest) *auditlog.LogEntry {
+func testCreate(t *testing.T, conn *store.Connection, test createTest) *auditlog.AuditLog {
 	require.NotEqual(t, auditlog.Unknown, test.a.Type())
 	ctx := testContext()
 	err := test.fn(ctx, conn, test.uid, test.data)
@@ -165,15 +154,14 @@ func testCreate(t *testing.T, conn *store.Connection, test createTest) *auditlog
 	return le
 }
 
-func getLast(t *testing.T, conn *store.Connection) *auditlog.LogEntry {
-	le := &auditlog.LogEntry{}
-	tx := migration.NamespacedTable(conn.DB, le)
-	err := tx.Last(le).Error
+func getLast(t *testing.T, conn *store.Connection) *auditlog.AuditLog {
+	le := &auditlog.AuditLog{}
+	err := conn.Last(le).Error
 	require.NoError(t, err)
 	return le
 }
 
-func testLogEntry(t *testing.T, a auditlog.Action, uid uuid.UUID, data types.Map, fn logFunc) *auditlog.LogEntry {
+func testLogEntry(t *testing.T, a auditlog.Action, uid uuid.UUID, data types.Map, fn logFunc) *auditlog.AuditLog {
 	conn, _ := tconn.TempConn(t)
 	return testCreate(t, conn, createTest{a, uid, data, fn})
 }
