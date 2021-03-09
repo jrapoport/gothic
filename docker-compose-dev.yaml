@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 
-  db:
+  mysql:
     image: mysql:latest
     volumes:
       - db_volume:/var/lib/mysql
@@ -17,5 +17,18 @@ services:
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
 
+  pg:
+    image: postgres:latest
+    volumes:
+      - db_volume:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - PGDATA=var/lib/postgresql/data/db/
+    expose:
+      - '5432'
+    ports:
+      - "5432:5432"
+
 volumes:
-   db_volume: {}
+  db_volume: { }
