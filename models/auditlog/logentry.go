@@ -8,11 +8,11 @@ import (
 )
 
 func init() {
-	store.AddAutoMigration("1000-audit_log", LogEntry{})
+	store.AddAutoMigration("1000-audit_logs", AuditLog{})
 }
 
-// LogEntry is the database model for audit log entries.
-type LogEntry struct {
+// AuditLog is the database model for audit log entries.
+type AuditLog struct {
 	gorm.Model
 	Type   Type      `json:"type"`
 	Action Action    `json:"action"`
@@ -20,18 +20,13 @@ type LogEntry struct {
 	Fields types.Map `json:"fields"`
 }
 
-// NewLogEntry returns a new log entry
-func NewLogEntry(t Type, a Action, userID uuid.UUID, fields types.Map) *LogEntry {
-	e := &LogEntry{
+// NewAuditLog returns a new log entry
+func NewAuditLog(t Type, a Action, userID uuid.UUID, fields types.Map) *AuditLog {
+	e := &AuditLog{
 		Type:   t,
 		Action: a,
 		UserID: userID,
 		Fields: fields,
 	}
 	return e
-}
-
-// TableName overrides the table name
-func (LogEntry) TableName() string {
-	return "audit_log"
 }

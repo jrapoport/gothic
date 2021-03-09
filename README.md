@@ -1,20 +1,23 @@
 # 🦇 &nbsp;Gothic
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jrapoport/gothic/test?style=flat-square) [![Go Report Card](https://goreportcard.com/badge/github.com/jrapoport/gothic?style=flat-square&)](https://goreportcard.com/report/github.com/jrapoport/gothic) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/jrapoport/gothic?style=flat-square) [![GitHub](https://img.shields.io/github/license/jrapoport/gothic?style=flat-square)](https://github.com/jrapoport/gothic/blob/master/LICENSE)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jrapoport/gothic/test?style=flat-square) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/jrapoport/gothic?style=flat-square&)](https://goreportcard.com/report/github.com/jrapoport/gothic)
+![Codecov branch](https://img.shields.io/codecov/c/github/jrapoport/gothic/master?style=flat-square&token=YYRUCM2BMV) 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/jrapoport/gothic?style=flat-square) 
+[![GitHub](https://img.shields.io/github/license/jrapoport/gothic?style=flat-square)](https://github.com/jrapoport/gothic/blob/master/LICENSE)
 
 [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-☕-6F4E37?style=flat-square)](https://www.buymeacoffee.com/jrapoport)
 
 Gothic is a user registration and authentication microservice written in Go. It's based on OAuth2 and JWT and will
 handle user signup, authentication and custom user data.
 
-## A Complete Rewrite
+## Complete Rewrite
 
-~85-90% complete.
+This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete.
 
-This project was originally forked from
-[Netlify's GoTrue](https://github.com/netlify/gotrue). It has been completely rewritten from the ground 
-up and literally has no code in common with the original fork. The basic idea was to support most of the existing 
-functionality of GoTrue while expanding support for additional external providers and functionality.
+The basic idea was to support most of the existing functionality of GoTrue while modernizing it and expanding 
+support for additional external providers and functionality. At a certain point it just made more sense to start
+over from scratch with the goal of feature parity (more or less).
 
 GroTrue relied on its own custom implementations for oauth, mail templates, smtp, jwt, etc. These have all been
 replaced with mature external libraries. Details below.

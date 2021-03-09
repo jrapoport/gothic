@@ -1,4 +1,4 @@
 ignore:
-  - "test/**/*"
-  - "app/**/*"
-  - "*.pb.go"
+  - "test/"
+  - "app/"
+  - "**/*.pb.go"

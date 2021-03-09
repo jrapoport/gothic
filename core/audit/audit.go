@@ -6,7 +6,6 @@ import (
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/migration"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
 )
@@ -14,7 +13,7 @@ import (
 // CreateLogEntry creates a new audit log entry.
 // TODO: support IP geolocation https://github.com/apilayer/freegeoip/
 func CreateLogEntry(ctx context.Context, conn *store.Connection,
-	action auditlog.Action, userID uuid.UUID, fields types.Map) (*auditlog.LogEntry, error) {
+	action auditlog.Action, userID uuid.UUID, fields types.Map) (*auditlog.AuditLog, error) {
 	t := action.Type()
 	if ctx != nil {
 		if fields == nil {
@@ -36,17 +35,15 @@ func CreateLogEntry(ctx context.Context, conn *store.Connection,
 		}
 	}
 	conn.Logger.LogMode(0).Info(ctx, "%s %s: %s: %v", t, action, userID, fields)
-	le := auditlog.NewLogEntry(t, action, userID, fields)
-	tx := migration.NamespacedTable(conn.DB, le)
-	return le, tx.Create(le).Error
+	le := auditlog.NewAuditLog(t, action, userID, fields)
+	return le, conn.Create(le).Error
 }
 
 // GetLogEntry gets an audit log entry.
-func GetLogEntry(conn *store.Connection, id uint) (*auditlog.LogEntry, error) {
-	le := new(auditlog.LogEntry)
+func GetLogEntry(conn *store.Connection, id uint) (*auditlog.AuditLog, error) {
+	le := new(auditlog.AuditLog)
 	le.ID = id
-	tx := migration.NamespacedTable(conn.DB, le)
-	err := tx.First(le).Error
+	err := conn.First(le).Error
 	if err != nil {
 		return nil, err
 	}

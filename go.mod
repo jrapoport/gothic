@@ -4,7 +4,6 @@ go 1.15
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/DataDog/datadog-go v4.4.0+incompatible // indirect
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef // indirect
 	github.com/badoux/checkmail v1.2.1
@@ -23,7 +22,6 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gookit/event v1.0.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
-	github.com/hashicorp/go-multierror v1.0.0
 	github.com/imdario/mergo v0.3.11
 	github.com/improbable-eng/go-httpwares v0.0.0-20200609095714-edc8019f93cc
 	github.com/jackc/pgx/v4 v4.10.1
@@ -38,9 +36,8 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/orlangure/gnomock v0.12.0
 	github.com/philhofer/fwd v1.1.1 // indirect
-	github.com/prometheus/tsdb v0.10.0
 	github.com/segmentio/encoding v0.2.7
-	github.com/sirupsen/logrus v1.8.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
@@ -48,14 +45,14 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.8.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	google.golang.org/grpc v1.36.0
-	google.golang.org/grpc/examples v0.0.0-20210226164526-c949703b4b98 // indirect
+	google.golang.org/grpc/examples v0.0.0-20210309003715-fce74a94bdff // indirect
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/DataDog/dd-trace-go.v1 v1.28.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.29.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/datatypes v1.0.0
 	gorm.io/driver/mysql v1.0.4
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.21.3
 )
