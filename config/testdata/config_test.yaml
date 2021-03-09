@@ -1,0 +1,130 @@
+service: example.yaml
+site_url: http://example.com.yaml
+site_logo: http://example.com/logo.png.yaml
+
+host: example.com.yaml
+rest: example.com.yaml:80
+rpc: example.com.yaml:90
+rpcweb: example.com.yaml:100
+health: example.com.yaml:110
+
+mask_emails: false
+rate_limit: 100m0s
+request_id: "foobar.yaml"
+
+jwt:
+  secret: "i-am-a-secret.yaml"
+  algorithm: "HS384.yaml"
+  issuer: "foo.yaml"
+  audience: "bar.yaml"
+  expiration: 100m0s
+
+recaptcha:
+  key: "RECAPTCHA-KEY.yaml"
+  login: false
+
+validation:
+  username_regex: "[A-Za-z]{3}[0-9][A-Z]{2}[!@#$%^&*].yaml"
+  password_regex: "FOO[A-Z]{10}[0-9]{2}.yaml"
+
+cookies:
+  duration: 100m0s
+
+db:
+  namespace: foo.yaml
+  driver: mysql
+  dsn: "root@tcp(0.0.0.0:3306)/test?parseTime=true&foo=a.yaml"
+  max_retries: 99
+  automigrate: true
+
+mail:
+  host: smtp.example.com.yaml
+  port: 25
+  username: peaches.yaml
+  password: secret-password!.yaml
+  authentication: cram-md5.yaml
+  encryption: tls.yaml
+  keepalive: false
+  expiration: 100m0s
+  send_limit: 100m0s
+  spam_protection: false
+  name: "FooBar Co.yaml"
+  link: http://mail.example.com.yaml
+  logo: http://mail.example.com/logo.png.yaml
+  from: "foo <foo@example.com.yaml>"
+  theme: flat.yaml
+  layout: ./templates/mail.tmpl.yaml
+  change_email:
+    link_format: /:action/:token/link.yaml
+    subject: "Email Subject.yaml"
+    template: ./templates/mail.tmpl.yaml
+    referral_url: http://referral.example.com.yaml
+  confirm_user:
+    link_format: /:action/:token/link.yaml
+    subject: "Email Subject.yaml"
+    template: ./templates/mail.tmpl.yaml
+    referral_url: http://referral.example.com.yaml
+  invite_user:
+    link_format: /:action/:token/link.yaml
+    subject: "Email Subject.yaml"
+    template: ./templates/mail.tmpl.yaml
+    referral_url: http://referral.example.com.yaml
+  reset_password:
+    link_format: /:action/:token/link.yaml
+    subject: "Email Subject.yaml"
+    template: ./templates/mail.tmpl.yaml
+    referral_url: http://referral.example.com.yaml
+  signupcode:
+    link_format: /:action/:token/link.yaml
+    subject: "Email Subject.yaml"
+    template: ./templates/mail.tmpl.yaml
+    referral_url: http://referral.example.com.yaml
+
+signup:
+  disabled: true
+  autoconfirm: true
+  code: true
+  invites: "user"
+  username: false
+  default:
+    username: false
+    color: false
+
+provider_internal: false
+provider_redirect_url: "http://example.com/redirect.yaml"
+provider:
+  google:
+    client_key: "foo.yaml"
+    callback_url: "http://example.com/callback.yaml"
+    secret: "i-am-a-secret.yaml"
+  gitlab:
+    client_key: "foo.yaml"
+    secret: "i-am-a-secret.yaml"
+    callback_url: "http://example.com/callback.yaml"
+    scopes:
+      - "login"
+      - "confirmed"
+      -
+webhook:
+  url: http://webhook.example.com/hook.yaml
+  secret: i-am-a-webhook-secret.yaml
+  events:
+    - "login"
+    - "confirmed"
+  max_retries: 99
+  timeout: 1h40m0s
+
+log:
+  colors: false
+  file: "./logs/debug.log.yaml"
+  level: "debug.yaml"
+  timestamp: "Mon, 02 Jan 2006 15:04:05 -0700.yaml"
+  fields:
+    - source=peaches.yaml
+    - priority=1.yaml
+  tracer:
+    enabled: true
+    address: "example.com:9000.yaml"
+    tags:
+      - tag1=foo.yaml
+      - tag2=bar.yaml

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/health;health";
+
+package health;
+
+service Health {
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {
+  }
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string name = 1;
+  string version = 2;
+  string status = 3;
+}

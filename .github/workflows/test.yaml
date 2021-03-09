@@ -1,15 +1,17 @@
 on:
   push:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
 name: test
 jobs:
   test:
     strategy:
       matrix:
-        go-version: [1.15.x]
+        go-version: [ 1.15.x ]
     runs-on: ubuntu-latest
     steps:
+      #- name: Install workflow dependencies
+      #  run: apt update && apt install -y make gcc
       - name: Install Go
         uses: actions/setup-go@v2
         with:
@@ -19,4 +21,7 @@ jobs:
       - name: Install dependencies
         run: make deps
       - name: Lint and test
-        run: make all
+        run:  make all COVERAGE=1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+

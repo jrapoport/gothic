@@ -1,7 +1,9 @@
-gothic
-www/dist/
+/gothic
+/build
 .data
 *.sqlite
+get-docker.sh
+coverage.txt
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,go,node,yarn,jetbrains+all,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,go,node,yarn,jetbrains+all,visualstudiocode
@@ -10,7 +12,7 @@ www/dist/
 # Binaries for programs and plugins
 *.exe
 *.exe~
-*.dll
+*.dlls
 *.so
 *.dylib
 

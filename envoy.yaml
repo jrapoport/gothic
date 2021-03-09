@@ -24,15 +24,15 @@ static_resources:
                   name: local_route
                   virtual_hosts:
                     - name: local_service
-                      domains: ["*"]
+                      domains: [ "*" ]
                       routes:
-                      - match: { prefix: "/" }
-                        route:
-                          cluster: grpc_web_service
-                          max_grpc_timeout: 0s
+                        - match: { prefix: "/" }
+                          route:
+                            cluster: grpc_web_service
+                            max_grpc_timeout: 0s
                       cors:
                         allow_origin_string_match:
-                        - prefix: "*"
+                          - prefix: "*"
                         allow_methods: GET, PUT, DELETE, POST, OPTIONS
                         allow_headers: authorization,keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,custom-header-1,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
                         max_age: "1728000"
@@ -48,7 +48,7 @@ static_resources:
       type: logical_dns
       common_http_protocol_options:
         idle_timeout: 14400s
-      http2_protocol_options: {}
+      http2_protocol_options: { }
       upstream_connection_options:
         tcp_keepalive:
           keepalive_probes: 1
