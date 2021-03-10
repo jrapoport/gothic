@@ -37,7 +37,7 @@ func TestAuthServer_RefreshBearerToken(t *testing.T) {
 	v[key.Token] = []string{bt.RefreshToken.Token}
 	res, err = thttp.DoRequest(t, web, http.MethodPost, auth.Endpoint, v, nil)
 	assert.NoError(t, err)
-	tr, claims := tsrv.MarshalTokenResponse(t, srv.Config().JWT, res)
+	tr, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, tr.Type)
 	uid, err := uuid.Parse(claims.Subject)
 	assert.NoError(t, err)

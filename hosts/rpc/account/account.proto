@@ -6,8 +6,7 @@ package account;
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
-
-import "rpc/response.proto";
+import "response.proto";
 
 service Account {
   rpc Signup (SignupRequest) returns (rpc.UserResponse) {

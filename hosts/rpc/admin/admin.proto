@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin;admin";
 
-package config;
+package admin;
 
 service Admin {
   rpc Settings (SettingsRequest) returns (SettingsResponse) {

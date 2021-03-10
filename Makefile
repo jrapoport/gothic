@@ -1,3 +1,6 @@
+CUR_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+include $(CUR_DIR)/protoc.mk
+
 PKG := github.com/jrapoport/gothic
 EXE := gothic
 
@@ -5,12 +8,9 @@ BUILD_DIR := build
 DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
 
-UNAME_S := $(shell uname -s)
-
 GO_LINT_REPO := golang.org/x/lint/golint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
-GEN_GO_REPO := github.com/golang/protobuf/protoc-gen-go
 
 GO := go
 GO_PATH := $(shell $(GO) env GOPATH)
@@ -27,7 +27,9 @@ GO_TEST := $(GO) test -v
 GO_LINT := $(GO_BIN)/golint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
-GEN_GO := $(GO_BIN)/protoc-gen-go
+
+GRPC_PREFIX := github.com/jrapoport/gothic/hosts/rpc
+PROTO_INCLUDES := -I=hosts/rpc $(PROTO_INCLUDES)
 
 TEST_FLAGS :=-failfast
 COVERAGE_FILE=coverage.txt
@@ -45,9 +47,6 @@ $(GO_SEC):
 
 $(GO_STATIC):
 	$(GO_GET) $(GO_STATIC_REPO)
-
-$(GEN_GO):
-	$(GO_GET) $(GEN_GO_REPO)
 
 help: ## Show this help
 	echo $(BUILD_NUM)
@@ -74,16 +73,12 @@ tidy: ## Tidy module
 deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
-rpc: $(GEN_GO) ## Generate protobufs
-ifeq (, $(shell which protoc))
-ifeq ($(UNAME_S),Linux)
-	apt install -y protobuf-compiler
-endif
-ifeq ($(UNAME_S),Darwin)
-	brew install protobuf
-endif
-endif
+rpc::
 	$(GO_GEN) ./...
+
+rpcw:: GRPC_PREFIX := github.com/jrapoport/gothic/hosts
+# rpcw:: PROTO_WILDCARD := *_web.proto
+# rpcw:: PROTO_FILES += ./hosts/rpc/response.proto
 
 test: ## Run tests
 ifeq (, $(shell which docker))
@@ -93,7 +88,7 @@ endif
 	$(GO_TEST) $(BUILD_TAGS) $(TEST_FLAGS) ./...
 
 cover: TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
-cover: test
+cover: clean test
 	curl -fsSL https://codecov.io/bash | bash
 	$(RM) $(COVERAGE_FILE)
 
@@ -126,6 +121,9 @@ install: OUT_EXE :=
 install: OUT_CLI :=
 install: GO_BUILD = $(GOINSTALL)
 install: release ## Install gothic
+
+clean: ## Clean
+	$(RM) -r $(BUILD_DIR)
 
 all: lint vet test release ## Lint, vet, test, & release
 

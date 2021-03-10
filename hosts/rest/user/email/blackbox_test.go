@@ -79,7 +79,7 @@ func TestEmailServer_ConfirmChangeEmail(t *testing.T) {
 	}
 	res, err := thttp.DoAuthRequest(t, web, http.MethodPost, confirm, bt, nil, req)
 	assert.NoError(t, err)
-	_, claims := tsrv.MarshalTokenResponse(t, srv.Config().JWT, res)
+	_, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)
 	assert.Equal(t, u.ID.String(), claims.Subject)
 	updated, err := srv.GetUser(u.ID)
 	assert.NoError(t, err)

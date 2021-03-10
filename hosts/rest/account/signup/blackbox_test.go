@@ -53,7 +53,7 @@ func testCase(t *testing.T, srv *rest.Host, web *httptest.Server) (url.Values, *
 }
 
 func assertResponse(t *testing.T, h *rest.Host, test *rest.UserResponse, res string) {
-	ur, _ := tsrv.MarshalUserResponse(t, h.Config().JWT, res)
+	ur, _ := tsrv.UnmarshalUserResponse(t, h.Config().JWT, res)
 	assert.NotNil(t, ur.Token)
 	assert.NotEmpty(t, ur.Token.Access)
 	ur.Token = nil

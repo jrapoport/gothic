@@ -38,8 +38,8 @@ func RESTHost(t *testing.T, reg []rest.RegisterServer, smtp bool) (*rest.Host, *
 	return s, web, mock
 }
 
-// MarshalTokenResponse extracts the token from a token response.
-func MarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.BearerResponse, jwt.UserClaims) {
+// UnmarshalTokenResponse extracts the token from a token response.
+func UnmarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.BearerResponse, jwt.UserClaims) {
 	r := new(rest.BearerResponse)
 	err := json.Unmarshal([]byte(res), r)
 	require.NoError(t, err)
@@ -49,14 +49,16 @@ func MarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.BearerR
 	return r, claims
 }
 
-// MarshalUserResponse extracts the token from a token response.
-func MarshalUserResponse(t *testing.T, c config.JWT, res string) (*rest.UserResponse, jwt.UserClaims) {
-	r := new(rest.UserResponse)
-	err := json.Unmarshal([]byte(res), r)
+// UnmarshalUserResponse extracts the token from a token response.
+func UnmarshalUserResponse(t *testing.T, c config.JWT, res string) (*rest.UserResponse, jwt.UserClaims) {
+	ur := new(rest.UserResponse)
+	err := json.Unmarshal([]byte(res), ur)
 	require.NoError(t, err)
-	require.NotNil(t, r.Token)
-	claims, err := jwt.ParseUserClaims(c, r.Token.Access)
+	if ur.Token == nil {
+		return ur, jwt.UserClaims{}
+	}
+	claims, err := jwt.ParseUserClaims(c, ur.Token.Access)
 	require.NoError(t, err)
 	require.NotNil(t, claims)
-	return r, claims
+	return ur, claims
 }

@@ -2,11 +2,10 @@ syntax = "proto3";
 
 option go_package = "github.com/jrapoport/gothic/hosts/rpc/user;user";
 
-package config;
+package user;
 
 import "google/protobuf/struct.proto";
-
-import "rpc/response.proto";
+import "response.proto";
 
 service User {
   rpc GetUser (GetUserRequest) returns (rpc.UserResponse) {
