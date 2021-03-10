@@ -43,8 +43,24 @@ func (a *Authenticator) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return grpc_auth.StreamServerInterceptor(a.authFunc)
 }
 
-func (a *Authenticator) parseToken(tok string) (jwt.Claims, error) {
-	claims, err := jwt.ParseUserClaims(a.c, tok)
+func (a *Authenticator) authFunc(ctx context.Context) (context.Context, error) {
+	return Authenticate(a.c, ctx)
+}
+
+func Authenticate(c config.JWT, ctx context.Context) (context.Context, error) {
+	token, err := grpc_auth.AuthFromMD(ctx, BearerScheme)
+	if err != nil {
+		return nil, err
+	}
+	claims, err := parseToken(c, token)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, err.Error())
+	}
+	return WithClaims(ctx, claims), nil
+}
+
+func parseToken(c config.JWT, tok string) (jwt.Claims, error) {
+	claims, err := jwt.ParseUserClaims(c, tok)
 	if err != nil {
 		return nil, err
 	}
@@ -53,16 +69,4 @@ func (a *Authenticator) parseToken(tok string) (jwt.Claims, error) {
 		return nil, err
 	}
 	return claims, nil
-}
-
-func (a *Authenticator) authFunc(ctx context.Context) (context.Context, error) {
-	token, err := grpc_auth.AuthFromMD(ctx, BearerScheme)
-	if err != nil {
-		return nil, err
-	}
-	claims, err := a.parseToken(token)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-	return WithClaims(ctx, claims), nil
 }

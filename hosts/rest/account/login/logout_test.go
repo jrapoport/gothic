@@ -53,7 +53,7 @@ func TestLoginServer_Logout(t *testing.T) {
 	}{u.Email, testPass}
 	res, err := thttp.DoRequest(t, web, http.MethodPost, Endpoint, nil, req)
 	assert.NoError(t, err)
-	ur, _ := tsrv.MarshalUserResponse(t, srv.Config().JWT, res)
+	ur, _ := tsrv.UnmarshalUserResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, ur.Token.Type)
 	_, err = thttp.DoAuthRequest(t, web, http.MethodGet, Logout, ur.Token.Access, nil, nil)
 	assert.NoError(t, err)

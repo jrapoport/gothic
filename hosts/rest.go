@@ -5,7 +5,6 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/account"
 	"github.com/jrapoport/gothic/hosts/rest/admin"
-	"github.com/jrapoport/gothic/hosts/rest/health"
 	"github.com/jrapoport/gothic/hosts/rest/user"
 )
 
@@ -17,7 +16,6 @@ func NewRESTHost(a *core.API, address string) core.Hosted {
 		[]rest.RegisterServer{
 			admin.RegisterServer,
 			account.RegisterServer,
-			health.RegisterServer,
 			user.RegisterServer,
 		})
 }

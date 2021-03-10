@@ -161,7 +161,7 @@ func TestChangePassword(t *testing.T) {
 	req.OldPassword = testPass
 	res, err := thttp.DoAuthRequest(t, web, http.MethodPut, PassRoute, tok, nil, req)
 	assert.NoError(t, err)
-	_, claims := tsrv.MarshalTokenResponse(t, srv.Config().JWT, res)
+	_, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)
 	assert.Equal(t, u.ID.String(), claims.Subject)
 	u, err = srv.GetUser(u.ID)
 	assert.NoError(t, err)

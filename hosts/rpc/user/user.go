@@ -1,6 +1,6 @@
 package user
 
-//go:generate protoc -I=. -I=../.. --go_out=plugins=grpc:. --go_opt=paths=source_relative user.proto
+//go:generate protoc -I=. -I=.. --go_out=plugins=grpc:. --go_opt=paths=source_relative user.proto
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type userServer struct {
 var _ UserServer = (*userServer)(nil)
 
 func newUserServer(srv *rpc.Server) *userServer {
-	srv.FieldLogger = srv.WithField("module", "admin")
+	srv.FieldLogger = srv.WithField("module", "user")
 	return &userServer{srv}
 }
 

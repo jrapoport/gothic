@@ -20,7 +20,6 @@ func TestLogin(t *testing.T) {
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
 		return account.NewAccountClient(cc)
 	}).(account.AccountClient)
-
 	// new request context
 	ctx := context.Background()
 	// add key-value pairs of metadata to context

@@ -80,7 +80,7 @@ func TestLoginServer_Login(t *testing.T) {
 	}
 	res, err := thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
 	assert.NoError(t, err)
-	ur, claims := tsrv.MarshalUserResponse(t, srv.Config().JWT, res)
+	ur, claims := tsrv.UnmarshalUserResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, ur.Token.Type)
 	assert.Equal(t, u.ID.String(), claims.Subject)
 	assert.Equal(t, ur.Email, utils.MaskEmail(u.Email))

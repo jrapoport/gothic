@@ -79,7 +79,7 @@ func TestAuthServer_AuthorizeUser(t *testing.T) {
 	urlReq = strings.Replace(urlReq, web.URL, "", 1)
 	res, err := thttp.DoRequest(t, web, http.MethodPost, urlReq, nil, nil)
 	assert.NoError(t, err)
-	tr, claims := tsrv.MarshalUserResponse(t, srv.Config().JWT, res)
+	tr, claims := tsrv.UnmarshalUserResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, tr.Token.Type)
 	uid, err := uuid.Parse(claims.Subject)
 	assert.NoError(t, err)

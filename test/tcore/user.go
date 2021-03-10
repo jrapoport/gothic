@@ -19,7 +19,7 @@ func TestUser(t *testing.T, a *core.API, pass string, admin bool) (*user.User, s
 	em := tutils.RandomEmail()
 	ctx := context.Background()
 	ctx.SetProvider(a.Provider())
-	u, err := a.Signup(ctx, em, "", testPass, nil)
+	u, err := a.Signup(ctx, em, "", pass, nil)
 	require.NoError(t, err)
 	require.NotNil(t, u)
 	if admin {

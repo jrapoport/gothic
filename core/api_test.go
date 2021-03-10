@@ -42,7 +42,6 @@ func apiWithTempDB(t *testing.T) *API {
 
 // configuredAPI creates a new API for tests with config.
 func configuredAPI(t *testing.T, c *config.Config) *API {
-	c, _ = tconf.MockSMTP(t, c)
 	c.Signup.AutoConfirm = true
 	c.Mail.SpamProtection = false
 	a, err := NewAPI(c)
