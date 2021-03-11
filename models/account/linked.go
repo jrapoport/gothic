@@ -46,7 +46,7 @@ type Linked struct {
 	UserID    uuid.UUID     `json:"user_id" gorm:"type:char(36)"`
 	Type      Type          `json:"type" gorm:"uniqueIndex:idx_type_provider_account_id"`
 	Provider  provider.Name `json:"provider" gorm:"uniqueIndex:idx_type_provider_account_id;type:varchar(255)"`
-	AccountID string        `json:"account_id" gorm:"uniqueIndex:idx_type_provider_account_id;varchar(320)"`
+	AccountID string        `json:"account_id" gorm:"uniqueIndex:idx_type_provider_account_id;type:varchar(320)"`
 	Email     string        `json:"email" gorm:"type:varchar(320)"`
 	Data      types.Map     `json:"data"`
 }
