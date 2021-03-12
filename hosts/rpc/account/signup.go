@@ -15,6 +15,7 @@ func (s *accountServer) Signup(ctx context.Context,
 		return nil, s.RPCError(codes.InvalidArgument, err)
 	}
 	rtx := rpc.RequestContext(ctx)
+	rtx.SetCode(req.Code)
 	rtx.SetProvider(s.Provider())
 	s.Debugf("signup user: %v (%v)", req, rtx)
 	u, err := s.API.Signup(rtx, req.Email, req.Username, req.Password, req.Data.AsMap())

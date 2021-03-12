@@ -18,7 +18,7 @@ func Logger(h http.Handler) http.Handler {
 	//return middleware.Logger(h)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == config.HealthEndpoint {
-			h.ServeHTTP(w,r)
+			h.ServeHTTP(w, r)
 			return
 		}
 		middleware.Logger(h).ServeHTTP(w, r)

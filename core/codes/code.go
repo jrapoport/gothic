@@ -67,7 +67,8 @@ func GetCode(conn *store.Connection, c string) (*code.SignupCode, error) {
 		return nil, errors.New("invalid code")
 	}
 	sc := new(code.SignupCode)
-	if sc.Format == code.PIN && utils.IsDebugPIN(c) {
+	if utils.IsDebugPIN(c) {
+		sc.Format = code.PIN
 		sc.Token = c
 		return sc, nil
 	}
