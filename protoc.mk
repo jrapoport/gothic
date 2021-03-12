@@ -68,4 +68,4 @@ rpc-cs:: $(PROTOC_GEN) ## Protobuf gRPC C#
 
 grpc: rpc rpcw rpc-cs ## Protobuf gRPC All
 
-.PHONY: gen rpc rpcw rpc-cs grpc
+.PHONY: rpc rpcw rpc-cs grpc
