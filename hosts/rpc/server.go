@@ -34,9 +34,13 @@ func (s *Server) RPCError(c codes.Code, err error) error {
 	if c == codes.OK || err == nil {
 		return nil
 	}
-	err = status.Error(c, err.Error())
+	msg := statusText(c)
+	if err.Error() != "" {
+		msg = err.Error()
+	}
+	err = status.Error(c, msg)
 	s.Error(err)
-	return status.Error(c, statusText(c))
+	return err
 }
 
 // RPCErrorf wraps an rpc error code formatted according to a format specifier.

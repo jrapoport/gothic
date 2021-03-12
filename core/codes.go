@@ -62,7 +62,7 @@ type (
 )
 
 func (a *API) sendSignupCode(ctx context.Context, userID uuid.UUID, to string, create createCodeFunc, send sendCodeFunc) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}

@@ -2,7 +2,6 @@ package config
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -206,6 +205,3 @@ func newKeyValueMap(s []string) map[string]string {
 	}
 	return m
 }
-
-// ErrRateLimitExceeded rate limited exceeded error.
-var ErrRateLimitExceeded = errors.New("rate limit exceeded")

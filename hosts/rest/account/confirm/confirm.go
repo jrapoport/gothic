@@ -17,6 +17,7 @@ const (
 	Send = "/send"
 )
 
+// Request is an confirm server request
 type Request struct {
 	Email string `json:"email" form:"email"`
 	Token string `json:"token" form:"token"`

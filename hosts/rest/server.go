@@ -61,7 +61,7 @@ func (s *Server) ResponseCode(w http.ResponseWriter, code int, err error) {
 	if err != nil {
 		s.Error(err)
 	}
-	ResponseCode(w, code)
+	ResponseCode(w, code, err)
 }
 
 // ResponseError logs an error and the writes an sanitized standard response.
@@ -93,10 +93,14 @@ func (s *Server) PagedResponse(w http.ResponseWriter, r *http.Request,
 }
 
 // ResponseCode writes a standard http response
-func ResponseCode(w http.ResponseWriter, code int) {
+func ResponseCode(w http.ResponseWriter, code int, err error) {
 	if code == http.StatusOK {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	http.Error(w, http.StatusText(code), code)
+	msg := http.StatusText(code)
+	if err != nil && err.Error() == "" {
+		msg = err.Error()
+	}
+	http.Error(w, msg, code)
 }

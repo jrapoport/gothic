@@ -10,8 +10,8 @@ jobs:
         go-version: [ 1.15.x ]
     runs-on: ubuntu-latest
     steps:
-      #- name: Install workflow dependencies
-      #  run: apt update && apt install -y make gcc
+      - name: Install workflow dependencies
+        run: apt update && apt install -y make gcc
       - name: Install Go
         uses: actions/setup-go@v2
         with:

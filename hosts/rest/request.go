@@ -55,7 +55,7 @@ type Request struct {
 	Sort      store.Sort    `json:"sort"  form:"sort"`
 }
 
-// RequestContext adds the authenticated request context to a context
+// FromRequest adds the authenticated request context to a context
 func FromRequest(r *http.Request) context.Context {
 	req := &Request{}
 	err := UnmarshalRequest(r, req)

@@ -18,7 +18,7 @@ import (
 
 // GrantBearerToken issues a bearer token for the user.
 func (a *API) GrantBearerToken(ctx context.Context, u *user.User) (*tokens.BearerToken, error) {
-	if u == nil || !u.IsActive() {
+	if u == nil || (!u.IsActive() && !u.IsRestricted()) {
 		err := errors.New("invalid user")
 		return nil, a.logError(err)
 	}
@@ -70,7 +70,7 @@ type (
 )
 
 func (a *API) sendConfirmToken(ctx context.Context, userID uuid.UUID, check checkSenderFunc, send sendConfirmFunc) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}

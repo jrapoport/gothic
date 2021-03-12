@@ -29,9 +29,6 @@ func (s *accountServer) Signup(ctx context.Context,
 	if s.Config().MaskEmails {
 		res.MaskEmail()
 	}
-	if !u.IsConfirmed() {
-		return res, nil
-	}
 	bt, err := s.GrantBearerToken(rtx, u)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)

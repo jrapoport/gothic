@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/jrapoport/gothic/test/tconf"
 	"sync"
 	"testing"
 	"time"
@@ -39,6 +40,11 @@ func TestAPI_Signup(t *testing.T) {
 
 func testSignup(t *testing.T, autoconfirm bool) {
 	a := createAPI(t)
+	if !autoconfirm {
+		a.config, _ = tconf.MockSMTP(t, a.config)
+		err := a.OpenMail()
+		require.NoError(t, err)
+	}
 	a.config.Signup.AutoConfirm = autoconfirm
 	const (
 		empty       = ""

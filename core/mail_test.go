@@ -169,11 +169,7 @@ func TestAPI_SendChangeEmail(t *testing.T) {
 	a.config.Mail.ChangeEmail.ReferralURL = referral
 	to := tutils.RandomEmail()
 	u := testUser(t, a)
-	assert.False(t, u.IsConfirmed())
-	err := a.SendChangeEmail(ctx, u.ID, to)
-	assert.Error(t, err)
 	u = confirmUser(t, a, u)
-
 	act := template.ChangeEmailAction
 	testSend(t, a, u, act,
 		func() error {
@@ -199,7 +195,10 @@ func TestAPI_SendChangeEmail(t *testing.T) {
 			err = a.conn.Save(ct).Error
 			assert.NoError(t, err)
 		})
-
+	u = testUser(t, a)
+	assert.False(t, u.IsConfirmed())
+	err := a.SendChangeEmail(ctx, u.ID, to)
+	assert.Error(t, err)
 	forceExtProvider(t, a, u)
 	err = a.SendChangeEmail(ctx, u.ID, to)
 	assert.Error(t, err)
@@ -217,12 +216,6 @@ func TestAPI_SendInviteUser(t *testing.T) {
 	a.config.Signup.Invites = config.Users
 	u := testUser(t, a)
 	to := tutils.RandomEmail()
-	// bad mail
-	err := a.SendInviteUser(ctx, u.ID, "@")
-	assert.Error(t, err)
-	// not confirmed
-	err = a.SendInviteUser(ctx, u.ID, tutils.RandomEmail())
-	assert.Error(t, err)
 	confirmUser(t, a, u)
 	act := template.InviteUserAction
 	testSend(t, a, u, act,
@@ -252,14 +245,20 @@ func TestAPI_SendInviteUser(t *testing.T) {
 
 	// no admin rate limit
 	adm := promoteUser(t, a, u)
-	err = a.SendInviteUser(ctx, adm.ID, to)
+	err := a.SendInviteUser(ctx, adm.ID, to)
 	assert.NoError(t, err)
 	// admin restriction
 	a.config.Signup.Invites = config.Admins
 	err = a.SendInviteUser(ctx, adm.ID, to)
 	assert.NoError(t, err)
+	// bad mail
+	err = a.SendInviteUser(ctx, u.ID, "@")
+	assert.Error(t, err)
 	// not an admin
 	u = testUser(t, a)
+	// not confirmed
+	err = a.SendInviteUser(ctx, u.ID, tutils.RandomEmail())
+	assert.Error(t, err)
 	confirmUser(t, a, u)
 	err = a.SendInviteUser(ctx, u.ID, to)
 	assert.Error(t, err)

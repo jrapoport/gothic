@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jrapoport/gothic/config/provider"
@@ -28,14 +29,17 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 	ctx.SetProvider(p)
 	err := a.signupEnabled(p)
 	if err != nil {
-		return nil, err
+		err = fmt.Errorf("signup: %w", err)
+		return nil, a.logError(err)
 	}
 	email, err = a.ValidateEmail(email)
 	if err != nil {
-		return nil, err
+		err = fmt.Errorf("email: %w", err)
+		return nil, a.logError(err)
 	}
 	err = validate.Password(a.config, pw)
 	if err != nil {
+		err = fmt.Errorf("password: %w", err)
 		return nil, a.logError(err)
 	}
 	a.log.Debugf("signup: %s %s %s %v (%v)",
@@ -44,6 +48,7 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 	err = a.conn.Transaction(func(tx *store.Connection) error {
 		username, err = a.validateUsername(tx, username)
 		if err != nil {
+			err = fmt.Errorf("username: %w", err)
 			return err
 		}
 		u, err = a.userSignup(ctx, tx, p, email, username, pw, data)
@@ -92,11 +97,12 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 	}
 	err := a.signupEnabled(p)
 	if err != nil {
+		err = fmt.Errorf("signup: %w", err)
 		return nil, err
 	}
 	code := ctx.GetCode()
 	if a.config.Signup.Code && code == "" {
-		err = errors.New("signup code required")
+		err = errors.New("code: required")
 		return nil, err
 	}
 	ip := ctx.GetIPAddress()
@@ -104,12 +110,14 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 	// if recaptcha is disabled this is a no-op
 	err = validate.ReCaptcha(a.config, ip, recaptcha)
 	if err != nil {
+		err = fmt.Errorf("recaptcha: %w", err)
 		return nil, err
 	}
 	var u *user.User
 	err = conn.Transaction(func(tx *store.Connection) error {
 		username, err = a.useDefaultUsername(tx, username)
 		if err != nil {
+			err = fmt.Errorf("username: %w", err)
 			return err
 		}
 		data = a.useDefaultColor(data)
@@ -125,6 +133,7 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 		}
 		err = a.useSignupCode(tx, u, code)
 		if err != nil {
+			err = fmt.Errorf("code: %w", err)
 			return err
 		}
 		return audit.LogSignup(ctx, tx, u.ID, u.Role)

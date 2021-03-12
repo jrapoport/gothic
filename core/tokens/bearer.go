@@ -60,7 +60,7 @@ func RefreshBearerToken(conn *store.Connection, c config.JWT, u *user.User, tok 
 	if u == nil {
 		return nil, errors.New("invalid user")
 	}
-	if !u.IsActive() {
+	if !u.IsActive() && !u.IsRestricted() {
 		err := fmt.Errorf("inactive user: %s", u.ID)
 		return nil, err
 	}

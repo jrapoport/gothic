@@ -44,10 +44,11 @@ func (a *Authenticator) StreamServerInterceptor() grpc.StreamServerInterceptor {
 }
 
 func (a *Authenticator) authFunc(ctx context.Context) (context.Context, error) {
-	return Authenticate(a.c, ctx)
+	return Authenticate(ctx, a.c)
 }
 
-func Authenticate(c config.JWT, ctx context.Context) (context.Context, error) {
+// Authenticate parses the jwt claims and authenticates a grpc request
+func Authenticate(ctx context.Context, c config.JWT) (context.Context, error) {
 	token, err := grpc_auth.AuthFromMD(ctx, BearerScheme)
 	if err != nil {
 		return nil, err
