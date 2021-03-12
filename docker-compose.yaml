@@ -25,7 +25,7 @@ services:
 
   envoy:
     image: grpcweb/envoy:latest
-    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
+    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l debug
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
     expose:

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/health;health";
+
+package health;
+
+import "google/protobuf/empty.proto";
+
+service Health {
+  rpc HealthCheck (google.protobuf.Empty) returns (HealthCheckResponse) {
+  }
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string name = 1;
+  string version = 2;
+  string status = 3;
+}
