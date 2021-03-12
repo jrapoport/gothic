@@ -18,6 +18,7 @@ const (
 	Password = "/password"
 )
 
+// Request is an user server request
 type Request struct {
 	Username    string    `json:"username" form:"username"`
 	Data        types.Map `json:"data" form:"data"`

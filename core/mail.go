@@ -62,7 +62,7 @@ func (a *API) CloseMail() {
 func (a *API) ValidateEmail(email string) (string, error) {
 	var s string
 	var err error
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		s, err = validate.Email(email)
 	} else {
@@ -73,7 +73,7 @@ func (a *API) ValidateEmail(email string) (string, error) {
 
 // SendConfirmUser sends a invite mail to a new user
 func (a *API) SendConfirmUser(ctx context.Context, userID uuid.UUID) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}
@@ -96,7 +96,7 @@ func (a *API) SendConfirmUser(ctx context.Context, userID uuid.UUID) error {
 
 // SendResetPassword sends a password recovery mail
 func (a *API) SendResetPassword(ctx context.Context, userID uuid.UUID) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}
@@ -116,7 +116,7 @@ func (a *API) SendResetPassword(ctx context.Context, userID uuid.UUID) error {
 
 // SendChangeEmail sends an email change confirmation mail to a user
 func (a *API) SendChangeEmail(ctx context.Context, userID uuid.UUID, newAddress string) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}
@@ -143,7 +143,7 @@ func (a *API) SendChangeEmail(ctx context.Context, userID uuid.UUID, newAddress 
 
 // SendInviteUser sends a invite mail to a user
 func (a *API) SendInviteUser(ctx context.Context, userID uuid.UUID, toAddress string) error {
-	if a.mail == nil {
+	if a.mail == nil || a.mail.IsOffline() {
 		a.log.Warn("mail not found")
 		return nil
 	}

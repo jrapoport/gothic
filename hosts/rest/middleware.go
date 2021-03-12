@@ -85,13 +85,13 @@ func Authenticator(jc config.JWT) func(next http.Handler) http.Handler {
 			tok := RequestToken(r)
 			if tok == "" {
 				l.Error("token not found")
-				ResponseCode(w, http.StatusUnauthorized)
+				ResponseCode(w, http.StatusUnauthorized, nil)
 				return
 			}
 			r, err := ParseClaims(r, jc, tok)
 			if err != nil {
 				l.Error(err)
-				ResponseCode(w, http.StatusUnauthorized)
+				ResponseCode(w, http.StatusUnauthorized, nil)
 				return
 			}
 			next.ServeHTTP(w, r)
@@ -129,7 +129,7 @@ func claimCheck(check func(claims jwt.UserClaims) error) func(next http.Handler)
 			c := GetClaims(r)
 			if c == nil {
 				l.Error("jwt claims not found")
-				ResponseCode(w, http.StatusUnauthorized)
+				ResponseCode(w, http.StatusUnauthorized, nil)
 				return
 			}
 			uc, ok := c.(jwt.UserClaims)
@@ -139,7 +139,7 @@ func claimCheck(check func(claims jwt.UserClaims) error) func(next http.Handler)
 			}
 			if err := check(uc); err != nil {
 				l.Error(err)
-				ResponseCode(w, http.StatusForbidden)
+				ResponseCode(w, http.StatusForbidden, nil)
 				return
 			}
 			next.ServeHTTP(w, r)

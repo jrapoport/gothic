@@ -19,7 +19,7 @@ func TestAPI_GrantBearerToken(t *testing.T) {
 	assert.Error(t, err)
 	// not confirmed
 	_, err = a.GrantBearerToken(nil, u)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	u = confirmUser(t, a, u)
 	bt, err := a.GrantBearerToken(nil, u)
 	assert.NoError(t, err)

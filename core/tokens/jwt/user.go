@@ -10,10 +10,11 @@ import (
 // UserClaims is a struct to hold extended jwt claims
 type UserClaims struct {
 	StandardClaims
-	Provider  provider.Name `json:"pvd,omitempty"`
-	Admin     bool          `json:"adm,omitempty"`
-	Confirmed bool          `json:"cnf,omitempty"`
-	Verified  bool          `json:"vrd,omitempty"`
+	Provider   provider.Name `json:"pvd,omitempty"`
+	Admin      bool          `json:"adm,omitempty"`
+	Restricted bool          `json:"rst,omitempty"`
+	Confirmed  bool          `json:"cnf,omitempty"`
+	Verified   bool          `json:"vrd,omitempty"`
 }
 
 var _ Claims = (*UserClaims)(nil)
@@ -26,6 +27,7 @@ func NewUserClaims(c config.JWT, u *user.User) UserClaims {
 		StandardClaims: std,
 		Provider:       u.Provider,
 		Admin:          u.IsAdmin(),
+		Restricted:     u.IsRestricted(),
 		Confirmed:      u.IsConfirmed(),
 		Verified:       u.IsVerified(),
 	}

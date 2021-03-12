@@ -11,6 +11,7 @@ import (
 // Endpoint is the config endpoint
 const Endpoint = "/auditlog"
 
+// Request is an audit log search request
 type Request struct {
 	Filters store.Filters `json:"filters"  form:"filters"`
 }

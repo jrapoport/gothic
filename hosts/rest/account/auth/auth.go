@@ -22,6 +22,7 @@ const (
 	Callback = "/callback"
 )
 
+// Request is an auth server request
 type Request struct {
 	State string `json:"state" form:"state"`
 	Token string `json:"token" form:"token"`

@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/validate"
@@ -16,10 +17,11 @@ import (
 func CreateUser(conn *store.Connection, p provider.Name, email, username, pw string, data, meta types.Map) (*user.User, error) {
 	err := providers.IsEnabled(p)
 	if err != nil {
-		return nil, errors.New("invalid provider")
+		return nil, errors.New("provider: invalid")
 	}
 	email, err = validate.Email(email)
 	if err != nil {
+		err = fmt.Errorf("email: %w", err)
 		return nil, err
 	}
 	var u *user.User
@@ -28,10 +30,11 @@ func CreateUser(conn *store.Connection, p provider.Name, email, username, pw str
 		// has this user has already signed up?
 		taken, err = IsEmailTaken(tx, email)
 		if err != nil {
+			err = fmt.Errorf("email: %w", err)
 			return err
 		}
 		if taken {
-			return errors.New("email taken")
+			return errors.New("email: already taken")
 		}
 		u, err = createUser(tx, p, email, username, pw, data, meta)
 		return err

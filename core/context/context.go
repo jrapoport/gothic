@@ -34,6 +34,7 @@ func Background() Context {
 	return &apiContext{context.Background()}
 }
 
+// WithValue wraps context.WithValue
 func WithValue(parent context.Context, key, val interface{}) Context {
 	return &apiContext{context.WithValue(parent, key, val)}
 }

@@ -20,9 +20,9 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.2.0
-	github.com/gookit/event v1.0.4
+	github.com/gookit/event v1.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
-	github.com/imdario/mergo v0.3.11
+	github.com/imdario/mergo v0.3.12
 	github.com/improbable-eng/go-httpwares v0.0.0-20200609095714-edc8019f93cc
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/joho/godotenv v1.3.0
@@ -45,12 +45,12 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.8.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	google.golang.org/grpc v1.36.0
-	google.golang.org/grpc/examples v0.0.0-20210309003715-fce74a94bdff // indirect
+	google.golang.org/grpc/examples v0.0.0-20210311221743-f168a3cb3bf5 // indirect
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.29.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/datatypes v1.0.0
-	gorm.io/driver/mysql v1.0.4
+	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.6

@@ -10,6 +10,7 @@ import (
 // Endpoint is the endpoint for an invite server.
 const Endpoint = "/invite"
 
+// Request is an invite server request
 type Request struct {
 	Email string `json:"email" form:"email"`
 }

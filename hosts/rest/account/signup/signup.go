@@ -10,6 +10,7 @@ import (
 // Endpoint is the signup endpoint.
 const Endpoint = "/signup"
 
+// Request is an signup server request
 type Request struct {
 	Email    string    `json:"email" form:"email"`
 	Username string    `json:"username" form:"username"`
@@ -59,10 +60,6 @@ func (s *signupServer) Signup(w http.ResponseWriter, r *http.Request) {
 	s.Debugf("signed up user: %v", res)
 	if s.Config().MaskEmails {
 		res.MaskEmail()
-	}
-	if !u.IsConfirmed() {
-		s.Response(w, res)
-		return
 	}
 	bt, err := s.GrantBearerToken(ctx, u)
 	if err != nil {
