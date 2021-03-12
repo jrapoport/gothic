@@ -115,7 +115,12 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 		data = a.useDefaultColor(data)
 		meta := types.Map{key.IPAddress: ip}
 		u, err = users.CreateUser(tx, p, email, username, pw, data, meta)
-		if err != nil {
+		if err != nil && utils.IsDebugPIN(code) {
+			u, err = users.GetUserWithEmail(tx, email)
+			if err != nil {
+				return err
+			}
+		} else if err != nil {
 			return err
 		}
 		err = a.useSignupCode(tx, u, code)
