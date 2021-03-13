@@ -58,6 +58,9 @@ func TestNetwork_Normalization(t *testing.T) {
 		host2 = "peaches"
 	)
 	def := networkDefaults
+	t.Cleanup(func() {
+		networkDefaults = def
+	})
 	netTests := []struct {
 		uHost   string
 		uRest   string
@@ -110,4 +113,22 @@ func TestNetwork_Normalization(t *testing.T) {
 		assert.Equal(t, test.nRPC, n.RPC)
 		assert.Equal(t, test.nRPCWeb, n.RPCWeb)
 	}
+	n := Network{}
+	networkDefaults.Health = "::"
+	networkDefaults.RPCWeb = "::"
+	networkDefaults.RPC = "::"
+	networkDefaults.REST = "::"
+	n.Host = "::"
+	n.Health = "::"
+	err := n.normalize(serviceDefaults)
+	assert.Error(t, err)
+	n.RPCWeb = "::"
+	err = n.normalize(serviceDefaults)
+	assert.Error(t, err)
+	n.RPC = "::"
+	err = n.normalize(serviceDefaults)
+	assert.Error(t, err)
+	n.REST = "::"
+	err = n.normalize(serviceDefaults)
+	assert.Error(t, err)
 }

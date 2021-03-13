@@ -34,6 +34,25 @@ func TestProviders(t *testing.T) {
 			assert.Equal(t, callback+test.mark, v.CallbackURL)
 		}
 	})
+	a := Authorization{
+		Providers: map[provider.Name]Provider{},
+	}
+	a.Providers[provider.Google] = Provider{
+		ClientKey:   "foo",
+		CallbackURL: "",
+	}
+	err := a.normalize(Service{}, "")
+	assert.NoError(t, err)
+	assert.NotEmpty(t, a.Providers[provider.Google].CallbackURL)
+	a.Providers[provider.Google] = Provider{
+		ClientKey:   "foo",
+		CallbackURL: "\n",
+	}
+	err = a.normalize(Service{}, "")
+	assert.Error(t, err)
+	a.RedirectURL = "\n"
+	err = a.normalize(Service{}, "")
+	assert.Error(t, err)
 }
 
 // tests the ENV vars are correctly taking precedence
@@ -81,4 +100,6 @@ func TestAuthorization_InternalProvider(t *testing.T) {
 	c, err := loadNormalized("")
 	assert.NoError(t, err)
 	assert.EqualValues(t, c.Service.Name, c.Provider())
+	c.Authorization.UseInternal = false
+	assert.EqualValues(t, provider.Unknown, c.Provider())
 }

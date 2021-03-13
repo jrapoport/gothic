@@ -47,12 +47,12 @@ func (a *Authorization) normalize(srv Service, host string) error {
 		}
 	}
 	const urlFormat = "http://" + hostToken + "/account/auth/callback"
-	for k, provider := range a.Providers {
-		if provider.ClientKey == "" {
+	for k, p := range a.Providers {
+		if p.ClientKey == "" {
 			delete(a.Providers, k)
 			continue
 		}
-		callback := provider.CallbackURL
+		callback := p.CallbackURL
 		if callback == "" {
 			callback = urlFormat
 		}
@@ -61,7 +61,8 @@ func (a *Authorization) normalize(srv Service, host string) error {
 		if err != nil {
 			return err
 		}
-		provider.CallbackURL = callback
+		p.CallbackURL = callback
+		a.Providers[k] = p
 	}
 	return nil
 }

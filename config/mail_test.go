@@ -110,3 +110,24 @@ func TestMail_Normalization(t *testing.T) {
 	err = m.normalize(srv)
 	assert.Error(t, err)
 }
+
+func TestMail_CheckSendLimit(t *testing.T) {
+	m := Mail{}
+	err := m.CheckSendLimit(nil)
+	assert.NoError(t, err)
+	m.SendLimit = time.Millisecond
+	time.Sleep(10 * time.Millisecond)
+	last := time.Now()
+	err = m.CheckSendLimit(&last)
+	assert.Error(t, err)
+	m.SendLimit = 10 * time.Minute
+	err = m.CheckSendLimit(&last)
+	assert.Error(t, err)
+	last = last.Add(100 * time.Minute)
+	err = m.CheckSendLimit(&last)
+	assert.Error(t, err)
+	m.SendLimit = 0
+	last = time.Now()
+	err = m.CheckSendLimit(&last)
+	assert.NoError(t, err)
+}
