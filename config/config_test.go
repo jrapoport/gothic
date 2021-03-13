@@ -70,7 +70,7 @@ func loadTestConfig(t *testing.T, test testCase) *Config {
 	return c
 }
 
-func TestRequired(t *testing.T) {
+func TestLoadConfig(t *testing.T) {
 	reqTests := []struct {
 		key   string
 		value string
@@ -87,6 +87,15 @@ func TestRequired(t *testing.T) {
 		_, err := LoadConfig("")
 		test.Err(t, err)
 	}
+	_, err := LoadConfig(testEnv)
+	assert.Error(t, err)
+	setEnv(t, ENVPrefix+"LOG_LEVEL", "bad")
+	_, err = LoadConfig("")
+	assert.Error(t, err)
+	_, err = LoadConfig("bad path")
+	assert.Error(t, err)
+	_, err = LoadConfig("\n.json")
+	assert.Error(t, err)
 }
 
 func TestLog(t *testing.T) {

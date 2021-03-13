@@ -12,17 +12,25 @@ var (
 var ver string
 
 func init() {
-	var v = "release"
-	if debug {
-		v = "debug"
-	}
-	if Version != "" {
-		v = fmt.Sprintf("%s (%s)", Version, Build)
-	}
-	ver = v
+	ver = version()
 }
 
 // BuildVersion the build version string
 func BuildVersion() string {
 	return ver
+}
+
+func version() string {
+	var v = "release"
+	if debug {
+		v = "debug"
+	}
+	if Version != "" && Build != "" {
+		v = fmt.Sprintf("%s (%s)", Version, Build)
+	} else if Version != "" {
+		v = Version
+	} else if Build != "" {
+		v = Build
+	}
+	return v
 }

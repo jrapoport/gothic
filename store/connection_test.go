@@ -132,19 +132,18 @@ func (ts *ConnectionTestSuite) BeforeTest(_, testName string) {
 }
 
 func (ts *ConnectionTestSuite) TestRunMigration() {
-	conn, _ := testConn(ts.T(), ts.driver)
 	type ModelX struct {
 		gorm.Model
 	}
 	mx := ModelX{}
 	m := migration.NewMigration(time.Now().UTC().String(), mx)
-	err := conn.RunMigration(m)
+	err := ts.conn.RunMigration(m)
 	ts.NoError(err)
-	has := conn.DB.Migrator().HasTable(mx)
+	has := ts.conn.DB.Migrator().HasTable(mx)
 	ts.True(has)
-	err = conn.DB.Migrator().DropTable(mx)
+	err = ts.conn.DB.Migrator().DropTable(mx)
 	ts.NoError(err)
-	has = conn.DB.Migrator().HasTable(mx)
+	has = ts.conn.DB.Migrator().HasTable(mx)
 	ts.False(has)
 }
 

@@ -1,13 +1,10 @@
 coverage:
   status:
-    project:
-      default:
-        threshold: 0.2
-        if_not_found: success
     patch:
       default:
         enabled: no
         if_not_found: success
+
 ignore:
   - "test/"
   - "app/"

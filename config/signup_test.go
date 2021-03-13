@@ -58,3 +58,16 @@ func TestSignup_Defaults(t *testing.T) {
 	s := c.Signup
 	assert.Equal(t, def, s)
 }
+
+func TestSignup_CanSendInvites(t *testing.T) {
+	c := Signup{}
+	c.Invites = Admins
+	can := c.CanSendInvites()
+	assert.True(t, can)
+	c.Invites = "bad"
+	can = c.CanSendInvites()
+	assert.False(t, can)
+	c.Disabled = true
+	can = c.CanSendInvites()
+	assert.False(t, can)
+}

@@ -40,10 +40,13 @@ func TestAPI_Signup(t *testing.T) {
 
 func testSignup(t *testing.T, autoconfirm bool) {
 	a := createAPI(t)
+	var mu sync.Mutex
 	if !autoconfirm {
+		mu.Lock()
 		a.config, _ = tconf.MockSMTP(t, a.config)
 		err := a.OpenMail()
 		require.NoError(t, err)
+		mu.Unlock()
 	}
 	a.config.Signup.AutoConfirm = autoconfirm
 	const (

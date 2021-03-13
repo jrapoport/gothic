@@ -7,9 +7,6 @@ type Name string
 
 // IsExternal returns true if the provider is external.
 func (p Name) IsExternal() bool {
-	if p == Unknown {
-		return false
-	}
 	_, ok := External[p]
 	return ok
 }
