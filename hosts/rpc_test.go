@@ -1,12 +1,12 @@
 package hosts
 
 import (
-	"github.com/jrapoport/gothic/hosts/rpc/admin"
 	"testing"
 	"time"
 
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/hosts/rpc/admin/config"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
@@ -14,10 +14,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func adminClient(t *testing.T, h core.Hosted) admin.AdminClient {
+func configClient(t *testing.T, h core.Hosted) config.ConfigClient {
 	return tsrv.RPCClient(t, h.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return admin.NewAdminClient(cc)
-	}).(admin.AdminClient)
+		return config.NewConfigClient(cc)
+	}).(config.ConfigClient)
 }
 
 func TestRPCHost(t *testing.T) {
@@ -33,8 +33,8 @@ func TestRPCHost(t *testing.T) {
 	test := a.Settings()
 	// unauthenticated call
 	ctx := context.Background()
-	ac := adminClient(t, h)
-	res, err := ac.Settings(ctx, &admin.SettingsRequest{})
+	ac := configClient(t, h)
+	res, err := ac.Settings(ctx, &config.SettingsRequest{})
 	assert.NoError(t, err)
 	assert.Equal(t, test.Status, res.Status)
 	assert.Equal(t, test.Signup.Provider.Internal, res.Signup.Provider.Internal)

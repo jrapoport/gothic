@@ -292,7 +292,7 @@ func TestAPI_Signup_SignupCode(t *testing.T) {
 	}
 	a := createAPI(t)
 	ctx := testContext(a)
-	sc, err := codes.CreateCode(a.conn, uuid.Nil, code.PIN, 1, true)
+	sc, err := codes.CreateSignupCode(a.conn, uuid.Nil, code.PIN, 1, true)
 	require.NoError(t, err)
 	require.NotNil(t, sc)
 	// Signup code off
@@ -319,7 +319,7 @@ func TestAPI_Signup_SignupCode(t *testing.T) {
 	_, err = a.Signup(ctx, email(), testUsername, testPass, nil)
 	assert.NoError(t, err)
 	// check code was used
-	_, err = codes.GetUsableCode(a.conn, sc.Code())
+	_, err = codes.GetUsableSignupCode(a.conn, sc.Code())
 	assert.Error(t, err)
 	// can't re-use code
 	_, err = a.Signup(ctx, email(), testUsername, testPass, nil)

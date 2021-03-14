@@ -183,7 +183,7 @@ func TestSignupServer_Signup_SignupCode(t *testing.T) {
 	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
 	assert.Error(t, err)
 	// good code
-	pin, err := srv.CreateCode(context.Background(), code.SingleUse)
+	pin, err := srv.CreateSignupCode(context.Background(), code.SingleUse)
 	assert.NoError(t, err)
 	v.Set(key.Code, pin)
 	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)

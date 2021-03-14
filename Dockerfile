@@ -18,7 +18,7 @@ FROM alpine:3.7
 RUN adduser -D -u 1000 gothic
 
 RUN apk add --no-cache ca-certificates
-COPY --from=build /app/build/release/gothic /usr/local/bin/gothic
+COPY --from=build /cmd/build/release/gothic /usr/local/bin/gothic
 
 USER gothic
 CMD ["gothic"]

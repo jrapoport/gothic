@@ -3,7 +3,9 @@ include $(CUR_DIR)/protoc.mk
 
 PKG := github.com/jrapoport/gothic
 EXE := gothic
+CLI := gcli
 
+CMD_DIR := ./cmd
 BUILD_DIR := build
 DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
@@ -105,11 +107,14 @@ DEBUG_TAGS := -tags "debug"
 RELEASE_TAGS := -tags "osusergo,netgo,release"
 BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
 OUT_DIR := $(DEBUG_DIR)
+IN_EXE = $(CMD_DIR)/$(EXE)
 OUT_EXE = -o $(OUT_DIR)/$(EXE)
-IN_EXE = ./app
+IN_CLI = $(CMD_DIR)/$(CLI)
+OUT_CLI = -o $(OUT_DIR)/$(CLI)
 build: ## Debug build
 	echo $(VER_FLAGS)
 	$(GO_BUILD) $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)
+	$(GO_BUILD) $(OUT_CLI) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_CLI)
 
 release: BUILD_TAGS := $(RELEASE_TAGS)
 release: OUT_DIR := $(RELEASE_DIR)

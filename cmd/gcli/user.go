@@ -1,5 +1,6 @@
-package cmd
+package main
 
+/*
 import "github.com/spf13/cobra"
 
 var userCmd = &cobra.Command{
@@ -11,3 +12,4 @@ func init() {
 	userCmd.AddCommand(roleCmd)
 	userCmd.AddCommand(deleteCmd)
 }
+*/

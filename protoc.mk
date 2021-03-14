@@ -66,6 +66,6 @@ rpc-cs:: $(PROTOC_GEN) ## Protobuf gRPC C#
 	--grpc_opt=no_server \
 	$(PROTO_FILES)
 
-grpc: rpc rpcw rpc-cs ## Protobuf gRPC All
+grpc: rpc rpcw # Protobuf gRPC All
 
 .PHONY: rpc rpcw rpc-cs grpc

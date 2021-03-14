@@ -2,6 +2,7 @@ package code
 
 import (
 	"errors"
+	"github.com/jrapoport/gothic/core/tokens"
 	"time"
 
 	"github.com/google/uuid"
@@ -60,7 +61,7 @@ func (sc *SignupCode) UseCode(tx *store.Connection, u *user.User) error {
 		return nil
 	}
 	sc.Users = append(sc.Users, *u)
-	return token.UseToken(tx, sc)
+	return tokens.UseToken(tx, sc)
 }
 
 func validUser(u *user.User) bool {

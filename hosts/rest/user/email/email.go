@@ -2,9 +2,9 @@ package email
 
 import (
 	"errors"
+	"github.com/jrapoport/gothic/config"
 	"net/http"
 
-	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/store/types/key"

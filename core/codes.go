@@ -11,11 +11,11 @@ import (
 	"github.com/jrapoport/gothic/store"
 )
 
-// CreateCode returns a new signup pin code.
-func (a *API) CreateCode(ctx context.Context, uses int) (string, error) {
+// CreateSignupCode returns a new signup pin code.
+func (a *API) CreateSignupCode(ctx context.Context, uses int) (string, error) {
 	var sc *code.SignupCode
 	err := a.conn.Transaction(func(tx *store.Connection) (err error) {
-		sc, err = codes.CreateCode(a.conn, user.SystemID, code.PIN, uses, true)
+		sc, err = codes.CreateSignupCode(a.conn, user.SystemID, code.PIN, uses, true)
 		if err != nil {
 			return err
 		}
@@ -27,11 +27,11 @@ func (a *API) CreateCode(ctx context.Context, uses int) (string, error) {
 	return sc.Code(), nil
 }
 
-// CreateCodes returns a list of new signup pin codes.
-func (a *API) CreateCodes(ctx context.Context, uses, count int) ([]string, error) {
+// CreateSignupCodes returns a list of new signup pin codes.
+func (a *API) CreateSignupCodes(ctx context.Context, uses, count int) ([]string, error) {
 	var list []string
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		cl, err := codes.CreateCodes(tx, user.SystemID, code.PIN, uses, count)
+		cl, err := codes.CreateSignupCodes(tx, user.SystemID, code.PIN, uses, count)
 		if err != nil {
 			return err
 		}
@@ -51,9 +51,13 @@ func (a *API) CreateCodes(ctx context.Context, uses, count int) ([]string, error
 }
 
 // CheckSignupCode returns nil if the code is valid and usable.
-func (a *API) CheckSignupCode(tok string) error {
-	_, err := codes.GetUsableCode(a.conn, tok)
-	return err
+func (a *API) CheckSignupCode(tok string) (*code.SignupCode, error) {
+	return codes.GetUsableSignupCode(a.conn, tok)
+}
+
+// VoidSignupCode returns nil if the code is valid and usable.
+func (a *API) VoidSignupCode(tok string) error {
+	return codes.VoidSignupCode(a.conn, tok)
 }
 
 type (
@@ -101,7 +105,7 @@ func (a *API) sendSignupCode(ctx context.Context, userID uuid.UUID, to string, c
 		if err != nil {
 			return
 		}
-		err = codes.CodeSent(tx, sc)
+		err = codes.SignupCodeSent(tx, sc)
 		if err != nil {
 			return
 		}
@@ -110,7 +114,7 @@ func (a *API) sendSignupCode(ctx context.Context, userID uuid.UUID, to string, c
 }
 
 func (a *API) rateLimitCode(tx *store.Connection, userID uuid.UUID) error {
-	last, err := codes.GetLastSentCode(tx, userID)
+	last, err := codes.GetLastSentSignupCode(tx, userID)
 	if err != nil {
 		return err
 	}

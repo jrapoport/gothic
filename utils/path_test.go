@@ -47,3 +47,9 @@ func TestIsDirectory(t *testing.T) {
 	is = IsDirectory(testFile.Name())
 	assert.False(t, is)
 }
+
+func TestExecutableName(t *testing.T) {
+	name, err := ExecutableName()
+	assert.NoError(t, err)
+	assert.NotEmpty(t, name)
+}

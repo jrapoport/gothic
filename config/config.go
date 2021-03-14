@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"github.com/jrapoport/gothic/utils"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -63,6 +64,11 @@ func (c *Config) Log() logrus.FieldLogger {
 		c.log = logrus.New()
 	}
 	return c.log
+}
+
+// ReplaceLog replaces the configured log.
+func (c *Config) ReplaceLog(l logrus.FieldLogger) {
+	c.log = l
 }
 
 // Write writes a copy of the config to the supplied path.
@@ -154,10 +160,14 @@ func loadFromFile(path string) (*viper.Viper, error) {
 			v.SetConfigFile(path)
 		}
 	} else {
-		v.AddConfigPath("/etc/gothic/")
-		v.AddConfigPath("$HOME/.gothic")
+		name, err := utils.ExecutableName()
+		if err != nil {
+			return nil, err
+		}
+		v.AddConfigPath("/etc/" + name + "/")
+		v.AddConfigPath("$HOME/." + name)
 		v.AddConfigPath(".")
-		v.SetConfigName("gothic")
+		v.SetConfigName(name)
 	}
 	err = v.MergeInConfig()
 	if err != nil {

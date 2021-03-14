@@ -59,7 +59,7 @@ func TestInviteServer_SendInviteUser(t *testing.T) {
 	assert.Equal(t, req.Email, data.Get(key.Email))
 	in := data.Get(key.Token)
 	assert.NotEmpty(t, in)
-	err = srv.CheckSignupCode(in)
+	_, err = srv.CheckSignupCode(in)
 	assert.NoError(t, err)
 }
 

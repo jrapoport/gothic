@@ -78,7 +78,7 @@ func AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.Us
 		if err != nil {
 			return err
 		}
-		return token.UseToken(tx, t)
+		return tokens.UseToken(tx, t)
 	})
 	if err != nil {
 		return nil, err

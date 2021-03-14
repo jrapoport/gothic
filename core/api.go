@@ -1,9 +1,8 @@
 package core
 
 import (
-	"github.com/jrapoport/gothic/config/provider"
-
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/mail"

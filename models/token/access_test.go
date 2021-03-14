@@ -14,6 +14,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	testToken    = "1234567890asdfghjkl="
+	tokenExp     = time.Hour * 1
+	tokenExpired = tokenExp * -1
+	tokenTests   = []struct {
+		uses int
+		exp  time.Duration
+		use  Usage
+		max  int
+	}{
+		{-2, NoExpiration, Infinite, InfiniteUse},
+		{InfiniteUse, NoExpiration, Infinite, InfiniteUse},
+		{0, NoExpiration, Single, SingleUse},
+		{SingleUse, NoExpiration, Single, SingleUse},
+		{2, NoExpiration, Multi, 2},
+		{-2, tokenExpired, Infinite, InfiniteUse},
+		{InfiniteUse, tokenExpired, Infinite, InfiniteUse},
+		{0, tokenExpired, Single, SingleUse},
+		{SingleUse, tokenExpired, Single, SingleUse},
+		{2, tokenExpired, Multi, 2},
+		{-2, tokenExp, Timed, InfiniteUse},
+		{InfiniteUse, tokenExp, Timed, InfiniteUse},
+		{0, tokenExp, Timed, SingleUse},
+		{SingleUse, tokenExp, Timed, SingleUse},
+		{2, tokenExp, Timed, 2},
+	}
+)
+
 func accessTokenConn(t *testing.T) *store.Connection {
 	conn, _ := tconn.TempConn(t)
 	mg := migration.NewMigrationWithIndexes("1",

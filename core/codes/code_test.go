@@ -49,7 +49,7 @@ func testCreateCode(t *testing.T, f code.Format) {
 		{code.InfiniteUse, true, code.InfiniteUse},
 	}
 	for _, test := range tests {
-		sc, err := CreateCode(conn, uuid.Nil, f, test.uses, test.unique)
+		sc, err := CreateSignupCode(conn, uuid.Nil, f, test.uses, test.unique)
 		assert.NoError(t, err)
 		assert.False(t, sc.CreatedAt.IsZero())
 		assert.Equal(t, user.SystemID, sc.UserID)
@@ -83,7 +83,7 @@ func testCreateCodes(t *testing.T, f code.Format) {
 		{code.InfiniteUse, 48, code.InfiniteUse, 48},
 	}
 	for _, test := range tests {
-		list, err := CreateCodes(conn, uuid.Nil, f, test.uses, test.count)
+		list, err := CreateSignupCodes(conn, uuid.Nil, f, test.uses, test.count)
 		assert.NoError(t, err)
 		assert.Len(t, list, test.len)
 		if len(list) <= 0 {
@@ -107,7 +107,7 @@ func testGetCode(t *testing.T, f code.Format) {
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	testCode := func() *code.SignupCode {
-		sc, err := CreateCode(conn, uid, f, code.SingleUse, true)
+		sc, err := CreateSignupCode(conn, uid, f, code.SingleUse, true)
 		require.NoError(t, err)
 		return sc
 	}
@@ -124,7 +124,7 @@ func testGetCode(t *testing.T, f code.Format) {
 		{deletedCode, assert.Error},
 	}
 	for _, test := range tests {
-		sc, err := GetCode(conn, test.sc.Code())
+		sc, err := GetSignupCode(conn, test.sc.Code())
 		test.Err(t, err)
 		if sc != nil {
 			assert.Equal(t, f, sc.Format)
@@ -151,7 +151,7 @@ func testGetUsableCode(t *testing.T, f code.Format) {
 		Nil  assert.ValueAssertionFunc
 	}
 	usedTest := func() testCase {
-		used, err := CreateCode(conn, uuid.Nil, f, code.SingleUse, true)
+		used, err := CreateSignupCode(conn, uuid.Nil, f, code.SingleUse, true)
 		assert.NoError(t, err)
 		used.Used = code.SingleUse
 		err = conn.Save(used).Error
@@ -163,7 +163,7 @@ func testGetUsableCode(t *testing.T, f code.Format) {
 		}
 	}
 	deleteTest := func() testCase {
-		deleted, err := CreateCode(conn, uuid.Nil, f, code.SingleUse, true)
+		deleted, err := CreateSignupCode(conn, uuid.Nil, f, code.SingleUse, true)
 		assert.NoError(t, err)
 		err = conn.Delete(deleted).Error
 		assert.NoError(t, err)
@@ -180,7 +180,7 @@ func testGetUsableCode(t *testing.T, f code.Format) {
 		deleteTest(),
 	}
 	for _, use := range uses {
-		sc, err := CreateCode(conn, uuid.Nil, f, use, true)
+		sc, err := CreateSignupCode(conn, uuid.Nil, f, use, true)
 		assert.NoError(t, err)
 		tests = append(tests, testCase{
 			sc.Code(),
@@ -190,7 +190,7 @@ func testGetUsableCode(t *testing.T, f code.Format) {
 	}
 
 	for _, test := range tests {
-		sc, err := GetUsableCode(conn, test.code)
+		sc, err := GetUsableSignupCode(conn, test.code)
 		test.Err(t, err)
 		test.Nil(t, sc)
 	}
@@ -199,14 +199,14 @@ func testGetUsableCode(t *testing.T, f code.Format) {
 func TestCodeSent(t *testing.T) {
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
-	sc, err := CreateCode(conn, uid, code.Invite, code.SingleUse, true)
+	sc, err := CreateSignupCode(conn, uid, code.Invite, code.SingleUse, true)
 	require.NoError(t, err)
 	require.NotNil(t, sc)
 	assert.Nil(t, sc.SentAt)
-	err = CodeSent(conn, sc)
+	err = SignupCodeSent(conn, sc)
 	assert.NoError(t, err)
 	assert.NotNil(t, sc.SentAt)
-	tc, err := GetCode(conn, sc.Code())
+	tc, err := GetSignupCode(conn, sc.Code())
 	require.NoError(t, err)
 	require.NotNil(t, sc)
 	assert.Equal(t, sc.SentAt.String(), tc.SentAt.String())
@@ -217,11 +217,11 @@ func TestGetLastSentCode(t *testing.T) {
 	uid := uuid.New()
 	codes := make([]*code.SignupCode, 0)
 	for i := 0; i < 3; i++ {
-		sc, err := CreateCode(conn, uid, code.Invite, code.SingleUse, true)
+		sc, err := CreateSignupCode(conn, uid, code.Invite, code.SingleUse, true)
 		require.NoError(t, err)
 		require.NotNil(t, sc)
 		if i > 0 {
-			err = CodeSent(conn, sc)
+			err = SignupCodeSent(conn, sc)
 			assert.NoError(t, err)
 		}
 		for _, c := range codes {
@@ -229,10 +229,10 @@ func TestGetLastSentCode(t *testing.T) {
 		}
 		codes = append(codes, sc)
 	}
-	lc, err := GetLastSentCode(conn, uid)
+	lc, err := GetLastSentSignupCode(conn, uid)
 	assert.NoError(t, err)
 	assert.Equal(t, codes[len(codes)-1].ID, lc.ID)
-	lc, err = GetLastSentCode(conn, uuid.Nil)
+	lc, err = GetLastSentSignupCode(conn, uuid.Nil)
 	assert.NoError(t, err)
 	assert.Nil(t, lc)
 }

@@ -10,7 +10,7 @@ import (
 func TestAPI_CreateCode(t *testing.T) {
 	a := createAPI(t)
 	ctx := testContext(a)
-	c, err := a.CreateCode(ctx, code.SingleUse)
+	c, err := a.CreateSignupCode(ctx, code.SingleUse)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, c)
 }
@@ -19,10 +19,23 @@ func TestAPI_CreateCodes(t *testing.T) {
 	const count = 100
 	a := createAPI(t)
 	ctx := testContext(a)
-	list, err := a.CreateCodes(ctx, code.SingleUse, count)
+	list, err := a.CreateSignupCodes(ctx, code.SingleUse, count)
 	assert.NoError(t, err)
 	assert.Len(t, list, count)
 	assertUnique(t, list)
+}
+
+func TestAPI_CheckSignupCode(t *testing.T) {
+	a := createAPI(t)
+	ctx := testContext(a)
+	test, err := a.CreateSignupCode(ctx, code.SingleUse)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, test)
+	sc, err := a.CheckSignupCode(test)
+	assert.NoError(t, err)
+	assert.Equal(t, test, sc.Token)
+	_, err = a.CheckSignupCode("")
+	assert.Error(t, err)
 }
 
 func assertUnique(t *testing.T, s []string) {

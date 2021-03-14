@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/imdario/mergo"
+	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
@@ -41,7 +42,7 @@ func ConfirmIfNeeded(conn *store.Connection, ct *token.ConfirmToken, u *user.Use
 	}
 	var confirmed bool
 	err := conn.Transaction(func(tx *store.Connection) error {
-		err := token.UseToken(tx, ct)
+		err := tokens.UseToken(tx, ct)
 		if err != nil {
 			return err
 		}
