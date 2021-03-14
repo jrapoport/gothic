@@ -26,7 +26,9 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 		ctx = context.Background()
 	}
 	p := a.Provider()
-	ctx.SetProvider(p)
+	if ctx.GetProvider() != p {
+		ctx.SetProvider(p)
+	}
 	err := a.signupEnabled(p)
 	if err != nil {
 		err = fmt.Errorf("signup: %w", err)

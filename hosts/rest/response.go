@@ -5,6 +5,7 @@ import (
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/utils"
+	"time"
 )
 
 // UserResponse contains an http user response.
@@ -33,17 +34,19 @@ func (r *UserResponse) MaskEmail() {
 
 // BearerResponse is the
 type BearerResponse struct {
-	Type    string `json:"type"`
-	Access  string `json:"access,omitempty"`
-	Refresh string `json:"refresh,omitempty"`
-	ID      string `json:"id,omitempty"`
+	Type      string     `json:"type"`
+	Access    string     `json:"access,omitempty"`
+	Refresh   string     `json:"refresh,omitempty"`
+	ID        string     `json:"id,omitempty"`
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 }
 
 // NewBearerResponse returns a BearerResponse from a BearerToken
 func NewBearerResponse(bt *tokens.BearerToken) *BearerResponse {
 	return &BearerResponse{
-		Type:    bt.Class().String(),
-		Access:  bt.String(),
-		Refresh: bt.RefreshToken.String(),
+		Type:      bt.Class().String(),
+		Access:    bt.String(),
+		Refresh:   bt.RefreshToken.String(),
+		ExpiresAt: bt.ExpiredAt,
 	}
 }

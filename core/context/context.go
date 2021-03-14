@@ -138,6 +138,9 @@ func (ctx *apiContext) SetAdminID(uid uuid.UUID) {
 }
 
 func (ctx *apiContext) setValue(key, val interface{}) {
+	if ctx.Value(key) == val {
+		return
+	}
 	*ctx = apiContext{context.WithValue(ctx.Context, key, val)}
 }
 

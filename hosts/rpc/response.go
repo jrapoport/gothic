@@ -7,6 +7,7 @@ import (
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/utils"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // NewUserResponse returns a UserResponse for the supplied user.
@@ -30,9 +31,13 @@ func (x *UserResponse) MaskEmail() {
 
 // NewBearerResponse returns a BearerResponse from a BearerToken
 func NewBearerResponse(bt *tokens.BearerToken) *BearerResponse {
-	return &BearerResponse{
+	res := &BearerResponse{
 		Type:    bt.Class().String(),
 		Access:  bt.String(),
 		Refresh: bt.RefreshToken.String(),
 	}
+	if bt.ExpiredAt != nil {
+		res.ExpiresAt = timestamppb.New(*bt.ExpiredAt)
+	}
+	return res
 }
