@@ -48,7 +48,7 @@ const (
 	mailLinkToken  = ":token"
 )
 
-const defaultLinkFormat = "/" + mailLinkAction + "/" + mailLinkToken
+const defaultLinkFormat = "/" + mailLinkAction + "/#" + mailLinkToken
 
 var templateDefaults = MailTemplates{
 	ChangeEmail: MailTemplate{

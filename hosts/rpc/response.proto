@@ -5,6 +5,7 @@ option go_package = "github.com/jrapoport/gothic/hosts/rpc;rpc";
 package rpc;
 
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 message UserResponse {
   string role = 1;
@@ -19,4 +20,5 @@ message BearerResponse {
  string access = 2;
  string refresh = 3;
  string id = 4;
+  google.protobuf.Timestamp expires_at = 5;
 }
