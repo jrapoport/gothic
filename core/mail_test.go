@@ -228,7 +228,7 @@ func TestAPI_SendInviteUser(t *testing.T) {
 			assert.Equal(t, to, data[key.Email])
 			tok, ok := data[key.Token].(string)
 			assert.True(t, ok)
-			sc, err := codes.GetUsableCode(a.conn, tok)
+			sc, err := codes.GetUsableSignupCode(a.conn, tok)
 			assert.NoError(t, err)
 			assert.Equal(t, u.ID, sc.UserID)
 		},

@@ -219,7 +219,7 @@ func (a *API) useSignupCode(tx *store.Connection, u *user.User, code string) err
 	if code == "" {
 		return errors.New("signup code required")
 	}
-	sc, err := codes.GetUsableCode(tx, code)
+	sc, err := codes.GetUsableSignupCode(tx, code)
 	if err != nil {
 		return err
 	}

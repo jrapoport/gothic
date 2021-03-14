@@ -1,8 +1,6 @@
-package cmd
+package main
 
 import (
-	"fmt"
-
 	"github.com/jrapoport/gothic/store"
 	"github.com/spf13/cobra"
 )
@@ -14,19 +12,17 @@ var migrateCmd = &cobra.Command{
 }
 
 func migrateRunE(*cobra.Command, []string) error {
-	c, err := adminConfig()
+	c := rootConfig()
+	l := c.Log().WithField("exe", "gmd")
+	conn, err := store.Dial(c, l)
 	if err != nil {
 		return err
 	}
-	conn, err := store.Dial(c, c.Log())
-	if err != nil {
-		return err
-	}
-	fmt.Println("starting migration...")
+	l.Info("starting migration...")
 	err = conn.AutoMigrate()
 	if err != nil {
 		return err
 	}
-	fmt.Println("migration complete")
+	l.Info("migration complete")
 	return nil
 }

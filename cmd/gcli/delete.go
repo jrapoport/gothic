@@ -1,5 +1,6 @@
-package cmd
+package main
 
+/*
 import (
 	"fmt"
 	"net/mail"
@@ -65,3 +66,4 @@ func deleteUserRunE(_ *cobra.Command, args []string) error {
 	fmt.Printf("deleted user: %s\n", email)
 	return nil
 }
+*/

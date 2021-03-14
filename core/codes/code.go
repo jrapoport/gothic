@@ -11,8 +11,8 @@ import (
 	"github.com/jrapoport/gothic/utils"
 )
 
-// CreateCode creates a signup code.
-func CreateCode(conn *store.Connection, userID uuid.UUID, f code.Format, uses int, unique bool) (*code.SignupCode, error) {
+// CreateSignupCode creates a signup code.
+func CreateSignupCode(conn *store.Connection, userID uuid.UUID, f code.Format, uses int, unique bool) (*code.SignupCode, error) {
 	var sc *code.SignupCode
 	err := conn.Transaction(func(tx *store.Connection) error {
 		for {
@@ -39,15 +39,15 @@ func CreateCode(conn *store.Connection, userID uuid.UUID, f code.Format, uses in
 	return sc, nil
 }
 
-// CreateCodes generates a list of unique signup codes.
-func CreateCodes(conn *store.Connection, userID uuid.UUID, f code.Format, uses, count int) ([]*code.SignupCode, error) {
+// CreateSignupCodes generates a list of unique signup codes.
+func CreateSignupCodes(conn *store.Connection, userID uuid.UUID, f code.Format, uses, count int) ([]*code.SignupCode, error) {
 	if count < 0 {
 		count = 0
 	}
 	list := make([]*code.SignupCode, count)
 	err := conn.Transaction(func(tx *store.Connection) error {
 		for i := 0; i < count; i++ {
-			c, err := CreateCode(tx, userID, f, uses, true)
+			c, err := CreateSignupCode(tx, userID, f, uses, true)
 			if err != nil {
 				return err
 			}
@@ -61,46 +61,46 @@ func CreateCodes(conn *store.Connection, userID uuid.UUID, f code.Format, uses, 
 	return list, nil
 }
 
-// GetCode finds the signup code that matches code.
-func GetCode(conn *store.Connection, c string) (*code.SignupCode, error) {
-	if !utils.IsValidCode(c) {
+// GetSignupCode finds the signup code that matches code.
+func GetSignupCode(conn *store.Connection, tok string) (*code.SignupCode, error) {
+	if !utils.IsValidCode(tok) {
 		return nil, errors.New("invalid code")
 	}
 	sc := new(code.SignupCode)
-	if utils.IsDebugPIN(c) {
+	if utils.IsDebugPIN(tok) {
 		sc.Format = code.PIN
-		sc.Token = c
+		sc.Token = tok
 		return sc, nil
 	}
-	err := conn.First(sc, "token = ?", c).Error
+	err := conn.First(sc, "token = ?", tok).Error
 	if err != nil {
 		return nil, err
 	}
 	return sc, nil
 }
 
-// GetUsableCode returns not nil if a signup code is found that can be used
-func GetUsableCode(conn *store.Connection, c string) (*code.SignupCode, error) {
-	sc, err := GetCode(conn, c)
+// GetUsableSignupCode returns not nil if a signup code is found that can be used
+func GetUsableSignupCode(conn *store.Connection, tok string) (*code.SignupCode, error) {
+	sc, err := GetSignupCode(conn, tok)
 	if err != nil {
 		return nil, err
 	}
 	if !sc.Usable() {
-		err = fmt.Errorf("unusable code: %s", c)
+		err = fmt.Errorf("%w: %s", code.ErrUnusableCode, tok)
 		return nil, err
 	}
 	return sc, nil
 }
 
-// CodeSent mark a code as sent.
-func CodeSent(conn *store.Connection, sc *code.SignupCode) error {
+// SignupCodeSent mark a code as sent.
+func SignupCodeSent(conn *store.Connection, sc *code.SignupCode) error {
 	now := time.Now().UTC()
 	sc.SentAt = &now
 	return conn.Model(sc).Update("sent_at", sc.SentAt).Error
 }
 
-// GetLastSentCode returns the last usable code sent by a user
-func GetLastSentCode(conn *store.Connection, userID uuid.UUID) (*code.SignupCode, error) {
+// GetLastSentSignupCode returns the last usable code sent by a user
+func GetLastSentSignupCode(conn *store.Connection, userID uuid.UUID) (*code.SignupCode, error) {
 	sc := new(code.SignupCode)
 	has, err := conn.HasLast(sc, "user_id = ? AND sent_at NOT NULL", userID)
 	if err != nil {
@@ -110,4 +110,15 @@ func GetLastSentCode(conn *store.Connection, userID uuid.UUID) (*code.SignupCode
 		return nil, nil
 	}
 	return sc, nil
+}
+
+// VoidSignupCode removes a signup code from use
+func VoidSignupCode(conn *store.Connection, tok string) error {
+	return conn.Transaction(func(tx *store.Connection) error {
+		sc, err := GetUsableSignupCode(tx, tok)
+		if err != nil {
+			return err
+		}
+		return tx.Delete(sc).Error
+	})
 }

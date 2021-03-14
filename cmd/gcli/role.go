@@ -1,5 +1,6 @@
-package cmd
+package main
 
+/*
 import (
 	"fmt"
 	"net/mail"
@@ -83,3 +84,6 @@ func roleUserRunE(_ *cobra.Command, args []string) error {
 		u.ID, u.Role.String())
 	return nil
 }
+
+
+*/

@@ -1,12 +1,10 @@
 package token
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/store"
 )
 
 // Token is the interface for tokens.
@@ -76,21 +74,3 @@ const (
 	// Auth is an authorization token.
 	Auth Class = "auth"
 )
-
-// UseToken burns a usable token
-func UseToken(conn *store.Connection, t Token) error {
-	if !t.Usable() {
-		return errors.New("invalid")
-	}
-	return conn.Transaction(func(tx *store.Connection) error {
-		t.Use()
-		err := tx.Save(t).Error
-		if err != nil {
-			return err
-		}
-		if t.Usable() {
-			return nil
-		}
-		return tx.Delete(t).Error
-	})
-}

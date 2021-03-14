@@ -31,11 +31,11 @@ func (s *Server) Response(in interface{}, out interface{}) error {
 
 // RPCError wraps an rpc error code.
 func (s *Server) RPCError(c codes.Code, err error) error {
-	if c == codes.OK || err == nil {
+	if c == codes.OK {
 		return nil
 	}
 	msg := statusText(c)
-	if err.Error() != "" {
+	if err != nil {
 		msg = err.Error()
 	}
 	err = status.Error(c, msg)

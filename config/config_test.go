@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -100,7 +101,11 @@ func TestLoadConfig(t *testing.T) {
 
 func TestLog(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
+		l := c.Log()
 		c.Log().Info("test")
+		c.ReplaceLog(logrus.New())
+		c.Log().Info("test")
+		c.ReplaceLog(l)
 	})
 }
 

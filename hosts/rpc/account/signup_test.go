@@ -156,7 +156,7 @@ func TestAccountServer_Signup_SignupCode(t *testing.T) {
 	_, err = srv.Signup(ctx, req)
 	assert.Error(t, err)
 	// good code
-	pin, err := srv.CreateCode(ctx, code.SingleUse)
+	pin, err := srv.CreateSignupCode(ctx, code.SingleUse)
 	assert.NoError(t, err)
 	ctx.SetCode(pin)
 	_, err = srv.Signup(ctx, req)

@@ -2,10 +2,10 @@ package account
 
 import (
 	"context"
+	"github.com/jrapoport/gothic/config"
 	"testing"
 	"time"
 
-	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/test/tconf"

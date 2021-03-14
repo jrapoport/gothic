@@ -24,3 +24,21 @@ func grantToken(conn *store.Connection, userID uuid.UUID, issueToken func() toke
 func revokeAll(conn *store.Connection, t token.Token, userID uuid.UUID) error {
 	return conn.Unscoped().Where("user_id = ?", userID).Delete(t).Error
 }
+
+// UseToken burns a usable token
+func UseToken(conn *store.Connection, t token.Token) error {
+	if !t.Usable() {
+		return errors.New("invalid")
+	}
+	return conn.Transaction(func(tx *store.Connection) error {
+		t.Use()
+		err := tx.Save(t).Error
+		if err != nil {
+			return err
+		}
+		if t.Usable() {
+			return nil
+		}
+		return tx.Delete(t).Error
+	})
+}

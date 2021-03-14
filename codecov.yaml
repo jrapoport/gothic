@@ -7,5 +7,5 @@ coverage:
 
 ignore:
   - "test/"
-  - "app/"
+  - "cmd/"
   - "**/*.pb.go"

@@ -31,9 +31,9 @@ func register(s *http.Server, srv *configServer) {
 }
 
 func (s *configServer) addRoutes(r *rest.Router) {
-	r.Get(Endpoint, s.Settings)
+	r.Get(Endpoint, s.Config)
 }
 
-func (s *configServer) Settings(w http.ResponseWriter, r *http.Request) {
+func (s *configServer) Config(w http.ResponseWriter, r *http.Request) {
 	s.Response(w, s.API.Settings())
 }

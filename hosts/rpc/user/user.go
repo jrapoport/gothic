@@ -48,6 +48,9 @@ func (s *userServer) GetUser(ctx context.Context, _ *GetUserRequest) (*rpc.UserR
 }
 
 func (s *userServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*rpc.UserResponse, error) {
+	if req == nil {
+		return nil, s.RPCError(codes.InvalidArgument, nil)
+	}
 	uid, err := rpc.GetUserID(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
@@ -74,6 +77,9 @@ func (s *userServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*r
 }
 
 func (s *userServer) ChangePassword(ctx context.Context, req *ChangePasswordRequest) (*rpc.BearerResponse, error) {
+	if req == nil {
+		return nil, s.RPCError(codes.InvalidArgument, nil)
+	}
 	uid, err := rpc.GetUserID(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)

@@ -1,11 +1,11 @@
-package cmd
+package main
 
 import (
 	"fmt"
+	"github.com/jrapoport/gothic/hosts/rpc/admin/codes"
 	"os"
 	"strconv"
 
-	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
@@ -41,20 +41,24 @@ func codeRunE(_ *cobra.Command, args []string) error {
 	if count <= 0 {
 		count = 1
 	}
-	c, err := adminConfig()
+	c := rootConfig()
+	conn, err := clientConn(c.RPC)
 	if err != nil {
 		return err
 	}
-	a, err := core.NewAPI(c)
+	defer func() {
+		conn.Close()
+	}()
+	client := codes.NewCodesClient(conn)
+	ctx := context.Background()
+	res, err := client.CreateSignupCodes(ctx, &codes.CreateSignupCodesRequest{
+		Uses:  int64(codeUses),
+		Count: int64(count),
+	})
 	if err != nil {
 		return err
 	}
-	defer a.Shutdown()
-	list, err := a.CreateCodes(context.Background(), codeUses, count)
-	if err != nil {
-		err = fmt.Errorf("error generating codes: %w", err)
-		return err
-	}
+	list := res.GetCodes()
 	if codeOutput != "" {
 		err = utils.WriteCSV(codeOutput, "code", list)
 		if err != nil {

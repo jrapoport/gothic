@@ -1,5 +1,6 @@
-package cmd
+package main
 
+/*
 import (
 	"fmt"
 
@@ -60,3 +61,6 @@ func createUserRunE(_ *cobra.Command, args []string) error {
 	utils.PrettyPrint(u)
 	return nil
 }
+
+
+*/

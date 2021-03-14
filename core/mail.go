@@ -153,7 +153,7 @@ func (a *API) SendInviteUser(ctx context.Context, userID uuid.UUID, toAddress st
 	}
 	err := a.sendSignupCode(ctx, userID, toAddress,
 		func(tx *store.Connection) (*code.SignupCode, error) {
-			return codes.CreateCode(tx, userID, code.Invite, 1, true)
+			return codes.CreateSignupCode(tx, userID, code.Invite, 1, true)
 		},
 		func(from, to string, sc *code.SignupCode) error {
 			tok, err := jwt.NewSignedData(a.config.JWT, types.Map{
