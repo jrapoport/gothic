@@ -48,10 +48,6 @@ func (a *API) RefreshBearerToken(ctx context.Context, refreshToken string) (*tok
 		if err != nil {
 			return err
 		}
-		if !u.IsActive() {
-			err = fmt.Errorf("inactive user %s", u.ID)
-			return err
-		}
 		bt, err = tokens.RefreshBearerToken(tx, a.config.JWT, u, rt.String())
 		if err != nil {
 			return err
