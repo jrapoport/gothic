@@ -79,18 +79,28 @@ func TestGetActiveUserWithID(t *testing.T) {
 
 func TestGetAuthenticatedUserWithID(t *testing.T) {
 	conn, c := tconn.TempConn(t)
-	u := testUser(t, conn, c.Provider())
-	err := ConfirmUser(conn, u, time.Now())
-	require.NoError(t, err)
-	_, err = GetAuthenticatedUser(conn, uuid.Nil)
+	test := testUser(t, conn, c.Provider())
+	_, err := GetAuthenticatedUser(conn, uuid.Nil)
 	assert.Error(t, err)
-	_, err = GetAuthenticatedUser(conn, u.ID)
+	_, err = GetAuthenticatedUser(conn, test.ID)
 	assert.Error(t, err)
-	_, err = tokens.GrantBearerToken(conn, c.JWT, u)
+	_, err = tokens.GrantBearerToken(conn, c.JWT, test)
 	require.NoError(t, err)
-	tu, err := GetAuthenticatedUser(conn, u.ID)
+	u, err := GetAuthenticatedUser(conn, test.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, u.ID, tu.ID)
+	require.NotNil(t, u)
+	assert.Equal(t, test.ID, u.ID)
+	err = ConfirmUser(conn, test, time.Now())
+	require.NoError(t, err)
+	u, err = GetAuthenticatedUser(conn, test.ID)
+	assert.NoError(t, err)
+	require.NotNil(t, u)
+	assert.Equal(t, test.ID, u.ID)
+	u.Status = user.Locked
+	err = conn.Save(u).Error
+	require.NoError(t, err)
+	_, err = GetAuthenticatedUser(conn, test.ID)
+	assert.Error(t, err)
 }
 
 func TestIsEmailTaken(t *testing.T) {
