@@ -67,8 +67,17 @@ func GetAuthenticatedUser(conn *store.Connection, userID uuid.UUID) (*user.User,
 				userID.String())
 			return err
 		}
-		u, err = GetActiveUser(tx, userID)
-		return err
+		u, err = GetUser(tx, userID)
+		if err != nil {
+			return err
+		}
+		if u.IsLocked() {
+			err = fmt.Errorf("invalid user: %s",
+				userID.String())
+			_ = tokens.RevokeAllRefreshTokens(tx, userID)
+			return err
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
