@@ -14,7 +14,22 @@ func grantToken(conn *store.Connection, userID uuid.UUID, issueToken func() toke
 		return nil, errors.New("system user")
 	}
 	t := issueToken()
-	err := conn.FirstOrCreate(t, "user_id = ?", userID).Error
+	err := conn.Transaction(func(tx *store.Connection) error {
+		err := tx.FirstOrCreate(t, "user_id = ?", userID).Error
+		if err != nil {
+			return err
+		}
+		// do we need to reissue this token?
+		if t.Usable() {
+			return nil
+		}
+		err = tx.Delete(t).Error
+		if err != nil {
+			return err
+		}
+		t, err = grantToken(tx, userID, issueToken)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -125,11 +125,17 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 		data = a.useDefaultColor(data)
 		meta := types.Map{key.IPAddress: ip}
 		u, err = users.CreateUser(tx, p, email, username, pw, data, meta)
-		if err != nil && utils.IsDebugPIN(code) {
+		if err != nil && a.config.IsDebug() && utils.IsDebugPIN(code) {
 			u, err = users.GetUserWithEmail(tx, email)
 			if err != nil {
 				return err
 			}
+			if a.config.Signup.AutoConfirm {
+				return nil
+			}
+			u.Status = user.Restricted
+			u.ConfirmedAt = nil
+			return tx.Save(u).Error
 		} else if err != nil {
 			return err
 		}

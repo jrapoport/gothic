@@ -120,12 +120,19 @@ func TestAccessToken_Usable(t *testing.T) {
 		err := conn.Create(tk).Error
 		assert.NoError(t, err)
 		assert.True(t, tk.Usable())
+		if tk.Type == Timed {
+			if test.exp > 0 {
+				assert.True(t, tk.Usable())
+
+			}
+		}
 		if tk.MaxUses != InfiniteUse {
 			tk.Used = 3
 			assert.False(t, tk.Usable())
 		}
 		if tk.Type == Timed {
-			tm := time.Now().UTC().Add(-1 * time.Hour)
+			tm := time.Now().UTC()
+			tm = tm.Add(-time.Hour)
 			tk.ExpiredAt = &tm
 			assert.False(t, tk.Usable())
 		}
