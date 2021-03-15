@@ -1,11 +1,12 @@
 package rest
 
 import (
+	"time"
+
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/utils"
-	"time"
 )
 
 // UserResponse contains an http user response.

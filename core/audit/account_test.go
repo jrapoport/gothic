@@ -72,7 +72,7 @@ func TestLogDeleted(t *testing.T) {
 }
 
 func TestLogLinked(t *testing.T) {
-	la := &account.Linked{
+	la := &account.LinkedAccount{
 		Type:      account.Auth,
 		Provider:  provider.Google,
 		AccountID: uuid.New().String(),

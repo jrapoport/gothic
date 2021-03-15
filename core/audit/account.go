@@ -51,7 +51,7 @@ func LogDeleted(ctx context.Context, conn *store.Connection, userID uuid.UUID) e
 }
 
 // LogLinked logs a linked account.
-func LogLinked(ctx context.Context, conn *store.Connection, userID uuid.UUID, la *account.Linked) error {
+func LogLinked(ctx context.Context, conn *store.Connection, userID uuid.UUID, la *account.LinkedAccount) error {
 	data := types.Map{
 		key.Type:      la.Type.String(),
 		key.Provider:  la.Provider,

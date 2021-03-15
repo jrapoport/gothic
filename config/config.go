@@ -2,12 +2,12 @@ package config
 
 import (
 	"bytes"
-	"github.com/jrapoport/gothic/utils"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/jrapoport/gothic/utils"
 	"github.com/segmentio/encoding/json"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

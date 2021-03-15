@@ -43,24 +43,24 @@ const (
 // User represents a registered user with email/password authentication
 // TODO: support additional verification (beyond email confirmation) via VerifiedAt
 type User struct {
-	ID          uuid.UUID        `json:"id" gorm:"primaryKey;type:char(36)"`
-	Provider    provider.Name    `json:"provider" gorm:"type:varchar(255)"`
-	Role        Role             `json:"role" gorm:"type:varchar(36)"`
-	Status      Status           `json:"status"`
-	Email       string           `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
-	Username    string           `json:"username" gorm:"type:varchar(255)"`
-	Password    []byte           `json:"-" gorm:"type:binary(60)"`
-	Data        types.Map        `json:"data"`
-	Metadata    types.Map        `json:"metadata"`
-	SignupCode  *uint            `json:"signup_code"`
-	Linked      []account.Linked `json:"linked"`
-	CreatedAt   time.Time        `json:"created_at"`
-	UpdatedAt   time.Time        `json:"updated_at"`
-	LoginAt     *time.Time       `json:"login_at,omitempty"`
-	ConfirmedAt *time.Time       `json:"confirmed_at,omitempty"`
-	VerifiedAt  *time.Time       `json:"verified_at,omitempty"`
-	InvitedAt   *time.Time       `json:"invited_at,omitempty"`
-	DeletedAt   gorm.DeletedAt   `json:"deleted_at"`
+	ID          uuid.UUID               `json:"id" gorm:"primaryKey;type:char(36)"`
+	Provider    provider.Name           `json:"provider" gorm:"type:varchar(255)"`
+	Role        Role                    `json:"role" gorm:"type:varchar(36)"`
+	Status      Status                  `json:"status"`
+	Email       string                  `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
+	Username    string                  `json:"username" gorm:"type:varchar(255)"`
+	Password    []byte                  `json:"-" gorm:"type:binary(60)"`
+	Data        types.Map               `json:"data"`
+	Metadata    types.Map               `json:"metadata"`
+	SignupCode  *uint                   `json:"signup_code"`
+	Linked      []account.LinkedAccount `json:"linked"`
+	CreatedAt   time.Time               `json:"created_at"`
+	UpdatedAt   time.Time               `json:"updated_at"`
+	LoginAt     *time.Time              `json:"login_at,omitempty"`
+	ConfirmedAt *time.Time              `json:"confirmed_at,omitempty"`
+	VerifiedAt  *time.Time              `json:"verified_at,omitempty"`
+	InvitedAt   *time.Time              `json:"invited_at,omitempty"`
+	DeletedAt   gorm.DeletedAt          `json:"deleted_at"`
 }
 
 // NewUser initializes a new user from an email, password and user data.

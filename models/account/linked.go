@@ -15,7 +15,7 @@ func init() {
 		"idx_type_provider_account_id",
 	}
 	store.AddAutoMigrationWithIndexes("4500-linked",
-		Linked{}, linkedIndexes)
+		LinkedAccount{}, linkedIndexes)
 }
 
 // Type is the type of linked account
@@ -40,8 +40,8 @@ func (t Type) String() string {
 	}
 }
 
-// Linked holds a linked account
-type Linked struct {
+// LinkedAccount holds a linked account
+type LinkedAccount struct {
 	gorm.Model
 	UserID    uuid.UUID     `json:"user_id" gorm:"type:char(36)"`
 	Type      Type          `json:"type" gorm:"uniqueIndex:idx_type_provider_account_id"`
@@ -52,7 +52,7 @@ type Linked struct {
 }
 
 // Valid returns nil if the linked account is valid.
-func (l Linked) Valid() error {
+func (l LinkedAccount) Valid() error {
 	if l.Type.String() == "" {
 		return errors.New("invalid type")
 	}

@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLinked_Valid(t *testing.T) {
-	l := &Linked{}
+func TestLinkedAccount_Valid(t *testing.T) {
+	l := &LinkedAccount{}
 	err := l.Valid()
 	assert.Error(t, err)
 	l.Type = -1

@@ -14,7 +14,7 @@ import (
 func TestLinkAccount(t *testing.T) {
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
-	l := account.Linked{}
+	l := account.LinkedAccount{}
 	l.Type = -1
 	err := LinkAccount(conn, nil, &l)
 	assert.Error(t, err)
@@ -35,7 +35,7 @@ func TestLinkAccount(t *testing.T) {
 	assert.NoError(t, err)
 	err = LinkAccount(conn, u, &l)
 	assert.Error(t, err)
-	l2 := account.Linked{
+	l2 := account.LinkedAccount{
 		Provider:  c.Provider(),
 		AccountID: l.AccountID,
 	}
@@ -47,7 +47,7 @@ func TestGetLinkedUser(t *testing.T) {
 	var accountID1 = uuid.New().String()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
-	l := account.Linked{
+	l := account.LinkedAccount{
 		Provider:  c.Provider(),
 		AccountID: accountID1,
 	}
@@ -63,7 +63,7 @@ func TestGetLinkedUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, lu)
 	var accountID2 = uuid.New().String()
-	badLink := account.Linked{
+	badLink := account.LinkedAccount{
 		UserID:    uuid.New(),
 		Provider:  c.Provider(),
 		AccountID: accountID2,
