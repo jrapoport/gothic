@@ -4,6 +4,9 @@ package user
 
 import (
 	"context"
+	"errors"
+	"github.com/jrapoport/gothic/config"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"google.golang.org/grpc"
@@ -74,6 +77,31 @@ func (s *userServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*r
 	}
 	s.Debugf("got user %s: %v", uid, res)
 	return res, nil
+}
+
+func (s *userServer) SendConfirmUser(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	uid, err := rpc.GetUserID(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
+	u, err := s.GetAuthenticatedUser(uid)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
+	if u.IsConfirmed() {
+		return &emptypb.Empty{}, nil
+	}
+	s.Debugf("send confirm user %s", u.ID)
+	rtx := rpc.RequestContext(ctx)
+	rtx.SetProvider(s.Provider())
+	err = s.API.SendConfirmUser(rtx, u.ID)
+	if errors.Is(err, config.ErrRateLimitExceeded) {
+		return nil, s.RPCError(codes.DeadlineExceeded, err)
+	}
+	if err != nil {
+		return nil, s.RPCError(codes.Internal, err)
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (s *userServer) ChangePassword(ctx context.Context, req *ChangePasswordRequest) (*rpc.BearerResponse, error) {

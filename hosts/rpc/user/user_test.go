@@ -2,8 +2,12 @@ package user
 
 import (
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/mail/template"
+	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"testing"
+	"time"
 
 	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/core/context"
@@ -100,6 +104,38 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	assert.EqualValues(t, u.Data, res.Data.AsMap())
 }
 
+func TestUserServer_SendConfirmUser(t *testing.T) {
+	s, smtp := tsrv.RPCServer(t, true)
+	s.Config().Signup.AutoConfirm = false
+	s.Config().Mail.SendLimit = 0
+	srv := newUserServer(s)
+	u, _ := tcore.TestUser(t, srv.API, "", false)
+	bt, err := srv.GrantBearerToken(context.Background(), u)
+	require.NoError(t, err)
+	require.NotNil(t, bt)
+	ctx := tsrv.RPCAuthContext(t, srv.Config(), bt.Token)
+	// success
+	var tok string
+	act := template.ConfirmUserAction
+	smtp.AddHook(t, func(email string) {
+		tok = tconf.GetEmailToken(act, email)
+	})
+	_, err = srv.SendConfirmUser(ctx, &emptypb.Empty{})
+	assert.NoError(t, err)
+	assert.Eventually(t, func() bool {
+		return tok != ""
+	}, 1*time.Second, 100*time.Millisecond)
+	srv.Config().Mail.SendLimit = 5 * time.Minute
+	_, err = srv.SendConfirmUser(ctx, &emptypb.Empty{})
+	assert.Error(t, err)
+	u, err = srv.ConfirmUser(rpc.RequestContext(ctx), tok)
+	require.NoError(t, err)
+	require.NotNil(t, u)
+	assert.True(t, u.IsConfirmed())
+	_, err = srv.SendConfirmUser(ctx, &emptypb.Empty{})
+	assert.NoError(t, err)
+}
+
 func TestUserServer_ChangePassword(t *testing.T) {
 	const newPassword = "gj8#xtg#yrabxpnno!p5f3t8na!hd3?4jq7majxs"
 	srv := testServer(t)
@@ -149,64 +185,3 @@ func TestRequestErrors(t *testing.T) {
 	_, err = srv.ChangePassword(ctx, &ChangePasswordRequest{})
 	assert.Error(t, err)
 }
-
-/*
-func TestRequestErrors(t *testing.T) {
-	s, _ := tsrv.RESTServer(t, false)
-	srv := newUserServer(s)
-	j := srv.Config().JWT
-	srv.Config().Signup.AutoConfirm = true
-	testRoute := func(t *testing.T, h http.HandlerFunc, method, route string, checkReq bool) {
-		// not authorized
-		r := thttp.Request(t, method, route, "", nil, nil)
-		w := httptest.NewRecorder()
-		h.ServeHTTP(w, r)
-		assert.NotEqual(t, http.StatusOK, w.Code)
-		// no user id
-		tok := thttp.BadToken(t, j, false, true)
-		r = thttp.Request(t, method, route, tok, nil, nil)
-		w = httptest.NewRecorder()
-		h.ServeHTTP(w, r)
-		assert.NotEqual(t, http.StatusOK, w.Code)
-		// user not found
-		tok = thttp.UserToken(t, j, false, true)
-		r = thttp.Request(t, method, route, tok, nil, &rest.Request{})
-		r, err := rest.ParseClaims(r, j, tok)
-		require.NoError(t, err)
-		w = httptest.NewRecorder()
-		h.ServeHTTP(w, r)
-		assert.NotEqual(t, http.StatusOK, w.Code)
-		if checkReq {
-			// invalid req
-			tok = thttp.UserToken(t, j, false, true)
-			r = thttp.Request(t, method, route, tok, nil, []byte("\n"))
-			r, err = rest.ParseClaims(r, j, tok)
-			require.NoError(t, err)
-			w = httptest.NewRecorder()
-			h.ServeHTTP(w, r)
-			assert.NotEqual(t, http.StatusOK, w.Code)
-		}
-		// user banned
-		u, tok := tsrv.TestUser(t, srv.Server.Server, "", false)
-		_, err = srv.BanUser(context.Background(), u.ID)
-		require.NoError(t, err)
-		r, err = rest.ParseClaims(r, j, tok)
-		require.NoError(t, err)
-		r = thttp.Request(t, method, route, tok, nil, nil)
-		assert.NotEqual(t, http.StatusOK, w.Code)
-	}
-	const PassRoute = Endpoint + Password
-	tests := []struct {
-		checkReq bool
-		h        http.HandlerFunc
-	}{
-		{http.MethodGet, Endpoint, false, srv.GetUser},
-		{http.MethodPut, Endpoint, true, srv.UpdateUser},
-		{http.MethodPut, PassRoute, true, srv.ChangePassword},
-	}
-	for _, test := range tests {
-		testRoute(t, test.h, test.m, test.r, test.checkReq)
-	}
-}
-
-*/
