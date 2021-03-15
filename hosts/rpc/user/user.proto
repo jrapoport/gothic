@@ -4,6 +4,7 @@ option go_package = "github.com/jrapoport/gothic/hosts/rpc/user;user";
 
 package user;
 
+import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
 import "response.proto";
 
@@ -12,6 +13,9 @@ service User {
   }
 
   rpc UpdateUser (UpdateUserRequest) returns (rpc.UserResponse) {
+  }
+
+  rpc SendConfirmUser (google.protobuf.Empty) returns (google.protobuf.Empty) {
   }
 
   rpc ChangePassword (ChangePasswordRequest) returns (rpc.BearerResponse) {

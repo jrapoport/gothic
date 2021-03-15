@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/jrapoport/gothic/hosts/rest/user/confirm"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
@@ -51,6 +52,7 @@ func (s *userServer) addRoutes(r *rest.Router) {
 		rt.Get(Root, s.GetUser)
 		rt.Put(Root, s.UpdateUser)
 		rt.Put(Password, s.ChangePassword)
+		confirm.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		email.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		invite.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 	})
