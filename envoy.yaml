@@ -34,9 +34,21 @@ static_resources:
                         allow_origin_string_match:
                           - prefix: "*"
                         allow_methods: GET, PUT, DELETE, POST, OPTIONS
-                        allow_headers: authorization,keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,custom-header-1,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
+                        allow_headers: "\
+                          authorization,\
+                          keep-alive,\
+                          user-agent,\
+                          cache-control,\
+                          content-type,\
+                          content-transfer-encoding,\
+                          x-accept-content-transfer-encoding,\
+                          x-accept-response-streaming,\
+                          x-user-agent,\
+                          x-grpc-web,\
+                          grpc-timeout,\
+                          x-recaptcha-token"
                         max_age: "1728000"
-                        expose_headers: custom-header-1,grpc-status,grpc-message
+                        expose_headers: grpc-status,grpc-message
                 http_filters:
                   - name: envoy.filters.http.grpc_web
                   - name: envoy.filters.http.cors
@@ -55,7 +67,8 @@ static_resources:
           keepalive_time: 10
           keepalive_interval: 10
       lb_policy: round_robin
-      # win/mac hosts: Use address: host.docker.internal instead of address: localhost or 0.0.0.0 in the line below
+      # win/mac hosts: Use address: host.docker.internal instead
+      # of address: localhost or 0.0.0.0 in the line below
       load_assignment:
         cluster_name: cluster_0
         endpoints:
