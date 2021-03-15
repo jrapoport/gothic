@@ -49,13 +49,17 @@ func (a *Authenticator) authFunc(ctx context.Context) (context.Context, error) {
 
 // Authenticate parses the jwt claims and authenticates a grpc request
 func Authenticate(ctx context.Context, c config.JWT) (context.Context, error) {
+	claims := GetClaims(ctx)
+	if claims != nil {
+		return ctx, nil
+	}
 	token, err := grpc_auth.AuthFromMD(ctx, BearerScheme)
 	if err != nil {
-		return nil, err
+		return ctx, err
 	}
-	claims, err := parseToken(c, token)
+	claims, err = parseToken(c, token)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
+		return ctx, status.Error(codes.Unauthenticated, err.Error())
 	}
 	return WithClaims(ctx, claims), nil
 }

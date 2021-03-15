@@ -11,7 +11,7 @@ import (
 )
 
 // LinkAccount links an account to a user.
-func LinkAccount(conn *store.Connection, u *user.User, la *account.Linked) error {
+func LinkAccount(conn *store.Connection, u *user.User, la *account.LinkedAccount) error {
 	if u == nil || u.IsLocked() {
 		return errors.New("invalid user")
 	}
@@ -31,7 +31,7 @@ func LinkAccount(conn *store.Connection, u *user.User, la *account.Linked) error
 func HasLinkedUser(conn *store.Connection, p provider.Name, accountID string) (*user.User, error) {
 	var u *user.User
 	err := conn.Transaction(func(tx *store.Connection) error {
-		var la account.Linked
+		var la account.LinkedAccount
 		const query = "provider = ? AND account_id = ?"
 		has, err := tx.Has(&la, query, p, accountID)
 		if err != nil || !has {

@@ -127,7 +127,7 @@ func (a *API) linkAccount(ctx context.Context, conn *store.Connection,
 	}
 	ip := ctx.GetIPAddress()
 	raw[key.IPAddress] = ip
-	la := &account.Linked{
+	la := &account.LinkedAccount{
 		Type:      account.Auth,
 		Provider:  u.Provider,
 		AccountID: accountID,
