@@ -49,7 +49,6 @@ func TestIsDirectory(t *testing.T) {
 }
 
 func TestExecutableName(t *testing.T) {
-	name, err := ExecutableName()
-	assert.NoError(t, err)
+	name := ExecutableName()
 	assert.NotEmpty(t, name)
 }
