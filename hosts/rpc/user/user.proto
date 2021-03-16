@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/jrapoport/gothic/hosts/rpc/user;user";
-
 package user;
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/user;user";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
