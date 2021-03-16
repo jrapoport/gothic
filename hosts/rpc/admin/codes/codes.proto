@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin/codes;codes";
-
 package codes;
+
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin/codes;codes";
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
