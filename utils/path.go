@@ -29,16 +29,12 @@ func IsDirectory(path string) bool {
 }
 
 // ExecutableName returns the name of the current exe
-func ExecutableName() (string, error) {
-	path, err := os.Executable()
-	if err != nil {
-		return "", err
-	}
-	path, err = filepath.EvalSymlinks(path)
-	if err != nil {
-		return "", err
+func ExecutableName() string {
+	path, _ := os.Executable()
+	if link, err := filepath.EvalSymlinks(path); err == nil {
+		path = link
 	}
 	name := filepath.Base(path)
 	ext := filepath.Ext(name)
-	return strings.ReplaceAll(name, ext, ""), nil
+	return strings.ReplaceAll(name, ext, "")
 }

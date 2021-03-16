@@ -3,11 +3,12 @@ package main
 import (
 	"github.com/jrapoport/gothic"
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "gothic",
+	Use:     utils.ExecutableName(),
 	Version: config.BuildVersion(),
 	RunE:    rootRunE,
 }

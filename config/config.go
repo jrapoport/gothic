@@ -160,10 +160,7 @@ func loadFromFile(path string) (*viper.Viper, error) {
 			v.SetConfigFile(path)
 		}
 	} else {
-		name, err := utils.ExecutableName()
-		if err != nil {
-			return nil, err
-		}
+		name := utils.ExecutableName()
 		v.AddConfigPath("/etc/" + name + "/")
 		v.AddConfigPath("$HOME/." + name)
 		v.AddConfigPath(".")

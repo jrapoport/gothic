@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/jrapoport/gothic/utils"
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/manifoldco/promptui"
@@ -14,7 +15,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:               "gcli",
+	Use:               utils.ExecutableName(),
 	Short:             "control plane for gothic",
 	Version:           config.BuildVersion(),
 	RunE:              rootRunE,

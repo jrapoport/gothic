@@ -107,9 +107,9 @@ DEBUG_TAGS := -tags "debug"
 RELEASE_TAGS := -tags "osusergo,netgo,release"
 BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
 OUT_DIR := $(DEBUG_DIR)
-IN_EXE = $(CMD_DIR)/$(EXE)
+IN_EXE = $(CMD_DIR)/gothic
 OUT_EXE = -o $(OUT_DIR)/$(EXE)
-IN_CLI = $(CMD_DIR)/$(CLI)
+IN_CLI = $(CMD_DIR)/cli
 OUT_CLI = -o $(OUT_DIR)/$(CLI)
 build: ## Debug build
 	echo $(VER_FLAGS)
