@@ -3,10 +3,10 @@ package core
 import (
 	"errors"
 	"fmt"
-	"github.com/jrapoport/gothic/config"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"

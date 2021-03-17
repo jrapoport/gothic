@@ -1,23 +1,23 @@
 package user
 
 import (
-	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/mail/template"
-	"github.com/jrapoport/gothic/test/tconf"
-	"github.com/jrapoport/gothic/test/tcore"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/test/tconf"
+	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
