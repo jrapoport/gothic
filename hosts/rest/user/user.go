@@ -1,11 +1,11 @@
 package user
 
 import (
-	"github.com/jrapoport/gothic/hosts/rest/user/confirm"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
+	"github.com/jrapoport/gothic/hosts/rest/user/confirm"
 	"github.com/jrapoport/gothic/hosts/rest/user/email"
 	"github.com/jrapoport/gothic/store/types"
 )

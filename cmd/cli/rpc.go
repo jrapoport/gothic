@@ -1,8 +1,6 @@
 package main
 
-import (
-	"google.golang.org/grpc"
-)
+import "google.golang.org/grpc"
 
 func clientConn(address string) (*grpc.ClientConn, error) {
 	opts := []grpc.DialOption{
