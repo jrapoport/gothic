@@ -7,16 +7,14 @@ import (
 )
 
 const (
-	service  = "example"
-	siteURL  = "http://example.com"
-	siteLogo = "http://example.com/logo.png"
+	service = "example"
+	siteURL = "http://example.com"
 )
 
 func TestService(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		assert.Equal(t, service+test.mark, c.Name)
 		assert.Equal(t, siteURL+test.mark, c.SiteURL)
-		assert.Equal(t, siteLogo+test.mark, c.SiteLogo)
 	})
 }
 
@@ -30,7 +28,6 @@ func TestService_Env(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, service, c.Name)
 			assert.Equal(t, siteURL, c.SiteURL)
-			assert.Equal(t, siteLogo, c.SiteLogo)
 		})
 	}
 }

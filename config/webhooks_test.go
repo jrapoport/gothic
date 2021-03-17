@@ -75,9 +75,8 @@ func TestWebhook_Normalization(t *testing.T) {
 	assert.Equal(t, "", w.Secret)
 	w.URL = webhookURL
 	err = w.normalize(Service{
-		Name:     service,
-		SiteURL:  siteURL,
-		SiteLogo: siteLogo,
+		Name:    service,
+		SiteURL: siteURL,
 	}, JWT{
 		Secret: webhookSecret,
 	})

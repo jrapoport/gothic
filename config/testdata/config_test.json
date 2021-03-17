@@ -1,7 +1,6 @@
 {
   "service": "example.json",
   "site_url": "http://example.com.json",
-  "site_logo": "http://example.com/logo.png.json",
   "host": "example.com.json",
   "rest": "example.com.json:80",
   "rpc": "example.com.json:90",

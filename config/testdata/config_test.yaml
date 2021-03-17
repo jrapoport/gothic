@@ -1,6 +1,5 @@
 service: example.yaml
 site_url: http://example.com.yaml
-site_logo: http://example.com/logo.png.yaml
 
 host: example.com.yaml
 rest: example.com.yaml:80
