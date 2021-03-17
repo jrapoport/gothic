@@ -91,11 +91,12 @@ func TestMail_Defaults(t *testing.T) {
 
 func TestMail_Normalization(t *testing.T) {
 	srv := Service{
-		Name:     service,
-		SiteURL:  siteURL,
-		SiteLogo: siteLogo,
+		Name:    service,
+		SiteURL: siteURL,
 	}
-	m := Mail{}
+	m := Mail{
+		Logo: mailLogo,
+	}
 	const (
 		name = "Example"
 		from = "Example <do-not-reply@example.com>"
@@ -104,7 +105,7 @@ func TestMail_Normalization(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, name, m.Name)
 	assert.Equal(t, siteURL, m.Link)
-	assert.Equal(t, siteLogo, m.Logo)
+	assert.Equal(t, mailLogo, m.Logo)
 	assert.Equal(t, from, m.From)
 	m.Link = "\n"
 	err = m.normalize(srv)

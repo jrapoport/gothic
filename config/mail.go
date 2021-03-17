@@ -50,9 +50,6 @@ func (m *Mail) normalize(srv Service) error {
 	if m.Link == "" {
 		m.Link = srv.SiteURL
 	}
-	if m.Logo == "" {
-		m.Logo = srv.SiteLogo
-	}
 	if m.Link != "" {
 		u, err := url.Parse(m.Link)
 		if err != nil {

@@ -39,7 +39,6 @@ type testCase struct {
 
 func mockSMTP(t *testing.T) (*config.Config, *tconf.SMTPMock) {
 	c := tconf.Config(t)
-	c.SiteLogo = logoFile
 	c.Mail.Logo = logoFile
 	return tconf.MockSMTP(t, c)
 }

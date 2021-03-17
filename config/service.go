@@ -12,8 +12,6 @@ type Service struct {
 	Name string `json:"service" yaml:"service" mapstructure:"service"`
 	// SiteURL is the url for the microservice.
 	SiteURL string `json:"site_url" yaml:"site_url" mapstructure:"site_url"`
-	// SiteLogo is the logo url for the microservice.
-	SiteLogo string `json:"site_logo" yaml:"site_logo" mapstructure:"site_logo"`
 }
 
 // Version returns the build version.

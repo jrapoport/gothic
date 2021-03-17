@@ -83,9 +83,8 @@ func TestSecurity_Normalization(t *testing.T) {
 	s := Security{}
 	s.JWT.Secret = jwtSecret
 	err := s.normalize(Service{
-		Name:     service,
-		SiteURL:  siteURL,
-		SiteLogo: siteLogo,
+		Name:    service,
+		SiteURL: siteURL,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, strings.ToLower(service), s.JWT.Issuer)
