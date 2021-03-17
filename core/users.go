@@ -46,6 +46,14 @@ func (a *API) GetUserWithEmail(email string) (*user.User, error) {
 	return u, nil
 }
 
+// SearchUsers searches for users.
+func (a *API) SearchUsers(ctx context.Context, f store.Filters, page *store.Pagination) ([]*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return users.SearchUsers(a.conn, ctx.GetSort(), f, page)
+}
+
 // ChangePassword changes a user password.
 func (a *API) ChangePassword(ctx context.Context, userID uuid.UUID, old, pw string) (*user.User, error) {
 	if ctx == nil {

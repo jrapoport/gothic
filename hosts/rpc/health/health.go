@@ -4,10 +4,10 @@ package health
 
 import (
 	"context"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type healthServer struct {

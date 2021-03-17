@@ -18,12 +18,15 @@ func SearchUsers(conn *store.Connection, s store.Sort, f store.Filters, p *store
 		filters[key.ID] = v
 		delete(filters, key.UserID)
 	}
-	if uid, ok := f[key.ID].(string); ok && uid != "" {
+	if uid, ok := filters[key.ID].(string); ok && uid != "" {
 		id, err := uuid.Parse(uid)
 		if err != nil {
 			return nil, err
 		}
-		f[key.ID] = id
+		filters[key.ID] = id
+	}
+	if v, ok := filters[key.Role].(string); ok {
+		filters[key.Role] = user.ToRole(v)
 	}
 	flt := store.Filter{
 		Filters:   filters,

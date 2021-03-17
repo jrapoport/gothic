@@ -1,4 +1,4 @@
-package auditlog_test
+package audit_test
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/hosts/rest"
-	audit_log "github.com/jrapoport/gothic/hosts/rest/admin/auditlog"
+	audit_log "github.com/jrapoport/gothic/hosts/rest/admin/audit"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types/key"

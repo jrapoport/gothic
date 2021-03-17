@@ -83,14 +83,18 @@ func testCreateUsers(t *testing.T, conn *store.Connection, c *config.Config) []t
 		}
 		return tests
 	}()
-	for i, test := range cases {
-		u, err := createUser(conn, test.provider, test.email, test.name, "", test.data, nil)
-		require.NoError(t, err)
-		u.Role = test.role
-		err = conn.Save(u).Error
-		require.NoError(t, err)
-		cases[i].uid = u.ID
-	}
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range cases {
+			u, err := createUser(tx, test.provider, test.email, test.name, "", test.data, nil)
+			require.NoError(t, err)
+			u.Role = test.role
+			err = tx.Save(u).Error
+			require.NoError(t, err)
+			cases[i].uid = u.ID
+		}
+		return nil
+	})
+	require.NoError(t, err)
 	return cases
 }
 

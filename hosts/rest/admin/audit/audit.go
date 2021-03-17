@@ -1,4 +1,4 @@
-package auditlog
+package audit
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 )
 
 // Endpoint is the config endpoint
-const Endpoint = "/auditlog"
+const Endpoint = "/audit"
 
 // Request is an audit log search request
 type Request struct {

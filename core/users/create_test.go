@@ -94,25 +94,29 @@ func (ts *CreateUserTestSuite) TestCreateUser() {
 			tests = append(tests, test)
 		}
 	}
-	for _, test := range tests {
-		checkUser := func(u *user.User) {
-			ts.NotNil(u)
-			e, err := validate.Email(test.email)
-			ts.Require().NoError(err)
-			ts.Equal(e, u.Email)
-			ts.Equal(test.username, u.Username)
-			ts.False(u.IsConfirmed())
-			ts.Equal(test.data, u.Data)
-			ts.Equal(test.data, u.Metadata)
+	err := ts.conn.Transaction(func(tx *store.Connection) error {
+		for _, test := range tests {
+			checkUser := func(u *user.User) {
+				ts.NotNil(u)
+				e, err := validate.Email(test.email)
+				ts.Require().NoError(err)
+				ts.Equal(e, u.Email)
+				ts.Equal(test.username, u.Username)
+				ts.False(u.IsConfirmed())
+				ts.Equal(test.data, u.Data)
+				ts.Equal(test.data, u.Metadata)
 
+			}
+			u, err := CreateUser(tx, p, test.email, test.username, test.pw, test.data, test.data)
+			ts.NoError(err)
+			checkUser(u)
+			u, err = GetUserWithEmail(tx, test.email)
+			ts.Require().NoError(err)
+			checkUser(u)
 		}
-		u, err := CreateUser(ts.conn, p, test.email, test.username, test.pw, test.data, test.data)
-		ts.NoError(err)
-		checkUser(u)
-		u, err = GetUserWithEmail(ts.conn, test.email)
-		ts.Require().NoError(err)
-		checkUser(u)
-	}
+		return nil
+	})
+	ts.Require().NoError(err)
 }
 
 func (ts *CreateUserTestSuite) TestCreateUser_Error() {
