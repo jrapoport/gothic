@@ -1,4 +1,4 @@
-package auditlog
+package audit
 
 import (
 	"fmt"
@@ -117,6 +117,21 @@ func (ts *AuditServerTestSuite) searchAuditLogs(ep string, v url.Values) *httpte
 	w := httptest.NewRecorder()
 	ts.srv.SearchAuditLogs(w, r)
 	return w
+}
+
+func (ts *AuditServerTestSuite) TestErrors() {
+	// invalid req
+	r := thttp.Request(ts.T(), http.MethodGet, Endpoint, "", nil, []byte("\n"))
+	w := httptest.NewRecorder()
+	ts.srv.SearchAuditLogs(w, r)
+	ts.NotEqual(http.StatusOK, w.Code)
+	// bad paging
+	r = thttp.Request(ts.T(), http.MethodGet, Endpoint, "", url.Values{
+		key.Page: []string{"\n"},
+	}, nil)
+	w = httptest.NewRecorder()
+	ts.srv.SearchAuditLogs(w, r)
+	ts.NotEqual(http.StatusOK, w.Code)
 }
 
 func (ts *AuditServerTestSuite) TestPageHeaders() {

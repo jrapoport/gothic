@@ -16,12 +16,16 @@ const pageSize = 10
 
 func createEntries(t *testing.T, conn *store.Connection) []testCase {
 	tests := testCases()
-	for i, test := range tests {
-		le, err := CreateLogEntry(test.ctx, conn, test.act, test.uid, test.fields)
-		require.NoError(t, err)
-		require.NotNil(t, le)
-		tests[i].logID = le.ID
-	}
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range tests {
+			le, err := CreateLogEntry(test.ctx, tx, test.act, test.uid, test.fields)
+			require.NoError(t, err)
+			require.NotNil(t, le)
+			tests[i].logID = le.ID
+		}
+		return nil
+	})
+	require.NoError(t, err)
 	return tests
 }
 

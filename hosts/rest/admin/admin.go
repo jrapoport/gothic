@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
+	"github.com/jrapoport/gothic/hosts/rest/admin/audit"
 	"github.com/jrapoport/gothic/hosts/rest/admin/config"
+	"github.com/jrapoport/gothic/hosts/rest/admin/users"
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
 )
 
@@ -34,7 +36,9 @@ func register(s *http.Server, srv *adminServer) {
 
 func (s *adminServer) addRoutes(r *rest.Router) {
 	r.Authenticated().Admin().Route(Endpoint, func(rt *rest.Router) {
+		audit.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		config.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		invite.RegisterServer(&http.Server{Handler: rt}, s.Clone())
+		users.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 	})
 }
