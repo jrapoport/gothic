@@ -24,6 +24,7 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 	ip := ctx.GetIPAddress()
 	recaptcha := ctx.GetReCaptcha()
 	p := a.Provider()
+	ctx.SetProvider(p)
 	a.log.Debugf("login: %s %s (%s %s %s)",
 		email, pw, p, ip, recaptcha)
 	err := providers.IsEnabled(p)

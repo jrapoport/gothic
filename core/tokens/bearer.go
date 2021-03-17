@@ -72,10 +72,6 @@ func RefreshBearerToken(conn *store.Connection, c config.JWT, u *user.User, tok 
 			return err
 		}
 		if tok == "" {
-			err = RevokeAllRefreshTokens(tx, bt.UserID)
-			if err != nil {
-				return err
-			}
 			bt.RefreshToken, err = GrantRefreshToken(tx, bt.UserID)
 		} else {
 			bt.RefreshToken, err = SwapRefreshToken(tx, bt.UserID, tok)
