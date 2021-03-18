@@ -2,8 +2,8 @@ package auditlog
 
 import (
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
 	"gorm.io/gorm"
 )
 

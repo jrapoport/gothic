@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // CreateRequest is an signup server request

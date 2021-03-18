@@ -6,8 +6,8 @@ import (
 
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
-	"github.com/jrapoport/gothic/store/types/key"
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/hosts/rest"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
 	"github.com/jrapoport/gothic/test/thttp"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/jrapoport/gothic/test/tutils"

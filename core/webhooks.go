@@ -8,7 +8,7 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/webhooks"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // LoadWebhooks load the webhooks.

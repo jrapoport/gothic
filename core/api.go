@@ -6,8 +6,8 @@ import (
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/providers"
 	"github.com/jrapoport/gothic/mail"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/sirupsen/logrus"
 )
 

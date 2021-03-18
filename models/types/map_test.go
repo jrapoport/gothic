@@ -105,17 +105,16 @@ func TestDataFromMap(t *testing.T) {
 
 func TestMap_GormDBDataType(t *testing.T) {
 	m := Map{}
-	tests := []struct{
+	tests := []struct {
 		d string
 		t string
-	} {
+	}{
 		{mySQL, "JSON"},
 		{postgres, "JSONB"},
 		{sqlServer, "NVARCHAR(MAX)"},
 		{sqlite, "JSON"},
 		{sqlite3, "JSON"},
 		{"fake", "JSON"},
-
 	}
 	for _, test := range tests {
 		typ := m.GormDBDataType(dummyDB(test.d), nil)
@@ -125,11 +124,11 @@ func TestMap_GormDBDataType(t *testing.T) {
 
 func dummyDB(name string) *gorm.DB {
 	d := &dummy{name}
-	c :=  &gorm.Config{Dialector: d}
+	c := &gorm.Config{Dialector: d}
 	return &gorm.DB{Config: c}
 }
 
-type dummy struct{
+type dummy struct {
 	name string
 }
 

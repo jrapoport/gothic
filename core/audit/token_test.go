@@ -8,8 +8,8 @@ import (
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/models/token"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
 )
 
 func TestLogTokenGranted(t *testing.T) {

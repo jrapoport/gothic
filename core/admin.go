@@ -8,9 +8,9 @@ import (
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/users"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
 )
 
 // AdminCreateUser creates a new user

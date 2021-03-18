@@ -5,9 +5,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/account"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // LinkAccount links an account to a user.

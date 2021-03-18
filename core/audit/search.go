@@ -3,8 +3,8 @@ package audit
 import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/auditlog"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/key"
 )
 
 // SearchEntries search the audit log entries.

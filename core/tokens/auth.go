@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/jrapoport/gothic/models/token"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // GrantAuthToken gets or creates an auth token for the provider.
