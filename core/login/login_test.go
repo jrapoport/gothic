@@ -6,13 +6,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/test/tconf"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/stretchr/testify/suite"
@@ -34,8 +32,6 @@ func (ts *LoginTestSuite) SetupSuite() {
 	ts.conn, ts.c = tconn.TempConn(ts.T())
 	ts.c.UseInternal = true
 	ts.jwt = ts.c.JWT
-	err := providers.LoadProviders(ts.c)
-	ts.Require().NoError(err)
 }
 
 func (ts *LoginTestSuite) testUser(p provider.Name, email, pw string) *user.User {
@@ -128,10 +124,6 @@ func (ts *LoginTestSuite) TestLogin_Error() {
 	// disabled provider
 	_, err = UserLogin(ts.conn, provider.Google, em, testPass)
 	ts.Error(err)
-	// provider mismatch
-	c, mock := tconf.MockedProvider(ts.T(), ts.c, "")
-	_, err = UserLogin(ts.conn, mock.PName(), em, testPass)
-	ts.c = c
 	// inactive user
 	u.Status = user.Restricted
 	err = ts.conn.Save(u).Error

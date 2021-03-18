@@ -2,9 +2,8 @@ package settings
 
 import (
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/health"
-	"github.com/jrapoport/gothic/providers"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // Settings is the api settings response
@@ -54,9 +53,6 @@ func Current(c *config.Config) Settings {
 		External: map[provider.Name]bool{},
 	}
 	for name := range c.Providers {
-		if err := providers.IsEnabled(name); err != nil {
-			continue
-		}
 		p.External[name] = true
 	}
 	return Settings{

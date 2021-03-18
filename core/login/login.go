@@ -6,22 +6,17 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // UserLogin authorizes a user and returns a bearer token
 func UserLogin(conn *store.Connection, p provider.Name, email, pw string) (*user.User, error) {
-	err := providers.IsEnabled(p)
-	if err != nil {
-		return nil, errors.New("invalid provider")
-	}
-	email, err = validate.Email(email)
+	email, err := validate.Email(email)
 	if err != nil {
 		return nil, err
 	}

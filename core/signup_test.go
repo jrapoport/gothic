@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/codes"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/events"
@@ -17,6 +16,7 @@ import (
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"

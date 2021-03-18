@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/store/drivers"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 const (

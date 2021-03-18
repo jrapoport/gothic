@@ -2,15 +2,13 @@ package core
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/providers"
 	"math"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
+	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
@@ -18,6 +16,7 @@ import (
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
@@ -145,7 +144,7 @@ func testCreateUsers(t *testing.T, a *API) []testUsers {
 		ClientKey: "key",
 		Secret:    "secret",
 	}
-	err := providers.LoadProviders(a.config)
+	err := a.ext.LoadProviders(a.config)
 	require.NoError(t, err)
 	err = a.conn.Transaction(func(tx *store.Connection) error {
 		for i, test := range cases {

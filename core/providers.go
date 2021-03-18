@@ -5,16 +5,16 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/core/providers"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/utils"
 )
 
@@ -26,7 +26,7 @@ func (a *API) GetAuthorizationURL(ctx context.Context, p provider.Name) (string,
 	ctx.SetProvider(p)
 	var au *providers.AuthURL
 	err := a.conn.Transaction(func(tx *store.Connection) (err error) {
-		au, err = providers.GrantAuthURL(a.conn, p, 60*time.Minute)
+		au, err = a.ext.GrantAuthURL(a.conn, p, 60*time.Minute)
 		if err != nil {
 			return err
 		}
@@ -45,7 +45,7 @@ func (a *API) AuthorizeUser(ctx context.Context, tok string, data types.Map) (*u
 	}
 	var u *user.User
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		au, err := providers.AuthorizeUser(tx, tok, data)
+		au, err := a.ext.AuthorizeUser(tx, tok, data)
 		if err != nil {
 			return err
 		}

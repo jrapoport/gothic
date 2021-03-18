@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/auditlog"
@@ -15,6 +14,7 @@ import (
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 func TestLogSignup(t *testing.T) {
