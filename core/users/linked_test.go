@@ -12,6 +12,7 @@ import (
 )
 
 func TestLinkAccount(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	l := account.LinkedAccount{}

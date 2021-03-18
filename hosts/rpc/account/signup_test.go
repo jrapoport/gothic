@@ -40,6 +40,7 @@ func testCase(t *testing.T) (*SignupRequest, *rpc.UserResponse) {
 }
 
 func TestAccountServer_Signup(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().MaskEmails = false
@@ -71,6 +72,7 @@ func TestAccountServer_Signup(t *testing.T) {
 }
 
 func TestAccountServer_Signup_Confirm(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().Signup.AutoConfirm = false
@@ -84,6 +86,7 @@ func TestAccountServer_Signup_Confirm(t *testing.T) {
 }
 
 func TestAccountServer_Signup_AutoConfirm(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().Signup.AutoConfirm = true
@@ -97,6 +100,7 @@ func TestAccountServer_Signup_AutoConfirm(t *testing.T) {
 }
 
 func TestAccountServer_Signup_Disabled(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().Signup.Disabled = true
@@ -106,6 +110,7 @@ func TestAccountServer_Signup_Disabled(t *testing.T) {
 }
 
 func TestAccountServer_Signup_EmailDisabled(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().UseInternal = false
@@ -115,6 +120,7 @@ func TestAccountServer_Signup_EmailDisabled(t *testing.T) {
 }
 
 func TestAccountServer_Signup_Recaptcha(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	srv.Config().Recaptcha.Key = validate.ReCaptchaDebugKey
@@ -137,6 +143,7 @@ func TestAccountServer_Signup_Recaptcha(t *testing.T) {
 }
 
 func TestAccountServer_Signup_SignupCode(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	// no code required
@@ -168,6 +175,7 @@ func TestAccountServer_Signup_SignupCode(t *testing.T) {
 }
 
 func TestAccountServer_Signup_Password(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	srv := testServer(t)
 	const passRegex = "^[a-zA-Z0-9[:punct:]]{8,40}$"

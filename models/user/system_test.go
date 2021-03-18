@@ -9,6 +9,7 @@ import (
 )
 
 func TestNewSystemUser(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	su := NewSystemUser()
 	assert.True(t, su.IsSystemUser())

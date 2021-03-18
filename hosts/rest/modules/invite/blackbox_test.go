@@ -40,6 +40,7 @@ func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 }
 
 func TestInviteServer_SendInviteUser(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	var inviteTok string
 	smtp.AddHook(t, func(email string) {
@@ -53,7 +54,7 @@ func TestInviteServer_SendInviteUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return inviteTok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	data, err := jwt.ParseData(srv.Config().JWT, inviteTok)
 	assert.NoError(t, err)
 	assert.Equal(t, req.Email, data.Get(key.Email))
@@ -64,6 +65,7 @@ func TestInviteServer_SendInviteUser(t *testing.T) {
 }
 
 func TestInviteServer_SendInviteUser_Error(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := testServer(t)
 	srv.Config().Signup.Invites = config.Users
 	tok := thttp.UserToken(t, srv.Config().JWT, false, true)

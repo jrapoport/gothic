@@ -9,6 +9,7 @@ import (
 )
 
 func TestHealthServer_HealthCheck(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newHealthServer(s)
 	ctx := context.Background()

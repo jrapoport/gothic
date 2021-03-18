@@ -10,6 +10,7 @@ import (
 )
 
 func TestIsLocalPath(t *testing.T) {
+	t.Parallel()
 	const (
 		testURL1 = "http://exmaple.com"
 		testURL2 = "https://exmaple.com"
@@ -26,6 +27,7 @@ func TestIsLocalPath(t *testing.T) {
 }
 
 func TestHasExt(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	has := HasExt(dir)
 	assert.False(t, has)
@@ -35,6 +37,7 @@ func TestHasExt(t *testing.T) {
 }
 
 func TestIsDirectory(t *testing.T) {
+	t.Parallel()
 	dir := t.TempDir()
 	is := IsDirectory(dir)
 	assert.True(t, is)
@@ -49,6 +52,7 @@ func TestIsDirectory(t *testing.T) {
 }
 
 func TestExecutableName(t *testing.T) {
+	t.Parallel()
 	name := ExecutableName()
 	assert.NotEmpty(t, name)
 }

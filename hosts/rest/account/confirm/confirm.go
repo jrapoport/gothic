@@ -2,9 +2,9 @@ package confirm
 
 import (
 	"errors"
-	"github.com/jrapoport/gothic/config"
 	"net/http"
 
+	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 

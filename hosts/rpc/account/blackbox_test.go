@@ -13,6 +13,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
+	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
 		account.RegisterServer,
 	})

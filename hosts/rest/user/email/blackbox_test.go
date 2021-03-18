@@ -43,6 +43,7 @@ func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 }
 
 func TestEmailServer_ConfirmChangeEmail(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	var newEmail = tutils.RandomEmail()
 	// invalid req
@@ -72,7 +73,7 @@ func TestEmailServer_ConfirmChangeEmail(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// now use the token to change the email
 	req = &email.Request{
 		Token: tok,
@@ -88,6 +89,7 @@ func TestEmailServer_ConfirmChangeEmail(t *testing.T) {
 }
 
 func TestEmailServer_SendChangeEmail(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	u, bt := tcore.TestUser(t, srv.API, "", false)
 	j := srv.Config().JWT
@@ -140,10 +142,11 @@ func TestEmailServer_SendChangeEmail(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }
 
 func TestEmailServer_SendChangeEmail_RateLimit(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	u, bt := tcore.TestUser(t, srv.API, "", false)
@@ -162,13 +165,13 @@ func TestEmailServer_SendChangeEmail_RateLimit(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		} else {
 			msg := thttp.FmtError(http.StatusTooEarly).Error()
 			assert.EqualError(t, err, msg)
 			assert.Never(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		}
 	}
 }

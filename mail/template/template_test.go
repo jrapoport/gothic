@@ -117,6 +117,7 @@ func testTemplateLoad(t *testing.T, newTemplate func(sub string, test testCase) 
 }
 
 func TestEmailTemplate_Valid(t *testing.T) {
+	t.Parallel()
 	e := MailTemplate{}
 	assert.Error(t, e.Valid())
 	e.Prod.Name = "test"
@@ -128,6 +129,7 @@ func TestEmailTemplate_Valid(t *testing.T) {
 }
 
 func TestEmailTemplate_LoadSender(t *testing.T) {
+	t.Parallel()
 	require.FileExists(t, testLayout)
 	static := config.Mail{
 		Name: confName,
@@ -181,6 +183,7 @@ func TestEmailTemplate_LoadSender(t *testing.T) {
 }
 
 func TestEmailTemplate_LoadBody(t *testing.T) {
+	t.Parallel()
 	require.FileExists(t, testBody)
 	static := config.MailTemplate{
 		Subject:    confSub,
@@ -264,6 +267,7 @@ func testConfigTemplate(t *testing.T) config.MailTemplate {
 }
 
 func TestEmailTemplate_LoadTemplate(t *testing.T) {
+	t.Parallel()
 	c := testConfig(t)
 	tc := testConfigTemplate(t)
 	e := MailTemplate{}
@@ -283,6 +287,7 @@ func TestEmailTemplate_LoadTemplate(t *testing.T) {
 }
 
 func TestEmailTemplate_Content(t *testing.T) {
+	t.Parallel()
 	loadTemplate := func(t *testing.T, tc testCase) MailTemplate {
 		tmpl := testConfigTemplate(t)
 		e := MailTemplate{}

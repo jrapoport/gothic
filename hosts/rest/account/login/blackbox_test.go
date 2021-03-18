@@ -41,6 +41,7 @@ type testRequest struct {
 }
 
 func TestLoginServer_Login(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		login.RegisterServer,
 	}, false)
@@ -90,6 +91,7 @@ func TestLoginServer_Login(t *testing.T) {
 }
 
 func TestLoginServer_Login_Recaptcha(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		login.RegisterServer,
 	}, false)

@@ -8,6 +8,7 @@ import (
 )
 
 func TestNewMigrateFunc(t *testing.T) {
+	t.Parallel()
 	db := tdb.DB(t)
 	m := ModelA{}
 	fn := NewMigrateFunc(m)
@@ -18,6 +19,7 @@ func TestNewMigrateFunc(t *testing.T) {
 }
 
 func TestNewMigrateWithIndexes(t *testing.T) {
+	t.Parallel()
 	const tableIdx = "idx_model_bs_value"
 	var indexes = []string{ModelBIndex}
 	db := tdb.DB(t)
@@ -50,6 +52,7 @@ func TestNewMigrateWithIndexes(t *testing.T) {
 }
 
 func TestNewRollbackFunc(t *testing.T) {
+	t.Parallel()
 	db := tdb.DB(t)
 	tc := &ModelA{}
 	err := db.AutoMigrate(tc)

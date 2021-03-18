@@ -21,6 +21,7 @@ const testResponse = `{"name":"gothic","version":"debug","status":"bela lugosi's
 	`","online":true},"test3":{"name":"test3","online":false}}}`
 
 func TestNewHealthHost(t *testing.T) {
+	t.Parallel()
 	c := tconf.TempDB(t)
 	a, err := core.NewAPI(c)
 	require.NoError(t, err)

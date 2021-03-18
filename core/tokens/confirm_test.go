@@ -12,6 +12,7 @@ import (
 )
 
 func TestGrantConfirmToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	ct, err := GrantConfirmToken(conn, uid, token.NoExpiration)
@@ -25,6 +26,7 @@ func TestGrantConfirmToken(t *testing.T) {
 }
 
 func TestGetConfirmToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	test, err := GrantConfirmToken(conn, uid, token.NoExpiration)
@@ -39,6 +41,7 @@ func TestGetConfirmToken(t *testing.T) {
 }
 
 func TestConfirmTokenSent(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	ct, err := GrantConfirmToken(conn, uid, token.NoExpiration)

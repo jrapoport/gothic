@@ -61,6 +61,7 @@ func assertResponse(t *testing.T, h *rest.Host, test *rest.UserResponse, res str
 }
 
 func TestSignupServer_Signup(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -97,6 +98,7 @@ func TestSignupServer_Signup(t *testing.T) {
 }
 
 func TestSignupServer_Signup_Confirm(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -111,6 +113,7 @@ func TestSignupServer_Signup_Confirm(t *testing.T) {
 }
 
 func TestSignupServer_Signup_AutoConfirm(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -126,6 +129,7 @@ func TestSignupServer_Signup_AutoConfirm(t *testing.T) {
 }
 
 func TestSignupServer_Signup_Disabled(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -135,6 +139,7 @@ func TestSignupServer_Signup_Disabled(t *testing.T) {
 }
 
 func TestSignupServer_Signup_EmailDisabled(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -144,6 +149,7 @@ func TestSignupServer_Signup_EmailDisabled(t *testing.T) {
 }
 
 func TestSignupServer_Signup_Recaptcha(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -165,6 +171,7 @@ func TestSignupServer_Signup_Recaptcha(t *testing.T) {
 }
 
 func TestSignupServer_Signup_SignupCode(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
@@ -196,6 +203,7 @@ func TestSignupServer_Signup_SignupCode(t *testing.T) {
 }
 
 func TestSignupServer_Signup_Password(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)

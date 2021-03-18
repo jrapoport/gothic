@@ -28,6 +28,7 @@ func userClient(t *testing.T, h core.Hosted) user.UserClient {
 }
 
 func TestRPCWebHost(t *testing.T) {
+	t.Parallel()
 	a, c, _ := tcore.API(t, false)
 	// create an rcp-web host
 	h := NewRPCWebHost(a, "127.0.0.1:0")

@@ -15,6 +15,7 @@ import (
 )
 
 func TestNewUser(t *testing.T) {
+	t.Parallel()
 	email := tutils.RandomEmail()
 	conn, c := tconn.TempConn(t)
 	p := c.Provider()
@@ -39,6 +40,7 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestUser_BeforeSave(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := &User{ID: SystemID}
 	err := conn.Create(u).Error
@@ -59,6 +61,7 @@ func TestUser_BeforeSave(t *testing.T) {
 }
 
 func TestUser_EmailAddress(t *testing.T) {
+	t.Parallel()
 	email := tutils.RandomEmail()
 	un := utils.RandomUsername()
 	u := &User{
@@ -74,6 +77,7 @@ func TestUser_EmailAddress(t *testing.T) {
 }
 
 func TestUser_Authenticate(t *testing.T) {
+	t.Parallel()
 	const testPass = "password"
 	conn, c := tconn.TempConn(t)
 	email := tutils.RandomEmail()
@@ -90,6 +94,7 @@ func TestUser_Authenticate(t *testing.T) {
 }
 
 func TestUser_Status(t *testing.T) {
+	t.Parallel()
 	email := tutils.RandomEmail()
 	conn, c := tconn.TempConn(t)
 	p := c.Provider()

@@ -37,7 +37,7 @@ type testCase struct {
 	Err  assert.ErrorAssertionFunc
 }
 
-func mockSMTP(t *testing.T) (*config.Config, *tconf.SMTPMock) {
+func  mockSMTP(t *testing.T) (*config.Config, *tconf.SMTPMock) {
 	c := tconf.Config(t)
 	c.Mail.Logo = logoFile
 	return tconf.MockSMTP(t, c)
@@ -69,6 +69,7 @@ type ClientTestSuite struct {
 }
 
 func TestMailer(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name      string
 		offline   bool
@@ -84,6 +85,9 @@ func TestMailer(t *testing.T) {
 			keepalive: test.keepalive,
 		}
 		t.Run(test.name, func(t *testing.T) {
+			if !test.keepalive {
+				t.Parallel()
+			}
 			suite.Run(t, ts)
 		})
 	}
@@ -281,9 +285,10 @@ func (ts *ClientTestSuite) TestKeepalive() {
 		{"SendResetPassword", ts.testSendResetPassword},
 		{"SendSignupCode", ts.testSendSignupCode},
 	}
+	ts.client.keepalive.Reset(1 * time.Second)
 	for _, test := range tests {
 		ts.Run(test.name, func() {
-			time.Sleep(7 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 			test.fn()
 		})
 	}
@@ -308,7 +313,7 @@ func (ts *ClientTestSuite) sendTest(send func(tc testCase) error) {
 			if err == nil && test.tok != "" {
 				ts.Eventually(func() bool {
 					return sent != ""
-				}, 1*time.Second, 100*time.Millisecond)
+				}, 200*time.Millisecond, 10*time.Millisecond)
 				ts.Contains(sent, test.ref)
 				ts.Contains(sent, test.tok)
 
