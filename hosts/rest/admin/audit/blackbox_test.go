@@ -41,6 +41,7 @@ type AuditTestSuite struct {
 }
 
 func TestAudit(t *testing.T) {
+	t.Parallel()
 	ts := &AuditTestSuite{}
 	suite.Run(t, ts)
 }

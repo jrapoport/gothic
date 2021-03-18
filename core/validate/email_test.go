@@ -7,6 +7,7 @@ import (
 )
 
 func TestEmailTemplate_Valid(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		email    string
 		expected string

@@ -15,13 +15,14 @@ import (
 
 // Logger is a middleware that logs the start and end of each request.
 func Logger(h http.Handler) http.Handler {
-	//return middleware.Logger(h)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == config.HealthEndpoint {
-			h.ServeHTTP(w, r)
-			return
+		if r.URL.Path != config.HealthEndpoint {
+			l := &middleware.DefaultLogFormatter{
+				Logger: GetLogger(r),
+			}
+			h = middleware.RequestLogger(l)(h)
 		}
-		middleware.Logger(h).ServeHTTP(w, r)
+		h.ServeHTTP(w, r)
 	})
 }
 

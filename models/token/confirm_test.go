@@ -10,6 +10,7 @@ import (
 )
 
 func TestConfirmToken_Kind(t *testing.T) {
+	t.Parallel()
 	assert.NotPanics(t, func() {
 		tk := NewConfirmToken(uuid.New(), 0)
 		cls := tk.Class()
@@ -18,6 +19,7 @@ func TestConfirmToken_Kind(t *testing.T) {
 }
 
 func TestConfirmToken_HasToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	createToken := func() *ConfirmToken {
 		tk := NewConfirmToken(uuid.New(), 0)

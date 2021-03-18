@@ -59,7 +59,7 @@ func testWebhookEvent(t *testing.T, evt events.Event, test events.Event) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return rec.Code == http.StatusOK
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	var msg types.Map
 	err = json.Unmarshal(rec.Body.Bytes(), &msg)
 	assert.NoError(t, err)
@@ -115,14 +115,17 @@ func testHookSvr(t *testing.T, mu *sync.RWMutex, c config.Webhooks, evt events.E
 }
 
 func TestAPI_Webhook(t *testing.T) {
+	t.Parallel()
 	testWebhookEvent(t, events.Signup, events.Signup)
 }
 
 func TestAPI_WebhookAll(t *testing.T) {
+	t.Parallel()
 	testWebhookEvent(t, events.Signup, events.All)
 }
 
 func TestAPI_WebhookTimeout(t *testing.T) {
+	t.Parallel()
 	var mu sync.RWMutex
 	a := testHook(t)
 	c := a.config
@@ -145,6 +148,7 @@ func TestAPI_WebhookTimeout(t *testing.T) {
 }
 
 func TestAPI_WebhookRetry(t *testing.T) {
+	t.Parallel()
 	var mu sync.RWMutex
 	a := testHook(t)
 	c := a.config
@@ -167,6 +171,7 @@ func TestAPI_WebhookRetry(t *testing.T) {
 }
 
 func TestAPI_WebhookNotFound(t *testing.T) {
+	t.Parallel()
 	var mu sync.RWMutex
 	a := testHook(t)
 	c := a.config
@@ -189,6 +194,7 @@ func TestAPI_WebhookNotFound(t *testing.T) {
 }
 
 func TestAPI_WebhookDisabled(t *testing.T) {
+	t.Parallel()
 	a := testHook(t)
 	c := a.config
 	// no events

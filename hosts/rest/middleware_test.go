@@ -11,6 +11,7 @@ import (
 )
 
 func TestProtect(t *testing.T) {
+	t.Parallel()
 	c := tconf.Config(t)
 	r := NewRouter(c)
 	s := httptest.NewServer(r)

@@ -88,6 +88,7 @@ func testCases() []testCase {
 }
 
 func TestCreateLogEntry(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	fields := types.Map{
 		key.IPAddress: "test",

@@ -31,7 +31,6 @@ func createAPI(t *testing.T) *API {
 	a.config.Signup.Code = false
 	a.config.Signup.Username = false
 	a.config.Recaptcha.Key = ""
-	a.mail.UseSpamProtection(false)
 	return a
 }
 
@@ -44,6 +43,7 @@ func apiWithTempDB(t *testing.T) *API {
 func configuredAPI(t *testing.T, c *config.Config) *API {
 	c.Signup.AutoConfirm = true
 	c.Mail.SpamProtection = false
+	c.Mail.KeepAlive = false
 	a, err := NewAPI(c)
 	require.NoError(t, err)
 	require.NotNil(t, a)

@@ -11,6 +11,7 @@ import (
 )
 
 func TestFromContext(t *testing.T) {
+	t.Parallel()
 	var (
 		aid       = uuid.New()
 		uid       = uuid.New()

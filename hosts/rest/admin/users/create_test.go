@@ -43,6 +43,7 @@ func createUserTest(t *testing.T) (url.Values, *rest.UserResponse) {
 }
 
 func TestUsersServer_AdminCreateUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	v, test := createUserTest(t)

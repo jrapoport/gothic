@@ -11,6 +11,7 @@ import (
 )
 
 func TestGrantAuthToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	p := provider.Google
 	at, err := GrantAuthToken(conn, p, token.NoExpiration)
@@ -22,6 +23,7 @@ func TestGrantAuthToken(t *testing.T) {
 }
 
 func TestGetAuthToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	p := provider.Google
 	test, err := GrantAuthToken(conn, p, token.NoExpiration)

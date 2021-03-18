@@ -8,6 +8,7 @@ import (
 )
 
 func TestUsername(t *testing.T) {
+	t.Parallel()
 	const tooLongName = "nzYgP4vScpzAG2wyXX1MaWNsRwlGof9m1HAy2tX05" +
 		"54WGWgyEyokhSkHCkQFjnEsbx6Nk6CetjU0H24pmQw9kPu0LnlNzh2" +
 		"KdHNkCJMHSDBie9mhKHinN75Ot2Z5oaqlobNp0wdFl7PxFj4guA7uX" +

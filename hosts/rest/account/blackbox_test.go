@@ -43,6 +43,7 @@ func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 }
 
 func TestAccountServer(t *testing.T) {
+	t.Parallel()
 	const (
 		testPass = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
 		newPass  = "gj8#xtg#yrabxpnno!p5f3t8na!hd3?4jq7majxs"
@@ -82,7 +83,7 @@ func TestAccountServer(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return confirmToken != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// confirm user email
 	route = account.Endpoint + confirm.Endpoint
 	cr = &confirm.Request{
@@ -114,7 +115,7 @@ func TestAccountServer(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return passToken != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// reset the password
 	route = account.Endpoint + password.Endpoint
 	pr = &password.Request{
@@ -144,6 +145,7 @@ func TestAccountServer(t *testing.T) {
 }
 
 func TestAccountServer_RateLimit(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := testServer(t)
 	c := srv.Config()
 	c.Signup.AutoConfirm = true

@@ -7,6 +7,7 @@ import (
 )
 
 func TestAction_Type(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		a Action
 		t Type

@@ -37,6 +37,7 @@ func testResponse(t *testing.T, s *rest.Host) string {
 }
 
 func TestAdminServer_Config(t *testing.T) {
+	t.Parallel()
 	const settings = admin.Endpoint + config.Endpoint
 	s, web, _ := testServer(t)
 	j := s.Config().JWT

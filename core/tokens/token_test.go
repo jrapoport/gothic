@@ -38,6 +38,7 @@ func tokenConn(t *testing.T) *store.Connection {
 }
 
 func TestUseToken(t *testing.T) {
+	t.Parallel()
 	const testToken = "1234567890asdfghjkl="
 	conn := tokenConn(t)
 	tk := token.NewAccessToken(testToken, token.SingleUse, token.NoExpiration)

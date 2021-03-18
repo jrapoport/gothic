@@ -7,6 +7,7 @@ import (
 )
 
 func TestTypeFromString(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		s string
 		t Type

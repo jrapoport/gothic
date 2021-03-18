@@ -53,26 +53,30 @@ func accessTokenConn(t *testing.T) *store.Connection {
 
 func TestNewAccessToken(t *testing.T) {
 	conn := accessTokenConn(t)
-	for i, test := range tokenTests {
-		testToken = testToken + strconv.Itoa(i)
-		tk := NewAccessToken(testToken, test.uses, test.exp)
-		assert.NotNil(t, tk)
-		assert.Equal(t, user.SystemID, tk.UserID)
-		assert.Equal(t, testToken, tk.Token)
-		assert.Equal(t, test.use, tk.Usage())
-		assert.NotEmpty(t, tk.String())
-		assert.Equal(t, test.max, tk.MaxUses)
-		assert.Equal(t, 0, tk.Used)
-		assert.Nil(t, tk.UsedAt)
-		exp := test.exp
-		if exp < NoExpiration {
-			exp = NoExpiration
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range tokenTests {
+			testToken = testToken + strconv.Itoa(i)
+			tk := NewAccessToken(testToken, test.uses, test.exp)
+			assert.NotNil(t, tk)
+			assert.Equal(t, user.SystemID, tk.UserID)
+			assert.Equal(t, testToken, tk.Token)
+			assert.Equal(t, test.use, tk.Usage())
+			assert.NotEmpty(t, tk.String())
+			assert.Equal(t, test.max, tk.MaxUses)
+			assert.Equal(t, 0, tk.Used)
+			assert.Nil(t, tk.UsedAt)
+			exp := test.exp
+			if exp < NoExpiration {
+				exp = NoExpiration
+			}
+			assert.Equal(t, exp, tk.Expiration)
+			err := tx.Create(tk).Error
+			assert.NoError(t, err)
+			assert.True(t, tk.Usable())
 		}
-		assert.Equal(t, exp, tk.Expiration)
-		err := conn.Create(tk).Error
-		assert.NoError(t, err)
-		assert.True(t, tk.Usable())
-	}
+		return nil
+	})
+	require.NoError(t, err)
 	tk := NewAccessToken("", SingleUse, NoExpiration)
 	assert.Nil(t, tk)
 }
@@ -90,56 +94,64 @@ func TestAccessToken_BeforeCreate(t *testing.T) {
 
 func TestAccessToken_AfterCreate(t *testing.T) {
 	conn := accessTokenConn(t)
-	for i, test := range tokenTests {
-		testToken = fmt.Sprintf("%s-%d", testToken, i)
-		tk := NewAccessToken(testToken, SingleUse, test.exp)
-		err := conn.Create(tk).Error
-		assert.NoError(t, err)
-		assert.True(t, tk.Usable())
-		if test.exp <= NoExpiration {
-			assert.Nil(t, tk.ExpiredAt)
-			assert.Equal(t, time.Duration(0), tk.Expiration)
-		} else {
-			assert.Equal(t, test.exp, tk.Expiration)
-			assert.NotNil(t, tk.ExpiredAt)
-			diff := tk.ExpiredAt.Sub(tk.CreatedAt)
-			assert.Equal(t, test.exp, diff)
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range tokenTests {
+			testToken = fmt.Sprintf("%s-%d", testToken, i)
+			tk := NewAccessToken(testToken, SingleUse, test.exp)
+			err := tx.Create(tk).Error
+			assert.NoError(t, err)
+			assert.True(t, tk.Usable())
+			if test.exp <= NoExpiration {
+				assert.Nil(t, tk.ExpiredAt)
+				assert.Equal(t, time.Duration(0), tk.Expiration)
+			} else {
+				assert.Equal(t, test.exp, tk.Expiration)
+				assert.NotNil(t, tk.ExpiredAt)
+				diff := tk.ExpiredAt.Sub(tk.CreatedAt)
+				assert.Equal(t, test.exp, diff)
+			}
+			tk = NewAccessToken(testToken, SingleUse, test.exp)
+			err = tx.Create(tk).Error
+			assert.Error(t, err)
 		}
-		tk = NewAccessToken(testToken, SingleUse, test.exp)
-		err = conn.Create(tk).Error
-		assert.Error(t, err)
-	}
+		return nil
+	})
+	require.NoError(t, err)
 }
 
 func TestAccessToken_Usable(t *testing.T) {
 	const token = "token"
 	conn := accessTokenConn(t)
-	for i, test := range tokenTests {
-		testToken = fmt.Sprintf("%s-%d", testToken, i)
-		tk := NewAccessToken(testToken, test.uses, test.exp)
-		err := conn.Create(tk).Error
-		assert.NoError(t, err)
-		assert.True(t, tk.Usable())
-		if tk.Type == Timed {
-			if test.exp > 0 {
-				assert.True(t, tk.Usable())
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range tokenTests {
+			testToken = fmt.Sprintf("%s-%d", testToken, i)
+			tk := NewAccessToken(testToken, test.uses, test.exp)
+			err := conn.Create(tk).Error
+			assert.NoError(t, err)
+			assert.True(t, tk.Usable())
+			if tk.Type == Timed {
+				if test.exp > 0 {
+					assert.True(t, tk.Usable())
 
+				}
 			}
-		}
-		if tk.MaxUses != InfiniteUse {
-			tk.Used = 3
+			if tk.MaxUses != InfiniteUse {
+				tk.Used = 3
+				assert.False(t, tk.Usable())
+			}
+			if tk.Type == Timed {
+				tm := time.Now().UTC()
+				tm = tm.Add(-time.Hour)
+				tk.ExpiredAt = &tm
+				assert.False(t, tk.Usable())
+			}
+			err = conn.Delete(tk).Error
+			assert.NoError(t, err)
 			assert.False(t, tk.Usable())
 		}
-		if tk.Type == Timed {
-			tm := time.Now().UTC()
-			tm = tm.Add(-time.Hour)
-			tk.ExpiredAt = &tm
-			assert.False(t, tk.Usable())
-		}
-		err = conn.Delete(tk).Error
-		assert.NoError(t, err)
-		assert.False(t, tk.Usable())
-	}
+		return nil
+	})
+	require.NoError(t, err)
 	bad := NewAccessToken(token, SingleUse, NoExpiration)
 	bad.Token = ""
 	assert.False(t, bad.Usable())

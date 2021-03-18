@@ -19,6 +19,7 @@ import (
 )
 
 func TestAuthServer_RefreshBearerToken(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		auth.RegisterServer,
 	}, false)

@@ -15,10 +15,7 @@ import (
 // Main is the application main
 func Main(c *config.Config) error {
 	if c.IsDebug() {
-		b, err := json.MarshalIndent(c, "", "\t")
-		if err != nil {
-			return err
-		}
+		b, _ := json.MarshalIndent(c, "", "\t")
 		fmt.Println(string(b))
 	}
 	signalsToCatch := []os.Signal{

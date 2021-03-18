@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccountServer_RefreshBearerToken(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
 	// invalid req

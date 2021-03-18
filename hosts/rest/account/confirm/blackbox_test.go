@@ -31,6 +31,7 @@ func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 }
 
 func TestConfirmServer_ConfirmUser(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	// invalid req
 	_, err := thttp.DoRequest(t, web, http.MethodPost, confirmRt, nil, []byte("\n"))
@@ -53,7 +54,7 @@ func TestConfirmServer_ConfirmUser(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	req = &confirm.Request{
 		Token: tok,
 	}
@@ -67,6 +68,7 @@ func TestConfirmServer_ConfirmUser(t *testing.T) {
 }
 
 func TestConfirmServer_SendConfirmUser(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	// invalid req
 	_, err := thttp.DoRequest(t, web, http.MethodPost, sendRt, nil, []byte("\n"))
@@ -96,7 +98,7 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok1 != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	var tok2 string
 	smtp.AddHook(t, func(email string) {
 		tok2 = tconf.GetEmailToken(template.ConfirmUserAction, email)
@@ -108,11 +110,12 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok2 != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	assert.Equal(t, tok1, tok2)
 }
 
 func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	var sent string
@@ -124,7 +127,7 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// resend
 	sent = ""
 	req := &confirm.Request{
@@ -134,5 +137,5 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.EqualError(t, err, thttp.FmtError(http.StatusTooEarly).Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }

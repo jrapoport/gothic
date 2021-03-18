@@ -7,6 +7,7 @@ import (
 )
 
 func TestOutboundIP(t *testing.T) {
+	t.Parallel()
 	ip, err := OutboundIP()
 	assert.NoError(t, err)
 	assert.NotEmpty(t, ip)

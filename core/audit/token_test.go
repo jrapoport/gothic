@@ -13,6 +13,7 @@ import (
 )
 
 func TestLogTokenGranted(t *testing.T) {
+	t.Parallel()
 	uid := uuid.New()
 	tk := token.NewRefreshToken(uid)
 	tk.ID = 100
@@ -24,6 +25,7 @@ func TestLogTokenGranted(t *testing.T) {
 }
 
 func TestLogTokenRefreshed(t *testing.T) {
+	t.Parallel()
 	uid := uuid.New()
 	tk := token.NewRefreshToken(uid)
 	tk.ID = 100
@@ -35,6 +37,7 @@ func TestLogTokenRefreshed(t *testing.T) {
 }
 
 func TestLogTokenRevoked(t *testing.T) {
+	t.Parallel()
 	uid := uuid.New()
 	tk := token.NewRefreshToken(uid)
 	tm := time.Now().UTC()

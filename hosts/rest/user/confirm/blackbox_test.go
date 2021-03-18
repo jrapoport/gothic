@@ -30,6 +30,7 @@ func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 }
 
 func TestConfirmServer_SendConfirmUser(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 0
 	j := srv.Config().JWT
@@ -66,10 +67,11 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }
 
 func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	var sent string
@@ -84,12 +86,12 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// resend
 	sent = ""
 	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, send, bt.Token, nil, nil)
 	assert.EqualError(t, err, thttp.FmtError(http.StatusTooEarly).Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }

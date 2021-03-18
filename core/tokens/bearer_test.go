@@ -10,6 +10,7 @@ import (
 )
 
 func TestGrantBearerToken(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	// system user
 	_, err := GrantBearerToken(conn, c.JWT, nil)
@@ -29,6 +30,7 @@ func TestGrantBearerToken(t *testing.T) {
 }
 
 func TestRefreshBearerToken(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c)
 	bt, err := GrantBearerToken(conn, c.JWT, u)

@@ -12,6 +12,7 @@ import (
 )
 
 func TestHas(t *testing.T) {
+	t.Parallel()
 	type ModA struct {
 		gorm.Model
 		Value string
@@ -62,6 +63,7 @@ func TestHas(t *testing.T) {
 }
 
 func TestHasLast(t *testing.T) {
+	t.Parallel()
 	type ModA struct {
 		gorm.Model
 		Value string

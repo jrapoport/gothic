@@ -8,6 +8,7 @@ import (
 )
 
 func TestMigration_Run(t *testing.T) {
+	t.Parallel()
 	const tableIdx = "idx_model_bs_value"
 	var indexes = []string{ModelBIndex}
 	db := tdb.DB(t)

@@ -7,6 +7,7 @@ import (
 )
 
 func TestNamespaced(t *testing.T) {
+	t.Parallel()
 	const name = "bar"
 	const namespace = "foo"
 	test := Namespaced("", name)
@@ -18,6 +19,7 @@ func TestNamespaced(t *testing.T) {
 }
 
 func TestMaskString(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		in  string
 		n   int
@@ -36,6 +38,7 @@ func TestMaskString(t *testing.T) {
 }
 
 func TestMaskEmail(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		in  string
 		out string
