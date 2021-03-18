@@ -4,9 +4,9 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"gorm.io/gorm"
 )
 

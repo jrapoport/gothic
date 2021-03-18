@@ -2,12 +2,12 @@ package audit
 
 import (
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // CreateLogEntry creates a new audit log entry.

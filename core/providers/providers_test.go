@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,6 +17,7 @@ func setEnv(t *testing.T, key, value string) {
 }
 
 func TestLoadProviders(t *testing.T) {
+	providers := NewProviders()
 	c := tconf.ProvidersConfig(t)
 	os.Clearenv()
 	tests := []struct {
@@ -33,29 +34,30 @@ func TestLoadProviders(t *testing.T) {
 		if test.key != "" {
 			setEnv(t, test.key, test.value)
 		}
-		err := LoadProviders(c)
+		err := providers.LoadProviders(c)
 		test.Err(t, err)
 	}
-	err := LoadProviders(c)
+	err := providers.LoadProviders(c)
 	assert.NoError(t, err)
 }
 
 func TestUseProvider(t *testing.T) {
+	providers := NewProviders()
 	c := tconf.ProvidersConfig(t)
 	setEnv(t, config.TwitterAuthorizeEnv, "1")
 	for name, v := range c.Providers {
-		err := useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
+		err := providers.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
 		assert.NoError(t, err, name)
 	}
-	err := useProvider("", "", "", "")
+	err := providers.useProvider("", "", "", "")
 	assert.Error(t, err)
-	err = useProvider("unknown", "", "", "")
+	err = providers.useProvider("unknown", "", "", "")
 	assert.Error(t, err)
 }
 
 func TestIsEnabled(t *testing.T) {
 	const badProvider = "bad"
-	clearProviders()
+	providers := NewProviders()
 	tests := make([]provider.Name, len(provider.External))
 	var i = 0
 	for name := range provider.External {
@@ -64,15 +66,15 @@ func TestIsEnabled(t *testing.T) {
 	}
 	tests = append(tests, provider.Unknown, badProvider)
 	for _, name := range tests {
-		err := IsEnabled(name)
+		err := providers.IsEnabled(name)
 		assert.Error(t, err, name)
 	}
 	c := tconf.ProvidersConfig(t)
-	err := LoadProviders(c)
+	err := providers.LoadProviders(c)
 	assert.NoError(t, err)
 	tests = append(tests, c.Provider())
 	for _, name := range tests {
-		err = IsEnabled(name)
+		err = providers.IsEnabled(name)
 		switch name {
 		case provider.Unknown, badProvider:
 			assert.Error(t, err, name)

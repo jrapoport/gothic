@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/codes"
 	"github.com/jrapoport/gothic/core/context"
@@ -13,10 +12,10 @@ import (
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/utils"
 )
 
@@ -192,7 +191,7 @@ func (a *API) signupEnabled(p provider.Name) error {
 		err := errors.New("signup disabled")
 		return err
 	}
-	return providers.IsEnabled(p)
+	return a.ext.IsEnabled(p)
 }
 
 func (a *API) useDefaultUsername(tx *store.Connection, username string) (string, error) {

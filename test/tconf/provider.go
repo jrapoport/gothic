@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/markbates/goth"
@@ -74,7 +74,6 @@ func MockedProvider(t *testing.T, c *config.Config, callback string) (*config.Co
 	t.Cleanup(func() {
 		delete(provider.External, fp.PName())
 	})
-	goth.UseProviders(fp)
 	if callback == "" {
 		callback = testCallback
 	}

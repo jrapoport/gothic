@@ -4,9 +4,8 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/health"
-	"github.com/jrapoport/gothic/providers"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +23,7 @@ func TestSettings(t *testing.T) {
 			CallbackURL: "http://exmaple.com",
 		},
 	}
-	err := providers.LoadProviders(a.config)
+	err := a.ext.LoadProviders(a.config)
 	require.NoError(t, err)
 	settings := a.Settings()
 	assert.EqualValues(t, settings.Health, health.Check(a.config))

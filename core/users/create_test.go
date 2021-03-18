@@ -4,13 +4,12 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
@@ -31,8 +30,6 @@ func TestCreateUser(t *testing.T) {
 func (ts *CreateUserTestSuite) SetupSuite() {
 	ts.conn, ts.c = tconn.TempConn(ts.T())
 	ts.c.UseInternal = true
-	err := providers.LoadProviders(ts.c)
-	ts.NoError(err)
 }
 
 func (ts *CreateUserTestSuite) TestCreateUser() {

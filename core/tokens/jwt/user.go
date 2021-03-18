@@ -3,8 +3,8 @@ package jwt
 import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // UserClaims is a struct to hold extended jwt claims

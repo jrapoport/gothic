@@ -4,12 +4,12 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/markbates/goth"
 )
 
@@ -20,8 +20,8 @@ type AuthURL struct {
 }
 
 // GrantAuthURL returns the auth url for a named provider.
-func GrantAuthURL(conn *store.Connection, p provider.Name, exp time.Duration) (*AuthURL, error) {
-	gp, err := GetProvider(p)
+func (providers Providers) GrantAuthURL(conn *store.Connection, p provider.Name, exp time.Duration) (*AuthURL, error) {
+	gp, err := providers.GetProvider(p)
 	if err != nil {
 		return nil, err
 	}
@@ -51,14 +51,14 @@ func GrantAuthURL(conn *store.Connection, p provider.Name, exp time.Duration) (*
 }
 
 // AuthorizeUser checks the token and turns the oauth authorized user.
-func AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
+func (providers Providers) AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
 	var u goth.User
 	err := conn.Transaction(func(tx *store.Connection) error {
 		t, err := tokens.GetAuthToken(tx, tok)
 		if err != nil {
 			return err
 		}
-		gp, err := GetProvider(t.Provider)
+		gp, err := providers.GetProvider(t.Provider)
 		if err != nil {
 			return err
 		}
