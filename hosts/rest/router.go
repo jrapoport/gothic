@@ -18,13 +18,13 @@ type Router struct {
 
 // NewRouter returns a new configured router.
 func NewRouter(c *config.Config) *Router {
-	r := &Router{chi.NewRouter(), c}
+	r := &Router{chi: chi.NewRouter(), config: c}
 	r.UseDefaults()
 	r.UseLogger(c.Log())
 	return r
 }
 
-// UseDefaults applys the default router middlewares.
+// UseDefaults applies the default router middlewares.
 func (r *Router) UseDefaults() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -45,7 +45,7 @@ func (r *Router) Mount(pattern string, h http.Handler) {
 // Route mounts a sub-Router along a `pattern`` string.
 func (r *Router) Route(pattern string, fn func(*Router)) {
 	r.chi.Route(pattern, func(cr chi.Router) {
-		fn(&Router{cr, r.config})
+		fn(&Router{chi: cr, config: r.config})
 	})
 }
 
@@ -77,7 +77,7 @@ func (r *Router) Delete(pattern string, fn http.HandlerFunc) {
 // With adds inline middlewares for an endpoint handler.
 func (r *Router) With(middlewares ...func(http.Handler) http.Handler) *Router {
 	cr := r.chi.With(middlewares...)
-	return &Router{cr, r.config}
+	return &Router{chi: cr, config: r.config}
 }
 
 // Use appends one or more middlewares onto the Router stack.
@@ -92,10 +92,6 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 // UseLogger sets the logger to use for the Router stack.
 func (r *Router) UseLogger(log logrus.FieldLogger) {
-	l := &middleware.DefaultLogFormatter{
-		Logger: log,
-	}
-	middleware.DefaultLogger = middleware.RequestLogger(l)
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r = WithLogger(r, log)

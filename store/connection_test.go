@@ -37,6 +37,7 @@ type ModelB struct {
 const ModelBIndex = "idx_value"
 
 func TestDial(t *testing.T) {
+	t.Parallel()
 	// bad url
 	url := &config.Config{}
 	url.DB.DSN = "\n"
@@ -91,6 +92,7 @@ type ConnectionTestSuite struct {
 }
 
 func TestConnection(t *testing.T) {
+	t.Parallel()
 	dvrs := []drivers.Driver{
 		tconf.MySQLTemp,
 		tconf.PostgresTemp,
@@ -101,6 +103,7 @@ func TestConnection(t *testing.T) {
 			driver: d,
 		}
 		t.Run(string(d), func(t *testing.T) {
+			t.Parallel()
 			suite.Run(t, ts)
 		})
 	}

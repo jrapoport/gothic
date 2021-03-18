@@ -8,6 +8,7 @@ import (
 )
 
 func TestAccountServer_Logout(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	u := testUser(t, srv)
 	// not authorized

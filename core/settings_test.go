@@ -11,6 +11,7 @@ import (
 )
 
 func TestSettings(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	a.config.Mail.Host = "example.com"
 	a.config.Mail.Port = 25

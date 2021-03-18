@@ -17,7 +17,7 @@ type API struct {
 	conn   *store.Connection
 	evt    *events.Dispatch
 	mail   *mail.Client
-	ext    providers.Providers
+	ext    *providers.Providers
 	log    logrus.FieldLogger
 }
 
@@ -64,7 +64,7 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 }
 
 // Providers is mainly here for testing rn
-func (a *API) Providers() providers.Providers {
+func (a *API) Providers() *providers.Providers {
 	return a.ext
 }
 

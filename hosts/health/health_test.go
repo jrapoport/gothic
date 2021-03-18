@@ -18,6 +18,7 @@ const testResponse = `{"name":"gothic","version":"debug","status":"bela lugos` +
 	`ame":"mock","address":"` + tsrv.MockAddress + `","online":true}}}`
 
 func TestNewHealthHost(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		h      core.Hosted
 		name   string

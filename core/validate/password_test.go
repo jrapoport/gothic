@@ -8,6 +8,7 @@ import (
 )
 
 func TestPassword(t *testing.T) {
+	t.Parallel()
 	const randomPass8 = "7r/M3Z&F"
 	const randomPass8AN = "isBSfVB9"
 	const randomPass8NO = "01234569"

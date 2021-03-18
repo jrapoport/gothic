@@ -81,11 +81,15 @@ func SetupTestLogs(t *testing.T, c *config.Config, uid, bid uuid.UUID) []TestCas
 	ctx.SetIPAddress("127.0.0.1")
 	conn, err := store.Dial(c, nil)
 	require.NoError(t, err)
-	for i, test := range tests {
-		le, err := audit.CreateLogEntry(ctx, conn, test.act, test.uid, test.fields)
-		require.NoError(t, err)
-		tests[i].logID = le.ID
-	}
+	err = conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range tests {
+			le, err := audit.CreateLogEntry(ctx, tx, test.act, test.uid, test.fields)
+			require.NoError(t, err)
+			tests[i].logID = le.ID
+		}
+		return nil
+	})
+	require.NoError(t, err)
 	return tests
 }
 
@@ -98,6 +102,7 @@ type AuditServerTestSuite struct {
 }
 
 func TestAuditLogs(t *testing.T) {
+	t.Parallel()
 	ts := &AuditServerTestSuite{}
 	suite.Run(t, ts)
 }

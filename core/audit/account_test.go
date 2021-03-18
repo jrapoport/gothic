@@ -18,6 +18,7 @@ import (
 )
 
 func TestLogSignup(t *testing.T) {
+	t.Parallel()
 	r := user.RoleAdmin
 	testLogEntry(t, auditlog.Signup, uuid.New(),
 		types.Map{
@@ -29,6 +30,7 @@ func TestLogSignup(t *testing.T) {
 }
 
 func TestLogCodeSent(t *testing.T) {
+	t.Parallel()
 	uid := uuid.New()
 	sc := code.NewSignupCode(uid, code.PIN, 1)
 	sc.ID = 100
@@ -40,6 +42,7 @@ func TestLogCodeSent(t *testing.T) {
 }
 
 func TestLogConfirmationSent(t *testing.T) {
+	t.Parallel()
 	uid := uuid.New()
 	tk := token.NewConfirmToken(uid, time.Second)
 	tk.ID = 100
@@ -51,6 +54,7 @@ func TestLogConfirmationSent(t *testing.T) {
 }
 
 func TestLogConfirmed(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Confirmed, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogConfirmed(ctx, conn, uid)
@@ -58,6 +62,7 @@ func TestLogConfirmed(t *testing.T) {
 }
 
 func TestLogBanned(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Banned, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogBanned(ctx, conn, uid)
@@ -65,6 +70,7 @@ func TestLogBanned(t *testing.T) {
 }
 
 func TestLogDeleted(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Deleted, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogDeleted(ctx, conn, uid)
@@ -72,6 +78,7 @@ func TestLogDeleted(t *testing.T) {
 }
 
 func TestLogLinked(t *testing.T) {
+	t.Parallel()
 	la := &account.LinkedAccount{
 		Type:      account.Auth,
 		Provider:  provider.Google,

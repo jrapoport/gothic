@@ -31,6 +31,7 @@ func testUser(t *testing.T, srv *rest.Host) *user.User {
 }
 
 func TestLoginServer_Logout(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		RegisterServer,
 	}, false)

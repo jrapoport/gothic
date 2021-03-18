@@ -8,11 +8,13 @@ import (
 )
 
 func TestPINCode(t *testing.T) {
+	t.Parallel()
 	pin := PINCode()
 	assert.NotEmpty(t, pin)
 }
 
 func TestIsValidPIN(t *testing.T) {
+	t.Parallel()
 	pin := PINCode()
 	require.NotEmpty(t, pin)
 	is := IsValidCode(pin)

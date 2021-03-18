@@ -34,7 +34,7 @@ func CreateLogEntry(ctx context.Context, conn *store.Connection,
 			fields[key.UserID] = ctx.GetUserID().String()
 		}
 	}
-	conn.Logger.LogMode(0).Info(ctx, "%s %s: %s: %v", t, action, userID, fields)
+	// conn.Logger.LogMode(0).Info(ctx, "%s %s: %s: %v", t, action, userID, fields)
 	le := auditlog.NewAuditLog(t, action, userID, fields)
 	return le, conn.Create(le).Error
 }

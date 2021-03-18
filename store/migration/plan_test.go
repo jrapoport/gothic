@@ -9,6 +9,7 @@ import (
 )
 
 func TestPlan_Run(t *testing.T) {
+	t.Parallel()
 	db := tdb.DB(t)
 	ma := ModelA{}
 	mb := ModelB{}

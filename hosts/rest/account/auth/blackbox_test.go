@@ -43,6 +43,7 @@ func DoProviderURLRequest(t *testing.T, web *httptest.Server, p provider.Name) s
 }
 
 func TestAuthServer_GetAuthorizationURL(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		auth.RegisterServer,
 	}, false)
@@ -69,6 +70,7 @@ func TestAuthServer_GetAuthorizationURL(t *testing.T) {
 }
 
 func TestAuthServer_AuthorizeUser(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		auth.RegisterServer,
 	}, false)

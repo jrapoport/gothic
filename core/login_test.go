@@ -25,6 +25,7 @@ func loginAPI(t *testing.T) *API {
 }
 
 func TestAPI_Login(t *testing.T) {
+	t.Parallel()
 	const (
 		empty          = ""
 		badEmail       = "bad"
@@ -64,6 +65,7 @@ func TestAPI_Login(t *testing.T) {
 }
 
 func TestAPI_Login_Disabled(t *testing.T) {
+	t.Parallel()
 	a := loginAPI(t)
 	ctx := context.Background()
 	_, err := a.Login(ctx, "", "")
@@ -71,6 +73,7 @@ func TestAPI_Login_Disabled(t *testing.T) {
 }
 
 func TestAPI_Login_ReCaptcha(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	a := loginAPI(t)
 	u := testUser(t, a)
@@ -97,6 +100,7 @@ func TestAPI_Login_ReCaptcha(t *testing.T) {
 }
 
 func TestAPI_Login_Event(t *testing.T) {
+	t.Parallel()
 	a := loginAPI(t)
 	testListen := func(mu *sync.RWMutex, lis events.Event, data *types.Map) {
 		c := a.Listen(lis)

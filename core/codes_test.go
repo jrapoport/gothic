@@ -8,6 +8,7 @@ import (
 )
 
 func TestAPI_CreateCode(t *testing.T) {
+	t.Parallel()
 	a := createAPI(t)
 	ctx := testContext(a)
 	c, err := a.CreateSignupCode(ctx, code.SingleUse)
@@ -16,6 +17,7 @@ func TestAPI_CreateCode(t *testing.T) {
 }
 
 func TestAPI_CreateCodes(t *testing.T) {
+	t.Parallel()
 	const count = 100
 	a := createAPI(t)
 	ctx := testContext(a)
@@ -26,6 +28,7 @@ func TestAPI_CreateCodes(t *testing.T) {
 }
 
 func TestAPI_CheckSignupCode(t *testing.T) {
+	t.Parallel()
 	a := createAPI(t)
 	ctx := testContext(a)
 	test, err := a.CreateSignupCode(ctx, code.SingleUse)

@@ -12,6 +12,7 @@ import (
 )
 
 func TestHealthServer_HealthCheck(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		health.RegisterServer,
 	}, false)

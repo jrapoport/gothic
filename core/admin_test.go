@@ -13,6 +13,7 @@ import (
 )
 
 func TestAPI_AdminCreateUser(t *testing.T) {
+	t.Parallel()
 	em := tutils.RandomEmail()
 	un := utils.RandomUsername()
 	a := apiWithTempDB(t)
@@ -61,6 +62,7 @@ func TestAPI_AdminCreateUser(t *testing.T) {
 }
 
 func TestAPI_AdminPromoteUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	ctx := testContext(a)
 	a.config.Signup.Username = true
@@ -103,6 +105,7 @@ func TestAPI_AdminPromoteUser(t *testing.T) {
 }
 
 func TestAPI_AdminDeleteUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	ctx := testContext(a)
 	a.config.Signup.Username = true

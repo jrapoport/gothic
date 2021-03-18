@@ -8,11 +8,13 @@ import (
 )
 
 func TestRandomUsername(t *testing.T) {
+	t.Parallel()
 	un := RandomUsername()
 	assert.NotEmpty(t, un)
 }
 
 func TestRandomUsernameN(t *testing.T) {
+	t.Parallel()
 	tests := []int{10, 20, 100}
 	for _, test := range tests {
 		un := RandomUsernameN(test)
@@ -23,12 +25,14 @@ func TestRandomUsernameN(t *testing.T) {
 }
 
 func TestRandomColor(t *testing.T) {
+	t.Parallel()
 	clr := RandomColor()
 	assert.Len(t, clr, 7)
 	assert.True(t, strings.HasPrefix(clr, "#"))
 }
 
 func TestRandomPIN(t *testing.T) {
+	t.Parallel()
 	tests := []int{10, 20, 100}
 	for _, test := range tests {
 		pin := RandomPIN(test)

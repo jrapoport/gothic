@@ -123,6 +123,7 @@ type UserServerTestSuite struct {
 }
 
 func TestUserServer_Search(t *testing.T) {
+	t.Parallel()
 	ts := &UserServerTestSuite{}
 	suite.Run(t, ts)
 }

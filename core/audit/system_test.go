@@ -15,6 +15,7 @@ import (
 )
 
 func TestLogStartup(t *testing.T) {
+	t.Parallel()
 	const service = "test_service"
 	host, err := os.Hostname()
 	require.NoError(t, err)
@@ -32,6 +33,7 @@ func TestLogStartup(t *testing.T) {
 }
 
 func TestLogShutdown(t *testing.T) {
+	t.Parallel()
 	const service = "test_service"
 	host, err := os.Hostname()
 	require.NoError(t, err)

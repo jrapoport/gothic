@@ -8,6 +8,7 @@ import (
 )
 
 func TestJoinLink(t *testing.T) {
+	t.Parallel()
 	const (
 		example = "http://example.com"
 		base    = "http://base.com"
@@ -44,6 +45,7 @@ func TestJoinLink(t *testing.T) {
 }
 
 func TestAppendFragment(t *testing.T) {
+	t.Parallel()
 	const (
 		example = "http://example.com"
 		base    = "http://base.com"
@@ -79,6 +81,7 @@ func TestAppendFragment(t *testing.T) {
 }
 
 func TestMakeRelative(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		in  string
 		out string
@@ -97,6 +100,7 @@ func TestMakeRelative(t *testing.T) {
 }
 
 func TestURLValuesToMap(t *testing.T) {
+	t.Parallel()
 	const (
 		testVal  = "test"
 		testJSON = `{"test":"test"}`

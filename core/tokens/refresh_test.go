@@ -12,6 +12,7 @@ import (
 )
 
 func TestGrantRefreshToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	testGrant := func(userID uuid.UUID) *token.RefreshToken {
@@ -32,6 +33,7 @@ func TestGrantRefreshToken(t *testing.T) {
 }
 
 func TestSwapRefreshToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	_, err := SwapRefreshToken(conn, uid, "")
@@ -49,6 +51,7 @@ func TestSwapRefreshToken(t *testing.T) {
 }
 
 func TestRevokeAllRefreshTokens(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	uid := uuid.New()
 	_, err := GrantRefreshToken(conn, uid)
@@ -72,6 +75,7 @@ func TestRevokeAllRefreshTokens(t *testing.T) {
 }
 
 func TestHasUsableRefreshToken(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	uid := uuid.New()
 	has, err := HasUsableRefreshToken(conn, uid)

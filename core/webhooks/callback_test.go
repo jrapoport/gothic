@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewCallback(t *testing.T) {
+	t.Parallel()
 	const (
 		testURL      = "http://example.com/" + config.WebhookURLEvent
 		testCallback = "http://example.com/signup"
@@ -33,5 +34,4 @@ func TestNewCallback(t *testing.T) {
 	b, err := data.JSON()
 	assert.NoError(t, err)
 	assert.JSONEq(t, string(b), cb.RequestBody().String())
-
 }

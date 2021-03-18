@@ -8,6 +8,7 @@ import (
 )
 
 func TestRole(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		role  Role
 		name  string

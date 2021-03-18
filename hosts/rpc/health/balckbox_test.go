@@ -13,6 +13,7 @@ import (
 )
 
 func TestHealthServer_HealthCheck(t *testing.T) {
+	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
 		health.RegisterServer,
 	})

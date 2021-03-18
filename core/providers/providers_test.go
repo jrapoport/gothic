@@ -17,7 +17,7 @@ func setEnv(t *testing.T, key, value string) {
 }
 
 func TestLoadProviders(t *testing.T) {
-	providers := NewProviders()
+	p := NewProviders()
 	c := tconf.ProvidersConfig(t)
 	os.Clearenv()
 	tests := []struct {
@@ -34,30 +34,30 @@ func TestLoadProviders(t *testing.T) {
 		if test.key != "" {
 			setEnv(t, test.key, test.value)
 		}
-		err := providers.LoadProviders(c)
+		err := p.LoadProviders(c)
 		test.Err(t, err)
 	}
-	err := providers.LoadProviders(c)
+	err := p.LoadProviders(c)
 	assert.NoError(t, err)
 }
 
 func TestUseProvider(t *testing.T) {
-	providers := NewProviders()
+	p := NewProviders()
 	c := tconf.ProvidersConfig(t)
 	setEnv(t, config.TwitterAuthorizeEnv, "1")
 	for name, v := range c.Providers {
-		err := providers.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
+		err := p.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
 		assert.NoError(t, err, name)
 	}
-	err := providers.useProvider("", "", "", "")
+	err := p.useProvider("", "", "", "")
 	assert.Error(t, err)
-	err = providers.useProvider("unknown", "", "", "")
+	err = p.useProvider("unknown", "", "", "")
 	assert.Error(t, err)
 }
 
 func TestIsEnabled(t *testing.T) {
 	const badProvider = "bad"
-	providers := NewProviders()
+	p := NewProviders()
 	tests := make([]provider.Name, len(provider.External))
 	var i = 0
 	for name := range provider.External {
@@ -66,15 +66,15 @@ func TestIsEnabled(t *testing.T) {
 	}
 	tests = append(tests, provider.Unknown, badProvider)
 	for _, name := range tests {
-		err := providers.IsEnabled(name)
+		err := p.IsEnabled(name)
 		assert.Error(t, err, name)
 	}
 	c := tconf.ProvidersConfig(t)
-	err := providers.LoadProviders(c)
+	err := p.LoadProviders(c)
 	assert.NoError(t, err)
 	tests = append(tests, c.Provider())
 	for _, name := range tests {
-		err = providers.IsEnabled(name)
+		err = p.IsEnabled(name)
 		switch name {
 		case provider.Unknown, badProvider:
 			assert.Error(t, err, name)

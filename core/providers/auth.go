@@ -20,14 +20,14 @@ type AuthURL struct {
 }
 
 // GrantAuthURL returns the auth url for a named provider.
-func (providers Providers) GrantAuthURL(conn *store.Connection, p provider.Name, exp time.Duration) (*AuthURL, error) {
-	gp, err := providers.GetProvider(p)
+func (p *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp time.Duration) (*AuthURL, error) {
+	gp, err := p.GetProvider(name)
 	if err != nil {
 		return nil, err
 	}
 	var au = &AuthURL{}
 	err = conn.Transaction(func(tx *store.Connection) error {
-		au.Token, err = tokens.GrantAuthToken(tx, p, exp)
+		au.Token, err = tokens.GrantAuthToken(tx, name, exp)
 		if err != nil {
 			return err
 		}
@@ -51,14 +51,14 @@ func (providers Providers) GrantAuthURL(conn *store.Connection, p provider.Name,
 }
 
 // AuthorizeUser checks the token and turns the oauth authorized user.
-func (providers Providers) AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
+func (p *Providers) AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
 	var u goth.User
 	err := conn.Transaction(func(tx *store.Connection) error {
 		t, err := tokens.GetAuthToken(tx, tok)
 		if err != nil {
 			return err
 		}
-		gp, err := providers.GetProvider(t.Provider)
+		gp, err := p.GetProvider(t.Provider)
 		if err != nil {
 			return err
 		}

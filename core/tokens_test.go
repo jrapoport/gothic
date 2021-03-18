@@ -9,6 +9,7 @@ import (
 )
 
 func TestAPI_GrantBearerToken(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	// nil
@@ -32,6 +33,7 @@ func TestAPI_GrantBearerToken(t *testing.T) {
 }
 
 func TestAPI_RefreshBearerToken(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	u = confirmUser(t, a, u)
