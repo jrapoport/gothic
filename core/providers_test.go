@@ -4,10 +4,10 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,6 +26,7 @@ func TestAPI_GetAuthorizationURL(t *testing.T) {
 	ctx := context.Background()
 	a := apiWithTempDB(t)
 	_, mock := tconf.MockedProvider(t, a.config, "")
+	a.ext.UseProviders(mock)
 	// no context
 	_, err := a.GetAuthorizationURL(ctx, provider.Unknown)
 	assert.Error(t, err)
@@ -55,6 +56,7 @@ func TestAPI_GetAuthorizationURL(t *testing.T) {
 func TestAPI_AuthorizeUser(t *testing.T) {
 	a := apiWithTempDB(t)
 	_, mock := tconf.MockedProvider(t, a.config, "")
+	a.ext.UseProviders(mock)
 	// no token
 	_, err := a.AuthorizeUser(nil, "", nil)
 	assert.Error(t, err)

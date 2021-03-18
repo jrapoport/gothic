@@ -10,7 +10,6 @@ import (
 	"github.com/jrapoport/gothic/core/login"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
@@ -27,7 +26,7 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 	ctx.SetProvider(p)
 	a.log.Debugf("login: %s %s (%s %s %s)",
 		email, pw, p, ip, recaptcha)
-	err := providers.IsEnabled(p)
+	err := a.ext.IsEnabled(p)
 	if err != nil {
 		return nil, a.logError(err)
 	}

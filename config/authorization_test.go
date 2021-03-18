@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/jrapoport/gothic/config/provider"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -4,22 +4,17 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/utils"
 )
 
 // CreateUser creates a user.
 func CreateUser(conn *store.Connection, p provider.Name, email, username, pw string, data, meta types.Map) (*user.User, error) {
-	err := providers.IsEnabled(p)
-	if err != nil {
-		return nil, errors.New("provider: invalid")
-	}
-	email, err = validate.Email(email)
+	email, err := validate.Email(email)
 	if err != nil {
 		err = fmt.Errorf("email: %w", err)
 		return nil, err

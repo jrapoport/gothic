@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/utils"
 
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )

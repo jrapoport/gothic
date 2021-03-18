@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/account/auth"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/thttp"
 	"github.com/jrapoport/gothic/test/tsrv"
@@ -47,6 +47,7 @@ func TestAuthServer_GetAuthorizationURL(t *testing.T) {
 		auth.RegisterServer,
 	}, false)
 	_, mock := tconf.MockedProvider(t, srv.Config(), "")
+	srv.Providers().UseProviders(mock)
 	// empty provider
 	_, err := thttp.DoRequest(t, web, http.MethodGet, auth.Endpoint, nil, nil)
 	assert.Error(t, err)
@@ -75,6 +76,7 @@ func TestAuthServer_AuthorizeUser(t *testing.T) {
 	// state not found
 	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, callbackURL, nil)
 	_, mock := tconf.MockedProvider(t, srv.Config(), callbackURL)
+	srv.Providers().UseProviders(mock)
 	urlReq := DoProviderURLRequest(t, web, mock.PName())
 	urlReq = strings.Replace(urlReq, web.URL, "", 1)
 	res, err := thttp.DoRequest(t, web, http.MethodPost, urlReq, nil, nil)

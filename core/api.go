@@ -2,12 +2,12 @@ package core
 
 import (
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/events"
+	"github.com/jrapoport/gothic/core/providers"
 	"github.com/jrapoport/gothic/mail"
-	"github.com/jrapoport/gothic/providers"
 	"github.com/jrapoport/gothic/store"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,6 +17,7 @@ type API struct {
 	conn   *store.Connection
 	evt    *events.Dispatch
 	mail   *mail.Client
+	ext    providers.Providers
 	log    logrus.FieldLogger
 }
 
@@ -53,12 +54,18 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 	if err != nil {
 		return a.logError(err)
 	}
-	err = providers.LoadProviders(a.config)
+	a.ext = providers.NewProviders()
+	err = a.ext.LoadProviders(a.config)
 	if err != nil {
 		return a.logError(err)
 	}
 	err = audit.LogStartup(a.conn, a.config.Service.Name)
 	return a.logError(err)
+}
+
+// Providers is mainly here for testing rn
+func (a *API) Providers() providers.Providers {
+	return a.ext
 }
 
 // Provider returns the name of the internal provider.
