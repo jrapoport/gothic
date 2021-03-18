@@ -25,6 +25,8 @@ func mailAPI(t *testing.T) *API {
 	c.Mail.Host = ""
 	c.Validation.PasswordRegex = ""
 	c.Signup.AutoConfirm = false
+	//c.Mail.KeepAlive = false
+	c.Mail.SpamProtection = false
 	a, err := NewAPI(c)
 	require.NoError(t, err)
 	require.NotNil(t, a)
@@ -43,6 +45,7 @@ func forceExtProvider(t *testing.T, a *API, u *user.User) {
 
 func TestAPI_OpenMail(t *testing.T) {
 	a := mailAPI(t)
+	a.config.Mail.SpamProtection = true
 	assert.True(t, a.mail.IsOffline())
 	err := a.OpenMail()
 	assert.NoError(t, err)
@@ -61,9 +64,13 @@ func TestAPI_OpenMail(t *testing.T) {
 
 func TestAPI_ValidateEmail(t *testing.T) {
 	a := mailAPI(t)
+	a.config.Mail.KeepAlive = true
+	a.config.Mail.SpamProtection = true
+	err := a.OpenMail()
+	require.NoError(t, err)
 	assert.True(t, a.mail.IsOffline())
 	e := tutils.RandomEmail()
-	_, err := a.ValidateEmail(e)
+	_, err = a.ValidateEmail(e)
 	assert.NoError(t, err)
 	_, err = a.ValidateEmail("")
 	assert.Error(t, err)
@@ -309,7 +316,7 @@ func testSend(t *testing.T, a *API, u *user.User, action string,
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	testToken(tok)
 	// rate limit
 	if rateLimit != nil {

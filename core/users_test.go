@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
@@ -24,6 +23,7 @@ import (
 )
 
 func TestAPI_GetUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u1 := testUser(t, a)
 	u2, err := a.GetUser(u1.ID)
@@ -39,6 +39,7 @@ func TestAPI_GetUser(t *testing.T) {
 }
 
 func TestAPI_GetAuthenticatedUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	u = confirmUser(t, a, u)
@@ -60,6 +61,7 @@ func TestAPI_GetAuthenticatedUser(t *testing.T) {
 }
 
 func TestAPI_GetUserWithEmail(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u1 := testUser(t, a)
 	u2, err := a.GetUserWithEmail(u1.EmailAddress().String())
@@ -112,7 +114,7 @@ func testCreateUsers(t *testing.T, a *API) []testUsers {
 			}
 			tests = append(tests, ext)
 		}
-		var once sync.Once
+		var one sync.Once
 		for i, bk := range []interface{}{
 			"thing2", testBook, uuid.New().String(),
 		} {
@@ -123,7 +125,7 @@ func testCreateUsers(t *testing.T, a *API) []testUsers {
 				}
 				sld := fmt.Sprintf("salad-%d", x+i)
 				test.data["extra"] = sld
-				once.Do(func() {
+				one.Do(func() {
 					test.data["pepper"] = "spicy"
 				})
 				test.email = email()
@@ -132,26 +134,17 @@ func testCreateUsers(t *testing.T, a *API) []testUsers {
 		}
 		return tests
 	}()
-	ctx := context.Background()
-	a.config.Signup.AutoConfirm = true
-	a.config.Signup.Default.Username = false
-	a.config.Signup.Default.Color = false
-	a.config.Providers[provider.Google] = config.Provider{
-		ClientKey: "key",
-		Secret:    "secret",
-	}
-	a.config.Providers[provider.Amazon] = config.Provider{
-		ClientKey: "key",
-		Secret:    "secret",
-	}
-	err := a.ext.LoadProviders(a.config)
-	require.NoError(t, err)
-	err = a.conn.Transaction(func(tx *store.Connection) error {
+	err := a.conn.Transaction(func(tx *store.Connection) error {
 		for i, test := range cases {
-			u, err := a.userSignup(ctx, tx, test.provider, test.email, test.name, testPass, test.data)
-			require.NoError(t, err)
-			u.Role = test.role
-			err = tx.Save(u).Error
+			u := user.NewUser(
+				test.provider,
+				test.role,
+				test.email,
+				test.name,
+				[]byte(testPass),
+				test.data,
+				nil)
+			err := tx.Save(u).Error
 			require.NoError(t, err)
 			cases[i].uid = u.ID
 		}
@@ -162,9 +155,10 @@ func testCreateUsers(t *testing.T, a *API) []testUsers {
 }
 
 func TestSearchUsers(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	var tests []testUsers
-	t.Run("Populate Users", func(t *testing.T) {
+	t.Run("CreateUsers", func(t *testing.T) {
 		tests = testCreateUsers(t, a)
 	})
 	// find all no page
@@ -391,6 +385,7 @@ func filtersTest(t *testing.T, a *API, f store.Filters, tests []testUsers, paged
 }
 
 func TestAPI_ChangePassword(t *testing.T) {
+	t.Parallel()
 	var newPass = utils.SecureToken()
 	a := apiWithTempDB(t)
 	ctx := testContext(a)
@@ -411,6 +406,7 @@ func TestAPI_ChangePassword(t *testing.T) {
 }
 
 func TestAPI_CmdChangeUserRole(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	ctx := testContext(a)
 	u := testUser(t, a)
@@ -448,6 +444,7 @@ func TestAPI_CmdChangeUserRole(t *testing.T) {
 }
 
 func TestAPI_ConfirmUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	ctx := testContext(a)
@@ -469,6 +466,7 @@ func TestAPI_ConfirmUser(t *testing.T) {
 }
 
 func TestAPI_ConfirmPassword(t *testing.T) {
+	t.Parallel()
 	const (
 		empty   = ""
 		badPass = "pass"
@@ -508,6 +506,7 @@ func TestAPI_ConfirmPassword(t *testing.T) {
 }
 
 func TestAPI_ConfirmEmail(t *testing.T) {
+	t.Parallel()
 	const (
 		empty    = ""
 		badEmail = "@"
@@ -535,6 +534,7 @@ func TestAPI_ConfirmEmail(t *testing.T) {
 }
 
 func TestAPI_UpdateUser(t *testing.T) {
+	t.Parallel()
 	var testName = "peaches"
 	data := types.Map{
 		"foo":   "bar",
@@ -566,6 +566,7 @@ func TestAPI_UpdateUser(t *testing.T) {
 }
 
 func TestAPI_BanUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	assert.False(t, u.IsBanned())
@@ -588,6 +589,7 @@ func TestAPI_BanUser(t *testing.T) {
 }
 
 func TestAPI_DeleteUser(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
 	assert.True(t, u.Valid())

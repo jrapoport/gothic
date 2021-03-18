@@ -7,9 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 )
 
 func TestData(t *testing.T) {
+	t.Parallel()
 	type Tests struct {
 		gorm.Model
 		Name       string
@@ -73,7 +76,20 @@ func TestData(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestMap_Scan(t *testing.T) {
+	m := Map{}
+	i := 0
+	err := m.Scan(i)
+	assert.Error(t, err)
+	err = m.Scan([]byte("\n"))
+	assert.Error(t, err)
+	err = m.Scan([]byte(""))
+	assert.NoError(t, err)
+}
+
 func TestDataFromMap(t *testing.T) {
+	t.Parallel()
+	const testString = "{\"foo\":\"bar\",\"quack\":1}"
 	m := map[string]interface{}{
 		"foo":   "bar",
 		"quack": 1,
@@ -83,4 +99,70 @@ func TestDataFromMap(t *testing.T) {
 	assert.Equal(t, "bar", test.Get("foo"))
 	assert.Equal(t, 1, test["quack"])
 	assert.Equal(t, "", test.Get("bar"))
+	s := test.String()
+	assert.Equal(t, testString, s)
 }
+
+func TestMap_GormDBDataType(t *testing.T) {
+	m := Map{}
+	tests := []struct{
+		d string
+		t string
+	} {
+		{mySQL, "JSON"},
+		{postgres, "JSONB"},
+		{sqlServer, "NVARCHAR(MAX)"},
+		{sqlite, "JSON"},
+		{sqlite3, "JSON"},
+		{"fake", "JSON"},
+
+	}
+	for _, test := range tests {
+		typ := m.GormDBDataType(dummyDB(test.d), nil)
+		assert.Equal(t, test.t, typ)
+	}
+}
+
+func dummyDB(name string) *gorm.DB {
+	d := &dummy{name}
+	c :=  &gorm.Config{Dialector: d}
+	return &gorm.DB{Config: c}
+}
+
+type dummy struct{
+	name string
+}
+
+func (m dummy) Name() string {
+	return m.name
+}
+
+func (m dummy) Initialize(*gorm.DB) error {
+	panic("implement me")
+}
+
+func (m dummy) Migrator(*gorm.DB) gorm.Migrator {
+	panic("implement me")
+}
+
+func (m dummy) DataTypeOf(*schema.Field) string {
+	panic("implement me")
+}
+
+func (m dummy) DefaultValueOf(*schema.Field) clause.Expression {
+	panic("implement me")
+}
+
+func (m dummy) BindVarTo(clause.Writer, *gorm.Statement, interface{}) {
+	panic("implement me")
+}
+
+func (m dummy) QuoteTo(clause.Writer, string) {
+	panic("implement me")
+}
+
+func (m dummy) Explain(string, ...interface{}) string {
+	panic("implement me")
+}
+
+var _ gorm.Dialector = (*dummy)(nil)

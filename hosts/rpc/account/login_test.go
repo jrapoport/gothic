@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccountServer_Login(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	u := testUser(t, srv)
 	// invalid req

@@ -10,6 +10,7 @@ import (
 )
 
 func TestRefreshToken_Kind(t *testing.T) {
+	t.Parallel()
 	assert.NotPanics(t, func() {
 		tk := NewRefreshToken(uuid.New())
 		cls := tk.Class()
@@ -18,6 +19,7 @@ func TestRefreshToken_Kind(t *testing.T) {
 }
 
 func TestRefreshToken_HasToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	createToken := func() *RefreshToken {
 		tk := NewRefreshToken(uuid.New())

@@ -23,6 +23,7 @@ import (
 )
 
 func TestRESTHost(t *testing.T) {
+	t.Parallel()
 	c := tconf.TempDB(t)
 	c.Signup.AutoConfirm = true
 	c.Security.MaskEmails = false

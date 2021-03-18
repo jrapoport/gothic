@@ -99,6 +99,7 @@ func testCreateUsers(t *testing.T, conn *store.Connection, c *config.Config) []t
 }
 
 func TestSearchUsers(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	var tests []testCase
 	t.Run("Populate Users", func(t *testing.T) {

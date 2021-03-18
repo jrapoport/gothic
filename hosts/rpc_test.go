@@ -21,6 +21,7 @@ func configClient(t *testing.T, h core.Hosted) config.ConfigClient {
 }
 
 func TestRPCHost(t *testing.T) {
+	t.Parallel()
 	a, _, _ := tcore.API(t, false)
 	// create an rcp-web host
 	h := NewRPCHost(a, "127.0.0.1:0")

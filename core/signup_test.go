@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/jrapoport/gothic/test/tconf"
 	"sync"
 	"testing"
 	"time"
@@ -14,9 +13,11 @@ import (
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/store/types/key"
 	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +25,7 @@ import (
 )
 
 func TestAPI_Signup(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		auto bool
@@ -33,6 +35,7 @@ func TestAPI_Signup(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 			testSignup(t, test.auto)
 		})
 	}
@@ -111,33 +114,46 @@ func testSignup(t *testing.T, autoconfirm bool) {
 		}
 	}
 	ctx := testContext(a)
-	for _, test := range tests {
-		a.config.Validation.UsernameRegex = test.unRx
-		a.config.Validation.PasswordRegex = test.pwRx
-		checkUser := func(u *user.User) {
-			require.NotNil(t, u)
-			e, err := validate.Email(test.email)
+	mu.Lock()
+	conn := a.conn
+	mu.Unlock()
+	err := conn.Transaction(func(tx *store.Connection) error {
+		mu.Lock()
+		a.conn = tx
+		mu.Unlock()
+		for _, test := range tests {
+			a.config.Validation.UsernameRegex = test.unRx
+			a.config.Validation.PasswordRegex = test.pwRx
+			checkUser := func(u *user.User) {
+				require.NotNil(t, u)
+				e, err := validate.Email(test.email)
+				require.NoError(t, err)
+				assert.Equal(t, e, u.Email)
+				assert.Equal(t, test.username, u.Username)
+				assert.Equal(t, autoconfirm, u.IsConfirmed())
+				if !u.IsConfirmed() {
+					var ct token.ConfirmToken
+					err = tx.First(&ct, "user_id = ?", u.ID).Error
+					assert.NoError(t, err)
+				}
+				if test.data == nil {
+					return
+				}
+				assert.Equal(t, test.data, u.Data)
+			}
+			u, err := a.Signup(ctx, test.email, test.username, test.pw, test.data)
+			assert.NoError(t, err)
+			checkUser(u)
+			u, err = a.GetUserWithEmail(test.email)
 			require.NoError(t, err)
-			assert.Equal(t, e, u.Email)
-			assert.Equal(t, test.username, u.Username)
-			assert.Equal(t, autoconfirm, u.IsConfirmed())
-			if !u.IsConfirmed() {
-				var ct token.ConfirmToken
-				err = a.conn.First(&ct, "user_id = ?", u.ID).Error
-				assert.NoError(t, err)
-			}
-			if test.data == nil {
-				return
-			}
-			assert.Equal(t, test.data, u.Data)
+			checkUser(u)
 		}
-		u, err := a.Signup(ctx, test.email, test.username, test.pw, test.data)
-		assert.NoError(t, err)
-		checkUser(u)
-		u, err = a.GetUserWithEmail(test.email)
-		require.NoError(t, err)
-		checkUser(u)
-	}
+		return nil
+	})
+	mu.Lock()
+	a.conn = conn
+	mu.Unlock()
+	require.NoError(t, err)
 }
 
 func TestAPI_Signup_Error(t *testing.T) {
@@ -225,16 +241,30 @@ func TestAPI_Signup_Error(t *testing.T) {
 	a := createAPI(t)
 	a.config.Signup.Username = true
 	ctx := testContext(a)
-	for _, data := range []types.Map{nil, {}, testData} {
-		for _, test := range tests {
-			a.config.Validation.UsernameRegex = test.unRx
-			a.config.Validation.PasswordRegex = test.pwRx
-			_, err := a.Signup(ctx, test.email, test.username, test.pw, data)
-			assert.Error(t, err)
+	var mu sync.Mutex
+	mu.Lock()
+	conn := a.conn
+	mu.Unlock()
+	err := conn.Transaction(func(tx *store.Connection) error {
+		mu.Lock()
+		a.conn = tx
+		mu.Unlock()
+		for _, data := range []types.Map{nil, {}, testData} {
+			for _, test := range tests {
+				a.config.Validation.UsernameRegex = test.unRx
+				a.config.Validation.PasswordRegex = test.pwRx
+				_, err := a.Signup(ctx, test.email, test.username, test.pw, data)
+				assert.Error(t, err)
+			}
 		}
-	}
+		return nil
+	})
+	mu.Lock()
+	a.conn = conn
+	mu.Unlock()
+	require.NoError(t, err)
 	// invalid context
-	_, err := a.Signup(nil, testEmail, testUsername, testPass, nil)
+	_, err = a.Signup(nil, testEmail, testUsername, testPass, nil)
 	assert.Error(t, err)
 	// test email taken
 	a.config.Validation.UsernameRegex = empty
@@ -249,6 +279,7 @@ func TestAPI_Signup_Error(t *testing.T) {
 }
 
 func TestAPI_Signup_Disabled(t *testing.T) {
+	t.Parallel()
 	a := createAPI(t)
 	a.config.Signup.Disabled = true
 	_, err := a.Signup(context.Background(), "", "", "", nil)
@@ -256,6 +287,7 @@ func TestAPI_Signup_Disabled(t *testing.T) {
 }
 
 func TestAPI_Signup_ReCaptcha(t *testing.T) {
+	t.Parallel()
 	a := createAPI(t)
 	ctx := context.Background()
 	_, err := a.Signup(ctx, "", "", "", nil)
@@ -417,6 +449,7 @@ func TestAPI_Signup_DefaultColor(t *testing.T) {
 }
 
 func TestAPI_Signup_Event(t *testing.T) {
+	t.Parallel()
 	a := createAPI(t)
 	testListen := func(mu *sync.RWMutex, lis events.Event, data *types.Map) {
 		c := a.Listen(lis)

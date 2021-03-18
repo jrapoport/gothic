@@ -52,6 +52,7 @@ func testUser(t *testing.T, srv *userServer) (*user.User, string) {
 }
 
 func TestUserServer_GetUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	srv.Config().Signup.AutoConfirm = true
@@ -86,6 +87,7 @@ func TestUserServer_GetUser(t *testing.T) {
 }
 
 func TestUserServer_UpdateUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	updateUser := func(tok string, body interface{}) *httptest.ResponseRecorder {
@@ -151,6 +153,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 }
 
 func TestUserServer_ChangePassword(t *testing.T) {
+	t.Parallel()
 	const newPassword = "gj8#xtg#yrabxpnno!p5f3t8na!hd3?4jq7majxs"
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
@@ -187,6 +190,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 }
 
 func TestRequestErrors(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	j := srv.Config().JWT

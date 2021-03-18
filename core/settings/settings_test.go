@@ -11,6 +11,7 @@ import (
 )
 
 func TestCheck(t *testing.T) {
+	t.Parallel()
 	c := tconf.Config(t)
 	c.Mail.Host = "example.com"
 	c.Mail.Port = 25

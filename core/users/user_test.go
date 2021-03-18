@@ -44,6 +44,7 @@ func banUser(t *testing.T, conn *store.Connection, u *user.User) {
 }
 
 func TestGetUserWithID(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u1 := testUser(t, conn, c.Provider())
 	u2, err := GetUser(conn, u1.ID)
@@ -59,6 +60,7 @@ func TestGetUserWithID(t *testing.T) {
 }
 
 func TestGetActiveUserWithID(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	_, err := GetActiveUser(conn, u.ID)
@@ -78,6 +80,7 @@ func TestGetActiveUserWithID(t *testing.T) {
 }
 
 func TestGetAuthenticatedUserWithID(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	test := testUser(t, conn, c.Provider())
 	_, err := GetAuthenticatedUser(conn, uuid.Nil)
@@ -104,12 +107,14 @@ func TestGetAuthenticatedUserWithID(t *testing.T) {
 }
 
 func TestIsEmailTaken(t *testing.T) {
+	t.Parallel()
 	var email = tutils.RandomEmail()
 	var uname = utils.RandomUsername()
 	testIsTakenFunc(t, email, uname, email, IsEmailTaken)
 }
 
 func TestIsUsernameTaken(t *testing.T) {
+	t.Parallel()
 	var email = tutils.RandomEmail()
 	var uname = utils.RandomUsername()
 	testIsTakenFunc(t, email, uname, uname, IsUsernameTaken)
@@ -136,6 +141,7 @@ func testIsTakenFunc(t *testing.T, email, uname, taken string, takenFn isTakenFu
 }
 
 func TestGetUserWithEmail(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u1 := testUser(t, conn, c.Provider())
 	u2, err := GetUserWithEmail(conn, u1.EmailAddress().String())
@@ -151,6 +157,7 @@ func TestGetUserWithEmail(t *testing.T) {
 }
 
 func TestHasUserWithEmail(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u1 := testUser(t, conn, c.Provider())
 	u2, err := HasUserWithEmail(conn, u1.EmailAddress().String())
@@ -167,21 +174,26 @@ func TestHasUserWithEmail(t *testing.T) {
 }
 
 func TestRandomUsername(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	uname, err := RandomUsername(conn, false)
 	assert.NoError(t, err)
 	used := []string{uname}
 	assert.NotEmpty(t, uname)
 	// fill users
-	for i := 0; i < 100; i++ {
-		em := tutils.RandomEmail()
-		un := utils.RandomUsername()
-		used = append(used, un)
-		p := c.Provider()
-		u := user.NewUser(p, user.RoleUser, em, un, []byte(""), nil, nil)
-		err = conn.Create(u).Error
-		assert.NoError(t, err)
-	}
+	err = conn.Transaction(func(tx *store.Connection) error {
+		for i := 0; i < 100; i++ {
+			em := tutils.RandomEmail()
+			un := utils.RandomUsername()
+			used = append(used, un)
+			p := c.Provider()
+			u := user.NewUser(p, user.RoleUser, em, un, []byte(""), nil, nil)
+			err = tx.Create(u).Error
+			assert.NoError(t, err)
+		}
+		return nil
+	})
+	assert.NoError(t, err)
 	uname, err = RandomUsername(conn, true)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, uname)

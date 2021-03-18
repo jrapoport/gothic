@@ -10,6 +10,7 @@ import (
 )
 
 func TestPrettyPrint(t *testing.T) {
+	t.Parallel()
 	type Foo struct {
 		Value  string
 		Number int
@@ -24,6 +25,7 @@ func TestPrettyPrint(t *testing.T) {
 }
 
 func TestPrintGrid(t *testing.T) {
+	t.Parallel()
 	const (
 		val   = "1234"
 		grid1 = "1234\t1234\t1234\t\t\n"
@@ -55,6 +57,7 @@ func TestPrintGrid(t *testing.T) {
 }
 
 func TestWriteCSV(t *testing.T) {
+	t.Parallel()
 	const (
 		val  = "1234"
 		test = "value\n1234\n1234\n1234\n1234\n1234\n1234\n1234\n1234\n1234\n1" +

@@ -36,8 +36,10 @@ func accessCodeConn(t *testing.T) *store.Connection {
 }
 
 func TestNewAccessCode(t *testing.T) {
+	t.Parallel()
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
+			t.Parallel()
 			testNewAccessCode(t, f)
 		})
 	}
@@ -69,32 +71,38 @@ func testNewAccessCode(t *testing.T, f Format) {
 		{SingleUse, futureExp, token.Timed, SingleUse},
 		{2, futureExp, token.Timed, 2},
 	}
-	for _, test := range tests {
-		code := NewAccessCode(f, test.uses, test.exp)
-		assert.NotNil(t, code)
-		assert.Equal(t, user.SystemID, code.UserID)
-		assert.Equal(t, test.use, code.Usage())
-		assert.NotEmpty(t, code.String())
-		assert.Equal(t, test.max, code.MaxUses)
-		assert.Equal(t, 0, code.Used)
-		assert.Nil(t, code.UsedAt)
-		exp := test.exp
-		if exp < NoExpiration {
-			exp = NoExpiration
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for _, test := range tests {
+			code := NewAccessCode(f, test.uses, test.exp)
+			assert.NotNil(t, code)
+			assert.Equal(t, user.SystemID, code.UserID)
+			assert.Equal(t, test.use, code.Usage())
+			assert.NotEmpty(t, code.String())
+			assert.Equal(t, test.max, code.MaxUses)
+			assert.Equal(t, 0, code.Used)
+			assert.Nil(t, code.UsedAt)
+			exp := test.exp
+			if exp < NoExpiration {
+				exp = NoExpiration
+			}
+			assert.Equal(t, exp, code.Expiration)
+			assert.False(t, code.Usable())
+			err := tx.Create(code).Error
+			assert.NoError(t, err)
+			assert.True(t, code.Usable())
 		}
-		assert.Equal(t, exp, code.Expiration)
-		assert.False(t, code.Usable())
-		err := conn.Create(code).Error
-		assert.NoError(t, err)
-		assert.True(t, code.Usable())
-	}
+		return nil
+	})
+	require.NoError(t, err)
 	code := NewAccessCode(255, SingleUse, NoExpiration)
 	assert.Nil(t, code)
 }
 
 func TestAccessCode_BeforeCreate(t *testing.T) {
+	t.Parallel()
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
+			t.Parallel()
 			testAccessCodeBeforeCreate(t, f)
 		})
 	}
@@ -112,8 +120,10 @@ func testAccessCodeBeforeCreate(t *testing.T, f Format) {
 }
 
 func TestAccessCode_Usable(t *testing.T) {
+	t.Parallel()
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
+			t.Parallel()
 			testAccessCodeUsable(t, f)
 		})
 	}
@@ -137,22 +147,26 @@ func testAccessCodeUsable(t *testing.T, f Format) {
 		{SingleUse, expiration},
 		{2, expiration},
 	}
-	for _, test := range tests {
-		code := NewAccessCode(f, test.uses, test.exp)
-		err := conn.Create(code).Error
-		assert.NoError(t, err)
-		assert.True(t, code.Usable())
-		if code.MaxUses != InfiniteUse {
-			code.Used = 3
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for _, test := range tests {
+			code := NewAccessCode(f, test.uses, test.exp)
+			err := tx.Create(code).Error
+			assert.NoError(t, err)
+			assert.True(t, code.Usable())
+			if code.MaxUses != InfiniteUse {
+				code.Used = 3
+				assert.False(t, code.Usable())
+			}
+			if code.Type == token.Timed {
+				tm := time.Now().UTC().Add(-1 * time.Hour)
+				code.ExpiredAt = &tm
+				assert.False(t, code.Usable())
+			}
+			err = tx.Delete(code).Error
+			assert.NoError(t, err)
 			assert.False(t, code.Usable())
 		}
-		if code.Type == token.Timed {
-			tm := time.Now().UTC().Add(-1 * time.Hour)
-			code.ExpiredAt = &tm
-			assert.False(t, code.Usable())
-		}
-		err = conn.Delete(code).Error
-		assert.NoError(t, err)
-		assert.False(t, code.Usable())
-	}
+		return nil
+	})
+	require.NoError(t, err)
 }

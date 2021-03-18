@@ -1,6 +1,7 @@
 package core
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/google/uuid"
@@ -14,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type testCase struct {
+type testLog struct {
 	act    auditlog.Action
 	uid    uuid.UUID
 	fields types.Map
@@ -26,52 +27,67 @@ var (
 	testBook = uuid.New().String()
 )
 
-func setupLogs(t *testing.T, conn *store.Connection) []testCase {
-	var tests = []testCase{
-		{auditlog.Startup, uuid.New(), nil, 0},
-		{auditlog.Shutdown, uuid.New(), nil, 0},
-		{auditlog.Signup, uuid.New(), nil, 0},
-		{auditlog.ConfirmSent, uuid.New(), nil, 0},
-		{auditlog.Confirmed, uuid.New(), nil, 0},
-		{auditlog.Granted, uuid.New(), nil, 0},
-		{auditlog.Revoked, uuid.New(), nil, 0},
-		{auditlog.RevokedAll, uuid.New(), nil, 0},
-		{auditlog.Login, uuid.New(), nil, 0},
-		{auditlog.Logout, uuid.New(), nil, 0},
-		{auditlog.Password, uuid.New(), nil, 0},
-		{auditlog.Email, uuid.New(), nil, 0},
-		{auditlog.Updated, uuid.New(), nil, 0},
-	}
-	for _, test := range tests {
-		tst := test
-		tst.uid = testUID
-		tests = append(tests, tst)
-	}
-	for _, bk := range []interface{}{
-		"thing2", testBook, uuid.New().String(),
-	} {
-		for _, test := range tests {
-			test.fields = types.Map{
-				"dr_suess": "thing1",
-				"book":     bk,
-			}
-			tests = append(tests, test)
+var _testLogs []testLog
+var _logAPI *API
+var once sync.Once
+
+func setupLogs(t *testing.T) (*API, []testLog) {
+	once.Do(func() {
+		a := apiWithTempDB(t)
+		var tests = []testLog{
+			{auditlog.Startup, uuid.New(), nil, 0},
+			{auditlog.Shutdown, uuid.New(), nil, 0},
+			{auditlog.Signup, uuid.New(), nil, 0},
+			{auditlog.ConfirmSent, uuid.New(), nil, 0},
+			{auditlog.Confirmed, uuid.New(), nil, 0},
+			{auditlog.Granted, uuid.New(), nil, 0},
+			{auditlog.Revoked, uuid.New(), nil, 0},
+			{auditlog.RevokedAll, uuid.New(), nil, 0},
+			{auditlog.Login, uuid.New(), nil, 0},
+			{auditlog.Logout, uuid.New(), nil, 0},
+			{auditlog.Password, uuid.New(), nil, 0},
+			{auditlog.Email, uuid.New(), nil, 0},
+			{auditlog.Updated, uuid.New(), nil, 0},
 		}
-	}
-	ctx := context.Background()
-	for i, test := range tests {
-		le, err := audit.CreateLogEntry(ctx, conn, test.act, test.uid, test.fields)
+		for _, test := range tests {
+			tst := test
+			tst.uid = testUID
+			tests = append(tests, tst)
+		}
+		for _, bk := range []interface{}{
+			"thing2", testBook, uuid.New().String(),
+		} {
+			for _, test := range tests {
+				test.fields = types.Map{
+					"dr_suess": "thing1",
+					"book":     bk,
+				}
+				tests = append(tests, test)
+			}
+		}
+		ctx := context.Background()
+		err := a.conn.Transaction(func(tx *store.Connection) error {
+			for i, test := range tests {
+				le, err := audit.CreateLogEntry(ctx, tx, test.act, test.uid, test.fields)
+				require.NoError(t, err)
+				tests[i].logID = le.ID
+			}
+			return nil
+		})
 		require.NoError(t, err)
-		tests[i].logID = le.ID
-	}
-	return tests
+		_testLogs = tests
+		_logAPI = a
+	})
+	require.NotNil(t, _logAPI)
+	require.NotEmpty(t, _testLogs)
+	return _logAPI, _testLogs
 }
 
 func TestAPI_GetAuditLog(t *testing.T) {
-	a := apiWithTempDB(t)
+	t.Parallel()
+	a, tests := setupLogs(t)
 	_, err := a.GetAuditLog(nil, 9999)
 	assert.Error(t, err)
-	tests := setupLogs(t, a.conn)
 	for _, test := range tests {
 		le, err := a.GetAuditLog(nil, test.logID)
 		assert.NoError(t, err)
@@ -84,8 +100,8 @@ func TestAPI_GetAuditLog(t *testing.T) {
 }
 
 func TestAPI_SearchAuditLogs(t *testing.T) {
-	a := apiWithTempDB(t)
-	setupLogs(t, a.conn)
+	t.Parallel()
+	a, _ := setupLogs(t)
 	tests := []struct {
 		filters store.Filters
 		comp    func(log *auditlog.AuditLog)
@@ -146,12 +162,12 @@ func TestAPI_SearchAuditLogs(t *testing.T) {
 }
 
 func TestAPI_SearchAuditLogs_Sort(t *testing.T) {
+	t.Parallel()
 	filters := store.Filters{
 		"dr_suess": []string{"thing1"},
 		"book":     []string{testBook},
 	}
-	a := apiWithTempDB(t)
-	setupLogs(t, a.conn)
+	a, _ := setupLogs(t)
 	ctx := testContext(a)
 	ctx.SetSort(store.Descending)
 	logs, err := a.SearchAuditLogs(ctx, filters, nil)

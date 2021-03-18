@@ -13,6 +13,7 @@ import (
 )
 
 func TestNewHost(t *testing.T) {
+	t.Parallel()
 	const (
 		address = "127.0.0.1:0"
 		name    = "test"
@@ -49,6 +50,7 @@ func TestNewHost(t *testing.T) {
 }
 
 func TestNewHost_Error(t *testing.T) {
+	t.Parallel()
 	c := tconf.TempDB(t)
 	a, err := NewAPI(c)
 	require.NoError(t, err)

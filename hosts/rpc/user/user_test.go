@@ -30,6 +30,7 @@ func testServer(t *testing.T) *userServer {
 }
 
 func TestUserServer_GetUser(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	srv.Config().MaskEmails = false
 	req := &GetUserRequest{}
@@ -58,6 +59,7 @@ func TestUserServer_GetUser(t *testing.T) {
 }
 
 func TestUserServer_UpdateUser(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	u, tok := tcore.TestUser(t, srv.API, "", false)
 	ctx := tsrv.RPCAuthContext(t, srv.Config(), tok)
@@ -105,6 +107,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 }
 
 func TestUserServer_SendConfirmUser(t *testing.T) {
+	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
 	s.Config().Signup.AutoConfirm = false
 	s.Config().Mail.SendLimit = 0
@@ -124,7 +127,7 @@ func TestUserServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	_, err = srv.SendConfirmUser(ctx, &emptypb.Empty{})
 	assert.Error(t, err)
@@ -137,6 +140,7 @@ func TestUserServer_SendConfirmUser(t *testing.T) {
 }
 
 func TestUserServer_ChangePassword(t *testing.T) {
+	t.Parallel()
 	const newPassword = "gj8#xtg#yrabxpnno!p5f3t8na!hd3?4jq7majxs"
 	srv := testServer(t)
 	u, tok := tcore.TestUser(t, srv.API, "", false)
@@ -167,6 +171,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 }
 
 func TestRequestErrors(t *testing.T) {
+	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
 	_, err := srv.GetUser(ctx, &GetUserRequest{})

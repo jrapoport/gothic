@@ -8,6 +8,7 @@ import (
 )
 
 func TestReCaptcha(t *testing.T) {
+	t.Parallel()
 	c := tconf.Config(t)
 	key := ReCaptchaDebugKey
 	token := ReCaptchaDebugToken

@@ -58,6 +58,7 @@ func testUser(t *testing.T, srv *usersServer, admin bool) (*user.User, string) {
 }
 
 func TestUserServer_GetUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	srv.Config().Signup.AutoConfirm = true
@@ -122,6 +123,7 @@ func TestUserServer_GetUser(t *testing.T) {
 }
 
 func TestUserServer_UpdateUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	srv.Config().Signup.AutoConfirm = true
@@ -200,6 +202,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 }
 
 func TestUserServer_DeleteUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	srv.Config().Signup.AutoConfirm = true
@@ -259,6 +262,7 @@ func TestUserServer_DeleteUser(t *testing.T) {
 }
 
 func TestUserServer_PromoteUser(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	srv.Config().Signup.AutoConfirm = true

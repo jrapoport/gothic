@@ -10,6 +10,7 @@ import (
 )
 
 func TestAuthToken_Kind(t *testing.T) {
+	t.Parallel()
 	assert.NotPanics(t, func() {
 		tk := NewAuthToken(provider.Google, 0)
 		cls := tk.Class()
@@ -18,6 +19,7 @@ func TestAuthToken_Kind(t *testing.T) {
 }
 
 func TestAuthToken_HasToken(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	createToken := func() *AuthToken {
 		tk := NewAuthToken(provider.Google, 0)
