@@ -7,7 +7,7 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/models/types/key"
 )
 
 const (

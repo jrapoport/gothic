@@ -5,7 +5,7 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/health"
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
 )

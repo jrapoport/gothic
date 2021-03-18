@@ -5,7 +5,7 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/events"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/stretchr/testify/assert"
 )
 

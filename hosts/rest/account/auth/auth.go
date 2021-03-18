@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 )
 
 const (

@@ -9,9 +9,9 @@ import (
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 // UserLogin authorizes a user and returns a bearer token

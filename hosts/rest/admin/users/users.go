@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 )
 
 const (

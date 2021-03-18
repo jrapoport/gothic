@@ -9,10 +9,10 @@ import (
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/login"
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
 )
 
 // Login is the endpoint for logging in a user

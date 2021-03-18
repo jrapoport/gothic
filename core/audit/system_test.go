@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/auditlog"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/require"
 )

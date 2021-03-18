@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/store/types"
 	"gorm.io/gorm"
 )
 

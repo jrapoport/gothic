@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/utils"
 )
 

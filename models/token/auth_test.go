@@ -3,7 +3,7 @@ package token
 import (
 	"testing"
 
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

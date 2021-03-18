@@ -4,7 +4,7 @@ import (
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // Filters hols the search filters.

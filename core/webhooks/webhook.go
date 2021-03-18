@@ -8,7 +8,7 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/events"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // CallWebhook calls a webhook callback with an event and msg.
