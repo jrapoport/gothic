@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/codes"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
@@ -14,6 +13,7 @@ import (
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/stretchr/testify/assert"

@@ -4,12 +4,10 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
 	"github.com/jrapoport/gothic/core/health"
-	"github.com/jrapoport/gothic/providers"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCheck(t *testing.T) {
@@ -26,8 +24,6 @@ func TestCheck(t *testing.T) {
 	c.Providers[provider.Google] = p
 	c.Providers[provider.GitLab] = p
 	c.Providers[provider.Heroku] = p
-	err := providers.LoadProviders(c)
-	require.NoError(t, err)
 	s := Current(c)
 	assert.EqualValues(t, s.Health, health.Check(c))
 	assert.True(t, s.Signup.Disabled)

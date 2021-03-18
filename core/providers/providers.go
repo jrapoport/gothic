@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/config/provider"
+	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/apple"
@@ -72,12 +72,21 @@ import (
 
 var internalProvider = provider.Unknown
 
+type Provider goth.Provider
+
+// Providers is list of known/available providers.
+type Providers map[string]Provider
+
+func NewProviders() Providers {
+	return Providers{}
+}
+
 // LoadProviders loads the configured external providers.
-func LoadProviders(c *config.Config) error {
-	clearProviders()
+func (providers *Providers) LoadProviders(c *config.Config) error {
+	providers.clearProviders()
 	internalProvider = c.Provider()
 	for name, v := range c.Providers {
-		err := useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
+		err := providers.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
 		if err != nil {
 			err = fmt.Errorf("load %s provider failed: %w", name, err)
 			return err
@@ -86,13 +95,55 @@ func LoadProviders(c *config.Config) error {
 	return nil
 }
 
-func clearProviders() {
-	internalProvider = provider.Unknown
-	goth.ClearProviders()
+// UseProviders adds a list of available providers for use with Goth.
+// Can be called multiple times. If you pass the same provider more
+// than once, the last will be used.
+func (providers Providers) UseProviders(viders ...Provider) {
+	for _, p := range viders {
+		providers[p.Name()] = p
+	}
 }
 
-func useProvider(name provider.Name, clientKey, secret, callback string, scopes ...string) (err error) {
-	var p goth.Provider
+// GetProvider returns a previously created provider. If we have not
+// been told to use the named provider it will return an error.
+func (providers Providers) GetProvider(p provider.Name) (Provider, error) {
+	if !p.IsExternal() {
+		err := fmt.Errorf("invalid provider: %s", p)
+		return nil, err
+	}
+	return providers.getProvider(p.String())
+}
+
+func (providers Providers) getProvider(name string) (Provider, error) {
+	p := providers[name]
+	if p == nil {
+		return nil, fmt.Errorf("no provider for %s exists", name)
+	}
+	return p, nil
+}
+
+// IsEnabled returns true if the provider is enabled.
+func (providers Providers) IsEnabled(p provider.Name) error {
+	// check against Unknown first so we catch internalProvider
+	// properly (in case internalProvider is Unknown)
+	if p == provider.Unknown {
+		return errors.New("invalid provider")
+	} else if p == internalProvider {
+		return nil
+	}
+	_, err := providers.GetProvider(p)
+	return err
+}
+
+// ClearProviders will remove all providers currently in use.
+// This is useful, mostly, for testing purposes.
+func (providers *Providers) clearProviders() {
+	internalProvider = provider.Unknown
+	*providers = Providers{}
+}
+
+func (providers *Providers) useProvider(name provider.Name, clientKey, secret, callback string, scopes ...string) (err error) {
+	var p Provider
 	switch name {
 	case provider.Amazon:
 		p = amazon.New(clientKey, secret, callback, scopes...)
@@ -261,30 +312,8 @@ func useProvider(name provider.Name, clientKey, secret, callback string, scopes 
 	default:
 		return fmt.Errorf("invalid provider: %s", name)
 	}
-	goth.UseProviders(p)
+	providers.UseProviders(p)
 	return nil
-}
-
-// GetProvider returns the provider for the name.
-func GetProvider(p provider.Name) (goth.Provider, error) {
-	if !p.IsExternal() {
-		err := fmt.Errorf("invalid provider: %s", p)
-		return nil, err
-	}
-	return goth.GetProvider(p.String())
-}
-
-// IsEnabled returns true if the provider is enabled.
-func IsEnabled(p provider.Name) error {
-	// check against Unknown first so we catch internalProvider
-	// properly (in case internalProvider is Unknown)
-	if p == provider.Unknown {
-		return errors.New("invalid provider")
-	} else if p == internalProvider {
-		return nil
-	}
-	_, err := GetProvider(p)
-	return err
 }
 
 func getEnv(key string) string {
