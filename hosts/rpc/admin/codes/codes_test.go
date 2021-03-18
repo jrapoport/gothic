@@ -13,6 +13,7 @@ import (
 )
 
 func TestCodesServer_CreateSignupCodes(t *testing.T) {
+	t.Parallel()
 	const testLen = 10
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newCodesServer(s)
@@ -30,6 +31,7 @@ func TestCodesServer_CreateSignupCodes(t *testing.T) {
 }
 
 func TestCodesServer_CheckSignupCode(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newCodesServer(s)
 	ctx := context.Background()
@@ -73,6 +75,7 @@ func TestCodesServer_CheckSignupCode(t *testing.T) {
 }
 
 func TestCodesServer_VoidSignupCode(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newCodesServer(s)
 	ctx := context.Background()

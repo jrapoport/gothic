@@ -1,6 +1,7 @@
 package code
 
 import (
+	"github.com/jrapoport/gothic/store"
 	"testing"
 
 	"github.com/jrapoport/gothic/models/user"
@@ -11,8 +12,10 @@ import (
 )
 
 func TestSignupCode_HasCode(t *testing.T) {
+	t.Parallel()
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
+			t.Parallel()
 			testSignupCodeHasCode(t, f)
 		})
 	}
@@ -48,8 +51,10 @@ func testSignupCodeHasCode(t *testing.T, f Format) {
 }
 
 func TestSignupCode_UseCode(t *testing.T) {
+	t.Parallel()
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
+			t.Parallel()
 			testSignupCodeUseCode(t, f)
 		})
 	}
@@ -99,16 +104,20 @@ func testSignupCodeUseCode(t *testing.T, f Format) {
 		{testCode(), du, assert.Error},
 		{testCode(), vu, assert.NoError},
 	}
-	for _, test := range tests {
-		err = test.sc.UseCode(conn, test.u)
-		test.Err(t, err)
-		if err == nil {
-			assert.False(t, test.sc.Usable())
-			assert.Equal(t, SingleUse, test.sc.Used)
-			u := &user.User{ID: test.u.ID}
-			err = conn.Find(u).Error
-			assert.NoError(t, err)
-			assert.Equal(t, &test.sc.ID, u.SignupCode)
+	err = conn.Transaction(func(tx *store.Connection) error {
+		for _, test := range tests {
+			err = test.sc.UseCode(tx, test.u)
+			test.Err(t, err)
+			if err == nil {
+				assert.False(t, test.sc.Usable())
+				assert.Equal(t, SingleUse, test.sc.Used)
+				u := &user.User{ID: test.u.ID}
+				err = tx.Find(u).Error
+				assert.NoError(t, err)
+				assert.Equal(t, &test.sc.ID, u.SignupCode)
+			}
 		}
-	}
+		return nil
+	})
+	require.NoError(t, err)
 }

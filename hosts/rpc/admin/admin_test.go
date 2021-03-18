@@ -14,6 +14,7 @@ import (
 )
 
 func TestAdminServer_Config(t *testing.T) {
+	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
 		RegisterServer,
 	})
@@ -30,6 +31,7 @@ func TestAdminServer_Config(t *testing.T) {
 }
 
 func TestAdminServer_Codes(t *testing.T) {
+	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
 		RegisterServer,
 	})

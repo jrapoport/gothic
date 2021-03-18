@@ -16,6 +16,7 @@ import (
 )
 
 func TestAccountServer_SendResetPassword(t *testing.T) {
+	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
 	srv := newAccountServer(s)
 	ctx := context.Background()
@@ -46,7 +47,7 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }
 
 func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
@@ -70,7 +71,7 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		} else {
 			test := s.RPCError(codes.DeadlineExceeded,
 				config.ErrRateLimitExceeded)
@@ -78,12 +79,13 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.EqualError(t, err, test.Error())
 			assert.Never(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		}
 	}
 }
 
 func TestAccountServer_ConfirmPasswordChange(t *testing.T) {
+	t.Parallel()
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"
 	s, smtp := tsrv.RPCServer(t, true)
 	srv := newAccountServer(s)
@@ -116,7 +118,7 @@ func TestAccountServer_ConfirmPasswordChange(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// now use the token to change the password
 	req = &ConfirmPasswordRequest{
 		Token:    tok,

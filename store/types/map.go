@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/markbates/goth"
 	"github.com/segmentio/encoding/json"
@@ -42,10 +41,7 @@ func (m Map) JSON() ([]byte, error) {
 
 // Value satisfies the driver.Valuer interface
 func (m Map) Value() (driver.Value, error) {
-	data, err := m.JSON()
-	if err != nil {
-		return driver.Value(""), err
-	}
+	data, _ := m.JSON()
 	return driver.Value(string(data)), nil
 }
 
@@ -96,10 +92,7 @@ func (Map) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
 
 // String satisfies the fmt.Stringer interface.
 func (m Map) String() string {
-	b, err := m.JSON()
-	if err != nil {
-		log.Panic(err)
-	}
+	b, _ := m.JSON()
 	return string(b)
 }
 

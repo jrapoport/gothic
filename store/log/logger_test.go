@@ -11,6 +11,7 @@ import (
 )
 
 func TestWithLogger(t *testing.T) {
+	t.Parallel()
 	fld := logrus.New().WithField("logger", "test")
 	loggers := []logger.Interface{
 		WithLogger(nil),

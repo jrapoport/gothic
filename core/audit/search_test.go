@@ -30,6 +30,7 @@ func createEntries(t *testing.T, conn *store.Connection) []testCase {
 }
 
 func TestSearchEntries(t *testing.T) {
+	t.Parallel()
 	conn, _ := tconn.TempConn(t)
 	var tests []testCase
 	t.Run("TestEntries", func(t *testing.T) {

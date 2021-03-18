@@ -12,6 +12,7 @@ import (
 )
 
 func TestConfigServer_Settings(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newConfigServer(s)
 	ctx := context.Background()

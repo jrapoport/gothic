@@ -13,6 +13,7 @@ import (
 )
 
 func TestLogLogin(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Login, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogLogin(ctx, conn, uid)
@@ -20,6 +21,7 @@ func TestLogLogin(t *testing.T) {
 }
 
 func TestLogLogout(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Logout, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogLogout(ctx, conn, uid)
@@ -27,6 +29,7 @@ func TestLogLogout(t *testing.T) {
 }
 
 func TestLogPasswordChange(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Password, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogPasswordChange(ctx, conn, uid)
@@ -34,6 +37,7 @@ func TestLogPasswordChange(t *testing.T) {
 }
 
 func TestLogEmailChange(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Email, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogEmailChange(ctx, conn, uid)
@@ -41,6 +45,7 @@ func TestLogEmailChange(t *testing.T) {
 }
 
 func TestLogUpdate(t *testing.T) {
+	t.Parallel()
 	testLogEntry(t, auditlog.Updated, uuid.New(), nil,
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogUserUpdated(ctx, conn, uid)
@@ -48,6 +53,7 @@ func TestLogUpdate(t *testing.T) {
 }
 
 func TestLogChangeRole(t *testing.T) {
+	t.Parallel()
 	r := user.RoleAdmin
 	testLogEntry(t, auditlog.ChangeRole, uuid.New(),
 		types.Map{

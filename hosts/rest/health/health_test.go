@@ -19,6 +19,7 @@ func ExpectedResponse(t *testing.T, a *core.API) string {
 }
 
 func TestHealthServer_HealthCheck(t *testing.T) {
+	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newHealthServer(s)
 	test := ExpectedResponse(t, s.API)

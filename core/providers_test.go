@@ -23,6 +23,7 @@ func authToken(t *testing.T, a *API, p provider.Name) string {
 }
 
 func TestAPI_GetAuthorizationURL(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	a := apiWithTempDB(t)
 	_, mock := tconf.MockedProvider(t, a.config, "")

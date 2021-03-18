@@ -33,12 +33,14 @@ func testDispatch(t *testing.T) *Dispatch {
 }
 
 func TestDispatch_AddListener(t *testing.T) {
+	t.Parallel()
 	testListen(t, func(d *Dispatch, evt Event, cb Callback) {
 		d.AddListener(evt, cb)
 	})
 }
 
 func TestDispatch_Listen(t *testing.T) {
+	t.Parallel()
 	testListen(t, func(d *Dispatch, evt Event, cb Callback) {
 		ch := d.Listen(evt)
 		go func() {
@@ -122,6 +124,7 @@ func testListen(t *testing.T, lis func(d *Dispatch, evt Event, cb Callback)) {
 }
 
 func TestDispatch_Dispatch(t *testing.T) {
+	t.Parallel()
 	d := testDispatch(t)
 	ch := make(chan types.Map)
 	d.listeners[ch] = Unknown
@@ -150,6 +153,7 @@ func TestDispatch_Dispatch(t *testing.T) {
 }
 
 func TestDispatch_Close(t *testing.T) {
+	t.Parallel()
 	em := tutils.RandomEmail()
 	d := testDispatch(t)
 	ch := d.Listen(Signup)

@@ -7,6 +7,7 @@ import (
 )
 
 func TestLinkedAccount_Valid(t *testing.T) {
+	t.Parallel()
 	l := &LinkedAccount{}
 	err := l.Valid()
 	assert.Error(t, err)

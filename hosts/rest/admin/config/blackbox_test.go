@@ -21,6 +21,7 @@ func testResponse(t *testing.T, s *rest.Host) string {
 }
 
 func TestConfigServer_Settings(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		config.RegisterServer,
 	}, false)

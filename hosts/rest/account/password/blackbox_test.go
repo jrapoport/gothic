@@ -53,6 +53,7 @@ func testUser(t *testing.T, srv *rest.Host) *user.User {
 }
 
 func TestPasswordServer_SendResetPassword(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	u := testUser(t, srv)
 	// invalid req
@@ -86,10 +87,11 @@ func TestPasswordServer_SendResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 }
 
 func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	srv.Config().Signup.AutoConfirm = true
@@ -108,18 +110,19 @@ func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		} else {
 			msg := thttp.FmtError(http.StatusTooEarly).Error()
 			assert.EqualError(t, err, msg)
 			assert.Never(t, func() bool {
 				return sent != ""
-			}, 1*time.Second, 100*time.Millisecond)
+			}, 200*time.Millisecond, 10*time.Millisecond)
 		}
 	}
 }
 
 func TestPasswordServer_ConfirmPasswordChange(t *testing.T) {
+	t.Parallel()
 	srv, web, smtp := testServer(t)
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"
 	// invalid req
@@ -150,7 +153,7 @@ func TestPasswordServer_ConfirmPasswordChange(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 1*time.Second, 100*time.Millisecond)
+	}, 200*time.Millisecond, 10*time.Millisecond)
 	// now use the token to change the password
 	req = &password.Request{
 		Password: newPass,

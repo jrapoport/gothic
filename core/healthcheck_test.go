@@ -7,6 +7,7 @@ import (
 )
 
 func TestHealthCheck(t *testing.T) {
+	t.Parallel()
 	a := apiWithTempDB(t)
 	h := a.HealthCheck()
 	assert.Equal(t, h.Name, a.config.Name)

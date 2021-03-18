@@ -8,6 +8,7 @@ import (
 )
 
 func TestCheck(t *testing.T) {
+	t.Parallel()
 	c := tconf.Config(t)
 	h := Check(c)
 	assert.Equal(t, h.Name, c.Name)

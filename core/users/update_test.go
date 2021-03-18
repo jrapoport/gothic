@@ -17,6 +17,7 @@ import (
 )
 
 func TestConfirmUser(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	now := time.Now()
@@ -39,6 +40,7 @@ func TestConfirmUser(t *testing.T) {
 }
 
 func TestConfirmIfNeeded(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	assert.False(t, u.IsConfirmed())
@@ -74,6 +76,7 @@ func TestConfirmIfNeeded(t *testing.T) {
 }
 
 func TestChangeRole(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	err := ConfirmUser(conn, u, time.Now())
@@ -92,6 +95,7 @@ func TestChangeRole(t *testing.T) {
 }
 
 func TestChangeEmail(t *testing.T) {
+	t.Parallel()
 	var newEmail = tutils.RandomEmail()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
@@ -116,6 +120,7 @@ func TestChangeEmail(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
+	t.Parallel()
 	var newPassword = utils.SecureToken()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
@@ -134,6 +139,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
+	t.Parallel()
 	const (
 		name1 = "peaches"
 		name2 = "foobar"
@@ -176,6 +182,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestLockUser(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	require.False(t, u.IsLocked())
@@ -187,6 +194,7 @@ func TestLockUser(t *testing.T) {
 }
 
 func TestBanUser(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	require.False(t, u.IsBanned())
@@ -205,6 +213,7 @@ func TestBanUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+	t.Parallel()
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	require.False(t, u.DeletedAt.Valid)

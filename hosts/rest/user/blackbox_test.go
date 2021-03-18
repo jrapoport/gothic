@@ -56,6 +56,7 @@ func testUser(t *testing.T, srv *rest.Host) (*user.User, string) {
 }
 
 func TestGetUser(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		rest_user.RegisterServer,
 	}, false)
@@ -83,6 +84,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		rest_user.RegisterServer,
 	}, false)
@@ -141,6 +143,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
+	t.Parallel()
 	const newPassword = "gj8#xtg#yrabxpnno!p5f3t8na!hd3?4jq7majxs"
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		rest_user.RegisterServer,
@@ -170,6 +173,7 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestErrors(t *testing.T) {
+	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		rest_user.RegisterServer,
 	}, false)

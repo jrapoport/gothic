@@ -1,27 +1,22 @@
 package tconf
 
 import (
-	"fmt"
 	"net"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/flashmob/go-guerrilla"
 	"github.com/flashmob/go-guerrilla/backends"
-	"github.com/flashmob/go-guerrilla/log"
 	"github.com/flashmob/go-guerrilla/mail"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/utils"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	smtpHost = "localhost"
-	smtpPort = 2525
-)
+const smtpHost = "127.0.0.1"
 
 // SMTPMock is a mock smtp server.
 type SMTPMock struct {
@@ -42,8 +37,9 @@ var mu sync.Mutex
 
 // MockSMTP returns a mocked smtp instance.
 func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
+	mu.Lock()
+	defer mu.Unlock()
 	c.Mail.Host = smtpHost
-	c.Mail.Port = smtpPort
 	cfg := &guerrilla.AppConfig{
 		BackendConfig: backends.BackendConfig{
 			"save_process": "mock|Debugger",
@@ -53,34 +49,22 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 		},
 		LogLevel: c.Logger.Level,
 	}
-	const maxTries = 100
-	var port int
-	mu.Lock()
-	for {
-		addr := fmt.Sprintf("%s:%d",
-			c.Mail.Host, c.Mail.Port+port)
-		lis, err := net.Listen("tcp", addr)
-		if err != nil {
-			port++
-			if port > maxTries {
-				t.Fatalf("cannot acquire smtp test port after %d tries", maxTries)
-			}
-			continue
-		}
-		_ = lis.Close()
-		c.Mail.Port += port
-		sc := guerrilla.ServerConfig{
-			ListenInterface: addr,
-			IsEnabled:       true,
-		}
-		cfg.Servers = append(cfg.Servers, sc)
-		break
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	addr := lis.Addr().String()
+	_ = lis.Close()
+	parts := strings.Split(addr, ":")
+	c.Mail.Port, err = strconv.Atoi(parts[1])
+	require.NoError(t, err)
+	sc := guerrilla.ServerConfig{
+		ListenInterface: addr,
+		IsEnabled:       true,
 	}
-	mu.Unlock()
-	hl := &log.HookedLogger{Logger: (c.Log().(*logrus.Entry)).Logger}
+	cfg.Servers = append(cfg.Servers, sc)
+	//hl := &log.HookedLogger{Logger: (c.Log().(*logrus.Entry)).Logger}
 	smtp := guerrilla.Daemon{
 		Config: cfg,
-		Logger: hl,
+		//Logger: hl,
 	}
 	mock := &SMTPMock{
 		smtp:  smtp,
@@ -101,7 +85,7 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 				})
 		}
 	})
-	err := smtp.Start()
+	err = smtp.Start()
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		smtp.Shutdown()
