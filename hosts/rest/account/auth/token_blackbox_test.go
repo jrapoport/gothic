@@ -10,7 +10,7 @@ import (
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/account/auth"
-	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/thttp"
 	"github.com/jrapoport/gothic/test/tsrv"

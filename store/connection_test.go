@@ -9,9 +9,9 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/jrapoport/gothic/store/migration"
-	"github.com/jrapoport/gothic/store/types"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"

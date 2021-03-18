@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
 	"github.com/markbates/goth/providers/apple"
@@ -83,7 +83,7 @@ type Providers struct {
 // NewProviders returns a new providers
 func NewProviders() *Providers {
 	return &Providers{
-		internal: provider.Unknown,
+		internal:  provider.Unknown,
 		providers: map[string]Provider{},
 	}
 }
@@ -137,7 +137,7 @@ func (p *Providers) GetProvider(name provider.Name) (Provider, error) {
 func (p *Providers) IsInternal(name provider.Name) bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	return  name == p.internal && p.internal != provider.Unknown
+	return name == p.internal && p.internal != provider.Unknown
 }
 
 // IsEnabled returns true if the provider is enabled.

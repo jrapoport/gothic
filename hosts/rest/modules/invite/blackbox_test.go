@@ -11,7 +11,7 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
 	"github.com/jrapoport/gothic/mail/template"
-	"github.com/jrapoport/gothic/store/types/key"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/thttp"

@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/jrapoport/gothic/core/tokens"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
-	"github.com/jrapoport/gothic/store/types/provider"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"

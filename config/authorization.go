@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/provider"
 )
 
 // Providers is a map of configured external providers.

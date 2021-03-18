@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/store/types/provider"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/markbates/goth"

@@ -7,7 +7,7 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
 	"github.com/jrapoport/gothic/hosts/rest/user/confirm"
 	"github.com/jrapoport/gothic/hosts/rest/user/email"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 const (

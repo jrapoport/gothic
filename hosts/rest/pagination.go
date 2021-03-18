@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/key"
 )
 
 const (

@@ -37,7 +37,7 @@ type testCase struct {
 	Err  assert.ErrorAssertionFunc
 }
 
-func  mockSMTP(t *testing.T) (*config.Config, *tconf.SMTPMock) {
+func mockSMTP(t *testing.T) (*config.Config, *tconf.SMTPMock) {
 	c := tconf.Config(t)
 	c.Mail.Logo = logoFile
 	return tconf.MockSMTP(t, c)

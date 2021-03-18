@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/jrapoport/gothic/core/events"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // Listen listens to an event.

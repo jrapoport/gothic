@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/models/auditlog"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/key"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

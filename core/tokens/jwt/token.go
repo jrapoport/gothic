@@ -5,7 +5,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // Token is a struct to hold extended jwt token.

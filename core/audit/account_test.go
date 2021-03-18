@@ -10,11 +10,11 @@ import (
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/jrapoport/gothic/models/token"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types"
-	"github.com/jrapoport/gothic/store/types/key"
-	"github.com/jrapoport/gothic/store/types/provider"
 )
 
 func TestLogSignup(t *testing.T) {

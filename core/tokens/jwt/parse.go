@@ -6,7 +6,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/store/types"
+	"github.com/jrapoport/gothic/models/types"
 )
 
 // ParseClaims parses a set of jwt claims from a token.

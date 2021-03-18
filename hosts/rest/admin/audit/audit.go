@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
-	"github.com/jrapoport/gothic/store/types/key"
 )
 
 // Endpoint is the config endpoint
