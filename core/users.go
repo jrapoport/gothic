@@ -21,6 +21,9 @@ import (
 
 // GetUser returns a user for the id if found.
 func (a *API) GetUser(userID uuid.UUID) (*user.User, error) {
+	if userID == user.SuperAdminID {
+		return nil, errors.New("invalid user")
+	}
 	u, err := users.GetUser(a.conn, userID)
 	if err != nil {
 		return nil, a.logError(err)
@@ -30,6 +33,9 @@ func (a *API) GetUser(userID uuid.UUID) (*user.User, error) {
 
 // GetAuthenticatedUser returns an authenticated user for the id if found.
 func (a *API) GetAuthenticatedUser(userID uuid.UUID) (*user.User, error) {
+	if userID == user.SuperAdminID {
+		return nil, errors.New("invalid user")
+	}
 	u, err := users.GetAuthenticatedUser(a.conn, userID)
 	if err != nil {
 		return nil, a.logError(err)

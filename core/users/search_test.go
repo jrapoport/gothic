@@ -35,13 +35,12 @@ type testCase struct {
 var testBook = utils.RandomUsername()
 
 func testCreateUsers(t *testing.T, conn *store.Connection, c *config.Config) []testCase {
+	p := c.Provider()
 	var cases = func() []testCase {
 		email := func() string { return tutils.RandomEmail() }
 		name := func() string { return utils.RandomUsername() }
-		p := c.Provider()
 		ru := user.RoleUser
 		ra := user.RoleAdmin
-		rs := user.RoleSuper
 		var tests = []testCase{
 			{uuid.Nil, p, ru, email(), name(), nil},
 			{uuid.Nil, p, ru, email(), name(), nil},
@@ -52,7 +51,6 @@ func testCreateUsers(t *testing.T, conn *store.Connection, c *config.Config) []t
 			{uuid.Nil, p, ru, email(), name(), nil},
 			{uuid.Nil, p, ra, email(), name(), nil},
 			{uuid.Nil, p, ra, email(), name(), nil},
-			{uuid.Nil, p, rs, email(), name(), nil},
 		}
 		for i, test := range tests {
 			ext := test
@@ -95,6 +93,10 @@ func testCreateUsers(t *testing.T, conn *store.Connection, c *config.Config) []t
 		return nil
 	})
 	require.NoError(t, err)
+	su := user.NewSuperAdmin("")
+	su.Provider = p
+	err = conn.Create(su).Error
+	require.NoError(t, err)
 	return cases
 }
 
@@ -108,7 +110,7 @@ func TestSearchUsers(t *testing.T) {
 	// find all no page
 	list, err := SearchUsers(conn, store.Descending, nil, nil)
 	assert.NoError(t, err)
-	assert.Len(t, list, len(tests))
+	require.Len(t, list, len(tests))
 	for _, idx := range []int{0, 5, 10, 20} {
 		test := tests[idx]
 		u := list[idx]
@@ -147,7 +149,7 @@ func TestSearchUsers(t *testing.T) {
 		key.UserID,
 		key.Username,
 	} {
-		name := strings.Title(string(filter) + "Filter")
+		name := strings.Title(filter + "Filter")
 		t.Run(name, func(t *testing.T) {
 			filterTest(t, conn, filter, tests)
 		})
@@ -180,12 +182,12 @@ func TestSearchUsers(t *testing.T) {
 		cnt = filtersTest(t, conn, store.Filters{
 			"book": "thing2",
 		}, tests, paged)
-		assert.Equal(t, test(20, paged), cnt)
+		assert.Equal(t, test(18, paged), cnt)
 		cnt = filtersTest(t, conn, store.Filters{
 			key.Provider: provider.Google,
 			"book":       "thing2",
 		}, tests, paged)
-		assert.Equal(t, test(5, paged), cnt)
+		assert.Equal(t, test(4, paged), cnt)
 		cnt = filtersTest(t, conn, store.Filters{
 			key.Provider: u.Provider,
 			"book":       u.Data["book"],
@@ -225,7 +227,7 @@ func filterTest(t *testing.T, conn *store.Connection, f string, tests []testCase
 	case key.Provider:
 		filters[f] = tc.provider
 		cnt := filtersTest(t, conn, filters, tests, false)
-		assert.Equal(t, 80, cnt)
+		assert.Equal(t, 72, cnt)
 	case key.Role:
 		filters[f] = tc.role
 		cnt := filtersTest(t, conn, filters, tests, false)
