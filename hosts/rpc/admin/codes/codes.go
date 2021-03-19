@@ -5,13 +5,13 @@ package codes
 import (
 	"context"
 	"errors"
-	"github.com/jrapoport/gothic/models/code"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/models/code"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type codesServer struct {

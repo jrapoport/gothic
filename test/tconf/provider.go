@@ -70,7 +70,7 @@ func MockedProvider(t *testing.T, c *config.Config, callback string) (*config.Co
 		Email:     tutils.RandomEmail(),
 		Callback:  callback,
 	}
-	provider.External[fp.PName()] = struct{}{}
+	provider.AddExternal(fp.PName())
 	t.Cleanup(func() {
 		delete(provider.External, fp.PName())
 	})

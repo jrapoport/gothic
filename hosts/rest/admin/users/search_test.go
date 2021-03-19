@@ -101,16 +101,23 @@ func CreateTestUsers(t *testing.T, srv *usersServer) []TestUsers {
 	srv.Config().Signup.Default.Color = false
 	srv.Config().Mail.SpamProtection = false
 	conn := tconn.Conn(t, srv.Config())
-	for i, test := range cases {
-		u, err := srv.API.AdminCreateUser(ctx, test.email, test.name, testPass, test.data, false)
-		require.NoError(t, err)
-		u, err = srv.ChangeRole(ctx, u.ID, test.role)
-		require.NoError(t, err)
-		u.Provider = test.provider
-		err = conn.Save(u).Error
-		require.NoError(t, err)
-		cases[i].uid = u.ID
-	}
+	err := conn.Transaction(func(tx *store.Connection) error {
+		for i, test := range cases {
+			u := user.NewUser(
+				test.provider,
+				test.role,
+				test.email,
+				test.name,
+				[]byte(testPass),
+				test.data,
+				nil)
+			err := tx.Save(u).Error
+			require.NoError(t, err)
+			cases[i].uid = u.ID
+		}
+		return nil
+	})
+	require.NoError(t, err)
 	return cases
 }
 

@@ -1,10 +1,10 @@
 package code
 
 import (
-	"github.com/jrapoport/gothic/store"
 	"testing"
 
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/stretchr/testify/assert"
