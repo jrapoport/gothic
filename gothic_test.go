@@ -25,7 +25,7 @@ func Test_Main(t *testing.T) {
 	}()
 	assert.Eventually(t, func() bool {
 		return hosts.Running()
-	}, 2*time.Second, 100*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 	healthURI := func() string {
 		require.NotEmpty(t, c.Network.Health)
 		return "http://" + c.Network.Health + config.HealthEndpoint
@@ -36,5 +36,5 @@ func Test_Main(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return !hosts.Running()
-	}, 2*time.Second, 100*time.Millisecond)
+	},  2*time.Second, 10*time.Millisecond)
 }

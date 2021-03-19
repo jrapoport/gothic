@@ -6,6 +6,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	LevelDebug = "debug"
+	LevelInfo  = "info"
+)
+
 // Logger config
 type Logger struct {
 	Level     string   `json:"level"`

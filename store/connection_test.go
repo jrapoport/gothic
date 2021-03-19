@@ -2,11 +2,11 @@ package store
 
 import (
 	"context"
-	"database/sql/driver"
 	"math"
 	"testing"
 	"time"
 
+	"database/sql/driver"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/models/types"
@@ -15,7 +15,6 @@ import (
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -36,53 +35,6 @@ type ModelB struct {
 // ModelBIndex is the name of the index for ModelB
 const ModelBIndex = "idx_value"
 
-func TestDial(t *testing.T) {
-	t.Parallel()
-	// bad url
-	url := &config.Config{}
-	url.DB.DSN = "\n"
-	// bad host
-	host := &config.Config{}
-	host.DB.Driver = drivers.MySQL
-	host.DB.DSN = "root@tcp(255.255.255.255:3306)/test" //"255.255.255.255"
-	// bad retry
-	retry := &config.Config{}
-	retry.DB.Driver = drivers.MySQL
-	retry.DB.DSN = "root@tcp(255.255.255.255:3306)/test"
-	retry.DB.MaxRetries = 1
-	// good mock
-	mctx, mocked := tconf.MockDB(t)
-	mock := tconf.MockFromContext(mctx)
-	create := "CREATE DATABASE IF NOT EXISTS " // + mocked.DB.Name
-	mock.ExpectExec(create).WillReturnResult(sqlmock.NewResult(1, 1))
-	use := "USE " // + mocked.DB.Name
-	mock.ExpectExec(use).WillReturnResult(driver.ResultNoRows)
-	type dialTest struct {
-		ctx context.Context
-		c   *config.Config
-		l   logrus.FieldLogger
-		Err assert.ErrorAssertionFunc
-	}
-	log := logrus.New()
-	tests := []dialTest{
-		{nil, nil, nil, assert.Error},
-		{nil, nil, log, assert.Error},
-		{nil, url, nil, assert.Error},
-		{nil, url, log, assert.Error},
-		{nil, host, log, assert.Error},
-		{nil, retry, log, assert.Error},
-		{mctx, mocked, log, assert.NoError},
-		{nil, tconf.TempDB(t), log, assert.NoError},
-	}
-	for _, test := range tests {
-		if test.c != nil {
-			t.Log("Dialing: ", test.c.DB.Driver)
-		}
-		_, err := NewConnection(test.ctx, test.c, nil)
-		test.Err(t, err, test.c)
-	}
-}
-
 type ConnectionTestSuite struct {
 	suite.Suite
 	driver   drivers.Driver
@@ -93,34 +45,40 @@ type ConnectionTestSuite struct {
 
 func TestConnection(t *testing.T) {
 	t.Parallel()
-	dvrs := []drivers.Driver{
+	drvs := []drivers.Driver{
 		tconf.MySQLTemp,
 		tconf.PostgresTemp,
+		tconf.SQLServerTemp,
 		tconf.SQLiteTemp,
 	}
-	for _, d := range dvrs {
-		ts := &ConnectionTestSuite{
-			driver: d,
-		}
-		t.Run(string(d), func(t *testing.T) {
-			t.Parallel()
-			suite.Run(t, ts)
+	cfgs := tconf.DBConfigs(t, drvs)
+	tests := []struct {
+		driver drivers.Driver
+	}{
+		{drivers.MySQL},
+		{drivers.Postgres},
+		{drivers.SQLServer},
+		{drivers.SQLite},
+	}
+	for i, test := range tests {
+		t.Run(string(test.driver), func(t *testing.T) {
+			suite.Run(t, &ConnectionTestSuite{
+				c: cfgs[i],
+			})
 		})
 	}
 }
 
 func (ts *ConnectionTestSuite) SetupSuite() {
-	ts.conn, ts.c = testConn(ts.T(), ts.driver)
-}
-
-func testConn(t *testing.T, d drivers.Driver) (*Connection, *config.Config) {
-	c := tconf.DBConfig(t, d)
-	conn, err := Dial(c, nil)
-	require.NoError(t, err)
-	require.NotNil(t, conn)
-	err = conn.DropAll()
-	require.NoError(t, err)
-	return conn, c
+	testConn := func(c *config.Config) *Connection {
+		conn, err := Dial(c, nil)
+		ts.NoError(err)
+		ts.NotNil(conn)
+		err = conn.DropAll()
+		ts.NoError(err)
+		return conn
+	}
+	ts.conn = testConn(ts.c)
 }
 
 func (ts *ConnectionTestSuite) BeforeTest(_, testName string) {
@@ -334,3 +292,50 @@ func (ts *ConnectionTestSuite) Test_5_DropDatabase() {
 	}
 }
 */
+
+func TestDial(t *testing.T) {
+	t.Parallel()
+	// bad url
+	url := &config.Config{}
+	url.DB.DSN = "\n"
+	// bad host
+	host := &config.Config{}
+	host.DB.Driver = drivers.MySQL
+	host.DB.DSN = "root@tcp(255.255.255.255:3306)/test" //"255.255.255.255"
+	// bad retry
+	retry := &config.Config{}
+	retry.DB.Driver = drivers.MySQL
+	retry.DB.DSN = "root@tcp(255.255.255.255:3306)/test"
+	retry.DB.MaxRetries = 1
+	// good mock
+	mctx, mocked := tconf.MockDB(t)
+	mock := tconf.MockFromContext(mctx)
+	create := "CREATE DATABASE IF NOT EXISTS " // + mocked.DB.Name
+	mock.ExpectExec(create).WillReturnResult(sqlmock.NewResult(1, 1))
+	use := "USE " // + mocked.DB.Name
+	mock.ExpectExec(use).WillReturnResult(driver.ResultNoRows)
+	type dialTest struct {
+		ctx context.Context
+		c   *config.Config
+		l   logrus.FieldLogger
+		Err assert.ErrorAssertionFunc
+	}
+	log := logrus.New()
+	tests := []dialTest{
+		{nil, nil, nil, assert.Error},
+		{nil, nil, log, assert.Error},
+		{nil, url, nil, assert.Error},
+		{nil, url, log, assert.Error},
+		{nil, host, log, assert.Error},
+		{nil, retry, log, assert.Error},
+		{mctx, mocked, log, assert.NoError},
+		{nil, tconf.TempDB(t), log, assert.NoError},
+	}
+	for _, test := range tests {
+		if test.c != nil {
+			t.Log("Dialing: ", test.c.DB.Driver)
+		}
+		_, err := NewConnection(test.ctx, test.c, nil)
+		test.Err(t, err, test.c)
+	}
+}

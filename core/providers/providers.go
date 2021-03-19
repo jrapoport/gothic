@@ -71,6 +71,7 @@ import (
 	"github.com/markbates/goth/providers/yandex"
 )
 
+// Provider wraps a Provider
 type Provider goth.Provider
 
 // Providers is list of known/available providers.
@@ -134,19 +135,19 @@ func (p *Providers) GetProvider(name provider.Name) (Provider, error) {
 	return pvd, nil
 }
 
-func (p *Providers) IsInternal(name provider.Name) bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return name == p.internal && p.internal != provider.Unknown
-}
-
 // IsEnabled returns true if the provider is enabled.
 func (p *Providers) IsEnabled(name provider.Name) error {
-	if p.IsInternal(name) {
+	if p.isInternal(name) {
 		return nil
 	}
 	_, err := p.GetProvider(name)
 	return err
+}
+
+func (p *Providers) isInternal(name provider.Name) bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return name == p.internal && p.internal != provider.Unknown
 }
 
 func (p *Providers) useProvider(name provider.Name, clientKey, secret, callback string, scopes ...string) (err error) {

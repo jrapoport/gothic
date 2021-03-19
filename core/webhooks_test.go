@@ -167,7 +167,7 @@ func TestAPI_WebhookRetry(t *testing.T) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return rec.Code == http.StatusOK
-	}, 2*time.Second, 100*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 }
 
 func TestAPI_WebhookNotFound(t *testing.T) {
@@ -190,7 +190,7 @@ func TestAPI_WebhookNotFound(t *testing.T) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return rec.Code == http.StatusOK
-	}, 2*time.Second, 10*time.Millisecond)
+	}, time.Second, 10*time.Millisecond)
 }
 
 func TestAPI_WebhookDisabled(t *testing.T) {

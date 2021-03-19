@@ -39,19 +39,23 @@ func NewDialect(ctx context.Context, drv Driver, dsn string) (*Dialector, error)
 	}
 	switch drv {
 	case MySQL:
-		if mc, ok := cfg.(mysql.Config); ok {
-			d = mysql.New(mc)
+		if dbc, ok := cfg.(mysql.Config); ok {
+			d = mysql.New(dbc)
 		} else {
 			d = mysql.Open(dsn)
 		}
 	case Postgres:
-		if pc, ok := cfg.(postgres.Config); ok {
-			d = postgres.New(pc)
+		if dbc, ok := cfg.(postgres.Config); ok {
+			d = postgres.New(dbc)
 		} else {
 			d = postgres.Open(dsn)
 		}
 	case SQLServer:
-		d = sqlserver.Open(dsn)
+		if dbc, ok := cfg.(sqlserver.Config); ok {
+			d = sqlserver.New(dbc)
+		} else {
+			d = sqlserver.Open(dsn)
+		}
 	case SQLite, SQLite3:
 		d = sqlite.Open(dsn)
 	default:

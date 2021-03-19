@@ -1,7 +1,5 @@
 package user
 
-import "strings"
-
 // Role is te user role.
 type Role int8
 
@@ -66,11 +64,7 @@ func (r Role) String() string {
 	}
 }
 
+// MarshalJSON marshals a role to json
 func (r Role) MarshalJSON() ([]byte, error) {
 	return []byte("\"" + r.String() + "\""), nil
-}
-
-func (r *Role) UnmarshalJSON(b []byte) error {
-	*r = ToRole(strings.ReplaceAll(string(b), "\"", ""))
-	return nil
 }
