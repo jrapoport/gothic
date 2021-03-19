@@ -26,32 +26,8 @@ import (
 
 func TestAPI_Signup(t *testing.T) {
 	t.Parallel()
-	tests := []struct {
-		name string
-		auto bool
-	}{
-		{"Confirm", false},
-		{"AutoConfirm", true},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-			testSignup(t, test.auto)
-		})
-	}
-}
-
-func testSignup(t *testing.T, autoconfirm bool) {
 	a := createAPI(t)
-	var mu sync.Mutex
-	if !autoconfirm {
-		mu.Lock()
-		a.config, _ = tconf.MockSMTP(t, a.config)
-		err := a.OpenMail()
-		require.NoError(t, err)
-		mu.Unlock()
-	}
-	a.config.Signup.AutoConfirm = autoconfirm
+	a.config.Signup.AutoConfirm = false
 	const (
 		empty       = ""
 		badUsername = "!"
@@ -60,29 +36,13 @@ func testSignup(t *testing.T, autoconfirm bool) {
 		userRx      = "^[a-zA-Z0-9_]{2,255}$"
 		passRx      = "^[a-zA-Z0-9[:punct:]]{8,40}$"
 	)
-	var testData = types.Map{
-		key.Color:   "#ffaa11",
-		"full_name": "Foo Bar",
-		"avatar":    "http://example.com/user/image.png",
-	}
 	username := func() string {
 		return utils.RandomUsername()
 	}
 	email := func() string {
 		return tutils.RandomEmail()
 	}
-	address := func() string {
-		return tutils.RandomAddress()
-	}
-	type testCase struct {
-		email    string
-		username string
-		unRx     string
-		pw       string
-		pwRx     string
-		data     types.Map
-	}
-	tests := []testCase{
+	tests := []signupTestCase{
 		{email(), empty, empty, empty, empty, nil},
 		{email(), empty, empty, badPass, empty, nil},
 		{email(), empty, empty, testPass, empty, nil},
@@ -100,60 +60,84 @@ func testSignup(t *testing.T, autoconfirm bool) {
 		{email(), username(), userRx, testPass, empty, nil},
 		{email(), username(), userRx, testPass, passRx, nil},
 	}
-	for i := len(tests) - 1; i >= 0; i-- {
-		test := tests[i]
-		for _, data := range []types.Map{{}, testData} {
-			test.email = email()
-			test.data = data
-			tests = append(tests, test)
-		}
-		for _, data := range []types.Map{nil, {}, testData} {
-			test.email = address()
-			test.data = data
-			tests = append(tests, test)
-		}
-	}
 	ctx := testContext(a)
-	mu.Lock()
 	conn := a.conn
-	mu.Unlock()
-	err := conn.Transaction(func(tx *store.Connection) error {
-		mu.Lock()
+	err := a.conn.Transaction(func(tx *store.Connection) error {
 		a.conn = tx
-		mu.Unlock()
 		for _, test := range tests {
 			a.config.Validation.UsernameRegex = test.unRx
 			a.config.Validation.PasswordRegex = test.pwRx
-			checkUser := func(u *user.User) {
-				require.NotNil(t, u)
-				e, err := validate.Email(test.email)
-				require.NoError(t, err)
-				assert.Equal(t, e, u.Email)
-				assert.Equal(t, test.username, u.Username)
-				assert.Equal(t, autoconfirm, u.IsConfirmed())
-				if !u.IsConfirmed() {
-					var ct token.ConfirmToken
-					err = tx.First(&ct, "user_id = ?", u.ID).Error
-					assert.NoError(t, err)
-				}
-				if test.data == nil {
-					return
-				}
-				assert.Equal(t, test.data, u.Data)
-			}
-			u, err := a.Signup(ctx, test.email, test.username, test.pw, test.data)
-			assert.NoError(t, err)
-			checkUser(u)
-			u, err = a.GetUserWithEmail(test.email)
+			su, err := a.Signup(ctx, test.email, test.username, test.pw, test.data)
 			require.NoError(t, err)
-			checkUser(u)
+			// do not check the token every time
+			checkUser(t, su, test, false)
 		}
 		return nil
 	})
-	mu.Lock()
 	a.conn = conn
-	mu.Unlock()
 	require.NoError(t, err)
+	a.config, _ = tconf.MockSMTP(t, a.config)
+	err = a.OpenMail()
+	require.NoError(t, err)
+	test := tests[len(tests)-1]
+	// autoconfirm: false
+	a.config.Signup.AutoConfirm = false
+	test.email = email()
+	su, err := a.Signup(ctx, test.email, test.username, test.pw, test.data)
+	require.NoError(t, err)
+	checkUser(t, su, test, false)
+	var ct token.ConfirmToken
+	err = a.conn.First(&ct, "user_id = ?", su.ID).Error
+	assert.NoError(t, err)
+	// autoconfirm: true
+	a.config.Signup.AutoConfirm = true
+	test.email = email()
+	su, err = a.Signup(ctx, test.email, test.username, test.pw, test.data)
+	require.NoError(t, err)
+	checkUser(t, su, test, true)
+	// empty data
+	test.email = email()
+	test.data = types.Map{}
+	su, err = a.Signup(ctx, test.email, test.username, test.pw, test.data)
+	require.NoError(t, err)
+	checkUser(t, su, test, true)
+	// data
+	test.email = email()
+	test.data = types.Map{
+		key.Color:   "#ffaa11",
+		"full_name": "Foo Bar",
+		"avatar":    "http://example.com/user/image.png",
+	}
+	su, err = a.Signup(ctx, test.email, test.username, test.pw, test.data)
+	require.NoError(t, err)
+	checkUser(t, su, test, true)
+	// address
+	test.email = tutils.RandomAddress()
+	su, err = a.Signup(ctx, test.email, test.username, test.pw, test.data)
+	require.NoError(t, err)
+	checkUser(t, su, test, true)
+}
+
+type signupTestCase struct {
+	email    string
+	username string
+	unRx     string
+	pw       string
+	pwRx     string
+	data     types.Map
+}
+
+func checkUser(t *testing.T, u *user.User, test signupTestCase, autoconfirm bool) {
+	require.NotNil(t, u)
+	e, err := validate.Email(test.email)
+	require.NoError(t, err)
+	assert.Equal(t, e, u.Email)
+	assert.Equal(t, test.username, u.Username)
+	assert.Equal(t, autoconfirm, u.IsConfirmed())
+	if test.data == nil {
+		return
+	}
+	assert.Equal(t, test.data, u.Data)
 }
 
 func TestAPI_Signup_Error(t *testing.T) {
@@ -515,7 +499,7 @@ func testSignupEvent(t *testing.T, a *API, lis events.Event, l listenerTestFunc)
 		mu.RLock()
 		defer mu.RUnlock()
 		return data != nil
-	}, 10*time.Second, 100*time.Millisecond)
+	}, 100*time.Millisecond, 10*time.Millisecond)
 	assert.Equal(t, events.Signup, data[key.Event].(events.Event))
 	assert.Equal(t, testIP, data[key.IPAddress].(string))
 	assert.Equal(t, p, data[key.Provider].(provider.Name))

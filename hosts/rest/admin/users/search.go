@@ -13,7 +13,7 @@ type SearchRequest struct {
 	Filters store.Filters `json:"filters"  form:"filters"`
 }
 
-// NewRequest returns a search request from a Request
+// NewSearchRequest returns a search request from a Request
 func NewSearchRequest(r *http.Request) (*SearchRequest, error) {
 	req := new(SearchRequest)
 	data := store.Filters{}

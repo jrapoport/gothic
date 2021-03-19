@@ -19,7 +19,7 @@ require (
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
 	github.com/go-playground/form/v4 v4.1.3
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.1
 	github.com/google/uuid v1.2.0
 	github.com/gookit/event v1.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
@@ -30,14 +30,16 @@ require (
 	github.com/jrapoport/sillyname-go v0.0.0-20191016072109-82c270b69bff
 	github.com/lestrrat-go/tcputil v0.0.0-20180223003554-d3c7f98154fb // indirect
 	github.com/lestrrat-go/test-mysqld v0.0.0-20190527004737-6c91be710371
+	github.com/lib/pq v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/markbates/goth v1.67.1
 	github.com/matcornic/hermes/v2 v2.1.0
+	github.com/mattn/go-sqlite3 v1.14.5
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/orlangure/gnomock v0.12.0
 	github.com/philhofer/fwd v1.1.1 // indirect
-	github.com/segmentio/encoding v0.2.8
+	github.com/segmentio/encoding v0.2.9
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
@@ -47,7 +49,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670
 	google.golang.org/grpc v1.36.0
 	google.golang.org/grpc/examples v0.0.0-20210316215007-967933baf52a // indirect
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.29.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/datatypes v1.0.0
