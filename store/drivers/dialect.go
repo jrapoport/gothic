@@ -3,6 +3,7 @@ package drivers
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -11,27 +12,25 @@ import (
 	"gorm.io/gorm"
 )
 
-// Dialector is a wrapper for the database dialector.
-type Dialector struct {
+// Dialect is a wrapper for the database dialect.
+type Dialect struct {
 	gorm.Dialector
 	name string
 }
 
-// DBName returns the name of the db.
-func (d Dialector) DBName() string {
-	return d.name
-}
-
-// NewDialect returns a new configured db Dialector.
-func NewDialect(ctx context.Context, drv Driver, dsn string) (*Dialector, error) {
+// NewDialect returns a new configured db Dialect.
+func NewDialect(ctx context.Context, drv Driver, dsn string) (*Dialect, error) {
 	var d gorm.Dialector
 	var cfg interface{}
+	var name string
+	var err error
 	if ctx != nil {
 		cfg = ConfigFromContext(ctx)
 	}
-	var name string
-	var err error
-	if dsn != "" {
+	if cfg == nil {
+		if dsn == "" {
+			return nil, errors.New("dsn required")
+		}
 		name, dsn, err = NormalizeDSN("", drv, dsn)
 		if err != nil {
 			return nil, err
@@ -65,7 +64,12 @@ func NewDialect(ctx context.Context, drv Driver, dsn string) (*Dialector, error)
 		}
 		d = mysql.New(mysql.Config{Conn: db})
 	}
-	return &Dialector{d, name}, nil
+	return &Dialect{d, name}, nil
+}
+
+// DBName returns the name of the db.
+func (d Dialect) DBName() string {
+	return d.name
 }
 
 type configKey struct{}

@@ -27,6 +27,15 @@ func HashPassword(password string) ([]byte, error) {
 	return pw, nil
 }
 
+// MustHashPassword will panic if hash password fails
+func MustHashPassword(password string) []byte {
+	pw, err := HashPassword(password)
+	if err != nil {
+		panic(`HashPassword(` + password + `): ` + err.Error())
+	}
+	return pw
+}
+
 // CheckPassword checks to see if the password matches the hashed password.
 func CheckPassword(hash []byte, password string) error {
 	return bcrypt.CompareHashAndPassword(hash, []byte(password))

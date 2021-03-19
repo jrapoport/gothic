@@ -2,6 +2,8 @@ package provider
 
 import (
 	"github.com/google/uuid"
+	"regexp"
+	"strings"
 )
 
 // Name is the name of a provider.
@@ -19,4 +21,11 @@ func (p Name) ID() uuid.UUID {
 
 func (p Name) String() string {
 	return string(p)
+}
+
+func NormalizeName(name string) Name {
+	reg := regexp.MustCompile(`[^a-z0-9]+`)
+	name = strings.ToLower(name)
+	name = reg.ReplaceAllString(name, "")
+	return Name(name)
 }

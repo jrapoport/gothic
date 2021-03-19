@@ -9,24 +9,26 @@ import (
 )
 
 const (
-	maskEmails = false
-	rateLimit  = 100 * time.Minute
-	requestID  = "foobar"
-	jwtSecret  = "i-am-a-secret"
-	jwtAlgo    = "HS384"
-	jwtIss     = "foo"
-	jwtAud     = "bar"
-	jwtExp     = 100 * time.Minute
-	recapKey   = "RECAPTCHA-KEY"
-	recapLogin = false
-	userRx     = "[A-Za-z]{3}[0-9][A-Z]{2}[!@#$%^&*]"
-	passRx     = "FOO[A-Z]{10}[0-9]{2}"
-	duration   = 100 * time.Minute
+	maskEmails   = false
+	rateLimit    = 100 * time.Minute
+	requestID    = "foobar"
+	rootPassword = "password"
+	jwtSecret    = "i-am-a-secret"
+	jwtAlgo      = "HS384"
+	jwtIss       = "foo"
+	jwtAud       = "bar"
+	jwtExp       = 100 * time.Minute
+	recapKey     = "RECAPTCHA-KEY"
+	recapLogin   = false
+	userRx       = "[A-Za-z]{3}[0-9][A-Z]{2}[!@#$%^&*]"
+	passRx       = "FOO[A-Z]{10}[0-9]{2}"
+	duration     = 100 * time.Minute
 )
 
 func TestSecurity(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		s := c.Security
+		assert.Equal(t, rootPassword+test.mark, s.RootPassword)
 		assert.Equal(t, maskEmails, s.MaskEmails)
 		assert.Equal(t, rateLimit, s.RateLimit)
 		assert.Equal(t, requestID+test.mark, s.RequestID)
@@ -52,6 +54,7 @@ func TestSecurity_Env(t *testing.T) {
 			c, err := loadNormalized(test.file)
 			assert.NoError(t, err)
 			s := c.Security
+			assert.Equal(t, rootPassword, s.RootPassword)
 			assert.Equal(t, maskEmails, s.MaskEmails)
 			assert.Equal(t, rateLimit, s.RateLimit)
 			assert.Equal(t, requestID, s.RequestID)
@@ -81,6 +84,7 @@ func TestSecurity_Defaults(t *testing.T) {
 
 func TestSecurity_Normalization(t *testing.T) {
 	s := Security{}
+	s.RootPassword = rootPassword
 	s.JWT.Secret = jwtSecret
 	err := s.normalize(Service{
 		Name:    service,

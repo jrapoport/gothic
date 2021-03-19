@@ -95,8 +95,9 @@ func TestProviders_Defaults(t *testing.T) {
 func TestAuthorization_InternalProvider(t *testing.T) {
 	clearEnv()
 	setEnv(t, ENVPrefix+"_SITE_URL", siteURL)
-	setEnv(t, ENVPrefix+"_DB_DSN", dsn)
+	setEnv(t, ENVPrefix+"_ROOT_PASSWORD", rootPassword)
 	setEnv(t, ENVPrefix+"_JWT_SECRET", jwtSecret)
+	setEnv(t, ENVPrefix+"_DB_DSN", dsn)
 	c, err := loadNormalized("")
 	assert.NoError(t, err)
 	assert.EqualValues(t, c.Service.Name, c.Provider())

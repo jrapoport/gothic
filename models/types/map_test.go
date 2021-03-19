@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/jrapoport/gothic/store/drivers"
 	"testing"
 
 	"github.com/jrapoport/gothic/test/tdb"
@@ -109,11 +110,11 @@ func TestMap_GormDBDataType(t *testing.T) {
 		d string
 		t string
 	}{
-		{mySQL, "JSON"},
-		{postgres, "JSONB"},
-		{sqlServer, "NVARCHAR(MAX)"},
-		{sqlite, "JSON"},
-		{sqlite3, "JSON"},
+		{drivers.MySQL, "JSON"},
+		{drivers.Postgres, "JSONB"},
+		{drivers.SQLServer, "NVARCHAR(MAX)"},
+		{drivers.SQLite, "JSON"},
+		{drivers.SQLite3, "JSON"},
 		{"fake", "JSON"},
 	}
 	for _, test := range tests {
