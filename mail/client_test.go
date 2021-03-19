@@ -285,10 +285,10 @@ func (ts *ClientTestSuite) TestKeepalive() {
 		{"SendResetPassword", ts.testSendResetPassword},
 		{"SendSignupCode", ts.testSendSignupCode},
 	}
-	ts.client.keepalive.Reset(1 * time.Second)
+	ts.client.keepalive.Reset(100 * time.Millisecond)
 	for _, test := range tests {
 		ts.Run(test.name, func() {
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			test.fn()
 		})
 	}

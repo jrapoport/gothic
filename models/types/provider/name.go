@@ -1,14 +1,15 @@
 package provider
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 // Name is the name of a provider.
 type Name string
 
 // IsExternal returns true if the provider is external.
 func (p Name) IsExternal() bool {
-	_, ok := External[p]
-	return ok
+	return IsExternal(p)
 }
 
 // ID returns the name as uuid.

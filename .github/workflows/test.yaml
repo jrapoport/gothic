@@ -12,6 +12,11 @@ jobs:
     steps:
       # - name: Install workflow dependencies
       #  run: apt update && apt install -y make gcc
+      - name: Install images
+        run: |
+          docker pull mysql:8.0.22
+          docker pull postgres:12.5
+          docker pull mcr.microsoft.com/mssql/server:2019-latest
       - name: Install Go
         uses: actions/setup-go@v2
         with:
@@ -24,4 +29,3 @@ jobs:
         run:  make all COVERAGE=1
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
-

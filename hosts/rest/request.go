@@ -90,7 +90,9 @@ func WithLogger(r *http.Request, l logrus.FieldLogger) *http.Request {
 func GetLogger(r *http.Request) logrus.FieldLogger {
 	log, ok := r.Context().Value(loggerKey{}).(logrus.FieldLogger)
 	if !ok {
-		return logrus.New()
+		l := logrus.New()
+		l.SetLevel(logrus.PanicLevel)
+		return l
 	}
 	return log
 }
