@@ -1,6 +1,7 @@
 {
   "service": "example.json",
   "site_url": "http://example.com.json",
+  "root_password": "password.json",
   "host": "example.com.json",
   "rest": "example.com.json:80",
   "rpc": "example.com.json:90",

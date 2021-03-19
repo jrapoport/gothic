@@ -40,7 +40,8 @@ func SearchUsers(conn *store.Connection, s store.Sort, f store.Filters, p *store
 		},
 	}
 	var users []*user.User
-	err := store.Search(tx, &users, s, flt, p)
+	var notSuperAdmins = `id <> "` + user.SuperAdminID.String() + `"`
+	err := store.Search(tx, &users, s, flt, p, notSuperAdmins)
 	if err != nil {
 		return nil, err
 	}

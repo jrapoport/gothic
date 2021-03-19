@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/jrapoport/gothic/store"
 	"sync"
 	"testing"
 	"time"
@@ -51,6 +52,18 @@ func configuredAPI(t *testing.T, c *config.Config) *API {
 		err = a.Shutdown()
 		require.NoError(t, err)
 	})
+	return a
+}
+
+func unloadedAPI(t *testing.T) *API {
+	c := tconf.TempDB(t)
+	conn, err := store.Dial(c, nil)
+	require.NoError(t, err)
+	a := &API{
+		config: c,
+		conn:   conn,
+		log:    c.Log(),
+	}
 	return a
 }
 

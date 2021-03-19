@@ -72,8 +72,16 @@ func NewUser(p provider.Name, role Role, email, username string, password []byte
 	} else if password == nil {
 		return nil
 	}
+	uid := SystemID
+	for {
+		uid = uuid.New()
+		if uid == SuperAdminID {
+			continue
+		}
+		break
+	}
 	u := &User{
-		ID:       uuid.New(),
+		ID:       uid,
 		Provider: p,
 		Role:     role,
 		Status:   Restricted,
@@ -93,6 +101,14 @@ func (u *User) BeforeSave(*gorm.DB) error {
 	}
 	if u.Provider == provider.Unknown {
 		return errors.New("invalid provider")
+	}
+	return nil
+}
+
+// BeforeUpdate runs before update.
+func (u *User) BeforeUpdate(*gorm.DB) error {
+	if u.ID == SuperAdminID {
+		return errors.New("invalid user id (super)")
 	}
 	return nil
 }

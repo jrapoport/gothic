@@ -50,6 +50,10 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 	if err != nil {
 		return a.logError(err)
 	}
+	err = a.CreateSuperAdmin()
+	if err != nil {
+		return a.logError(err)
+	}
 	err = a.OpenMail()
 	if err != nil {
 		return a.logError(err)

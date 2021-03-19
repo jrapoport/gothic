@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/markbates/goth"
 	"github.com/segmentio/encoding/json"
 	"gorm.io/gorm"
@@ -67,24 +68,16 @@ func (Map) GormDataType() string {
 	return "json"
 }
 
-const (
-	mySQL     = "mysql"
-	postgres  = "postgres"
-	sqlServer = "sqlserver"
-	sqlite    = "sqlite"
-	sqlite3   = "sqlite3"
-)
-
 // GormDBDataType gorm db data type for migrator.GormDataTypeInterface
 func (Map) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
 	switch db.Name() {
-	case mySQL:
+	case drivers.MySQL:
 		return "JSON"
-	case postgres:
+	case drivers.Postgres:
 		return "JSONB"
-	case sqlServer:
+	case drivers.SQLServer:
 		return "NVARCHAR(MAX)"
-	case sqlite, sqlite3:
+	case drivers.SQLite, drivers.SQLite3:
 		return "JSON"
 	}
 	return "JSON"
