@@ -1,10 +1,9 @@
 package store
 
 import (
+	"github.com/jrapoport/gothic/models/types"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-
-	"github.com/jrapoport/gothic/models/types"
 )
 
 // Filters hols the search filters.
@@ -18,7 +17,7 @@ type Filter struct {
 }
 
 // Search searches a table for hits
-func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination) error {
+func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination, cond ...string) error {
 	if s == "" {
 		s = Descending
 	}
@@ -30,6 +29,17 @@ func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination) er
 		if v, ok := filters[field]; ok {
 			tx = tx.Where(field+" = ?", v)
 			delete(filters, field)
+		}
+	}
+	for _, field := range f.Fields {
+		if v, ok := filters[field+"!"]; ok {
+			tx = tx.Where(field+" <> ?", v)
+			delete(filters, field+"!")
+		}
+	}
+	if len(cond) > 0 {
+		for _, c := range cond {
+			tx = tx.Where(c)
 		}
 	}
 	for k, v := range filters {

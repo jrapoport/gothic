@@ -58,6 +58,9 @@ func TestUser_BeforeSave(t *testing.T) {
 	u.Provider = c.Provider()
 	err = conn.Save(u).Error
 	assert.Error(t, err)
+	u.ID = SuperAdminID
+	err = conn.Save(u).Error
+	assert.Error(t, err)
 }
 
 func TestUser_EmailAddress(t *testing.T) {

@@ -2,12 +2,11 @@ package drivers
 
 import (
 	"errors"
-	"net/url"
-	"path/filepath"
-
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v4"
 	"github.com/jrapoport/gothic/utils"
+	"net/url"
+	"path/filepath"
 )
 
 // NormalizeDSN returns a normalized dsn.
@@ -17,6 +16,8 @@ func NormalizeDSN(name string, drv Driver, dsn string) (string, string, error) {
 		return mysqlDSN(dsn)
 	case Postgres:
 		return postgresDSN(dsn)
+	case SQLServer:
+		return sqlserverDSN(dsn)
 	case SQLite, SQLite3:
 		return sqlitePath(name, dsn)
 	}
@@ -45,6 +46,18 @@ func postgresDSN(dsn string) (string, string, error) {
 	return c.Database, c.ConnString(), nil
 }
 
+func sqlserverDSN(dsn string) (string, string, error) {
+	if dsn == "" {
+		return "", "", errors.New("invalid postgres dsn")
+	}
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return "", "", err
+	}
+	name := u.Query().Get("database")
+	return name, dsn, nil
+}
+
 func sqlitePath(name, dsn string) (string, string, error) {
 	const SQLiteExt = "." + SQLite
 	if name == "" {
@@ -67,10 +80,6 @@ func sqlitePath(name, dsn string) (string, string, error) {
 	} else if utils.IsDirectory(u.Path) || !utils.HasExt(u.Path) {
 		u.Path = filepath.Join(u.Path, file)
 	} else {
-		_, name = filepath.Split(u.Path)
-		if name == "" {
-			u.Path = filepath.Join(u.Path, file)
-		}
 		_, name = filepath.Split(u.Path)
 	}
 	if ext := filepath.Ext(name); ext != "" {
