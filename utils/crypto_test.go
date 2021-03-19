@@ -24,6 +24,13 @@ func TestHashPassword(t *testing.T) {
 	assert.NotEmpty(t, hash)
 }
 
+func TestMustHashPassword(t *testing.T) {
+	t.Parallel()
+	const pw = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
+	hash := MustHashPassword(pw)
+	assert.NotEmpty(t, hash)
+}
+
 func TestCheckPassword(t *testing.T) {
 	t.Parallel()
 	const pw = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"

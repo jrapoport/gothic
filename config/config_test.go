@@ -78,8 +78,10 @@ func TestLoadConfig(t *testing.T) {
 		Err   assert.ErrorAssertionFunc
 	}{
 		{ENVPrefix + "_SITE_URL", siteURL, assert.Error},
-		{ENVPrefix + "_DB_DSN", dsn, assert.Error},
+		{ENVPrefix + "_ROOT_PASSWORD", rootPassword, assert.Error},
 		{ENVPrefix + "_JWT_SECRET", jwtSecret, assert.Error},
+		{ENVPrefix + "_DB_DRIVER", driver, assert.Error},
+		{ENVPrefix + "_DB_DSN", dsn, assert.Error},
 	}
 	reqTests[len(reqTests)-1].Err = assert.NoError
 	clearEnv()

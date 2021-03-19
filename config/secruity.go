@@ -12,6 +12,8 @@ import (
 
 // Security config
 type Security struct {
+	// RootPassword the password for the super admin user. (there is no interactive login).
+	RootPassword string `json:"root_password" yaml:"root_password" mapstructure:"root_password"`
 	// MaskEmails user emails returned by api calls are masked by default.
 	MaskEmails bool `json:"mask_emails" yaml:"mask_emails" mapstructure:"mask_emails"`
 	// RateLimit is the rate limit per 100 requests to be enforced by ip address
@@ -30,6 +32,9 @@ type Security struct {
 }
 
 func (s *Security) normalize(srv Service) error {
+	if s.RootPassword == "" {
+		return errors.New("root password is required")
+	}
 	err := s.JWT.normalize(srv, jwtDefaults)
 	if err != nil {
 		return err
@@ -76,6 +81,8 @@ func (j *JWT) normalize(srv Service, def JWT) error {
 	if err != nil {
 		return err
 	}
+	// this needs to stay here
+	// so validation will happen correctly
 	if j.Secret == "" {
 		return errors.New("jwt secret is required")
 	}

@@ -2,7 +2,6 @@ package config
 
 import (
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/jrapoport/gothic/models/types/provider"
@@ -28,10 +27,7 @@ func (a *Authorization) Provider() provider.Name {
 }
 
 func (a *Authorization) useInternalProvider(name string) {
-	reg := regexp.MustCompile(`[^a-z0-9]+`)
-	name = strings.ToLower(name)
-	name = reg.ReplaceAllString(name, "")
-	a.internal = provider.Name(name)
+	a.internal = provider.NormalizeName(name)
 }
 
 const hostToken = ":host"
