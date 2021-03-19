@@ -14,7 +14,7 @@ const (
 	dbMaxRetry         = 3
 	jwtAlgorithm       = "HS256"
 	jwtExpiration      = 60 * time.Minute
-	logLevel           = "info"
+	logLevel           = LevelInfo
 	logTimeFormat      = time.RFC3339Nano
 	mailFrom           = ":name <do-not-reply@:link_hostname>"
 	mailTheme          = "default"

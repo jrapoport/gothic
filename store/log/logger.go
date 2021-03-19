@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Logger wraps a logger.Interface
 type Logger struct {
 	logrus.FieldLogger
 }
@@ -36,7 +37,7 @@ func (g Logger) LogMode(level logger.LogLevel) logger.Interface {
 	return g
 }
 
-// Warn logs an formatted string with info level.
+// Info logs an formatted string with info level.
 func (g Logger) Info(_ context.Context, s string, i ...interface{}) {
 	g.Debugf(s, i...)
 }

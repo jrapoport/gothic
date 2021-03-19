@@ -124,62 +124,64 @@ func (m *Client) keepAlive() error {
 	if m.client == nil || !m.client.KeepAlive {
 		return nil
 	}
-	logErr := func(err error) error {
-		if err == nil {
-			return nil
-		}
-		err = fmt.Errorf("keepalive: %w", err)
-		m.log.Error(err)
-		return err
-	}
-	sendNoop := func() error {
-		err := m.client.Noop()
-		if err == nil {
-			return nil
-		}
-		e, ok := err.(*textproto.Error)
-		if !ok {
-			return logErr(err)
-		}
-		if e.Code != http.StatusOK {
-			return logErr(err)
-		}
-		return nil
-	}
-	err := sendNoop()
-	if err != nil {
-		return nil
-	}
 	m.keepalive = time.NewTicker(30 * time.Second)
+	var wait sync.WaitGroup
+	wait.Add(1)
 	go func() {
+		wait.Done()
+		err := m.noop()
+		if err != nil {
+			return
+		}
 		for range m.keepalive.C {
-			err = sendNoop()
+			err = m.noop()
 			if err != nil {
 				return
 			}
 		}
 	}()
+	wait.Wait()
 	return nil
+}
+
+func (m *Client) noop() error {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	if m.client == nil {
+		return nil
+	}
+	err := m.client.Noop()
+	if err == nil {
+		return nil
+	}
+	e, ok := err.(*textproto.Error)
+	if ok && e.Code == http.StatusOK {
+		return nil
+	}
+	err = fmt.Errorf("keepalive: %w", err)
+	m.log.Error(err)
+	return err
 }
 
 // Close closes the mail client and disconnects from the smtp server.
 func (m *Client) Close() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	return m.close()
 }
 
 // close is non-locking close and can be called from Client.Open()
 func (m *Client) close() error {
-	defer func() {
-		m.smtpEmailValidation = false
-		if m.keepalive != nil {
-			m.keepalive.Stop()
-		}
-		m.client = nil
-	}()
+	m.smtpEmailValidation = false
+	if m.keepalive != nil {
+		m.keepalive.Stop()
+	}
 	if m.client == nil {
 		return nil
 	}
-	return m.client.Close()
+	err := m.client.Close()
+	m.client = nil
+	return err
 }
 
 // IsOffline returns true if the smtp server is offline.
@@ -222,8 +224,8 @@ func (m *Client) From() string {
 
 // Send can be used to send one-off emails to users
 func (m *Client) Send(to, logo, subject, html, plain string) error {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if m.IsOffline() {
 		m.log.Warn("mail client is offline")
 		return nil

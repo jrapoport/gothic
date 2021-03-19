@@ -10,9 +10,11 @@ import (
 
 	"github.com/flashmob/go-guerrilla"
 	"github.com/flashmob/go-guerrilla/backends"
+	"github.com/flashmob/go-guerrilla/log"
 	"github.com/flashmob/go-guerrilla/mail"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/utils"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -61,10 +63,10 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 		IsEnabled:       true,
 	}
 	cfg.Servers = append(cfg.Servers, sc)
-	//hl := &log.HookedLogger{Logger: (c.Log().(*logrus.Entry)).Logger}
+	hl := &log.HookedLogger{Logger: (c.Log().(*logrus.Entry)).Logger}
 	smtp := guerrilla.Daemon{
 		Config: cfg,
-		//Logger: hl,
+		Logger: hl,
 	}
 	mock := &SMTPMock{
 		smtp:  smtp,

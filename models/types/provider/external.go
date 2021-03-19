@@ -1,5 +1,7 @@
 package provider
 
+import "sync"
+
 const (
 	// Unknown provider
 	Unknown Name = ""
@@ -187,4 +189,19 @@ var External = map[Name]struct{}{
 	Yahoo:           {},
 	Yammer:          {},
 	Yandex:          {},
+}
+
+var mu sync.RWMutex
+
+func AddExternal(p Name) {
+	mu.Lock()
+	defer mu.Unlock()
+	External[p] = struct{}{}
+}
+
+func IsExternal(p Name) bool {
+	mu.RLock()
+	defer mu.RUnlock()
+	_, ok := External[p]
+	return ok
 }

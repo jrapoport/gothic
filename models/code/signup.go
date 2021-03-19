@@ -2,10 +2,10 @@ package code
 
 import (
 	"errors"
-	"github.com/jrapoport/gothic/core/tokens"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"

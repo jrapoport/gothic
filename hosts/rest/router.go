@@ -20,7 +20,6 @@ type Router struct {
 func NewRouter(c *config.Config) *Router {
 	r := &Router{chi: chi.NewRouter(), config: c}
 	r.UseDefaults()
-	r.UseLogger(c.Log())
 	return r
 }
 
