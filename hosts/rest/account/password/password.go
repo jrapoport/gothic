@@ -47,7 +47,7 @@ func register(s *http.Server, srv *passwordServer) {
 func (s *passwordServer) addRoutes(r *rest.Router) {
 	r.Route(Endpoint, func(rt *rest.Router) {
 		rt.Post(Reset, s.SendResetPassword)
-		rt.Post(Confirm, s.ConfirmPasswordChange)
+		rt.Post(Confirm, s.ConfirmResetPassword)
 	})
 }
 
@@ -82,7 +82,7 @@ func (s *passwordServer) SendResetPassword(w http.ResponseWriter, r *http.Reques
 	s.AuthError(w, err)
 }
 
-func (s *passwordServer) ConfirmPasswordChange(w http.ResponseWriter, r *http.Request) {
+func (s *passwordServer) ConfirmResetPassword(w http.ResponseWriter, r *http.Request) {
 	req := new(Request)
 	err := rest.UnmarshalRequest(r, req)
 	if err != nil {
@@ -101,7 +101,7 @@ func (s *passwordServer) ConfirmPasswordChange(w http.ResponseWriter, r *http.Re
 	}
 	s.Debugf("change password: %v", req)
 	ctx := rest.FromRequest(r)
-	u, err := s.API.ConfirmPasswordChange(ctx, req.Token, req.Password)
+	u, err := s.API.ConfirmResetPassword(ctx, req.Token, req.Password)
 	if err != nil {
 		s.AuthError(w, err)
 		return

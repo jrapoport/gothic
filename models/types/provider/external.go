@@ -193,12 +193,14 @@ var External = map[Name]struct{}{
 
 var mu sync.RWMutex
 
+// AddExternal adds an external provider
 func AddExternal(p Name) {
 	mu.Lock()
 	defer mu.Unlock()
 	External[p] = struct{}{}
 }
 
+// IsExternal returns true if a provider is external
 func IsExternal(p Name) bool {
 	mu.RLock()
 	defer mu.RUnlock()

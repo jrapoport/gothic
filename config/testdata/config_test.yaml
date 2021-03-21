@@ -7,10 +7,10 @@ rest: example.com.yaml:80
 rpc: example.com.yaml:90
 rpcweb: example.com.yaml:100
 health: example.com.yaml:110
+request_id: "foobar.yaml"
 
 mask_emails: false
 rate_limit: 100m0s
-request_id: "foobar.yaml"
 
 jwt:
   secret: "i-am-a-secret.yaml"

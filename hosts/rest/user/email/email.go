@@ -49,10 +49,12 @@ func register(s *http.Server, srv *emailServer) {
 }
 
 func (s *emailServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Confirmed().Route(Endpoint, func(rt *rest.Router) {
-		rt.Post(Root, s.UnMaskEmail)
+	r.Route(Endpoint, func(rt *rest.Router) {
 		rt.Post(Confirm, s.ConfirmChangeEmail)
-		rt.Post(Change, s.SendChangeEmail)
+		rt.Authenticated().Confirmed().Route(Root, func(cr *rest.Router) {
+			cr.Post(Root, s.UnMaskEmail)
+			cr.Post(Change, s.SendChangeEmail)
+		})
 	})
 }
 

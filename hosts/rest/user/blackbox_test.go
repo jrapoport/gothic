@@ -149,7 +149,7 @@ func TestChangePassword(t *testing.T) {
 		rest_user.RegisterServer,
 	}, false)
 	req := rest_user.Request{
-		Password: newPassword,
+		NewPassword: newPassword,
 	}
 	// invalid password
 	u, tok := testUser(t, srv)
@@ -161,7 +161,8 @@ func TestChangePassword(t *testing.T) {
 	_, err = thttp.DoAuthRequest(t, web, http.MethodPut, PassRoute, tok, nil, req)
 	assert.Error(t, err)
 	// success
-	req.OldPassword = testPass
+	req.Password = testPass
+	req.NewPassword = newPassword
 	res, err := thttp.DoAuthRequest(t, web, http.MethodPut, PassRoute, tok, nil, req)
 	assert.NoError(t, err)
 	_, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)

@@ -7,6 +7,9 @@ import (
 
 // MailTemplates config
 type MailTemplates struct {
+	// Theme is the theme to use when formatting emails.
+	// Options are "default", "flat", "" = default
+	Theme string `json:"theme"`
 	// MailTemplate is a path to a configuration file with additional customization.
 	// For an example, SEE: mail/email/testdata/template_layout.yaml
 	Layout string `json:"layout"`
@@ -48,9 +51,10 @@ const (
 	mailLinkToken  = ":token"
 )
 
-const defaultLinkFormat = "/" + mailLinkAction + "/#" + mailLinkToken
+const defaultLinkFormat = "/" + mailLinkAction + "/#/" + mailLinkToken
 
 var templateDefaults = MailTemplates{
+	Theme: mailTheme,
 	ChangeEmail: MailTemplate{
 		LinkFormat: defaultLinkFormat,
 	},

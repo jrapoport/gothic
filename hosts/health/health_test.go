@@ -46,5 +46,5 @@ func TestNewHealthHost(t *testing.T) {
 	s := &http.Server{Handler: rt}
 	registerServer(s, srv, hosted)
 	assert.HTTPBodyContains(t, s.Handler.ServeHTTP,
-		http.MethodGet, config.HealthEndpoint, nil, testResponse)
+		http.MethodGet, config.HealthCheck, nil, testResponse)
 }

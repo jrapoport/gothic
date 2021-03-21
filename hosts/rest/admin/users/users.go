@@ -26,7 +26,7 @@ type Request struct {
 	Username    string    `json:"username" form:"username"`
 	Data        types.Map `json:"data" form:"data"`
 	Password    string    `json:"password" form:"password"`
-	OldPassword string    `json:"old_password" form:"old_password"`
+	OldPassword string    `json:"new_password" form:"new_password"`
 }
 
 type usersServer struct {

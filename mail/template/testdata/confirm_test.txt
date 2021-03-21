@@ -4,7 +4,7 @@ Hi The_real_mr_flibble,
 
 Welcome to Gothic! We are excited to have you on board.
 
-Please click the button below to confirm your email address and finish setting up your account: http://test.example.com:3000/confirm/#1234567890asdfghjklqwertyuiopzxcvbnm=
+Please click the button below to confirm your email address and finish setting up your account: http://test.example.com:3000/confirm/#/1234567890asdfghjklqwertyuiopzxcvbnm=
 
 Need help, or have questions? Please contact support. Do not reply to this email.
 

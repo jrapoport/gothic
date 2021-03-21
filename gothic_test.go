@@ -28,7 +28,7 @@ func Test_Main(t *testing.T) {
 	}, 5*time.Second, 100*time.Millisecond)
 	healthURI := func() string {
 		require.NotEmpty(t, c.Network.Health)
-		return "http://" + c.Network.Health + config.HealthEndpoint
+		return "http://" + c.Network.Health + config.HealthCheck
 	}
 	_, err := http.Get(healthURI())
 	assert.NoError(t, err)

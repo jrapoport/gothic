@@ -41,7 +41,7 @@ func (s *accountServer) SendResetPassword(ctx context.Context,
 	return &emptypb.Empty{}, nil
 }
 
-func (s *accountServer) ConfirmPasswordChange(ctx context.Context,
+func (s *accountServer) ConfirmResetPassword(ctx context.Context,
 	req *ConfirmPasswordRequest) (*rpc.BearerResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")
@@ -57,7 +57,7 @@ func (s *accountServer) ConfirmPasswordChange(ctx context.Context,
 	}
 	s.Debugf("change password: %v", req)
 	rtx := rpc.RequestContext(ctx)
-	u, err := s.API.ConfirmPasswordChange(rtx, req.Token, req.Password)
+	u, err := s.API.ConfirmResetPassword(rtx, req.Token, req.Password)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
 	}

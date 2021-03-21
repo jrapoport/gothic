@@ -18,14 +18,16 @@ const (
 	logTimeFormat      = time.RFC3339Nano
 	mailFrom           = ":name <do-not-reply@:link_hostname>"
 	mailTheme          = "default"
+	usernameRegex      = "^[a-zA-Z0-9_]{2,255}$"
 	passwordRegex      = "^[a-zA-Z0-9[:punct:]]{8,40}$"
 	secRateLimit       = 5 * time.Minute
 	smtpAuthentication = "plain"
 	smtpEncryption     = "none"
 	smtpExpiration     = 60 * time.Minute
-	smtpPort           = 587
+	smtpKeepalive      = true
+	smtpPort           = 25
 	smtpSendLimit      = 1 * time.Minute
-	usernameRegex      = "^[a-zA-Z0-9_]{2,255}$"
+	smtpSpamProtection = true
 	webhookMaxRetry    = 3
 	webhookTimeout     = 30 * time.Second
 )
@@ -48,10 +50,10 @@ var serviceDefaults = Service{
 
 var networkDefaults = Network{
 	Host:   "localhost",
-	REST:   "localhost:8081",
-	RPC:    "localhost:3001",
-	RPCWeb: "localhost:6001",
-	Health: "localhost:10001",
+	REST:   "localhost:7727",
+	RPC:    "localhost:7721",
+	RPCWeb: "localhost:7729",
+	Health: "localhost:7720",
 }
 
 var securityDefaults = Security{
@@ -98,23 +100,19 @@ var mailDefaults = Mail{
 		Port:           smtpPort,
 		Authentication: smtpAuthentication,
 		Encryption:     smtpEncryption,
-		KeepAlive:      true,
+		KeepAlive:      smtpKeepalive,
 		Expiration:     smtpExpiration,
 		SendLimit:      smtpSendLimit,
-		SpamProtection: true,
+		SpamProtection: smtpSpamProtection,
 	},
-	From:          mailFrom,
-	Theme:         mailTheme,
+	MailFormat: MailFormat{
+		From: mailFrom,
+	},
 	MailTemplates: templateDefaults,
 }
 
 var signupDefaults = Signup{
-	Invites:  Admins,
-	Username: true,
-	Default: SignupDefaults{
-		Username: true,
-		Color:    true,
-	},
+	Invites: Admins,
 }
 
 var webhooksDefaults = Webhooks{
@@ -125,6 +123,5 @@ var webhooksDefaults = Webhooks{
 
 var loggerDefaults = Logger{
 	Level:     logLevel,
-	Colors:    true,
 	Timestamp: logTimeFormat,
 }

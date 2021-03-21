@@ -481,13 +481,13 @@ func TestAPI_ConfirmPassword(t *testing.T) {
 	a.config.Validation.PasswordRegex = passRx
 	ctx := testContext(a)
 	// bad token
-	u, err = a.ConfirmPasswordChange(nil, "", testPass)
+	u, err = a.ConfirmResetPassword(nil, "", testPass)
 	assert.Error(t, err)
-	_, err = a.ConfirmPasswordChange(nil, ct.String(), empty)
+	_, err = a.ConfirmResetPassword(nil, ct.String(), empty)
 	assert.Error(t, err)
-	_, err = a.ConfirmPasswordChange(ctx, ct.String(), badPass)
+	_, err = a.ConfirmResetPassword(ctx, ct.String(), badPass)
 	assert.Error(t, err)
-	u, err = a.ConfirmPasswordChange(ctx, ct.String(), testPass)
+	u, err = a.ConfirmResetPassword(ctx, ct.String(), testPass)
 	assert.NoError(t, err)
 	assert.True(t, u.IsConfirmed())
 	err = u.Authenticate(testPass)
@@ -496,12 +496,12 @@ func TestAPI_ConfirmPassword(t *testing.T) {
 	a.config.Validation.PasswordRegex = empty
 	ct, err = tokens.GrantConfirmToken(a.conn, u.ID, token.NoExpiration)
 	assert.NoError(t, err)
-	u, err = a.ConfirmPasswordChange(ctx, ct.String(), empty)
+	u, err = a.ConfirmResetPassword(ctx, ct.String(), empty)
 	assert.NoError(t, err)
 	err = u.Authenticate(empty)
 	assert.NoError(t, err)
 	// can't reuse token
-	_, err = a.ConfirmPasswordChange(ctx, ct.String(), empty)
+	_, err = a.ConfirmResetPassword(ctx, ct.String(), empty)
 	assert.Error(t, err)
 }
 

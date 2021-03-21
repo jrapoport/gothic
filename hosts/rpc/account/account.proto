@@ -27,7 +27,7 @@ service Account {
   rpc SendResetPassword (ResetPasswordRequest) returns (google.protobuf.Empty) {
   }
 
-  rpc ConfirmPasswordChange (ConfirmPasswordRequest) returns (rpc.BearerResponse) {
+  rpc ConfirmResetPassword (ConfirmPasswordRequest) returns (rpc.BearerResponse) {
   }
 
   rpc RefreshBearerToken (RefreshTokenRequest) returns (rpc.BearerResponse) {

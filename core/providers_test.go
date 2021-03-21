@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/jrapoport/gothic/models/types"
 	"net/url"
 	"testing"
 
@@ -13,13 +14,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func authToken(t *testing.T, a *API, p provider.Name) string {
+func authToken(t *testing.T, a *API, p provider.Name) (string, types.Map) {
 	authURL, err := a.GetAuthorizationURL(context.Background(), p)
 	require.NoError(t, err)
 	au, err := url.Parse(authURL)
 	require.NoError(t, err)
 	tok := au.Query().Get(key.State)
-	return tok
+	return tok, types.Map{
+		key.Role: au.Query().Get(key.Role),
+	}
 }
 
 func TestAPI_GetAuthorizationURL(t *testing.T) {
@@ -80,8 +83,8 @@ func TestAPI_AuthorizeUser(t *testing.T) {
 	_, err = a.AuthorizeUser(nil, at.Token, nil)
 	assert.Error(t, err)
 	// create
-	tok := authToken(t, a, mock.PName())
-	u, err := a.AuthorizeUser(context.Background(), tok, nil)
+	tok, data := authToken(t, a, mock.PName())
+	u, err := a.AuthorizeUser(context.Background(), tok, data)
 	assert.NoError(t, err)
 	require.NotNil(t, u)
 	assert.True(t, u.IsConfirmed())
@@ -91,8 +94,8 @@ func TestAPI_AuthorizeUser(t *testing.T) {
 	assert.Equal(t, mock.Email, u.Email)
 	// update
 	username := u.Username
-	tok = authToken(t, a, mock.PName())
-	u, err = a.AuthorizeUser(context.Background(), tok, nil)
+	tok, data = authToken(t, a, mock.PName())
+	u, err = a.AuthorizeUser(context.Background(), tok, data)
 	assert.NoError(t, err)
 	require.NotNil(t, u)
 	assert.NoError(t, err)
