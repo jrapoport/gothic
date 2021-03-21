@@ -2,26 +2,32 @@ package config
 
 import "net"
 
-// HealthEndpoint is the rest health check route to use.
-const HealthEndpoint = "/health"
+// HealthCheck is the health check route to use.
+const HealthCheck = "/health"
 
 // Network config
 type Network struct {
 	// Host is default adapter to listen on.
 	// default: localhost
 	Host string `json:"host"`
-	// REST is the address for the REST server.
-	// default: [Host]:8081
-	REST string `json:"rest"`
-	// RPC is the address for the gRPC server.
-	// default: [Host]:3001
-	RPC string `json:"rpc"`
-	// RPCWeb is the address for the gRPC-Web server.
-	// default: [Host]:6001
-	RPCWeb string `json:"rpcweb" mapstructure:"rpcweb"`
 	// Health is the address for the health check server.
-	// default: [Host]:10001
+	// default: [Host]:7720
 	Health string `json:"health"`
+	// RPC is the address for the gRPC server.
+	// default: [Host]:7721
+	RPC string `json:"rpc"`
+	// Admin is the address for the admin server.
+	// default: [Host]:7722
+	Admin string `json:"admin"`
+	// HTTP is the address for the HTTP server.
+	// default: [Host]:7727
+	REST string `json:"rest"`
+	// RPCWeb is the address for the gRPC-Web server.
+	// default: [Host]:7729
+	RPCWeb string `json:"rpcweb" mapstructure:"rpcweb"`
+	// TODO: use RequestID
+	// RequestID is the request id to use
+	RequestID string `json:"request_id" yaml:"request_id" mapstructure:"request_id"`
 }
 
 func (n *Network) normalize(Service) (err error) {

@@ -1,6 +1,6 @@
-package config
+package settings
 
-//go:generate protoc -I=. --go_out=plugins=grpc:. --go_opt=paths=source_relative config.proto
+//go:generate protoc -I=. --go_out=plugins=grpc:. --go_opt=paths=source_relative settings.proto
 
 import (
 	"context"
@@ -11,24 +11,24 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type configServer struct {
+type settingsServer struct {
 	*rpc.Server
 }
 
-var _ ConfigServer = (*configServer)(nil)
+var _ SettingsServer = (*settingsServer)(nil)
 
-func newConfigServer(srv *rpc.Server) *configServer {
+func newSettingsServer(srv *rpc.Server) *settingsServer {
 	srv.FieldLogger = srv.WithField("module", "config")
-	return &configServer{srv}
+	return &settingsServer{srv}
 }
 
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	RegisterConfigServer(s, newConfigServer(srv))
+	RegisterSettingsServer(s, newSettingsServer(srv))
 }
 
 // Settings returns the settings for a server.
-func (s *configServer) Settings(_ context.Context, _ *SettingsRequest) (*SettingsResponse, error) {
+func (s *settingsServer) Settings(_ context.Context, _ *SettingsRequest) (*SettingsResponse, error) {
 	set := s.API.Settings()
 	b, err := json.Marshal(set)
 	if err != nil {

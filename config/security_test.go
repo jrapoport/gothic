@@ -11,7 +11,6 @@ import (
 const (
 	maskEmails   = false
 	rateLimit    = 100 * time.Minute
-	requestID    = "foobar"
 	rootPassword = "password"
 	jwtSecret    = "i-am-a-secret"
 	jwtAlgo      = "HS384"
@@ -31,7 +30,6 @@ func TestSecurity(t *testing.T) {
 		assert.Equal(t, rootPassword+test.mark, s.RootPassword)
 		assert.Equal(t, maskEmails, s.MaskEmails)
 		assert.Equal(t, rateLimit, s.RateLimit)
-		assert.Equal(t, requestID+test.mark, s.RequestID)
 		assert.Equal(t, jwtSecret+test.mark, s.JWT.Secret)
 		assert.Equal(t, jwtAlgo+test.mark, s.JWT.Algorithm)
 		assert.Equal(t, jwtIss+test.mark, s.JWT.Issuer)
@@ -57,7 +55,6 @@ func TestSecurity_Env(t *testing.T) {
 			assert.Equal(t, rootPassword, s.RootPassword)
 			assert.Equal(t, maskEmails, s.MaskEmails)
 			assert.Equal(t, rateLimit, s.RateLimit)
-			assert.Equal(t, requestID, s.RequestID)
 			assert.Equal(t, jwtSecret, s.JWT.Secret)
 			assert.Equal(t, jwtAlgo, s.JWT.Algorithm)
 			assert.Equal(t, jwtIss, s.JWT.Issuer)

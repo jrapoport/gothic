@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package config;
+package settings;
 
-option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin/config;config";
+option go_package = "github.com/jrapoport/gothic/hosts/rpc/admin/settings;settings";
 
-service Config {
+service Settings {
   rpc Settings (SettingsRequest) returns (SettingsResponse) {
   }
 }

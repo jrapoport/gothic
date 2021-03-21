@@ -6,9 +6,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Log Levels
 const (
 	LevelDebug = "debug"
 	LevelInfo  = "info"
+	LevelWarn  = "warn"
+	LevelError = "error"
+	LevelFatal = "fatal"
+	LevelPanic = "panic"
+	LevelTrace = "trace"
 )
 
 // Logger config

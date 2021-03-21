@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/utils"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +52,7 @@ func rootConfig() *config.Config {
 func ExecuteRoot() error {
 	return rootCmd.Execute()
 }
-
+/*
 func confirmAction(format string, a ...interface{}) (bool, error) {
 	p := fmt.Sprintf(format, a...)
 	p = fmt.Sprintf("%s? [Yes/No]", p)
@@ -69,3 +66,5 @@ func confirmAction(format string, a ...interface{}) (bool, error) {
 	}
 	return result == "Yes", nil
 }
+
+ */

@@ -9,18 +9,8 @@ import (
 // Mail config
 type Mail struct {
 	// SMTP is the smtp configuration.
-	SMTP `yaml:",inline" mapstructure:",squash"`
-	// Name is the name to use with outbound mail (default: ServiceName).
-	Name string `json:"name"`
-	// Link is the url to use with outbound mail (default: SiteURL).
-	Link string `json:"link"`
-	// Logo is the logo to use with outbound mail (default: SiteLogo).
-	Logo string `json:"logo"`
-	// From is the originating address to use with outbound email.
-	From string `json:"from"`
-	// Theme is the theme to use when formatting emails.
-	// Options are "default", "flat", "" = default
-	Theme         string `json:"theme"`
+	SMTP          `yaml:",inline" mapstructure:",squash"`
+	MailFormat    `yaml:",inline" mapstructure:",squash"`
 	MailTemplates `yaml:",inline" mapstructure:",squash"`
 }
 
@@ -39,6 +29,18 @@ type SMTP struct {
 	SendLimit  time.Duration `json:"send_limit" yaml:"send_limit" mapstructure:"send_limit"`
 	// SpamProtection enables smtp email account validation
 	SpamProtection bool `json:"spam_protection" yaml:"spam_protection" mapstructure:"spam_protection"`
+}
+
+// MailFormat config
+type MailFormat struct {
+	// Name is the name to use with outbound mail (default: ServiceName).
+	Name string `json:"name"`
+	// Link is the url to use with outbound mail (default: SiteURL).
+	Link string `json:"link"`
+	// Logo is the logo to use with outbound mail (default: SiteLogo).
+	Logo string `json:"logo"`
+	// From is the originating address to use with outbound email.
+	From string `json:"from"`
 }
 
 func (m *Mail) normalize(srv Service) error {

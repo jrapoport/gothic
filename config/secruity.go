@@ -18,9 +18,6 @@ type Security struct {
 	MaskEmails bool `json:"mask_emails" yaml:"mask_emails" mapstructure:"mask_emails"`
 	// RateLimit is the rate limit per 100 requests to be enforced by ip address
 	RateLimit time.Duration `json:"rate_limit" yaml:"rate_limit" mapstructure:"rate_limit"`
-	// TODO: use RequestID
-	// RequestID is the request id to use
-	RequestID string `json:"request_id" yaml:"request_id" mapstructure:"request_id"`
 	// JWT is the JWT configuration.
 	JWT JWT `json:"jwt"`
 	// Recaptcha is the google CAPTCHA configuration.

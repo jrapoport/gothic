@@ -3,16 +3,17 @@ include $(CUR_DIR)/protoc.mk
 
 PKG := github.com/jrapoport/gothic
 EXE := gothic
-CLI := gcli
+CLI := gadmin
 
 CMD_DIR := ./cmd
 BUILD_DIR := build
 DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
-
-GO_LINT_REPO := golang.org/x/lint/golint
-GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
-GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
+OUT_DIR := $(DEBUG_DIR)
+IN_EXE = $(CMD_DIR)/gothic
+OUT_EXE = -o $(OUT_DIR)/$(EXE)
+IN_CLI = $(CMD_DIR)/cli
+OUT_CLI = -o $(OUT_DIR)/$(CLI)
 
 GO := go
 GO_PATH := $(shell $(GO) env GOPATH)
@@ -30,8 +31,28 @@ GO_LINT := $(GO_BIN)/golint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
 
+GO_LINT_REPO := golang.org/x/lint/golint
+GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
+GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
+
 GRPC_PREFIX := github.com/jrapoport/gothic/hosts/rpc
 PROTO_INCLUDES := -I=hosts/rpc $(PROTO_INCLUDES)
+
+DEBUG_TAGS := -tags "debug"
+RELEASE_TAGS := -tags "osusergo,netgo,release"
+BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
+
+VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)
+ifeq (, $(VERSION_NUM))
+	VERSION_NUM := 0.0.1
+endif
+# BUILD_MN := $(shell git log -1 --format=%cd --date=format:'%m')
+# BUILD_YR := $(shell git log -1 --format=%cd --date=format:'%y%d')
+# BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(BUILD_MN) + 64)) $(BUILD_YR))
+BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(shell date +%m) + 64)) $(shell date +%y%d))
+VER_PKG := $(PKG)/config
+# make sure this is = and not := so it gets expanded properly
+VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
 
 TEST_FLAGS :=-failfast
 COVERAGE_FILE=coverage.txt
@@ -72,7 +93,7 @@ static: $(GO_STATIC) ## Run static analysis
 tidy: ## Tidy module
 	$(GO_MOD) tidy
 
-deps: tidy ## Install dependencies
+deps:: tidy ## Install dependencies
 	$(GO_MOD) download
 
 rpc::
@@ -94,25 +115,7 @@ cover: clean test
 	curl -fsSL https://codecov.io/bash | bash
 	$(RM) $(COVERAGE_FILE)
 
-VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)
-ifeq (, $(VERSION_NUM))
-	VERSION_NUM := 0.0.1
-endif
-BUILD_MN := $(shell git log -1 --format=%cd --date=format:'%m')
-BUILD_YR := $(shell git log -1 --format=%cd --date=format:'%y%d')
-BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(shell date +%m) + 64)) $(shell date +%y%d))
-VER_PKG := $(PKG)/config
-VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
-DEBUG_TAGS := -tags "debug"
-RELEASE_TAGS := -tags "osusergo,netgo,release"
-BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
-OUT_DIR := $(DEBUG_DIR)
-IN_EXE = $(CMD_DIR)/gothic
-OUT_EXE = -o $(OUT_DIR)/$(EXE)
-IN_CLI = $(CMD_DIR)/cli
-OUT_CLI = -o $(OUT_DIR)/$(CLI)
 build: ## Debug build
-	echo $(VER_FLAGS)
 	$(GO_BUILD) $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)
 	$(GO_BUILD) $(OUT_CLI) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_CLI)
 

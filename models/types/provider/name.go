@@ -1,9 +1,10 @@
 package provider
 
 import (
-	"github.com/google/uuid"
 	"regexp"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // Name is the name of a provider.
@@ -23,6 +24,7 @@ func (p Name) String() string {
 	return string(p)
 }
 
+// NormalizeName normalizes a provider name
 func NormalizeName(name string) Name {
 	reg := regexp.MustCompile(`[^a-z0-9]+`)
 	name = strings.ToLower(name)

@@ -121,7 +121,7 @@ func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
 	}
 }
 
-func TestPasswordServer_ConfirmPasswordChange(t *testing.T) {
+func TestPasswordServer_ConfirmResetPassword(t *testing.T) {
 	t.Parallel()
 	srv, web, smtp := testServer(t)
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"

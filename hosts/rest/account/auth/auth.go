@@ -3,10 +3,10 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"github.com/jrapoport/gothic/utils"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 )
@@ -88,10 +88,7 @@ func (s *authServer) AuthorizeUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	var data = types.Map{}
-	for k, v := range r.Form {
-		data[k] = v
-	}
+	data := utils.URLValuesToMap(r.Form, false)
 	ctx := rest.FromRequest(r)
 	u, err := s.API.AuthorizeUser(ctx, req.State, data)
 	if err != nil {

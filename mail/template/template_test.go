@@ -132,14 +132,18 @@ func TestEmailTemplate_LoadSender(t *testing.T) {
 	t.Parallel()
 	require.FileExists(t, testLayout)
 	static := config.Mail{
-		Name: confName,
-		Link: confLink,
-		Logo: testLogo,
+		MailFormat: config.MailFormat{
+			Name: confName,
+			Link: confLink,
+			Logo: testLogo,
+		},
 	}
 	sender := config.Mail{
-		Link: tmplLink,
-		Logo: testLogo,
-		From: tmplFrom,
+		MailFormat: config.MailFormat{
+			Link: tmplLink,
+			Logo: testLogo,
+			From: tmplFrom,
+		},
 		MailTemplates: config.MailTemplates{
 			Layout: testLayout,
 		},
@@ -247,7 +251,9 @@ func testConfig(t *testing.T) *config.Config {
 	c := &config.Config{}
 	require.FileExists(t, testLayout)
 	c.Mail = config.Mail{
-		From: tmplFrom,
+		MailFormat: config.MailFormat{
+			From: tmplFrom,
+		},
 		MailTemplates: config.MailTemplates{
 			Layout: testLayout,
 		},

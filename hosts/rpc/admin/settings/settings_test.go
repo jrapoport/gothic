@@ -1,4 +1,4 @@
-package config
+package settings
 
 import (
 	"testing"
@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestConfigServer_Settings(t *testing.T) {
+func TestSettingsServer_Settings(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
-	srv := newConfigServer(s)
+	srv := newSettingsServer(s)
 	ctx := context.Background()
 	res, err := srv.Settings(ctx, nil)
 	assert.NoError(t, err)

@@ -12,6 +12,7 @@ const (
 	rpcPort    = ":90"
 	webPort    = ":100"
 	healthPort = ":110"
+	requestID  = "foobar"
 )
 
 func TestNetwork(t *testing.T) {
@@ -22,6 +23,7 @@ func TestNetwork(t *testing.T) {
 		assert.Equal(t, host+test.mark+rpcPort, n.RPC)
 		assert.Equal(t, host+test.mark+webPort, n.RPCWeb)
 		assert.Equal(t, host+test.mark+healthPort, n.Health)
+		assert.Equal(t, requestID+test.mark, n.RequestID)
 	})
 }
 
@@ -39,6 +41,7 @@ func TestNetwork_Env(t *testing.T) {
 			assert.Equal(t, host+rpcPort, n.RPC)
 			assert.Equal(t, host+webPort, n.RPCWeb)
 			assert.Equal(t, host+healthPort, n.Health)
+			assert.Equal(t, requestID, n.RequestID)
 		})
 	}
 }
@@ -85,11 +88,11 @@ func TestNetwork_Normalization(t *testing.T) {
 		},
 		{
 			host2, def.REST, def.RPC, def.RPCWeb,
-			host2, host2 + ":8081", host2 + ":3001", host2 + ":6001",
+			host2, host2 + ":7727", host2 + ":7721", host2 + ":7729",
 		},
 		{
 			host2, host + restPort, def.RPC, def.RPCWeb,
-			host2, host + restPort, host2 + ":3001", host2 + ":6001",
+			host2, host + restPort, host2 + ":7721", host2 + ":7729",
 		},
 		{
 			host2, host + restPort, host + restPort, host + restPort,

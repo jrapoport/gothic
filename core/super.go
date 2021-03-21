@@ -2,15 +2,13 @@ package core
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/core/users"
 
+	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 )
 
-func (a *API) superProvider() provider.Name {
-	return provider.NormalizeName(a.config.Name)
-}
+// CreateSuperAdmin creates a built-in super admin account
 func (a *API) CreateSuperAdmin() error {
 	pw := a.config.RootPassword
 	su := user.NewSuperAdmin(pw)
@@ -27,6 +25,7 @@ func (a *API) CreateSuperAdmin() error {
 	return a.logError(err)
 }
 
+// GetSuperAdmin gets the built-in super admin account
 func (a *API) GetSuperAdmin(pw string) (*user.User, error) {
 	su, err := users.GetUser(a.conn, user.SuperAdminID)
 	if err != nil {
@@ -44,4 +43,8 @@ func (a *API) GetSuperAdmin(pw string) (*user.User, error) {
 		return nil, a.logError(err)
 	}
 	return su, nil
+}
+
+func (a *API) superProvider() provider.Name {
+	return provider.NormalizeName(a.config.Name)
 }

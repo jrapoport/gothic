@@ -17,7 +17,7 @@ import (
 func Logger(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := GetLogger(r)
-		if logger != nil && r.URL.Path != config.HealthEndpoint {
+		if logger != nil && r.URL.Path != config.HealthCheck {
 			l := &middleware.DefaultLogFormatter{
 				Logger: logger,
 			}
@@ -60,7 +60,7 @@ func Tracer(h http.Handler) http.Handler {
 	}
 	fn := httptracer.Tracer(tr, httptracer.Config{
 		SkipFunc: func(r *http.Request) bool {
-			return r.URL.Path == config.HealthEndpoint
+			return r.URL.Path == config.HealthCheck
 		},
 		Tags: map[string]interface{}{
 			// datadog, turn on metrics for http.request stats

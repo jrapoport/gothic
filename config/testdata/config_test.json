@@ -7,9 +7,9 @@
   "rpc": "example.com.json:90",
   "rpcweb": "example.com.json:100",
   "health": "example.com.json:110",
+  "request_id": "foobar.json",
   "mask_emails": false,
   "rate_limit": "1h40m0s",
-  "request_id": "foobar.json",
   "jwt": {
     "secret": "i-am-a-secret.json",
     "algorithm": "HS384.json",

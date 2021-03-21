@@ -47,7 +47,7 @@ func TestNewHealthHost(t *testing.T) {
 func checkHealth(t *testing.T, h core.Hosted) string {
 	healthURI := func() string {
 		require.NotEmpty(t, h.Address())
-		return "http://" + h.Address() + config.HealthEndpoint
+		return "http://" + h.Address() + config.HealthCheck
 	}
 	res, err := http.Get(healthURI())
 	assert.NoError(t, err)

@@ -84,7 +84,7 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 	}
 }
 
-func TestAccountServer_ConfirmPasswordChange(t *testing.T) {
+func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	t.Parallel()
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"
 	s, smtp := tsrv.RPCServer(t, true)
@@ -93,15 +93,15 @@ func TestAccountServer_ConfirmPasswordChange(t *testing.T) {
 	srv.Config().Mail.SendLimit = 0
 	ctx := context.Background()
 	// invalid req
-	_, err := srv.ConfirmPasswordChange(ctx, nil)
+	_, err := srv.ConfirmResetPassword(ctx, nil)
 	assert.Error(t, err)
 	// empty token
 	req := &ConfirmPasswordRequest{}
-	_, err = srv.ConfirmPasswordChange(ctx, req)
+	_, err = srv.ConfirmResetPassword(ctx, req)
 	assert.Error(t, err)
 	// bad token
 	req.Token = "bad"
-	_, err = srv.ConfirmPasswordChange(ctx, req)
+	_, err = srv.ConfirmResetPassword(ctx, req)
 	assert.Error(t, err)
 	// first get the change token
 	u := testUser(t, srv)
@@ -124,7 +124,7 @@ func TestAccountServer_ConfirmPasswordChange(t *testing.T) {
 		Token:    tok,
 		Password: newPass,
 	}
-	res, err := srv.ConfirmPasswordChange(ctx, req)
+	res, err := srv.ConfirmResetPassword(ctx, req)
 	assert.NoError(t, err)
 	u, err = srv.GetUser(u.ID)
 	assert.NoError(t, err)

@@ -131,7 +131,7 @@ type ChangePasswordRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	Password    string `protobuf:"bytes,1,opt,name=password,proto3" json:"password,omitempty"`
-	OldPassword string `protobuf:"bytes,2,opt,name=old_password,json=oldPassword,proto3" json:"old_password,omitempty"`
+	OldPassword string `protobuf:"bytes,2,opt,name=new_password,json=oldPassword,proto3" json:"new_password,omitempty"`
 }
 
 func (x *ChangePasswordRequest) Reset() {

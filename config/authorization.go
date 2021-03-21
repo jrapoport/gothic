@@ -71,6 +71,18 @@ type Provider struct {
 	Scopes      []string `json:"scopes"`
 }
 
+/*
+// SAML is for SAML support.
+type SAML struct {
+	Enabled     bool   `json:"enabled"`
+	Name        string `json:"name"`
+	MetadataURL string `json:"metadata_url" yaml:"metadata_url" mapstructure:"metadata_url"`
+	APIBase     string `json:"api_base" yaml:"api_base" mapstructure:"api_base"`
+	Cert 		string `json:"cert"`
+	Key  		string `json:"key"`
+}
+*/
+
 // FormatCallback formats the link URL replacing the ':host' with the RESTAddress().
 func FormatCallback(callback, host string) string {
 	return strings.ReplaceAll(callback, hostToken, host)
