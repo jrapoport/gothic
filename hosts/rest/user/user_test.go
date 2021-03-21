@@ -166,7 +166,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 		return w
 	}
 	req := Request{
-		Password: newPassword,
+		NewPassword: newPassword,
 	}
 	// invalid password
 	u, tok := testUser(t, srv)
@@ -178,7 +178,8 @@ func TestUserServer_ChangePassword(t *testing.T) {
 	res = changePassword(tok, req)
 	assert.NotEqual(t, http.StatusOK, res.Code)
 	// success
-	req.OldPassword = testPass
+	req.Password = testPass
+	req.NewPassword = newPassword
 	res = changePassword(tok, req)
 	assert.Equal(t, http.StatusOK, res.Code)
 	_, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res.Body.String())

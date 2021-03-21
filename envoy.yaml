@@ -77,4 +77,4 @@ static_resources:
                   address:
                     socket_address:
                       address: host.docker.internal
-                      port_value: 6001
+                      port_value: 7729

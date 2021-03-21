@@ -161,8 +161,8 @@ func (a *API) ConfirmUser(ctx context.Context, tok string) (*user.User, error) {
 	return a.confirmUserWithChanges(ctx, tok, nil)
 }
 
-// ConfirmPasswordChange confirms a user pw change & account (if needed).
-func (a *API) ConfirmPasswordChange(ctx context.Context, tok string, pw string) (*user.User, error) {
+// ConfirmResetPassword confirms a user pw change & account (if needed).
+func (a *API) ConfirmResetPassword(ctx context.Context, tok string, pw string) (*user.User, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}

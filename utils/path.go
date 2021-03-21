@@ -35,6 +35,5 @@ func ExecutableName() string {
 		path = link
 	}
 	name := filepath.Base(path)
-	ext := filepath.Ext(name)
-	return strings.ReplaceAll(name, ext, "")
+	return  strings.TrimSuffix(name, filepath.Ext(name))
 }

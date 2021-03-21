@@ -6,7 +6,7 @@ import (
 
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/hosts/rpc/admin/codes"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/config"
+	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,10 +19,10 @@ func TestAdminServer_Config(t *testing.T) {
 		RegisterServer,
 	})
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return config.NewConfigClient(cc)
-	}).(config.ConfigClient)
+		return settings.NewSettingsClient(cc)
+	}).(settings.SettingsClient)
 	ctx := context.Background()
-	res, err := client.Settings(ctx, &config.SettingsRequest{})
+	res, err := client.Settings(ctx, &settings.SettingsRequest{})
 	assert.NoError(t, err)
 	test := srv.HealthCheck()
 	assert.Equal(t, test.Name, res.Name)

@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	mailName      = "FooBar Co"
-	mailLink      = "http://mail.example.com"
-	mailLogo      = "http://mail.example.com/logo.png"
-	testFrom      = "foo <foo@example.com%s>"
-	testTheme     = "flat"
-	smtpHost      = "smtp.example.com"
-	testPort      = 25
-	smtpUsername  = "peaches"
-	smtpPassword  = "secret-password!"
-	smtpAuth      = "cram-md5"
-	smtpEncrypt   = "tls"
-	smtpKeepalive = false
-	smtpExp       = 100 * time.Minute
-	smtpLimit     = 100 * time.Minute
-	smtpSpam      = false
-	template      = "./templates/mail.tmpl"
+	mailName     = "FooBar Co"
+	mailLink     = "http://mail.example.com"
+	mailLogo     = "http://mail.example.com/logo.png"
+	testFrom     = "foo <foo@example.com%s>"
+	testTheme    = "flat"
+	smtpHost     = "smtp.example.com"
+	testPort     = 25
+	smtpUsername = "peaches"
+	smtpPassword = "secret-password!"
+	smtpAuth     = "cram-md5"
+	smtpEncrypt  = "tls"
+	keepalive    = false
+	smtpExp      = 100 * time.Minute
+	smtpLimit    = 100 * time.Minute
+	smtpSpam     = false
+	template     = "./templates/mail.tmpl"
 )
 
 func TestMail(t *testing.T) {
@@ -42,7 +42,7 @@ func TestMail(t *testing.T) {
 		assert.Equal(t, smtpPassword+test.mark, s.Password)
 		assert.Equal(t, smtpAuth+test.mark, s.Authentication)
 		assert.Equal(t, smtpEncrypt+test.mark, s.Encryption)
-		assert.Equal(t, smtpKeepalive, s.KeepAlive)
+		assert.Equal(t, keepalive, s.KeepAlive)
 		assert.Equal(t, smtpExp, s.Expiration)
 		assert.Equal(t, smtpLimit, s.SendLimit)
 		assert.Equal(t, smtpSpam, s.SpamProtection)
@@ -71,7 +71,7 @@ func TestMail_Env(t *testing.T) {
 			assert.Equal(t, smtpPassword, s.Password)
 			assert.Equal(t, smtpAuth, s.Authentication)
 			assert.Equal(t, smtpEncrypt, s.Encryption)
-			assert.Equal(t, smtpKeepalive, s.KeepAlive)
+			assert.Equal(t, keepalive, s.KeepAlive)
 			assert.Equal(t, smtpExp, s.Expiration)
 			assert.Equal(t, smtpLimit, s.SendLimit)
 			assert.Equal(t, smtpSpam, s.SpamProtection)
@@ -95,7 +95,9 @@ func TestMail_Normalization(t *testing.T) {
 		SiteURL: siteURL,
 	}
 	m := Mail{
-		Logo: mailLogo,
+		MailFormat: MailFormat{
+			Logo: mailLogo,
+		},
 	}
 	const (
 		name = "Example"

@@ -8,6 +8,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
+// TODO: Merge this into the account endpoint to support authenticated
+// 	account confirmation in lieu of an email address.
 const (
 	// Endpoint is the confirmation rest endpoint.
 	Endpoint = "/confirm"

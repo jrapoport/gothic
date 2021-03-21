@@ -97,7 +97,7 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 
 // GetEmailToken parses a token from an email link.
 func GetEmailToken(action, email string) string {
-	rx := regexp.MustCompile(`(?m)` + action + `\/([a-zA-Z0-9_\-.=\n#]+)`)
+	rx := regexp.MustCompile(`(?m)` + action + `\/#\/([a-zA-Z0-9_\-.=\n]+)`)
 	matches := rx.FindStringSubmatch(email)
 	if len(matches) < 2 {
 		return ""

@@ -24,7 +24,7 @@ type Request struct {
 	Username    string    `json:"username" form:"username"`
 	Data        types.Map `json:"data" form:"data"`
 	Password    string    `json:"password" form:"password"`
-	OldPassword string    `json:"old_password" form:"old_password"`
+	NewPassword string    `json:"new_password" form:"new_password"`
 }
 
 type userServer struct {
@@ -124,7 +124,7 @@ func (s *userServer) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	old := req.OldPassword
+	old := req.Password
 	u, err := s.GetAuthenticatedUser(uid)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
@@ -132,7 +132,7 @@ func (s *userServer) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Debugf("change password %s: %v", u.ID, req)
 	ctx := rest.FromRequest(r)
-	u, err = s.API.ChangePassword(ctx, u.ID, old, req.Password)
+	u, err = s.API.ChangePassword(ctx, u.ID, old, req.NewPassword)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return

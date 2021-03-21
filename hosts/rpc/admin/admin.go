@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/hosts/rpc/admin/codes"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/config"
+	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
 	"google.golang.org/grpc"
 )
 
@@ -19,6 +19,6 @@ func newAdminServer(srv *rpc.Server) *adminServer {
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 	as := newAdminServer(srv).Server
-	config.RegisterServer(s, as)
+	settings.RegisterServer(s, as)
 	codes.RegisterServer(s, as)
 }

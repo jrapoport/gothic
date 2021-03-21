@@ -6,7 +6,7 @@ import (
 
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/config"
+	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
@@ -14,10 +14,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func configClient(t *testing.T, h core.Hosted) config.ConfigClient {
+func configClient(t *testing.T, h core.Hosted) settings.SettingsClient {
 	return tsrv.RPCClient(t, h.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return config.NewConfigClient(cc)
-	}).(config.ConfigClient)
+		return settings.NewSettingsClient(cc)
+	}).(settings.SettingsClient)
 }
 
 func TestRPCHost(t *testing.T) {
@@ -35,7 +35,7 @@ func TestRPCHost(t *testing.T) {
 	// unauthenticated call
 	ctx := context.Background()
 	ac := configClient(t, h)
-	res, err := ac.Settings(ctx, &config.SettingsRequest{})
+	res, err := ac.Settings(ctx, &settings.SettingsRequest{})
 	assert.NoError(t, err)
 	assert.Equal(t, test.Status, res.Status)
 	assert.Equal(t, test.Signup.Provider.Internal, res.Signup.Provider.Internal)

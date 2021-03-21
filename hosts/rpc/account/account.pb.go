@@ -564,7 +564,7 @@ var file_account_proto_depIdxs = []int32{
 	3,  // 4: account.Account.Login:input_type -> account.LoginRequest
 	4,  // 5: account.Account.Logout:input_type -> account.LogoutRequest
 	5,  // 6: account.Account.SendResetPassword:input_type -> account.ResetPasswordRequest
-	6,  // 7: account.Account.ConfirmPasswordChange:input_type -> account.ConfirmPasswordRequest
+	6,  // 7: account.Account.ConfirmResetPassword:input_type -> account.ConfirmPasswordRequest
 	7,  // 8: account.Account.RefreshBearerToken:input_type -> account.RefreshTokenRequest
 	9,  // 9: account.Account.Signup:output_type -> rpc.UserResponse
 	10, // 10: account.Account.SendConfirmUser:output_type -> google.protobuf.Empty
@@ -572,7 +572,7 @@ var file_account_proto_depIdxs = []int32{
 	9,  // 12: account.Account.Login:output_type -> rpc.UserResponse
 	10, // 13: account.Account.Logout:output_type -> google.protobuf.Empty
 	10, // 14: account.Account.SendResetPassword:output_type -> google.protobuf.Empty
-	11, // 15: account.Account.ConfirmPasswordChange:output_type -> rpc.BearerResponse
+	11, // 15: account.Account.ConfirmResetPassword:output_type -> rpc.BearerResponse
 	11, // 16: account.Account.RefreshBearerToken:output_type -> rpc.BearerResponse
 	9,  // [9:17] is the sub-list for method output_type
 	1,  // [1:9] is the sub-list for method input_type
@@ -722,7 +722,7 @@ type AccountClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*rpc.UserResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SendResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ConfirmPasswordChange(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error)
+	ConfirmResetPassword(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error)
 	RefreshBearerToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error)
 }
 
@@ -788,9 +788,9 @@ func (c *accountClient) SendResetPassword(ctx context.Context, in *ResetPassword
 	return out, nil
 }
 
-func (c *accountClient) ConfirmPasswordChange(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
+func (c *accountClient) ConfirmResetPassword(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
 	out := new(rpc.BearerResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/ConfirmPasswordChange", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/account.Account/ConfirmResetPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -814,7 +814,7 @@ type AccountServer interface {
 	Login(context.Context, *LoginRequest) (*rpc.UserResponse, error)
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	SendResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error)
-	ConfirmPasswordChange(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error)
+	ConfirmResetPassword(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error)
 	RefreshBearerToken(context.Context, *RefreshTokenRequest) (*rpc.BearerResponse, error)
 }
 
@@ -840,8 +840,8 @@ func (*UnimplementedAccountServer) Logout(context.Context, *LogoutRequest) (*emp
 func (*UnimplementedAccountServer) SendResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendResetPassword not implemented")
 }
-func (*UnimplementedAccountServer) ConfirmPasswordChange(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConfirmPasswordChange not implemented")
+func (*UnimplementedAccountServer) ConfirmResetPassword(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmResetPassword not implemented")
 }
 func (*UnimplementedAccountServer) RefreshBearerToken(context.Context, *RefreshTokenRequest) (*rpc.BearerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshBearerToken not implemented")
@@ -959,20 +959,20 @@ func _Account_SendResetPassword_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Account_ConfirmPasswordChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Account_ConfirmResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ConfirmPasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccountServer).ConfirmPasswordChange(ctx, in)
+		return srv.(AccountServer).ConfirmResetPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/ConfirmPasswordChange",
+		FullMethod: "/account.Account/ConfirmResetPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServer).ConfirmPasswordChange(ctx, req.(*ConfirmPasswordRequest))
+		return srv.(AccountServer).ConfirmResetPassword(ctx, req.(*ConfirmPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1024,8 +1024,8 @@ var _Account_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Account_SendResetPassword_Handler,
 		},
 		{
-			MethodName: "ConfirmPasswordChange",
-			Handler:    _Account_ConfirmPasswordChange_Handler,
+			MethodName: "ConfirmResetPassword",
+			Handler:    _Account_ConfirmResetPassword_Handler,
 		},
 		{
 			MethodName: "RefreshBearerToken",

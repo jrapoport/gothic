@@ -8,7 +8,7 @@ import (
 )
 
 // Endpoint is the health check endpoint.
-const Endpoint = config.HealthEndpoint
+const Endpoint = config.HealthCheck
 
 type healthServer struct {
 	*rest.Server

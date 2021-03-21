@@ -7,7 +7,7 @@ import (
 
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/admin"
-	"github.com/jrapoport/gothic/hosts/rest/admin/config"
+	"github.com/jrapoport/gothic/hosts/rest/admin/settings"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/thttp"
 	"github.com/jrapoport/gothic/test/tsrv"
@@ -38,7 +38,7 @@ func testResponse(t *testing.T, s *rest.Host) string {
 
 func TestAdminServer_Config(t *testing.T) {
 	t.Parallel()
-	const settings = admin.Endpoint + config.Endpoint
+	const settings = admin.Endpoint + settings.Endpoint
 	s, web, _ := testServer(t)
 	j := s.Config().JWT
 	// bad token

@@ -1,11 +1,11 @@
-package config_test
+package settings_test
 
 import (
 	"net/http"
 	"testing"
 
 	"github.com/jrapoport/gothic/hosts/rest"
-	"github.com/jrapoport/gothic/hosts/rest/admin/config"
+	"github.com/jrapoport/gothic/hosts/rest/admin/settings"
 	"github.com/jrapoport/gothic/test/thttp"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/segmentio/encoding/json"
@@ -14,25 +14,25 @@ import (
 )
 
 func testResponse(t *testing.T, s *rest.Host) string {
-	test := s.Settings()
+	test := s.API.Settings()
 	b, err := json.Marshal(test)
 	require.NoError(t, err)
 	return string(b)
 }
 
-func TestConfigServer_Settings(t *testing.T) {
+func TestSettingsServer_Settings(t *testing.T) {
 	t.Parallel()
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
-		config.RegisterServer,
+		settings.RegisterServer,
 	}, false)
 	j := srv.Config().JWT
 	// not admin
 	tok := thttp.UserToken(t, j, false, false)
-	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, config.Endpoint, tok, nil, nil)
+	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Endpoint, tok, nil, nil)
 	assert.NoError(t, err)
 	// admin
 	tok = thttp.UserToken(t, j, false, true)
-	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, config.Endpoint, tok, nil, nil)
+	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Endpoint, tok, nil, nil)
 	assert.NoError(t, err)
 	assert.JSONEq(t, testResponse(t, srv), res)
 }

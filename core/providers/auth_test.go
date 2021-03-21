@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/jrapoport/gothic/models/types"
 	"net/url"
 	"testing"
 	"time"
@@ -15,10 +16,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func getToken(t *testing.T, authURL string) string {
+func getToken(t *testing.T, authURL string) (string, types.Map) {
 	au, err := url.Parse(authURL)
 	require.NoError(t, err)
-	return au.Query().Get(key.State)
+	return au.Query().Get(key.State), types.Map{
+		key.Role: au.Query().Get(key.Role),
+	}
 }
 
 func TestGrantAuthURL(t *testing.T) {
@@ -52,9 +55,9 @@ func TestGrantAuthURL(t *testing.T) {
 	assert.NoError(t, err)
 	auth2, err := providers.GrantAuthURL(conn, mock.PName(), 60*time.Minute)
 	assert.NoError(t, err)
-	tok1 := getToken(t, auth1.URL)
+	tok1, _ := getToken(t, auth1.URL)
 	assert.Equal(t, auth1.Token.String(), tok1)
-	tok2 := getToken(t, auth2.URL)
+	tok2, _ := getToken(t, auth2.URL)
 	assert.Equal(t, auth2.Token.String(), tok2)
 	assert.NotEqual(t, tok1, tok2)
 }
@@ -66,31 +69,31 @@ func TestAuthorizeUser(t *testing.T) {
 	providers.UseProviders(mock)
 	authURL, err := providers.GrantAuthURL(conn, mock.PName(), 0)
 	require.NoError(t, err)
-	tok := getToken(t, authURL.URL)
-	_, err = providers.AuthorizeUser(conn, tok, nil)
+	tok, data := getToken(t, authURL.URL)
+	_, err = providers.AuthorizeUser(conn, tok, data)
 	require.NoError(t, err)
 	// cannot reuse token
-	_, err = providers.AuthorizeUser(conn, tok, nil)
+	_, err = providers.AuthorizeUser(conn, tok, data)
 	require.Error(t, err)
 	// empty token
-	_, err = providers.AuthorizeUser(conn, "", nil)
+	_, err = providers.AuthorizeUser(conn, "", data)
 	require.Error(t, err)
 	// bad token
-	_, err = providers.AuthorizeUser(conn, utils.SecureToken(), nil)
+	_, err = providers.AuthorizeUser(conn, utils.SecureToken(), data)
 	require.Error(t, err)
 	// bad provider
 	at, err := tokens.GrantAuthToken(conn, "bad", 0)
 	require.NoError(t, err)
-	_, err = providers.AuthorizeUser(conn, at.String(), nil)
+	_, err = providers.AuthorizeUser(conn, at.String(), data)
 	assert.Error(t, err)
 	// provider not found
 	at, err = tokens.GrantAuthToken(conn, provider.Google, 0)
 	require.NoError(t, err)
-	_, err = providers.AuthorizeUser(conn, at.String(), nil)
+	_, err = providers.AuthorizeUser(conn, at.String(), data)
 	assert.Error(t, err)
 	// invalid session
 	at, err = tokens.GrantAuthToken(conn, mock.PName(), 0)
 	require.NoError(t, err)
-	_, err = providers.AuthorizeUser(conn, at.String(), nil)
+	_, err = providers.AuthorizeUser(conn, at.String(), data)
 	assert.Error(t, err)
 }

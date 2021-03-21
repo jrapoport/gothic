@@ -74,6 +74,7 @@ func TestAuthServer_AuthorizeUser(t *testing.T) {
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		auth.RegisterServer,
 	}, false)
+	srv.Config().Signup.Default.Color = true
 	var callbackURL = web.URL + auth.Endpoint + auth.Callback
 	// state not found
 	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, callbackURL, nil)
@@ -81,6 +82,7 @@ func TestAuthServer_AuthorizeUser(t *testing.T) {
 	srv.Providers().UseProviders(mock)
 	urlReq := DoProviderURLRequest(t, web, mock.PName())
 	urlReq = strings.Replace(urlReq, web.URL, "", 1)
+	urlReq += "&test-value=expected"
 	res, err := thttp.DoRequest(t, web, http.MethodPost, urlReq, nil, nil)
 	assert.NoError(t, err)
 	tr, claims := tsrv.UnmarshalUserResponse(t, srv.Config().JWT, res)
