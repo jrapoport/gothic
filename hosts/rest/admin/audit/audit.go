@@ -8,8 +8,11 @@ import (
 	"github.com/jrapoport/gothic/store"
 )
 
-// Endpoint is the config endpoint
-const Endpoint = "/audit"
+// Audit endpoints
+const (
+	Audit  = "/audit"
+	Search = rest.Root
+)
 
 // Request is an audit log search request
 type Request struct {
@@ -53,7 +56,9 @@ func register(s *http.Server, srv *auditServer) {
 }
 
 func (s *auditServer) addRoutes(r *rest.Router) {
-	r.Get(Endpoint, s.SearchAuditLogs)
+	r.Route(Audit, func(rt *rest.Router) {
+		rt.Get(Search, s.SearchAuditLogs)
+	})
 }
 
 func (s *auditServer) SearchAuditLogs(w http.ResponseWriter, r *http.Request) {

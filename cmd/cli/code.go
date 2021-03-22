@@ -42,7 +42,7 @@ func codeRunE(_ *cobra.Command, args []string) error {
 		count = 1
 	}
 	c := rootConfig()
-	conn, err := clientConn(c.RPC)
+	conn, err := clientConn(c.Admin)
 	if err != nil {
 		return err
 	}

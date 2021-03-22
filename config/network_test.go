@@ -57,9 +57,7 @@ func TestNetwork_Defaults(t *testing.T) {
 }
 
 func TestNetwork_Normalization(t *testing.T) {
-	const (
-		host2 = "peaches"
-	)
+	const host2 = "peaches"
 	def := networkDefaults
 	t.Cleanup(func() {
 		networkDefaults = def

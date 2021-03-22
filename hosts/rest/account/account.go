@@ -11,8 +11,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest/account/signup"
 )
 
-// Endpoint is the account endpoint
-const Endpoint = "/account"
+// Account endpoint
+const Account = "/account"
 
 type accountServer struct {
 	*rest.Server
@@ -36,7 +36,7 @@ func register(s *http.Server, srv *accountServer) {
 }
 
 func (s *accountServer) addRoutes(r *rest.Router) {
-	r.RateLimit().Route(Endpoint, func(rt *rest.Router) {
+	r.RateLimit().Route(Account, func(rt *rest.Router) {
 		auth.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		confirm.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		login.RegisterServer(&http.Server{Handler: rt}, s.Clone())

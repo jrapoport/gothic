@@ -6,8 +6,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
-// Endpoint is the config endpoint
-const Endpoint = "/settings"
+// Settings is the config endpoint
+const Settings = "/settings"
 
 type settingsServer struct {
 	*rest.Server
@@ -31,7 +31,7 @@ func register(s *http.Server, srv *settingsServer) {
 }
 
 func (s *settingsServer) addRoutes(r *rest.Router) {
-	r.Get(Endpoint, s.Settings)
+	r.Get(Settings, s.Settings)
 }
 
 func (s *settingsServer) Settings(w http.ResponseWriter, r *http.Request) {

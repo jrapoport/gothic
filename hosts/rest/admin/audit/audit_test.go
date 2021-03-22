@@ -126,12 +126,12 @@ func (ts *AuditServerTestSuite) searchAuditLogs(ep string, v url.Values) *httpte
 
 func (ts *AuditServerTestSuite) TestErrors() {
 	// invalid req
-	r := thttp.Request(ts.T(), http.MethodGet, Endpoint, "", nil, []byte("\n"))
+	r := thttp.Request(ts.T(), http.MethodGet, Audit, "", nil, []byte("\n"))
 	w := httptest.NewRecorder()
 	ts.srv.SearchAuditLogs(w, r)
 	ts.NotEqual(http.StatusOK, w.Code)
 	// bad paging
-	r = thttp.Request(ts.T(), http.MethodGet, Endpoint, "", url.Values{
+	r = thttp.Request(ts.T(), http.MethodGet, Audit, "", url.Values{
 		key.Page: []string{"\n"},
 	}, nil)
 	w = httptest.NewRecorder()
@@ -140,7 +140,7 @@ func (ts *AuditServerTestSuite) TestErrors() {
 }
 
 func (ts *AuditServerTestSuite) TestPageHeaders() {
-	res := ts.searchAuditLogs(Endpoint, nil)
+	res := ts.searchAuditLogs(Audit, nil)
 	ts.Equal(http.StatusOK, res.Code)
 	var logs []interface{}
 	err := json.NewDecoder(res.Body).Decode(&logs)
@@ -171,7 +171,7 @@ func (ts *AuditServerTestSuite) TestPageHeaders() {
 func (ts *AuditServerTestSuite) TestPageLinks() {
 	startLink := func() string {
 		return fmt.Sprintf("%s?%s=1&%s=%d",
-			Endpoint, key.Page, key.PerPage, store.MaxPerPage)
+			Audit, key.Page, key.PerPage, store.MaxPerPage)
 	}
 	var nextLink = startLink()
 	for {
@@ -266,7 +266,7 @@ func (ts *AuditServerTestSuite) TestSearchFilters() {
 		},
 	}
 	for _, test := range tests {
-		res := ts.searchAuditLogs(Endpoint, test.v)
+		res := ts.searchAuditLogs(Audit, test.v)
 		ts.Equal(http.StatusOK, res.Code)
 		var logs []interface{}
 		err := json.NewDecoder(res.Body).Decode(&logs)
@@ -287,7 +287,7 @@ func (ts *AuditServerTestSuite) TestSearchSort() {
 		"sorted":   []string{"yes"},
 	}
 	var logs []interface{}
-	res := ts.searchAuditLogs(Endpoint, v)
+	res := ts.searchAuditLogs(Audit, v)
 	ts.Equal(http.StatusOK, res.Code)
 	err := json.NewDecoder(res.Body).Decode(&logs)
 	ts.NoError(err)
@@ -302,7 +302,7 @@ func (ts *AuditServerTestSuite) TestSearchSort() {
 	}
 	// search Descending
 	v[key.Sort] = []string{string(store.Descending)}
-	res = ts.searchAuditLogs(Endpoint, v)
+	res = ts.searchAuditLogs(Audit, v)
 	ts.Equal(http.StatusOK, res.Code)
 	err = json.NewDecoder(res.Body).Decode(&logs)
 	ts.NoError(err)

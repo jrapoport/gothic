@@ -35,13 +35,13 @@ func TestNewHealthHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.JSONEq(t, testResponse, checkHealth(t, h))
 	err = h.Shutdown()
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return !h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func checkHealth(t *testing.T, h core.Hosted) string {

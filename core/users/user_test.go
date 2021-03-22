@@ -22,7 +22,7 @@ func testUser(t *testing.T, conn *store.Connection, p provider.Name) *user.User 
 	email := tutils.RandomEmail()
 	username := utils.RandomUsername()
 	data := types.Map{
-		"helo":   "world",
+		"hello":  "world",
 		"foobar": 13.37,
 	}
 	meta := types.Map{

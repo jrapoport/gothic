@@ -12,6 +12,7 @@ import (
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
@@ -221,11 +222,14 @@ func (a *API) UpdateUser(ctx context.Context, userID uuid.UUID, username *string
 			err = fmt.Errorf("invalid user: %s", userID)
 			return err
 		}
-		err = users.Update(tx, u, username, data)
+		ok, err := users.Update(tx, u, username, data)
 		if err != nil {
 			return err
 		}
-		return audit.LogUserUpdated(ctx, tx, u.ID)
+		if ok {
+			err = audit.LogUserUpdated(ctx, tx, u.ID)
+		}
+		return err
 	})
 	if err != nil {
 		return nil, a.logError(err)
@@ -340,4 +344,48 @@ func (a *API) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	}
 	a.log.Debugf("deleted user: %s", userID)
 	return nil
+}
+
+func (a *API) LinkAccount(ctx context.Context, userID uuid.UUID, link *account.Account) error {
+	err := a.linkAccount(ctx, a.conn, userID, link)
+	if err != nil {
+		return a.logError(err)
+	}
+	return nil
+}
+
+func (a *API) linkAccount(ctx context.Context, conn *store.Connection, userID uuid.UUID, link *account.Account) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if userID == uuid.Nil {
+		return errors.New("user id required")
+	}
+	if link == nil {
+		return errors.New("account required")
+	}
+	if link.Data == nil {
+		link.Data = types.Map{}
+	}
+	ip := ctx.GetIPAddress()
+	link.Data[key.IPAddress] = ip
+	return conn.Transaction(func(tx *store.Connection) (err error) {
+		err = users.LinkAccount(tx, userID, link)
+		if err != nil {
+			return err
+		}
+		return audit.LogLinked(ctx, tx, userID, link)
+	})
+}
+
+func (a *API) GetLinkedAccounts(_ context.Context,
+	userID uuid.UUID, t account.Type, f store.Filters) ([]*account.Account, error) {
+	if userID == uuid.Nil {
+		return nil, errors.New("user id required")
+	}
+	linked, err := users.GetLinkedAccounts(a.conn, userID, t, f)
+	if err != nil {
+		return nil, a.logError(err)
+	}
+	return linked, nil
 }

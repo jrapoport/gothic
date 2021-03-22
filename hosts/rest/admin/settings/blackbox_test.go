@@ -28,11 +28,11 @@ func TestSettingsServer_Settings(t *testing.T) {
 	j := srv.Config().JWT
 	// not admin
 	tok := thttp.UserToken(t, j, false, false)
-	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Endpoint, tok, nil, nil)
+	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Settings, tok, nil, nil)
 	assert.NoError(t, err)
 	// admin
 	tok = thttp.UserToken(t, j, false, true)
-	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Endpoint, tok, nil, nil)
+	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings.Settings, tok, nil, nil)
 	assert.NoError(t, err)
 	assert.JSONEq(t, testResponse(t, srv), res)
 }

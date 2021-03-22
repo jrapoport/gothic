@@ -13,8 +13,6 @@ import (
 const (
 	// Endpoint for the email changes.
 	Endpoint = "/email"
-	// Root unmasks an email.
-	Root = "/"
 	// Change is the email change endpoint.
 	Change = "/change"
 	// Confirm an email change.
@@ -51,8 +49,8 @@ func register(s *http.Server, srv *emailServer) {
 func (s *emailServer) addRoutes(r *rest.Router) {
 	r.Route(Endpoint, func(rt *rest.Router) {
 		rt.Post(Confirm, s.ConfirmChangeEmail)
-		rt.Authenticated().Confirmed().Route(Root, func(cr *rest.Router) {
-			cr.Post(Root, s.UnMaskEmail)
+		rt.Authenticated().Confirmed().Route(rest.Root, func(cr *rest.Router) {
+			cr.Post(rest.Root, s.UnMaskEmail)
 			cr.Post(Change, s.SendChangeEmail)
 		})
 	})

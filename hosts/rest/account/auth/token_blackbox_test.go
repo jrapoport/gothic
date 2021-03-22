@@ -28,15 +28,15 @@ func TestAuthServer_RefreshBearerToken(t *testing.T) {
 	bt, err := srv.GrantBearerToken(context.Background(), u)
 	require.NoError(t, err)
 	// bad request
-	_, err = thttp.DoRequest(t, web, http.MethodPost, auth.Endpoint, nil, []byte("\n"))
+	_, err = thttp.DoRequest(t, web, http.MethodPost, auth.Auth, nil, []byte("\n"))
 	assert.Error(t, err)
 	// no token
 	v := url.Values{}
-	res, err := thttp.DoRequest(t, web, http.MethodPost, auth.Endpoint, v, nil)
+	res, err := thttp.DoRequest(t, web, http.MethodPost, auth.Auth, v, nil)
 	assert.Error(t, err)
 	// token
 	v[key.Token] = []string{bt.RefreshToken.Token}
-	res, err = thttp.DoRequest(t, web, http.MethodPost, auth.Endpoint, v, nil)
+	res, err = thttp.DoRequest(t, web, http.MethodPost, auth.Auth, v, nil)
 	assert.NoError(t, err)
 	tr, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, tr.Type)
@@ -48,7 +48,7 @@ func TestAuthServer_RefreshBearerToken(t *testing.T) {
 	au, err := srv.GetAuthenticatedUser(u2.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, u.ID, au.ID)
-	res, err = thttp.DoRequest(t, web, http.MethodPost, auth.Endpoint, v, nil)
+	res, err = thttp.DoRequest(t, web, http.MethodPost, auth.Auth, v, nil)
 	assert.NoError(t, err)
 	assert.Empty(t, res)
 }

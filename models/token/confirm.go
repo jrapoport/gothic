@@ -24,28 +24,28 @@ var _ Token = (*ConfirmToken)(nil)
 
 // NewConfirmToken generates a new token. The type is inferred from uses.
 func NewConfirmToken(userID uuid.UUID, exp time.Duration) *ConfirmToken {
-	t := *NewAccessToken(utils.SecureToken(), SingleUse, exp)
-	t.UserID = userID
-	return &ConfirmToken{AccessToken: t}
+	at := *NewAccessToken(utils.SecureToken(), SingleUse, exp)
+	at.UserID = userID
+	return &ConfirmToken{AccessToken: at}
 }
 
 // Class returns the class of the confirmation token.
-func (t ConfirmToken) Class() Class {
+func (ct ConfirmToken) Class() Class {
 	return Confirm
 }
 
 // Usable returns true if the token is usable.
-func (t ConfirmToken) Usable() bool {
-	if t.CreatedAt.IsZero() {
+func (ct ConfirmToken) Usable() bool {
+	if ct.CreatedAt.IsZero() {
 		return false
 	}
-	return t.AccessToken.Usable()
+	return ct.AccessToken.Usable()
 }
 
 // HasToken returns true if the refresh token is found.
-func (t ConfirmToken) HasToken(tx *store.Connection) (bool, error) {
-	if t.Token == "" {
+func (ct ConfirmToken) HasToken(tx *store.Connection) (bool, error) {
+	if ct.Token == "" {
 		return false, errors.New("invalid token")
 	}
-	return tx.Has(&t, "token = ?", t.Token)
+	return tx.Has(&ct, "token = ?", ct.Token)
 }

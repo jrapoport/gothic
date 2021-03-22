@@ -6,10 +6,9 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
+// Login endpoints
 const (
-	// Endpoint is the login endpoint
-	Endpoint = "/login"
-	// Logout is the logout endpoint
+	Login  = "/login"
 	Logout = "/logout"
 )
 
@@ -40,7 +39,7 @@ func register(s *http.Server, srv *loginServer) {
 }
 
 func (s *loginServer) addRoutes(r *rest.Router) {
-	r.Post(Endpoint, s.Login)
+	r.Post(Login, s.Login)
 	r.Authenticated().Get(Logout, s.Logout)
 }
 

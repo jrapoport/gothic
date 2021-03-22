@@ -25,6 +25,7 @@ func TestAuthToken_HasToken(t *testing.T) {
 		tk := NewAuthToken(provider.Google, 0)
 		err := conn.Create(tk).Error
 		require.NoError(t, err)
+		assert.True(t, tk.Usable())
 		return tk
 	}
 	deletedToken := createToken()

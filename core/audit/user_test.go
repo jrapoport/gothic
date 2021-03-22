@@ -5,9 +5,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
 )
@@ -61,5 +63,22 @@ func TestLogChangeRole(t *testing.T) {
 		},
 		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, _ types.Map) error {
 			return LogChangeRole(ctx, conn, uid, r)
+		})
+}
+
+func TestLogLinked(t *testing.T) {
+	t.Parallel()
+	aid := uuid.New().String()
+	la := account.NewAccount(provider.Google, aid, "", types.Map{
+		key.IPAddress: testIPAddress,
+	})
+	fields := types.Map{
+		key.Provider:  provider.Google,
+		key.AccountID: la.AccountID,
+		key.Type:      la.Type.String(),
+	}
+	testLogEntry(t, auditlog.Linked, uuid.New(), fields,
+		func(ctx context.Context, conn *store.Connection, uid uuid.UUID, fields types.Map) error {
+			return LogLinked(ctx, conn, uid, la)
 		})
 }

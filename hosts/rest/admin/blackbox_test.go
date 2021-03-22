@@ -38,20 +38,20 @@ func testResponse(t *testing.T, s *rest.Host) string {
 
 func TestAdminServer_Config(t *testing.T) {
 	t.Parallel()
-	const settings = admin.Endpoint + settings.Endpoint
+	const ep = admin.Endpoint + settings.Settings
 	s, web, _ := testServer(t)
 	j := s.Config().JWT
 	// bad token
 	bad := thttp.BadToken(t, j)
-	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings, bad, nil, nil)
+	_, err := thttp.DoAuthRequest(t, web, http.MethodGet, ep, bad, nil, nil)
 	assert.Error(t, err)
 	// not admin
 	tok := thttp.UserToken(t, j, false, false)
-	_, err = thttp.DoAuthRequest(t, web, http.MethodGet, settings, tok, nil, nil)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodGet, ep, tok, nil, nil)
 	assert.Error(t, err)
 	// admin
 	tok = thttp.UserToken(t, j, false, true)
-	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, settings, tok, nil, nil)
+	res, err := thttp.DoAuthRequest(t, web, http.MethodGet, ep, tok, nil, nil)
 	assert.NoError(t, err)
 	assert.JSONEq(t, testResponse(t, s), res)
 }

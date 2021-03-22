@@ -13,8 +13,6 @@ import (
 const (
 	// Endpoint is the user endpoint.
 	Endpoint = "/user"
-	// Root gets or updates a user.
-	Root = "/"
 	// Password changes a user password.
 	Password = "/password"
 )
@@ -49,8 +47,8 @@ func register(s *http.Server, srv *userServer) {
 
 func (s *userServer) addRoutes(r *rest.Router) {
 	r.Authenticated().Confirmed().Route(Endpoint, func(rt *rest.Router) {
-		rt.Get(Root, s.GetUser)
-		rt.Put(Root, s.UpdateUser)
+		rt.Get(rest.Root, s.GetUser)
+		rt.Put(rest.Root, s.UpdateUser)
 		rt.Put(Password, s.ChangePassword)
 		confirm.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		email.RegisterServer(&http.Server{Handler: rt}, s.Clone())

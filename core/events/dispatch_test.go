@@ -110,7 +110,7 @@ func testListen(t *testing.T, lis func(d *Dispatch, evt Event, cb Callback)) {
 				mu.RLock()
 				defer mu.RUnlock()
 				return recv == expect
-			}, time.Second, 10*time.Millisecond)
+			}, 1*time.Second, 10*time.Millisecond)
 			if test.fire {
 				assert.NotNil(t, m)
 				assert.Equal(t, em, m[key.Email])
@@ -135,7 +135,7 @@ func TestDispatch_Dispatch(t *testing.T) {
 			_, ok = <-ch
 		}()
 		return ok
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	var m types.Map
 	var mu sync.RWMutex
 	d.AddListener(Login, func(evt Event, msg types.Map) {
@@ -148,7 +148,7 @@ func TestDispatch_Dispatch(t *testing.T) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return m != nil
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.Equal(t, Login, m[key.Event].(Event))
 }
 

@@ -11,8 +11,8 @@ import (
 // Name is the name of the health host.
 const Name = "health"
 
-// Endpoint is the endpoint for the health host.
-const Endpoint = "/*"
+// Check is a wildcard healthcheck endpoint.
+const Check = "/*"
 
 // Health check response
 type Health struct {
@@ -70,6 +70,6 @@ func registerServer(s *http.Server, srv *rest.Server, hosted map[string]core.Hos
 		srv.Response(w, res)
 	}
 	if r, ok := s.Handler.(*rest.Router); ok {
-		r.Get(Endpoint, handler)
+		r.Get(Check, handler)
 	}
 }

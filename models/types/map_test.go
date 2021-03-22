@@ -77,6 +77,19 @@ func TestData(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestMap_Copy(t *testing.T) {
+	test := Map{
+		"age":  18,
+		"name": "data-1",
+		"orgs": Map{"orga": "orga"},
+		"tags": []string{"tag1", "tag2"},
+	}
+	m := test.Copy()
+	assert.Equal(t, test, m)
+	m["age"] = 19
+	assert.NotEqual(t, test, m)
+}
+
 func TestMap_Scan(t *testing.T) {
 	m := Map{}
 	i := 0

@@ -7,8 +7,8 @@ import (
 	"github.com/jrapoport/gothic/models/types"
 )
 
-// Endpoint is the signup endpoint.
-const Endpoint = "/signup"
+// Signup endpoint
+const Signup = "/signup"
 
 // Request is an signup server request
 type Request struct {
@@ -39,7 +39,7 @@ func register(s *http.Server, srv *signupServer) {
 }
 
 func (s *signupServer) addRoutes(r *rest.Router) {
-	r.Post(Endpoint, s.Signup)
+	r.Post(Signup, s.Signup)
 }
 
 func (s *signupServer) Signup(w http.ResponseWriter, r *http.Request) {

@@ -25,6 +25,7 @@ type Network struct {
 	// RPCWeb is the address for the gRPC-Web server.
 	// default: [Host]:7729
 	RPCWeb string `json:"rpcweb" mapstructure:"rpcweb"`
+
 	// TODO: use RequestID
 	// RequestID is the request id to use
 	RequestID string `json:"request_id" yaml:"request_id" mapstructure:"request_id"`
@@ -43,14 +44,20 @@ func (n *Network) normalize(Service) (err error) {
 		}
 		return net.JoinHostPort(host, p), nil
 	}
-	if n.REST == dc.REST {
-		n.REST, err = updateHost(n.REST, n.Host)
+	if n.RPC == dc.RPC {
+		n.RPC, err = updateHost(n.RPC, n.Host)
 		if err != nil {
 			return
 		}
 	}
-	if n.RPC == dc.RPC {
-		n.RPC, err = updateHost(n.RPC, n.Host)
+	if n.Admin == dc.Admin {
+		n.Admin, err = updateHost(n.Admin, n.Host)
+		if err != nil {
+			return
+		}
+	}
+	if n.REST == dc.REST {
+		n.REST, err = updateHost(n.REST, n.Host)
 		if err != nil {
 			return
 		}

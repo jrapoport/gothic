@@ -10,10 +10,7 @@ import (
 // SearchUsers search the audit log entries.
 func SearchUsers(conn *store.Connection, s store.Sort, f store.Filters, p *store.Pagination) ([]*user.User, error) {
 	tx := conn.Model(new(user.User))
-	filters := make(store.Filters, len(f))
-	for k, v := range f {
-		filters[k] = v
-	}
+	filters := f.Copy()
 	if v, ok := filters[key.UserID]; ok {
 		filters[key.ID] = v
 		delete(filters, key.UserID)
@@ -40,8 +37,8 @@ func SearchUsers(conn *store.Connection, s store.Sort, f store.Filters, p *store
 		},
 	}
 	var users []*user.User
-	var notSuperAdmins = `id <> "` + user.SuperAdminID.String() + `"`
-	err := store.Search(tx, &users, s, flt, p, notSuperAdmins)
+	tx = tx.Where(key.ID+" <> ?", user.SuperAdminID.String())
+	err := store.Search(tx, &users, s, flt, p)
 	if err != nil {
 		return nil, err
 	}
