@@ -80,91 +80,88 @@ func NewAccessToken(token string, uses int, exp time.Duration) *AccessToken {
 var _ Token = (*AccessToken)(nil)
 
 // BeforeCreate runs after create
-func (t AccessToken) BeforeCreate(_ *gorm.DB) (err error) {
-	if t.Token == "" {
+func (at AccessToken) BeforeCreate(_ *gorm.DB) (err error) {
+	if at.Token == "" {
 		return errors.New("invalid token")
 	}
 	return nil
 }
 
 // AfterCreate runs after create
-func (t AccessToken) AfterCreate(tx *gorm.DB) (err error) {
-	if t.Expiration <= NoExpiration {
+func (at AccessToken) AfterCreate(tx *gorm.DB) (err error) {
+	if at.Expiration <= NoExpiration {
 		return nil
 	}
-	exp := t.CreatedAt.Add(t.Expiration)
+	exp := at.CreatedAt.Add(at.Expiration)
 	m := tx.Statement.Model
 	return tx.Model(m).Update("expired_at", exp).Error
 }
 
 // Class returns the class of the access token.
-func (t AccessToken) Class() Class {
+func (at AccessToken) Class() Class {
 	return Access
 }
 
 // Usage returns usage for the token.
-func (t AccessToken) Usage() Usage {
-	return t.Type
+func (at AccessToken) Usage() Usage {
+	return at.Type
 }
 
 // IssuedTo returns the owner of the token.
-func (t AccessToken) IssuedTo() uuid.UUID {
-	return t.UserID
+func (at AccessToken) IssuedTo() uuid.UUID {
+	return at.UserID
 }
 
 // Issued returns the time the token was issued.
-func (t AccessToken) Issued() time.Time {
-	return t.CreatedAt
+func (at AccessToken) Issued() time.Time {
+	return at.CreatedAt
 }
 
 // LastUsed returns the last time the token was used.
-func (t AccessToken) LastUsed() time.Time {
-	if t.UsedAt == nil {
+func (at AccessToken) LastUsed() time.Time {
+	if at.UsedAt == nil {
 		return time.Time{}
 	}
-	return *t.UsedAt
+	return *at.UsedAt
 }
 
 // ExpirationDate returns the expiration date (if set).
-func (t AccessToken) ExpirationDate() time.Time {
-	if t.ExpiredAt == nil {
+func (at AccessToken) ExpirationDate() time.Time {
+	if at.ExpiredAt == nil {
 		return time.Time{}
 	}
-	return *t.ExpiredAt
+	return *at.ExpiredAt
 }
 
 // Revoked returns the time token was revoked (if set).
-func (t AccessToken) Revoked() time.Time {
-	return t.DeletedAt.Time
+func (at AccessToken) Revoked() time.Time {
+	return at.DeletedAt.Time
 }
 
 // Usable returns true if the token is usable.
-func (t AccessToken) Usable() bool {
-	if t.Class() == "" {
+func (at AccessToken) Usable() bool {
+	if at.Token == "" {
 		return false
 	}
-	if t.Token == "" {
+	if at.DeletedAt.Valid {
 		return false
 	}
-	if t.DeletedAt.Valid {
+	if at.ExpiredAt != nil && at.ExpiredAt.Before(time.Now().UTC()) {
 		return false
 	}
-	if t.ExpiredAt != nil && t.ExpiredAt.Before(time.Now().UTC()) {
-		return false
-	}
-	if t.Type == Infinite || t.MaxUses == InfiniteUse {
+	if at.Type == Infinite || at.MaxUses == InfiniteUse {
 		return true
 	}
-	return t.Used < t.MaxUses
+	return at.Used < at.MaxUses
 }
 
 // Use use the token.
-func (t *AccessToken) Use() {
+func (at *AccessToken) Use() {
 	now := time.Now().UTC()
-	t.Used++
-	t.UsedAt = &now
+	at.Used++
+	at.UsedAt = &now
 }
 
-func (t AccessToken) String() string {
-	return t.Token
+func (at AccessToken) String() string {
+	return at.Token
 }

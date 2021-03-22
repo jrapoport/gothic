@@ -153,12 +153,12 @@ func (ts *UserServerTestSuite) searchUsers(ep string, v url.Values) *httptest.Re
 
 func (ts *UserServerTestSuite) TestErrors() {
 	// invalid req
-	r := thttp.Request(ts.T(), http.MethodGet, Endpoint, "", nil, []byte("\n"))
+	r := thttp.Request(ts.T(), http.MethodGet, Users, "", nil, []byte("\n"))
 	w := httptest.NewRecorder()
 	ts.srv.SearchUsers(w, r)
 	ts.NotEqual(http.StatusOK, w.Code)
 	// bad paging
-	r = thttp.Request(ts.T(), http.MethodGet, Endpoint, "", url.Values{
+	r = thttp.Request(ts.T(), http.MethodGet, Users, "", url.Values{
 		key.Page: []string{"\n"},
 	}, nil)
 	w = httptest.NewRecorder()
@@ -167,7 +167,7 @@ func (ts *UserServerTestSuite) TestErrors() {
 }
 
 func (ts *UserServerTestSuite) TestPageHeaders() {
-	res := ts.searchUsers(Endpoint, nil)
+	res := ts.searchUsers(Users, nil)
 	ts.Equal(http.StatusOK, res.Code)
 	var list []interface{}
 	err := json.NewDecoder(res.Body).Decode(&list)
@@ -198,7 +198,7 @@ func (ts *UserServerTestSuite) TestPageHeaders() {
 func (ts *UserServerTestSuite) TestPageLinks() {
 	startLink := func() string {
 		return fmt.Sprintf("%s?%s=1&%s=%d",
-			Endpoint, key.Page, key.PerPage, store.MaxPerPage)
+			Users, key.Page, key.PerPage, store.MaxPerPage)
 	}
 	var nextLink = startLink()
 	for {
@@ -329,7 +329,7 @@ func (ts *UserServerTestSuite) TestSearchFilters() {
 		},
 	}
 	for _, test := range tests {
-		res := ts.searchUsers(Endpoint, test.v)
+		res := ts.searchUsers(Users, test.v)
 		ts.Equal(http.StatusOK, res.Code)
 		var list []interface{}
 		err := json.NewDecoder(res.Body).Decode(&list)
@@ -350,7 +350,7 @@ func (ts *UserServerTestSuite) TestSearchSort() {
 		"sorted":   []string{"yes"},
 	}
 	var list []interface{}
-	res := ts.searchUsers(Endpoint, v)
+	res := ts.searchUsers(Users, v)
 	ts.Equal(http.StatusOK, res.Code)
 	err := json.NewDecoder(res.Body).Decode(&list)
 	ts.NoError(err)
@@ -365,7 +365,7 @@ func (ts *UserServerTestSuite) TestSearchSort() {
 	}
 	// search Descending
 	v[key.Sort] = []string{string(store.Descending)}
-	res = ts.searchUsers(Endpoint, v)
+	res = ts.searchUsers(Users, v)
 	ts.Equal(http.StatusOK, res.Code)
 	err = json.NewDecoder(res.Body).Decode(&list)
 	ts.NoError(err)

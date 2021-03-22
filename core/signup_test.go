@@ -499,7 +499,7 @@ func testSignupEvent(t *testing.T, a *API, lis events.Event, l listenerTestFunc)
 		mu.RLock()
 		defer mu.RUnlock()
 		return data != nil
-	}, 100*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.Equal(t, events.Signup, data[key.Event].(events.Event))
 	assert.Equal(t, testIP, data[key.IPAddress].(string))
 	assert.Equal(t, p, data[key.Provider].(provider.Name))

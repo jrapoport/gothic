@@ -1,6 +1,8 @@
 package code
 
 import (
+	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/utils"
 	"testing"
 
 	"github.com/jrapoport/gothic/models/user"
@@ -10,6 +12,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func testUser(c *config.Config) *user.User {
+	p := c.Provider()
+	em := tutils.RandomEmail()
+	r := user.RoleUser
+	return user.NewUser(p, r, em, "", []byte(""), nil, nil)
+}
 
 func TestSignupCode_HasCode(t *testing.T) {
 	t.Parallel()
@@ -58,22 +67,28 @@ func TestSignupCode_UseCode(t *testing.T) {
 			testSignupCodeUseCode(t, f)
 		})
 	}
+	conn, c := tconn.TempConn(t)
+	sc := NewSignupCode(user.SystemID, PIN, SingleUse)
+	assert.Equal(t, Signup, sc.Class())
+	sc.Token = utils.DebugPIN
+	u := testUser(c)
+	err := conn.Create(u).Error
+	assert.NoError(t, err)
+	err = sc.UseCode(conn, u)
+	assert.NoError(t, err)
+	// reusing a single use code would normally fail
+	err = sc.UseCode(conn, u)
+	assert.NoError(t, err)
 }
 
 func testSignupCodeUseCode(t *testing.T, f Format) {
 	conn, c := tconn.TempConn(t)
-	testUser := func() *user.User {
-		p := c.Provider()
-		em := tutils.RandomEmail()
-		r := user.RoleUser
-		return user.NewUser(p, r, em, "", []byte(""), nil, nil)
-	}
 	su := user.NewSystemUser()
-	iu := testUser()
-	vu := testUser()
+	iu := testUser(c)
+	vu := testUser(c)
 	err := conn.Create(vu).Error
 	assert.NoError(t, err)
-	du := testUser()
+	du := testUser(c)
 	err = conn.Create(du).Error
 	assert.NoError(t, err)
 	err = conn.Delete(du).Error

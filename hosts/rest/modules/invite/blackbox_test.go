@@ -54,7 +54,7 @@ func TestInviteServer_SendInviteUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return inviteTok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	data, err := jwt.ParseData(srv.Config().JWT, inviteTok)
 	assert.NoError(t, err)
 	assert.Equal(t, req.Email, data.Get(key.Email))

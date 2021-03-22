@@ -23,7 +23,7 @@ import (
 const testURL = "http://example.com/auth?client_id=&response_type=code&state="
 
 func providerPath(p provider.Name) string {
-	return auth.Endpoint + "/" + p.String()
+	return auth.Auth + "/" + p.String()
 }
 
 func getToken(t *testing.T, authURL string) string {
@@ -50,7 +50,7 @@ func TestAuthServer_GetAuthorizationURL(t *testing.T) {
 	_, mock := tconf.MockedProvider(t, srv.Config(), "")
 	srv.Providers().UseProviders(mock)
 	// empty provider
-	_, err := thttp.DoRequest(t, web, http.MethodGet, auth.Endpoint, nil, nil)
+	_, err := thttp.DoRequest(t, web, http.MethodGet, auth.Auth, nil, nil)
 	assert.Error(t, err)
 	// bad provider
 	_, err = thttp.DoRequest(t, web, http.MethodGet, providerPath("bad"), nil, nil)
@@ -59,11 +59,12 @@ func TestAuthServer_GetAuthorizationURL(t *testing.T) {
 	_, err = thttp.DoRequest(t, web, http.MethodGet, providerPath(provider.Google), nil, nil)
 	assert.Error(t, err)
 	// valid provider
-	assert.HTTPRedirect(t, web.Config.Handler.ServeHTTP, http.MethodGet, providerPath(mock.PName()), nil)
-	urlReq1 := DoProviderURLRequest(t, web, mock.PName())
+	p := provider.Name(mock.Name())
+	assert.HTTPRedirect(t, web.Config.Handler.ServeHTTP, http.MethodGet, providerPath(p), nil)
+	urlReq1 := DoProviderURLRequest(t, web, p)
 	assert.True(t, strings.HasPrefix(urlReq1, testURL))
 	tok1 := getToken(t, urlReq1)
-	urlReq2 := DoProviderURLRequest(t, web, mock.PName())
+	urlReq2 := DoProviderURLRequest(t, web, p)
 	assert.True(t, strings.HasPrefix(urlReq2, testURL))
 	tok2 := getToken(t, urlReq2)
 	assert.NotEqual(t, tok1, tok2)
@@ -75,12 +76,12 @@ func TestAuthServer_AuthorizeUser(t *testing.T) {
 		auth.RegisterServer,
 	}, false)
 	srv.Config().Signup.Default.Color = true
-	var callbackURL = web.URL + auth.Endpoint + auth.Callback
+	var callbackURL = web.URL + auth.Auth + auth.Callback
 	// state not found
 	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, callbackURL, nil)
 	_, mock := tconf.MockedProvider(t, srv.Config(), callbackURL)
 	srv.Providers().UseProviders(mock)
-	urlReq := DoProviderURLRequest(t, web, mock.PName())
+	urlReq := DoProviderURLRequest(t, web, provider.Name(mock.Name()))
 	urlReq = strings.Replace(urlReq, web.URL, "", 1)
 	urlReq += "&test-value=expected"
 	res, err := thttp.DoRequest(t, web, http.MethodPost, urlReq, nil, nil)

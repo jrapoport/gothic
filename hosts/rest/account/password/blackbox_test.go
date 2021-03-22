@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	resetEndpoint   = password.Endpoint + password.Reset
-	confirmEndpoint = password.Endpoint + password.Confirm
+	resetEndpoint   = password.Password + password.Reset
+	confirmEndpoint = password.Password + password.Confirm
 )
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
@@ -87,7 +87,7 @@ func TestPasswordServer_SendResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
@@ -110,13 +110,13 @@ func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
 				return sent != ""
-			}, 200*time.Millisecond, 10*time.Millisecond)
+			}, 1*time.Second, 10*time.Millisecond)
 		} else {
 			msg := thttp.FmtError(http.StatusTooEarly).Error()
 			assert.EqualError(t, err, msg)
 			assert.Never(t, func() bool {
 				return sent != ""
-			}, 200*time.Millisecond, 10*time.Millisecond)
+			}, 1*time.Second, 10*time.Millisecond)
 		}
 	}
 }
@@ -153,7 +153,7 @@ func TestPasswordServer_ConfirmResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// now use the token to change the password
 	req = &password.Request{
 		Password: newPass,

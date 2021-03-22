@@ -33,7 +33,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	srv.Config().MaskEmails = false
-	req := &GetUserRequest{}
+	req := &UserRequest{}
 	ctx := context.Background()
 	// no id
 	_, err := srv.GetUser(ctx, req)
@@ -127,7 +127,7 @@ func TestUserServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	_, err = srv.SendConfirmUser(ctx, &emptypb.Empty{})
 	assert.Error(t, err)
@@ -146,7 +146,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 	u, tok := tcore.TestUser(t, srv.API, "", false)
 	ctx := tsrv.RPCAuthContext(t, srv.Config(), tok)
 	req := &ChangePasswordRequest{
-		Password: newPassword,
+		NewPassword: newPassword,
 	}
 	// invalid password
 	srv.Config().Validation.PasswordRegex = "0"
@@ -157,7 +157,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 	_, err = srv.ChangePassword(ctx, req)
 	assert.Error(t, err)
 	// success
-	req.OldPassword = testPass
+	req.Password = testPass
 	res, err := srv.ChangePassword(ctx, req)
 	assert.NoError(t, err)
 	claims, err := jwt.ParseUserClaims(srv.Config().JWT, res.Access)
@@ -174,7 +174,7 @@ func TestRequestErrors(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
-	_, err := srv.GetUser(ctx, &GetUserRequest{})
+	_, err := srv.GetUser(ctx, &UserRequest{})
 	assert.Error(t, err)
 	_, err = srv.UpdateUser(ctx, &UpdateUserRequest{})
 	assert.Error(t, err)
@@ -183,7 +183,7 @@ func TestRequestErrors(t *testing.T) {
 	claims := jwt.UserClaims{}
 	claims.Subject = uuid.New().String()
 	ctx = context.WithContext(rpc.WithClaims(ctx, claims))
-	_, err = srv.GetUser(ctx, &GetUserRequest{})
+	_, err = srv.GetUser(ctx, &UserRequest{})
 	assert.Error(t, err)
 	_, err = srv.UpdateUser(ctx, &UpdateUserRequest{})
 	assert.Error(t, err)

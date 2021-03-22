@@ -96,7 +96,7 @@ func testSearchModels(t *testing.T, conn *Connection) []testCase {
 	return cases
 }
 
-func doSearch(t *testing.T, conn *Connection, s Sort, f Filters, p *Pagination, raw ...string) []*SearchModel {
+func doSearch(t *testing.T, conn *Connection, s Sort, f Filters, p *Pagination) []*SearchModel {
 	tx := conn.Model(new(SearchModel))
 	flt := Filter{
 		Filters:   f,
@@ -107,7 +107,7 @@ func doSearch(t *testing.T, conn *Connection, s Sort, f Filters, p *Pagination, 
 		},
 	}
 	var models []*SearchModel
-	err := Search(tx, &models, s, flt, p, raw...)
+	err := Search(tx, &models, s, flt, p)
 	require.NoError(t, err)
 	return models
 }
@@ -236,11 +236,6 @@ func TestSearch(t *testing.T) {
 		"book":         "thing2",
 	}, page)
 	assert.Len(t, list, 4)
-	list = doSearch(t, conn, Descending, Filters{
-		"book":  tc.data["book"],
-		"extra": tc.data["extra"],
-	}, page, "JSON_EXTRACT(`data`, '$.pepper') = \"spicy\"")
-	assert.Len(t, list, 1)
 }
 
 func filterTest(t *testing.T, conn *Connection, f string, tests []testCase) {

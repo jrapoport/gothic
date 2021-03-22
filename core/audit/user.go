@@ -3,6 +3,7 @@ package audit
 import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/auditlog"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
@@ -45,5 +46,16 @@ func LogChangeRole(ctx context.Context, conn *store.Connection, userID uuid.UUID
 	_, err := CreateLogEntry(ctx, conn, auditlog.ChangeRole, userID, types.Map{
 		key.Role: r.String(),
 	})
+	return err
+}
+
+// LogLinked logs a linked account.
+func LogLinked(ctx context.Context, conn *store.Connection, userID uuid.UUID, la *account.Account) error {
+	data := types.Map{
+		key.Type:      la.Type.String(),
+		key.Provider:  la.Provider,
+		key.AccountID: la.AccountID,
+	}
+	_, err := CreateLogEntry(ctx, conn, auditlog.Linked, userID, data)
 	return err
 }

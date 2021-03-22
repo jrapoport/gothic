@@ -37,7 +37,7 @@ func TestRPCWebHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// create a test user
 	c.Signup.AutoConfirm = true
 	c.Security.MaskEmails = false
@@ -55,11 +55,11 @@ func TestRPCWebHost(t *testing.T) {
 	require.NotEmpty(t, ur.Token)
 	// authenticated call (error)
 	uc := userClient(t, h)
-	_, err = uc.GetUser(ctx, &user.GetUserRequest{})
+	_, err = uc.GetUser(ctx, &user.UserRequest{})
 	assert.Error(t, err)
 	// authenticated call (success)
 	ctx = tsrv.RPCAuthContext(t, c, ur.Token.Access)
-	res, err := uc.GetUser(ctx, &user.GetUserRequest{})
+	res, err := uc.GetUser(ctx, &user.UserRequest{})
 	assert.NoError(t, err)
 	assert.Equal(t, test.Email, res.Email)
 	// shut down
@@ -67,5 +67,5 @@ func TestRPCWebHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return !h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }

@@ -48,7 +48,7 @@ func TestUsersServer_AdminCreateUser(t *testing.T) {
 	srv := newUserServer(s)
 	v, test := createUserTest(t)
 	createUser := func(tok string) *httptest.ResponseRecorder {
-		r := thttp.Request(t, http.MethodPost, Endpoint, tok, v, nil)
+		r := thttp.Request(t, http.MethodPost, Users, tok, v, nil)
 		if tok != "" {
 			var err error
 			r, err = rest.ParseClaims(r, srv.Config().JWT, tok)
@@ -68,14 +68,14 @@ func TestUsersServer_AdminCreateUser(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.Code)
 	ur := userResponse(t, res.Body.String())
 	assert.Equal(t, test, ur)
-	r := thttp.Request(t, http.MethodPost, Endpoint, tok, nil, nil)
+	r := thttp.Request(t, http.MethodPost, Users, tok, nil, nil)
 	r, err := rest.ParseClaims(r, srv.Config().JWT, tok)
 	require.NoError(t, err)
 	w := httptest.NewRecorder()
 	srv.AdminCreateUser(w, r)
 	assert.NotEqual(t, http.StatusOK, w.Code)
 	// invalid req
-	r = thttp.Request(t, http.MethodPost, Endpoint, tok, nil, []byte("\n"))
+	r = thttp.Request(t, http.MethodPost, Users, tok, nil, []byte("\n"))
 	r, err = rest.ParseClaims(r, srv.Config().JWT, tok)
 	require.NoError(t, err)
 	w = httptest.NewRecorder()

@@ -1,6 +1,7 @@
 package code
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jrapoport/gothic/models/token"
@@ -11,11 +12,9 @@ import (
 // Format is the format of the signup code.
 type Format uint8
 
+// Access Code formats
 const (
-
-	// Invite is a invite code style signup code.
 	Invite Format = iota
-	// PIN is a pin code style signup code.
 	PIN
 )
 
@@ -50,9 +49,6 @@ func NewAccessCode(f Format, uses int, exp time.Duration) *AccessCode {
 	default:
 		return nil
 	}
-	if c == "" {
-		return nil
-	}
 	t := *token.NewAccessToken(c, uses, exp)
 	return &AccessCode{t, f}
 }
@@ -60,7 +56,7 @@ func NewAccessCode(f Format, uses int, exp time.Duration) *AccessCode {
 // BeforeCreate runs before create.
 func (ac AccessCode) BeforeCreate(db *gorm.DB) error {
 	if ac.Format == PIN && utils.IsDebugPIN(ac.Code()) {
-		return nil
+		return errors.New("invalid code")
 	}
 	return ac.AccessToken.BeforeCreate(db)
 }

@@ -1,4 +1,4 @@
-package providers
+package auth
 
 import (
 	"errors"
@@ -90,12 +90,12 @@ func NewProviders() *Providers {
 }
 
 // LoadProviders loads the configured external providers.
-func (p *Providers) LoadProviders(c *config.Config) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.internal = c.Provider()
+func (pv *Providers) LoadProviders(c *config.Config) error {
+	pv.mu.Lock()
+	defer pv.mu.Unlock()
+	pv.internal = c.Provider()
 	for name, v := range c.Providers {
-		err := p.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
+		err := pv.useProvider(name, v.ClientKey, v.Secret, v.CallbackURL, v.Scopes...)
 		if err != nil {
 			err = fmt.Errorf("load %s provider failed: %w", name, err)
 			return err
@@ -107,19 +107,19 @@ func (p *Providers) LoadProviders(c *config.Config) error {
 // UseProviders adds a list of available providers for use with Goth.
 // Can be called multiple times. If you pass the same provider more
 // than once, the last will be used.
-func (p *Providers) UseProviders(viders ...Provider) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	for _, pv := range viders {
-		p.providers[pv.Name()] = pv
+func (pv *Providers) UseProviders(ps ...Provider) {
+	pv.mu.Lock()
+	defer pv.mu.Unlock()
+	for _, p := range ps {
+		pv.providers[p.Name()] = p
 	}
 }
 
 // GetProvider returns a previously created provider. If we have not
 // been told to use the named provider it will return an error.
-func (p *Providers) GetProvider(name provider.Name) (Provider, error) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
+func (pv *Providers) GetProvider(name provider.Name) (Provider, error) {
+	pv.mu.RLock()
+	defer pv.mu.RUnlock()
 	// properly (in case internalProvider is Unknown)
 	if name == provider.Unknown {
 		return nil, errors.New("invalid provider")
@@ -128,7 +128,7 @@ func (p *Providers) GetProvider(name provider.Name) (Provider, error) {
 		err := fmt.Errorf("invalid provider: %s", name)
 		return nil, err
 	}
-	pvd := p.providers[string(name)]
+	pvd := pv.providers[string(name)]
 	if pvd == nil {
 		return nil, fmt.Errorf("no provider for %s exists", name)
 	}
@@ -136,21 +136,21 @@ func (p *Providers) GetProvider(name provider.Name) (Provider, error) {
 }
 
 // IsEnabled returns true if the provider is enabled.
-func (p *Providers) IsEnabled(name provider.Name) error {
-	if p.isInternal(name) {
+func (pv *Providers) IsEnabled(name provider.Name) error {
+	if pv.isInternal(name) {
 		return nil
 	}
-	_, err := p.GetProvider(name)
+	_, err := pv.GetProvider(name)
 	return err
 }
 
-func (p *Providers) isInternal(name provider.Name) bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return name == p.internal && p.internal != provider.Unknown
+func (pv *Providers) isInternal(name provider.Name) bool {
+	pv.mu.RLock()
+	defer pv.mu.RUnlock()
+	return name == pv.internal && pv.internal != provider.Unknown
 }
 
-func (p *Providers) useProvider(name provider.Name, clientKey, secret, callback string, scopes ...string) (err error) {
+func (pv *Providers) useProvider(name provider.Name, clientKey, secret, callback string, scopes ...string) (err error) {
 	var pvdr Provider
 	switch name {
 	case provider.Amazon:
@@ -320,7 +320,7 @@ func (p *Providers) useProvider(name provider.Name, clientKey, secret, callback 
 	default:
 		return fmt.Errorf("invalid provider: %s", name)
 	}
-	p.providers[pvdr.Name()] = pvdr
+	pv.providers[pvdr.Name()] = pvdr
 	return nil
 }
 

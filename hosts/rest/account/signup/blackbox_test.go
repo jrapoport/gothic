@@ -68,7 +68,7 @@ func TestSignupServer_Signup(t *testing.T) {
 	// json success (unmasked)
 	srv.Config().MaskEmails = false
 	v, test := testCase(t, srv, web)
-	res, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	res, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	assertResponse(t, srv, test, res)
 	u, err := srv.GetUserWithEmail(v.Get(key.Email))
@@ -77,22 +77,22 @@ func TestSignupServer_Signup(t *testing.T) {
 	assert.Equal(t, v.Get(key.Email), u.Email)
 	assert.Equal(t, v.Get(key.Username), u.Username)
 	// email taken
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// json success (masked)
 	srv.Config().MaskEmails = true
 	v, test = testCase(t, srv, web)
-	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	assertResponse(t, srv, test, res)
 	// form encoded success
 	v, test = testCase(t, srv, web)
-	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, v, v)
+	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, v, v)
 	assert.NoError(t, err)
 	assertResponse(t, srv, test, res)
 	// query string success
 	v, test = testCase(t, srv, web)
-	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, v, nil)
+	res, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, v, nil)
 	assert.NoError(t, err)
 	assertResponse(t, srv, test, res)
 }
@@ -104,7 +104,7 @@ func TestSignupServer_Signup_Confirm(t *testing.T) {
 	}, false)
 	srv.Config().Signup.AutoConfirm = false
 	v, _ := testCase(t, srv, web)
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	em := v.Get(key.Email)
 	u, err := srv.GetUserWithEmail(em)
@@ -120,7 +120,7 @@ func TestSignupServer_Signup_AutoConfirm(t *testing.T) {
 	//
 	srv.Config().Signup.AutoConfirm = true
 	v, _ := testCase(t, srv, web)
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, v, nil)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, v, nil)
 	assert.NoError(t, err)
 	em := v.Get(key.Email)
 	u, err := srv.GetUserWithEmail(em)
@@ -134,7 +134,7 @@ func TestSignupServer_Signup_Disabled(t *testing.T) {
 		signup.RegisterServer,
 	}, false)
 	srv.Config().Signup.Disabled = true
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, nil)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, nil)
 	assert.Error(t, err)
 }
 
@@ -144,7 +144,7 @@ func TestSignupServer_Signup_EmailDisabled(t *testing.T) {
 		signup.RegisterServer,
 	}, false)
 	srv.Config().UseInternal = false
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, nil)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, nil)
 	assert.Error(t, err)
 }
 
@@ -156,17 +156,17 @@ func TestSignupServer_Signup_Recaptcha(t *testing.T) {
 	srv.Config().Recaptcha.Key = validate.ReCaptchaDebugKey
 	v, _ := testCase(t, srv, web)
 	// invalid client ip
-	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, signup.Endpoint, v)
+	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, signup.Signup, v)
 	// no token
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// invalid token
 	v.Set(key.ReCaptcha, "invalid")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// token
 	v.Set(key.ReCaptcha, validate.ReCaptchaDebugToken)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 }
 
@@ -178,27 +178,27 @@ func TestSignupServer_Signup_SignupCode(t *testing.T) {
 	// no code
 	srv.Config().Signup.Code = false
 	v, _ := testCase(t, srv, web)
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	srv.Config().Signup.Code = true
 	// missing code
 	v, _ = testCase(t, srv, web)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// bad code
 	v.Set(key.Code, "bad")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// good code
 	pin, err := srv.CreateSignupCode(context.Background(), code.SingleUse)
 	assert.NoError(t, err)
 	v.Set(key.Code, pin)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	// reuse code
 	v, _ = testCase(t, srv, web)
 	v.Set(key.Code, pin)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 }
 
@@ -211,28 +211,28 @@ func TestSignupServer_Signup_Password(t *testing.T) {
 	srv.Config().Validation.PasswordRegex = passRegex
 	// good pw
 	v, _ := testCase(t, srv, web)
-	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	// missing pw
 	v, _ = testCase(t, srv, web)
 	v.Del(key.Password)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// bad password
 	v.Set(key.Password, "nope")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	// blank password ok
 	srv.Config().Validation.PasswordRegex = ""
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 	// custom password
 	srv.Config().Validation.PasswordRegex = "^[a-z]"
 	v, _ = testCase(t, srv, web)
 	v.Set(key.Password, "12345678")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.Error(t, err)
 	v.Set(key.Password, "password")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Endpoint, nil, v)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, signup.Signup, nil, v)
 	assert.NoError(t, err)
 }

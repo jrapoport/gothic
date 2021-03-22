@@ -25,20 +25,20 @@ var _ Token = (*AuthToken)(nil)
 
 // NewAuthToken generates a new token. The type is inferred from uses.
 func NewAuthToken(p provider.Name, exp time.Duration) *AuthToken {
-	t := *NewAccessToken(utils.SecureToken(), SingleUse, exp)
-	t.UserID = p.ID()
-	return &AuthToken{AccessToken: t, Provider: p}
+	at := *NewAccessToken(utils.SecureToken(), SingleUse, exp)
+	at.UserID = p.ID()
+	return &AuthToken{AccessToken: at, Provider: p}
 }
 
 // Class returns the class of the auth token.
-func (t AuthToken) Class() Class {
+func (at AuthToken) Class() Class {
 	return Auth
 }
 
 // HasToken returns true if the auth token is found.
-func (t AuthToken) HasToken(tx *store.Connection) (bool, error) {
-	if t.Token == "" {
+func (at AuthToken) HasToken(tx *store.Connection) (bool, error) {
+	if at.Token == "" {
 		return false, errors.New("invalid token")
 	}
-	return tx.Has(&t, "token = ?", t.Token)
+	return tx.Has(&at, "token = ?", at.Token)
 }

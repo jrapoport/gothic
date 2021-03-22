@@ -35,7 +35,7 @@ PROTOC_REPO := github.com/golang/protobuf/protoc-gen-go
 $(PROTOC_GEN):
 	$(GO_GET) $(PROTOC_REPO)
 
-deps:: $(PROTOC_GEN)
+proto: $(PROTOC_GEN)
 ifeq (, $(PROTOC))
 ifeq ($(OS),Linux)
 	apt install -y protobuf-compiler
@@ -46,7 +46,7 @@ endif
 endif
 
 GRPC_RPC_DIR = $(GRPC_DIR)/rpc
-rpc:: deps ## Protobuf gRPC
+rpc:: proto ## Protobuf gRPC
 	mkdir -p $(GRPC_RPC_DIR)
 	$(PROTOC) $(PROTO_INCLUDES) \
 	--go_out=plugins=grpc:$(GRPC_RPC_DIR) \
@@ -54,7 +54,7 @@ rpc:: deps ## Protobuf gRPC
 	$(PROTO_FILES)
 
 GRPC_WEB_DIR = $(GRPC_DIR)/web
-rpcw:: deps ## Protobuf gRPC-Web
+rpcw:: proto ## Protobuf gRPC-Web
 	mkdir -p $(GRPC_WEB_DIR)
 	$(PROTOC) $(PROTO_INCLUDES) \
 	--js_out=import_style=commonjs:$(GRPC_WEB_DIR) \
@@ -62,7 +62,7 @@ rpcw:: deps ## Protobuf gRPC-Web
 	--plugin=protoc-gen-grpc-web=$(GRPC_PLUGIN_WEB) $(PROTO_FILES)
 
 GRPC_CSHARP = $(GRPC_DIR)/csharp
-rpc-cs:: deps ## Protobuf gRPC C#
+rpc-cs:: proto ## Protobuf gRPC C#
 	mkdir -p $(GRPC_CSHARP)
 	$(PROTOC) $(PROTO_INCLUDES) \
 	--plugin=protoc-gen-grpc=$(GRPC_PLUGIN_CSHARP) \
@@ -73,4 +73,4 @@ rpc-cs:: deps ## Protobuf gRPC C#
 
 grpc: rpc rpcw # Protobuf gRPC All
 
-.PHONY: rpc rpcw rpc-cs grpc
+.PHONY: proto rpc rpcw rpc-cs grpc

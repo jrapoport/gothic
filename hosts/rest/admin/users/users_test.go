@@ -72,7 +72,7 @@ func TestUserServer_GetUser(t *testing.T) {
 		Username: u.Username,
 		Data:     u.Data,
 	}
-	uri := Endpoint + Root + u.ID.String()
+	uri := Users + rest.Root + u.ID.String()
 	getUser := func(tok string, useCtx bool, testID uuid.UUID) *httptest.ResponseRecorder {
 		r := thttp.Request(t, http.MethodGet, uri, tok, nil, nil)
 		if tok != "" {
@@ -131,7 +131,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	srv.Config().Signup.Default.Color = false
 	j := srv.Config().JWT
 	u, _ := testUser(t, srv, false)
-	uri := Endpoint + Root + u.ID.String()
+	uri := Users + rest.Root + u.ID.String()
 	updateUser := func(tok string, body interface{}, useCtx bool, testID uuid.UUID) *httptest.ResponseRecorder {
 		r := thttp.Request(t, http.MethodPut, uri, tok, nil, body)
 		if tok != "" {
@@ -210,7 +210,7 @@ func TestUserServer_DeleteUser(t *testing.T) {
 	srv.Config().Signup.Default.Color = false
 	j := srv.Config().JWT
 	u, _ := testUser(t, srv, false)
-	uri := Endpoint + Root + u.ID.String()
+	uri := Users + rest.Root + u.ID.String()
 	deleteUser := func(tok string, useCtx bool, testID uuid.UUID) *httptest.ResponseRecorder {
 		r := thttp.Request(t, http.MethodGet, uri, tok, nil, nil)
 		if tok != "" {
@@ -276,7 +276,7 @@ func TestUserServer_PromoteUser(t *testing.T) {
 		Username: u.Username,
 		Data:     u.Data,
 	}
-	uri := Endpoint + Root + u.ID.String() + Promote
+	uri := Users + rest.Root + u.ID.String() + Promote
 	promoteUser := func(tok string, useCtx bool, testID uuid.UUID) *httptest.ResponseRecorder {
 		r := thttp.Request(t, http.MethodGet, uri, tok, nil, nil)
 		if tok != "" {

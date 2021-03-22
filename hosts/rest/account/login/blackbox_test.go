@@ -46,23 +46,23 @@ func TestLoginServer_Login(t *testing.T) {
 		login.RegisterServer,
 	}, false)
 	// invalid req
-	_, err := thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, []byte("\n"))
+	_, err := thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, []byte("\n"))
 	assert.Error(t, err)
 	// empty email
 	req := new(testRequest)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, req)
 	assert.Error(t, err)
 	// bad email
 	req = &testRequest{
 		Email: "bad",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, req)
 	assert.Error(t, err)
 	// not found
 	req = &testRequest{
 		Email: "bad@example.com",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, req)
 	assert.Error(t, err)
 	u := testUser(t, srv)
 	// bad password
@@ -70,7 +70,7 @@ func TestLoginServer_Login(t *testing.T) {
 		Email:    u.Email,
 		Password: "",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, req)
 	assert.Error(t, err)
 	// login
 	_, err = srv.GetAuthenticatedUser(u.ID)
@@ -79,7 +79,7 @@ func TestLoginServer_Login(t *testing.T) {
 		Email:    u.Email,
 		Password: testPass,
 	}
-	res, err := thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, nil, req)
+	res, err := thttp.DoRequest(t, web, http.MethodPost, login.Login, nil, req)
 	assert.NoError(t, err)
 	ur, claims := tsrv.UnmarshalUserResponse(t, srv.Config().JWT, res)
 	assert.EqualValues(t, tokens.Bearer, ur.Token.Type)
@@ -100,18 +100,18 @@ func TestLoginServer_Login_Recaptcha(t *testing.T) {
 	v.Set(key.Email, tutils.RandomEmail())
 	v.Set(key.Password, testPass)
 	// invalid client ip
-	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, login.Endpoint, v)
+	assert.HTTPError(t, web.Config.Handler.ServeHTTP, http.MethodPost, login.Login, v)
 	// no token
-	_, err := thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, v, nil)
+	_, err := thttp.DoRequest(t, web, http.MethodPost, login.Login, v, nil)
 	assert.Error(t, err)
 	// invalid token
 	v.Set(key.ReCaptcha, "invalid")
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, v, nil)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, v, nil)
 	assert.Error(t, err)
 	// token
 	u := testUser(t, srv)
 	v.Set(key.Email, u.Email)
 	v.Set(key.ReCaptcha, validate.ReCaptchaDebugToken)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Endpoint, v, nil)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, login.Login, v, nil)
 	assert.NoError(t, err)
 }

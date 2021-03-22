@@ -8,13 +8,11 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
+// Password endpoints
 const (
-	// Endpoint for password
-	Endpoint = "/password"
-	// Confirm confirms a password
-	Confirm = "/"
-	// Reset starts a password reset
-	Reset = "/reset"
+	Password = "/password"
+	Confirm  = rest.Root
+	Reset    = "/reset"
 )
 
 // Request is an password server request
@@ -45,7 +43,7 @@ func register(s *http.Server, srv *passwordServer) {
 }
 
 func (s *passwordServer) addRoutes(r *rest.Router) {
-	r.Route(Endpoint, func(rt *rest.Router) {
+	r.Route(Password, func(rt *rest.Router) {
 		rt.Post(Reset, s.SendResetPassword)
 		rt.Post(Confirm, s.ConfirmResetPassword)
 	})

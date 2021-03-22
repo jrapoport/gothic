@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/markbates/goth"
 	"github.com/segmentio/encoding/json"
@@ -25,6 +24,15 @@ var (
 	_ migrator.GormDataTypeInterface = (*Map)(nil)
 	_ fmt.Stringer                   = (*Map)(nil)
 )
+
+// Copy returns a copy
+func (m Map) Copy() Map {
+	cpy := make(Map, len(m))
+	for k, v := range m {
+		cpy[k] = v
+	}
+	return cpy
+}
 
 // Get satisfies the goth.Params interface
 func (m Map) Get(k string) string {
