@@ -8,13 +8,11 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
+// Confirm endpoints
 const (
-	// Endpoint is the confirmation rest endpoint.
-	Endpoint = "/confirm"
-	// Root is the base route.
-	Root = "/"
-	// Send is the route to resent a confirmation email.
-	Send = "/send"
+	Confirm = "/confirm"
+	User    = rest.Root
+	Send    = "/send"
 )
 
 // Request is an confirm server request
@@ -44,8 +42,8 @@ func register(s *http.Server, srv *confirmServer) {
 }
 
 func (s *confirmServer) addRoutes(r *rest.Router) {
-	r.Route(Endpoint, func(rt *rest.Router) {
-		rt.Post(Root, s.ConfirmUser)
+	r.Route(Confirm, func(rt *rest.Router) {
+		rt.Post(User, s.ConfirmUser)
 		rt.Post(Send, s.SendConfirmUser)
 	})
 }

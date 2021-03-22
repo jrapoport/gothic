@@ -56,7 +56,7 @@ func TestAccountServer(t *testing.T) {
 		Email:    em,
 		Password: testPass,
 	}
-	route := account.Endpoint + signup.Endpoint
+	route := account.Account + signup.Signup
 	res, err := thttp.DoRequest(t, web, http.MethodPost, route, nil, sr)
 	assert.NoError(t, err)
 	ur := rest.UserResponse{}
@@ -78,14 +78,14 @@ func TestAccountServer(t *testing.T) {
 	cr := &confirm.Request{
 		Email: em,
 	}
-	route = account.Endpoint + confirm.Endpoint + confirm.Send
+	route = account.Account + confirm.Confirm + confirm.Send
 	_, err = thttp.DoRequest(t, web, http.MethodPost, route, nil, cr)
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return confirmToken != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// confirm user email
-	route = account.Endpoint + confirm.Endpoint
+	route = account.Account + confirm.Confirm
 	cr = &confirm.Request{
 		Token: confirmToken,
 	}
@@ -107,7 +107,7 @@ func TestAccountServer(t *testing.T) {
 	smtp.AddHook(t, func(email string) {
 		passToken = tconf.GetEmailToken(act, email)
 	})
-	route = account.Endpoint + password.Endpoint + password.Reset
+	route = account.Account + password.Password + password.Reset
 	pr := &password.Request{
 		Email: em,
 	}
@@ -115,9 +115,9 @@ func TestAccountServer(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return passToken != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// reset the password
-	route = account.Endpoint + password.Endpoint
+	route = account.Account + password.Password
 	pr = &password.Request{
 		Token:    passToken,
 		Password: newPass,
@@ -128,7 +128,7 @@ func TestAccountServer(t *testing.T) {
 	_, claims = tsrv.UnmarshalTokenResponse(t, c.JWT, res)
 	assert.Equal(t, u.ID.String(), claims.Subject)
 	// login with the >new< password
-	route = account.Endpoint + login.Endpoint
+	route = account.Account + login.Login
 	lr := login.Request{
 		Email:    em,
 		Password: newPass,
@@ -155,7 +155,7 @@ func TestAccountServer_RateLimit(t *testing.T) {
 			Email:    tutils.RandomEmail(),
 			Password: tutils.RandomEmail(),
 		}
-		route := account.Endpoint + signup.Endpoint
+		route := account.Account + signup.Signup
 		_, err = thttp.DoRequest(t, web, http.MethodPost, route, nil, req)
 		if err != nil {
 			break
@@ -163,7 +163,7 @@ func TestAccountServer_RateLimit(t *testing.T) {
 	}
 	assert.Eventually(t, func() bool {
 		return err != nil
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.EqualError(t, err,
 		thttp.FmtError(http.StatusTooManyRequests).Error())
 }

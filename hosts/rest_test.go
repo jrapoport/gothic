@@ -35,14 +35,14 @@ func TestRESTHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// create a test user
 	const pass = "1234567890asdfghjkl"
 	test, _ := tcore.TestUser(t, a, pass, false)
 	// unauthenticated call
 	loginURI := func() string {
 		require.NotEmpty(t, h.Address())
-		return "http://" + h.Address() + account.Endpoint + login.Endpoint
+		return "http://" + h.Address() + account.Account + login.Login
 	}
 	b, err := json.Marshal(&login.Request{
 		Email:    test.Email,
@@ -77,5 +77,5 @@ func TestRESTHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return !h.Online()
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }

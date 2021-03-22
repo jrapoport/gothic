@@ -3,16 +3,12 @@ package auditlog
 // Type is the type of the log entry
 type Type int
 
+// Audit log entry types
 const (
-	//Unknown log entry type
 	Unknown Type = iota - 1
-	//System log entry type
 	System
-	//Account log entry type
 	Account
-	//Token log entry type
 	Token
-	//User log entry type
 	User
 )
 

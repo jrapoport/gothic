@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const endpoint = audit_log.Endpoint
+const endpoint = audit_log.Audit
 
 var (
 	testUID  = uuid.New()

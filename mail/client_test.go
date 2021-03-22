@@ -313,7 +313,7 @@ func (ts *ClientTestSuite) sendTest(send func(tc testCase) error) {
 			if err == nil && test.tok != "" {
 				ts.Eventually(func() bool {
 					return sent != ""
-				}, 200*time.Millisecond, 10*time.Millisecond)
+				}, 1*time.Second, 10*time.Millisecond)
 				ts.Contains(sent, test.ref)
 				ts.Contains(sent, test.tok)
 

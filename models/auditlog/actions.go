@@ -2,56 +2,37 @@ package auditlog
 
 // Account actions
 const (
-	// Banned action
-	Banned Action = "banned"
-	// CodeSent action
-	CodeSent Action = "code_sent"
-	// ConfirmSent action
+	Banned      Action = "banned"
+	CodeSent    Action = "code_sent"
 	ConfirmSent Action = "confirm_sent"
-	// Confirmed action
-	Confirmed Action = "confirmed"
-	// Deleted action
-	Deleted Action = "deleted"
-	// Linked action
-	Linked Action = "linked"
-	// Signup action
-	Signup Action = "signup"
+	Confirmed   Action = "confirmed"
+	Deleted     Action = "deleted"
+	Signup      Action = "signup"
 )
 
 // System actions
 const (
-	// Startup action
-	Startup Action = "startup"
-	// Shutdown action
+	Startup  Action = "startup"
 	Shutdown Action = "shutdown"
 )
 
 // Token actions
 const (
-	// Granted action
-	Granted Action = "granted"
-	// Refreshed action
-	Refreshed Action = "refreshed"
-	// Revoked action
-	Revoked Action = "revoked"
-	// RevokedAll action
+	Granted    Action = "granted"
+	Refreshed  Action = "refreshed"
+	Revoked    Action = "revoked"
 	RevokedAll Action = "revoked_all"
 )
 
 // User actions
 const (
-	// ChangeRole action
 	ChangeRole Action = "change_role"
-	// Email action
-	Email Action = "email"
-	// Login action
-	Login Action = "login"
-	// Logout action
-	Logout Action = "logout"
-	// Password action
-	Password Action = "password"
-	// Updated action
-	Updated Action = "updated"
+	Email      Action = "email"
+	Linked     Action = "linked"
+	Login      Action = "login"
+	Logout     Action = "logout"
+	Password   Action = "password"
+	Updated    Action = "updated"
 )
 
 // Action is action captured by the log entry.
@@ -74,8 +55,6 @@ func (a Action) Type() Type {
 		return Account
 	case Confirmed:
 		return Account
-	case Linked:
-		return Account
 	case Banned:
 		return Account
 	case Deleted:
@@ -90,6 +69,8 @@ func (a Action) Type() Type {
 	case RevokedAll:
 		return Token
 	// User actions
+	case Linked:
+		return User
 	case Login:
 		return User
 	case Logout:

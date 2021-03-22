@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/jrapoport/gothic/core/accounts"
 	"time"
 
 	"github.com/google/uuid"
@@ -8,9 +9,11 @@ import (
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/login"
+	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
+	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
 )
@@ -24,8 +27,7 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 	recaptcha := ctx.GetReCaptcha()
 	p := a.Provider()
 	ctx.SetProvider(p)
-	a.log.Debugf("login: %s %s (%s %s %s)",
-		email, pw, p, ip, recaptcha)
+	a.log.Debugf("login: %s %s (%s %s %s)", email, pw, p, ip, recaptcha)
 	err := a.ext.IsEnabled(p)
 	if err != nil {
 		return nil, a.logError(err)
@@ -41,8 +43,54 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 			return nil, a.logError(err)
 		}
 	}
+	return a.userLogin(ctx, a.conn, p, email, pw)
+}
+
+func (a *API) externalLogin(ctx context.Context, conn *store.Connection,
+	p provider.Name, accountID, email string, data, raw types.Map) (*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	var u *user.User
-	err = a.conn.Transaction(func(tx *store.Connection) error {
+	err := conn.Transaction(func(tx *store.Connection) (err error) {
+		la, err := accounts.GetAccount(tx, p, accountID)
+		if err != nil {
+			return err
+		}
+		u, err = login.UserLogin(tx, la.Provider, la.Email, "")
+		if err != nil {
+			return err
+		}
+		_, err = accounts.UpdateAccount(tx, la, &email, raw)
+		if err != nil {
+			return err
+		}
+		err = users.ChangeEmail(tx, u, email)
+		if err != nil {
+			return err
+		}
+		ok, err := users.Update(tx, u, nil, data)
+		if err != nil {
+			return err
+		}
+		if ok {
+			err = audit.LogUserUpdated(ctx, tx, u.ID)
+		}
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (a *API) userLogin(ctx context.Context, conn *store.Connection,
+	p provider.Name, email, pw string) (*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	var u *user.User
+	err := conn.Transaction(func(tx *store.Connection) (err error) {
 		u, err = login.UserLogin(tx, p, email, pw)
 		if err != nil {
 			return err
@@ -54,7 +102,7 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 	}
 	a.dispatchEvent(events.Login, types.Map{
 		key.Provider:  p,
-		key.IPAddress: ip,
+		key.IPAddress: ctx.GetIPAddress(),
 		key.UserID:    u.ID,
 		key.Timestamp: time.Now().UTC(),
 	})

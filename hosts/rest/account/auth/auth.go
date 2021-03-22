@@ -3,21 +3,21 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"github.com/jrapoport/gothic/utils"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
+	"github.com/jrapoport/gothic/utils"
 )
 
+// Auth endpoints
 const (
-	// Endpoint is the endpoint for an auth server.
-	Endpoint = "/auth"
-	// Root is the root for an auth server.
-	Root = "/"
+	Auth = "/auth"
+	// Refresh refreshes a user refresh token
+	Refresh = rest.Root
 	// Provider returns the auth url for a provider.
-	Provider = "/{" + key.Provider + "}"
+	Provider = "/{" + key.Provider + "}" //
 	// Callback authorizes a user.
 	Callback = "/callback"
 )
@@ -49,8 +49,8 @@ func register(s *http.Server, srv *authServer) {
 }
 
 func (s *authServer) addRoutes(r *rest.Router) {
-	r.Route(Endpoint, func(rt *rest.Router) {
-		rt.Post(Root, s.RefreshBearerToken)
+	r.Route(Auth, func(rt *rest.Router) {
+		rt.Post(Refresh, s.RefreshBearerToken)
 		rt.Get(Provider, s.GetAuthorizationURL)
 		rt.Post(Callback, s.AuthorizeUser)
 	})

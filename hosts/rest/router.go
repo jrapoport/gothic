@@ -10,6 +10,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Root is the base route
+const Root = "/"
+
 // Router an http router
 type Router struct {
 	chi    chi.Router

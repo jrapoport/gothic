@@ -10,14 +10,15 @@ import (
 	"github.com/jrapoport/gothic/models/types/key"
 )
 
+// Users endpoint
 const (
-	// Endpoint is the users endpoint.
-	Endpoint = "/users"
-	// Root searches or creates a user.
-	Root = "/"
-	// UserID gets or updates or promotes a user.
-	UserID = "/{" + key.UserID + "}"
-	// Promote promotes a user
+	Users   = "/users"
+	Search  = rest.Root
+	UserID  = "/{" + key.UserID + "}" // select a user
+	Create  = rest.Root
+	Read    = rest.Root
+	Update  = rest.Root
+	Delete  = rest.Root
 	Promote = "/promote"
 )
 
@@ -50,13 +51,13 @@ func register(s *http.Server, srv *usersServer) {
 }
 
 func (s *usersServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Admin().Route(Endpoint, func(rt *rest.Router) {
-		rt.Get(Root, s.SearchUsers)
-		rt.Post(Root, s.AdminCreateUser)
+	r.Authenticated().Admin().Route(Users, func(rt *rest.Router) {
+		rt.Get(Search, s.SearchUsers)
+		rt.Post(Create, s.AdminCreateUser)
 		rt.Route(UserID, func(uid *rest.Router) {
-			uid.Get(Root, s.GetUser)
-			uid.Put(Root, s.UpdateUser)
-			uid.Delete(Root, s.AdminDeleteUser)
+			uid.Get(Read, s.GetUser)
+			uid.Put(Update, s.UpdateUser)
+			uid.Delete(Delete, s.AdminDeleteUser)
 			uid.Post(Promote, s.AdminPromoteUser)
 		})
 	})

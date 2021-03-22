@@ -11,6 +11,7 @@ import (
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
@@ -70,6 +71,30 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 	err = a.SendConfirmUser(ctx, u.ID)
 	if err != nil {
 		return nil, a.logError(err)
+	}
+	return u, nil
+}
+
+func (a *API) externalSignup(ctx context.Context, conn *store.Connection,
+	p provider.Name, accountID, email string, data, raw types.Map) (*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	var u *user.User
+	err := conn.Transaction(func(tx *store.Connection) (err error) {
+		pw := utils.SecureToken()
+		username := getUsername(data)
+		a.log.Debugf("external provider create: %s %s %s %v (%v)",
+			email, username, pw, data, ctx)
+		u, err = a.userSignup(ctx, tx, p, email, username, pw, data)
+		if err != nil {
+			return err
+		}
+		l := account.NewAccount(u.Provider, accountID, u.Email, raw)
+		return a.linkAccount(ctx, conn, u.ID, l)
+	})
+	if err != nil {
+		return nil, err
 	}
 	return u, nil
 }

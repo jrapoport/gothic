@@ -1,12 +1,12 @@
-package providers
+package auth
 
 import (
-	"github.com/jrapoport/gothic/models/types"
 	"net/url"
 	"testing"
 	"time"
 
 	"github.com/jrapoport/gothic/core/tokens"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
@@ -26,10 +26,10 @@ func getToken(t *testing.T, authURL string) (string, types.Map) {
 
 func TestGrantAuthURL(t *testing.T) {
 	const badProvider = "bad"
-	providers := NewProviders()
+	ps := NewProviders()
 	conn, c := tconn.TempConn(t)
 	c.Authorization = tconf.ProvidersConfig(t).Authorization
-	err := providers.LoadProviders(c)
+	err := ps.LoadProviders(c)
 	require.NoError(t, err)
 	for p := range provider.External {
 		// these providers will attempt a live connection
@@ -37,23 +37,24 @@ func TestGrantAuthURL(t *testing.T) {
 			// assert.Contains(t, err.Error(), "401 Unauthorized")
 			continue
 		}
-		auth, err := providers.GrantAuthURL(conn, p, 60*time.Minute)
+		auth, err := ps.GrantAuthURL(conn, p, 60*time.Minute)
 		assert.NoError(t, err)
 		_, err = url.Parse(auth.URL)
 		assert.NoError(t, err)
 	}
-	_, err = providers.GrantAuthURL(conn, provider.Unknown, 0)
+	_, err = ps.GrantAuthURL(conn, provider.Unknown, 0)
 	assert.Error(t, err)
-	_, err = providers.GrantAuthURL(conn, c.Provider(), 0)
+	_, err = ps.GrantAuthURL(conn, c.Provider(), 0)
 	assert.Error(t, err)
-	_, err = providers.GrantAuthURL(conn, badProvider, 0)
+	_, err = ps.GrantAuthURL(conn, badProvider, 0)
 	assert.Error(t, err)
 	// confirm different tokens are returned
 	_, mock := tconf.MockedProvider(t, c, "")
-	providers.UseProviders(mock)
-	auth1, err := providers.GrantAuthURL(conn, mock.PName(), 60*time.Minute)
+	ps.UseProviders(mock)
+	p := provider.Name(mock.Name())
+	auth1, err := ps.GrantAuthURL(conn, p, 60*time.Minute)
 	assert.NoError(t, err)
-	auth2, err := providers.GrantAuthURL(conn, mock.PName(), 60*time.Minute)
+	auth2, err := ps.GrantAuthURL(conn, p, 60*time.Minute)
 	assert.NoError(t, err)
 	tok1, _ := getToken(t, auth1.URL)
 	assert.Equal(t, auth1.Token.String(), tok1)
@@ -67,7 +68,8 @@ func TestAuthorizeUser(t *testing.T) {
 	conn, c := tconn.TempConn(t)
 	_, mock := tconf.MockedProvider(t, c, "")
 	providers.UseProviders(mock)
-	authURL, err := providers.GrantAuthURL(conn, mock.PName(), 0)
+	p := provider.Name(mock.Name())
+	authURL, err := providers.GrantAuthURL(conn, p, 0)
 	require.NoError(t, err)
 	tok, data := getToken(t, authURL.URL)
 	_, err = providers.AuthorizeUser(conn, tok, data)
@@ -92,7 +94,7 @@ func TestAuthorizeUser(t *testing.T) {
 	_, err = providers.AuthorizeUser(conn, at.String(), data)
 	assert.Error(t, err)
 	// invalid session
-	at, err = tokens.GrantAuthToken(conn, mock.PName(), 0)
+	at, err = tokens.GrantAuthToken(conn, p, 0)
 	require.NoError(t, err)
 	_, err = providers.AuthorizeUser(conn, at.String(), data)
 	assert.Error(t, err)

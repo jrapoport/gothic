@@ -14,11 +14,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Authorization metadata
 const (
-	// Authorization rpc metadata.
 	Authorization = "authorization"
-	// BearerScheme rpc metadata.
-	BearerScheme = "bearer"
+	BearerScheme  = "bearer"
 )
 
 // Authenticator is a jwt authenticator

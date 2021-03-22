@@ -23,17 +23,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// HTTP Headers
 const (
-	// Authorization http header.
-	Authorization = "Authorization"
-	// BearerScheme http header.
-	BearerScheme = "Bearer"
-	// ContentType http header.
-	ContentType = "Content-Type"
-	// UseCookieHeader http header.
+	Authorization   = "Authorization"
+	BearerScheme    = "Bearer"
+	ContentType     = "Content-Type"
 	UseCookieHeader = "X-Use-Cookie"
-	// ForwardedProto http header.
-	ForwardedProto = "X-Forwarded-Proto"
+	ForwardedProto  = "X-Forwarded-Proto"
 )
 
 const (

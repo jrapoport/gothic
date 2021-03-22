@@ -137,8 +137,8 @@ func TestFormatLink(t *testing.T) {
 		},
 	}
 	for i, test := range tmplTests {
-		link := FormatLink(test.link, action, token)
-		assert.Equal(t, test.expected, link, i)
+		l := FormatLink(test.link, action, token)
+		assert.Equal(t, test.expected, l, i)
 	}
 	clearTests := []struct {
 		action   string
@@ -152,7 +152,7 @@ func TestFormatLink(t *testing.T) {
 	}
 	const noLink = "http://www.example.com/:action/#:token?foo=bar"
 	for _, test := range clearTests {
-		link := FormatLink(noLink, test.action, test.token)
-		assert.Equal(t, test.expected, link)
+		l := FormatLink(noLink, test.action, test.token)
+		assert.Equal(t, test.expected, l)
 	}
 }

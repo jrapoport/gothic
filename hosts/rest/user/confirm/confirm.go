@@ -13,8 +13,6 @@ import (
 const (
 	// Endpoint is the confirmation rest endpoint.
 	Endpoint = "/confirm"
-	// Root sends the email.
-	Root = "/"
 )
 
 type confirmServer struct {
@@ -39,7 +37,7 @@ func register(s *http.Server, srv *confirmServer) {
 
 func (s *confirmServer) addRoutes(r *rest.Router) {
 	r.Authenticated().Route(Endpoint, func(rt *rest.Router) {
-		rt.Post(Root, s.SendConfirmUser)
+		rt.Post(rest.Root, s.SendConfirmUser)
 	})
 }
 

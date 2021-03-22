@@ -53,7 +53,11 @@ func accessTokenConn(t *testing.T) *store.Connection {
 
 func TestNewAccessToken(t *testing.T) {
 	conn := accessTokenConn(t)
-	err := conn.Transaction(func(tx *store.Connection) error {
+	at := AccessToken{Type: 255}
+	assert.Equal(t, "invalid", at.Usage().String())
+	err := conn.Create(at).Error
+	assert.Error(t, err)
+	err = conn.Transaction(func(tx *store.Connection) error {
 		for i, test := range tokenTests {
 			testToken = testToken + strconv.Itoa(i)
 			tk := NewAccessToken(testToken, test.uses, test.exp)
@@ -61,6 +65,10 @@ func TestNewAccessToken(t *testing.T) {
 			assert.Equal(t, user.SystemID, tk.UserID)
 			assert.Equal(t, testToken, tk.Token)
 			assert.Equal(t, test.use, tk.Usage())
+			assert.Equal(t, Access.String(), tk.Class().String())
+			assert.Equal(t, user.SystemID, tk.IssuedTo())
+			assert.Equal(t, tk.CreatedAt, tk.Issued())
+			assert.Equal(t, time.Time{}, tk.LastUsed())
 			assert.NotEmpty(t, tk.String())
 			assert.Equal(t, test.max, tk.MaxUses)
 			assert.Equal(t, 0, tk.Used)
@@ -73,12 +81,29 @@ func TestNewAccessToken(t *testing.T) {
 			err := tx.Create(tk).Error
 			assert.NoError(t, err)
 			assert.True(t, tk.Usable())
+			if tk.ExpiredAt == nil {
+				assert.Equal(t, time.Time{}, tk.ExpirationDate())
+			} else {
+				assert.Equal(t, *tk.ExpiredAt, tk.ExpirationDate())
+			}
+			err = tx.Delete(tk).Error
+			assert.NoError(t, err)
+			assert.Equal(t, tk.DeletedAt.Time, tk.Revoked())
 		}
 		return nil
 	})
 	require.NoError(t, err)
 	tk := NewAccessToken("", SingleUse, NoExpiration)
 	assert.Nil(t, tk)
+}
+
+type badToken struct {
+	AccessToken
+}
+
+// Class returns the class of the access token.
+func (t *badToken) Class() Class {
+	return ""
 }
 
 func TestAccessToken_BeforeCreate(t *testing.T) {
@@ -89,6 +114,11 @@ func TestAccessToken_BeforeCreate(t *testing.T) {
 	bad := NewAccessToken(testToken, SingleUse, NoExpiration)
 	bad.Token = ""
 	err = conn.Create(tk).Error
+	assert.Error(t, err)
+	bt := &badToken{}
+	assert.False(t, bt.Usable())
+	bt.Class()
+	err = conn.Create(bt).Error
 	assert.Error(t, err)
 }
 
@@ -168,4 +198,6 @@ func TestAccessToken_Use(t *testing.T) {
 	assert.Equal(t, 1, tk.Used)
 	assert.NotNil(t, tk.UsedAt)
 	assert.False(t, tk.Usable())
+	assert.NotNil(t, tk.LastUsed())
+
 }

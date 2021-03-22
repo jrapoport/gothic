@@ -31,9 +31,10 @@ func Start(a *core.API, c *config.Config) error {
 		addr   *string
 		hostFn func(a *core.API, addr string) core.Hosted
 	}{
-		{restName, &c.REST, NewRESTHost},
+		{adminName, &c.Admin, NewAdminHost},
 		{rpcName, &c.RPC, NewRPCHost},
 		{rpcWebName, &c.RPCWeb, NewRPCWebHost},
+		{restName, &c.REST, NewRESTHost},
 		{health.Name, &c.Health, func(a *core.API, addr string) core.Hosted {
 			return health.NewHealthHost(a, addr, hm.hosted)
 		}},

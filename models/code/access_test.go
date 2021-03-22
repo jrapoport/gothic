@@ -1,6 +1,7 @@
 package code
 
 import (
+	"github.com/jrapoport/gothic/utils"
 	"testing"
 	"time"
 
@@ -100,16 +101,24 @@ func testNewAccessCode(t *testing.T, f Format) {
 
 func TestAccessCode_BeforeCreate(t *testing.T) {
 	t.Parallel()
+	conn := accessCodeConn(t)
 	for _, f := range testFormats {
 		t.Run(testName(f), func(t *testing.T) {
 			t.Parallel()
-			testAccessCodeBeforeCreate(t, f)
+			testAccessCodeBeforeCreate(t, conn, f)
 		})
 	}
+	ac := NewAccessCode(Invite, SingleUse, NoExpiration)
+	err := conn.Create(ac).Error
+	assert.NoError(t, err)
+	ac = NewAccessCode(PIN, SingleUse, NoExpiration)
+	ac.Token = utils.DebugPIN
+	err = conn.Create(ac).Error
+	assert.Error(t, err)
+	assert.True(t, ac.Usable())
 }
 
-func testAccessCodeBeforeCreate(t *testing.T, f Format) {
-	conn := accessCodeConn(t)
+func testAccessCodeBeforeCreate(t *testing.T, conn *store.Connection, f Format) {
 	ac := NewAccessCode(f, SingleUse, NoExpiration)
 	err := conn.Create(ac).Error
 	assert.NoError(t, err)

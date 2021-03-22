@@ -9,7 +9,7 @@ import "google/protobuf/struct.proto";
 import "response.proto";
 
 service User {
-  rpc GetUser (GetUserRequest) returns (rpc.UserResponse) {
+  rpc GetUser (UserRequest) returns (rpc.UserResponse) {
   }
 
   rpc UpdateUser (UpdateUserRequest) returns (rpc.UserResponse) {
@@ -22,7 +22,7 @@ service User {
   }
 }
 
-message GetUserRequest {
+message UserRequest {
 }
 
 message UpdateUserRequest {

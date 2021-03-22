@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const send = confirm.Endpoint + confirm.Root
+const send = confirm.Endpoint + rest.Root
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 	srv, web, smtp := tsrv.RESTHost(t, []rest.RegisterServer{
@@ -67,7 +67,7 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
@@ -86,12 +86,12 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// resend
 	sent = ""
 	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, send, bt.Token, nil, nil)
 	assert.EqualError(t, err, thttp.FmtError(http.StatusTooEarly).Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }

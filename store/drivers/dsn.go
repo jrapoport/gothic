@@ -2,11 +2,12 @@ package drivers
 
 import (
 	"errors"
+	"net/url"
+	"path/filepath"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v4"
 	"github.com/jrapoport/gothic/utils"
-	"net/url"
-	"path/filepath"
 )
 
 // NormalizeDSN returns a normalized dsn.

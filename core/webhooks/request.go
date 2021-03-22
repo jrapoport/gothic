@@ -7,13 +7,11 @@ import (
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 )
 
+// HTTP Headers
 const (
-	// WebhookSignature http header
 	WebhookSignature = "x-webhook-signature"
-	// ContentType http header
-	ContentType = "Content-Type"
-	// JSONContent http header
-	JSONContent = "application/json"
+	ContentType      = "Content-Type"
+	JSONContent      = "application/json"
 )
 
 // NewWebhookRequest returns a new http request for the webhook callback.
