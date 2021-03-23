@@ -8,10 +8,9 @@ import (
 	"github.com/jrapoport/gothic/config"
 )
 
+// ReCaptcha debug values
 const (
-	// ReCaptchaDebugKey debug key
-	ReCaptchaDebugKey = "RECAPTCHA-DEBUG-KEY"
-	// ReCaptchaDebugToken debug token
+	ReCaptchaDebugKey   = "RECAPTCHA-DEBUG-KEY"
 	ReCaptchaDebugToken = "RECAPTCHA-DEBUG-TOKEN"
 )
 

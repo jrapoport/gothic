@@ -25,5 +25,13 @@ func TestRole(t *testing.T) {
 		r := test.role
 		assert.Equal(t, test.name, r.String())
 		test.Valid(t, r.Valid())
+		if r.Valid() {
+			assert.Equal(t, r, ToRole(test.name))
+		} else {
+			assert.Equal(t, InvalidRole, ToRole(test.name))
+		}
 	}
+	b, err := RoleSystem.MarshalJSON()
+	assert.NoError(t, err)
+	assert.Equal(t, `"system"`, string(b))
 }

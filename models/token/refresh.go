@@ -22,28 +22,28 @@ var _ Token = (*RefreshToken)(nil)
 
 // NewRefreshToken generates a new token. The type is inferred from uses.
 func NewRefreshToken(userID uuid.UUID) *RefreshToken {
-	t := *NewAccessToken(utils.SecureToken(), InfiniteUse, NoExpiration)
-	t.UserID = userID
-	return &RefreshToken{t}
+	at := *NewAccessToken(utils.SecureToken(), InfiniteUse, NoExpiration)
+	at.UserID = userID
+	return &RefreshToken{at}
 }
 
 // Class returns the class of the refresh token.
-func (t RefreshToken) Class() Class {
+func (rt RefreshToken) Class() Class {
 	return Refresh
 }
 
 // Usable returns true if the token is usable.
-func (t RefreshToken) Usable() bool {
-	if t.CreatedAt.IsZero() {
+func (rt RefreshToken) Usable() bool {
+	if rt.CreatedAt.IsZero() {
 		return false
 	}
-	return t.AccessToken.Usable()
+	return rt.AccessToken.Usable()
 }
 
 // HasToken returns true if the refresh token is found.
-func (t RefreshToken) HasToken(tx *store.Connection) (bool, error) {
-	if t.Token == "" {
+func (rt RefreshToken) HasToken(tx *store.Connection) (bool, error) {
+	if rt.Token == "" {
 		return false, errors.New("invalid token")
 	}
-	return tx.Has(&t, "token = ?", t.Token)
+	return tx.Has(&rt, "token = ?", rt.Token)
 }

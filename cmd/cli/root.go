@@ -52,6 +52,7 @@ func rootConfig() *config.Config {
 func ExecuteRoot() error {
 	return rootCmd.Execute()
 }
+
 /*
 func confirmAction(format string, a ...interface{}) (bool, error) {
 	p := fmt.Sprintf(format, a...)
@@ -67,4 +68,4 @@ func confirmAction(format string, a ...interface{}) (bool, error) {
 	return result == "Yes", nil
 }
 
- */
+*/

@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	confirmRt = confirm.Endpoint + confirm.Root
-	sendRt    = confirm.Endpoint + confirm.Send
+	confirmRt = confirm.Confirm + rest.Root
+	sendRt    = confirm.Confirm + confirm.Send
 )
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
@@ -54,7 +54,7 @@ func TestConfirmServer_ConfirmUser(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	req = &confirm.Request{
 		Token: tok,
 	}
@@ -98,7 +98,7 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok1 != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	var tok2 string
 	smtp.AddHook(t, func(email string) {
 		tok2 = tconf.GetEmailToken(template.ConfirmUserAction, email)
@@ -110,7 +110,7 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok2 != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.Equal(t, tok1, tok2)
 }
 
@@ -127,7 +127,7 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// resend
 	sent = ""
 	req := &confirm.Request{
@@ -137,5 +137,5 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.EqualError(t, err, thttp.FmtError(http.StatusTooEarly).Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }

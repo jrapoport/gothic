@@ -25,42 +25,37 @@ func init() {
 // Status is the user status
 type Status int8
 
+// User Status
 const (
-	// Invalid user status
 	Invalid Status = iota - 1
-	// Banned user status
 	Banned
-	// Locked user status
 	Locked
-	// Restricted user status
 	Restricted
-	// Active user status
 	Active
-	// Verified user status
 	Verified
 )
 
 // User represents a registered user with email/password authentication
 // TODO: support additional verification (beyond email confirmation) via VerifiedAt
 type User struct {
-	ID          uuid.UUID               `json:"id" gorm:"primaryKey;type:char(36)"`
-	Provider    provider.Name           `json:"provider" gorm:"type:varchar(255)"`
-	Role        Role                    `json:"role" gorm:"type:varchar(36)"`
-	Status      Status                  `json:"status"`
-	Email       string                  `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
-	Username    string                  `json:"username" gorm:"type:varchar(255)"`
-	Password    []byte                  `json:"-" gorm:"type:binary(60)"`
-	Data        types.Map               `json:"data"`
-	Metadata    types.Map               `json:"metadata"`
-	SignupCode  *uint                   `json:"signup_code"`
-	Linked      []account.LinkedAccount `json:"linked"`
-	CreatedAt   time.Time               `json:"created_at"`
-	UpdatedAt   time.Time               `json:"updated_at"`
-	LoginAt     *time.Time              `json:"login_at,omitempty"`
-	ConfirmedAt *time.Time              `json:"confirmed_at,omitempty"`
-	VerifiedAt  *time.Time              `json:"verified_at,omitempty"`
-	InvitedAt   *time.Time              `json:"invited_at,omitempty"`
-	DeletedAt   gorm.DeletedAt          `json:"deleted_at"`
+	ID          uuid.UUID         `json:"id" gorm:"primaryKey;type:char(36)"`
+	Provider    provider.Name     `json:"provider" gorm:"type:varchar(255)"`
+	Role        Role              `json:"role" gorm:"type:varchar(36)"`
+	Status      Status            `json:"status"`
+	Email       string            `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
+	Username    string            `json:"username" gorm:"type:varchar(255)"`
+	Password    []byte            `json:"-" gorm:"type:binary(60)"`
+	Data        types.Map         `json:"data"`
+	Metadata    types.Map         `json:"metadata"`
+	SignupCode  *uint             `json:"signup_code"`
+	Linked      []account.Account `json:"linked"`
+	CreatedAt   time.Time         `json:"created_at"`
+	UpdatedAt   time.Time         `json:"updated_at"`
+	LoginAt     *time.Time        `json:"login_at,omitempty"`
+	ConfirmedAt *time.Time        `json:"confirmed_at,omitempty"`
+	VerifiedAt  *time.Time        `json:"verified_at,omitempty"`
+	InvitedAt   *time.Time        `json:"invited_at,omitempty"`
+	DeletedAt   gorm.DeletedAt    `json:"deleted_at"`
 }
 
 // NewUser initializes a new user from an email, password and user data.

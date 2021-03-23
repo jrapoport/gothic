@@ -16,6 +16,27 @@ import (
 	"github.com/jrapoport/gothic/utils"
 )
 
+// Update updates a user
+func Update(conn *store.Connection, u *user.User, username *string, data types.Map) (bool, error) {
+	if u == nil || !u.IsActive() {
+		return false, errors.New("invalid user")
+	}
+	if username != nil {
+		u.Username = *username
+	} else if data == nil || len(data) <= 0 {
+		return false, nil
+	}
+	err := mergo.Merge(&u.Data, data, mergo.WithOverride)
+	if err != nil {
+		return false, err
+	}
+	err = conn.Model(u).Select(key.Username, key.Data).Updates(u).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // ConfirmUser confirms a user.
 func ConfirmUser(conn *store.Connection, u *user.User, t time.Time) error {
 	if u == nil || u.IsLocked() {
@@ -82,15 +103,15 @@ func ChangeEmail(conn *store.Connection, u *user.User, email string) error {
 	if u == nil || !u.IsActive() {
 		return errors.New("invalid user")
 	}
-	if u.Provider.IsExternal() {
-		return errors.New("invalid provider")
-	}
 	addr, err := mail.ParseAddress(email)
 	if err != nil {
 		return fmt.Errorf("invalid email: %s", email)
 	}
+	if u.Email == addr.Address {
+		return nil
+	}
 	u.Email = addr.Address
-	return conn.Model(&u).Select(key.Email).Updates(u).Error
+	return conn.Model(&u).Update(key.Email, u.Email).Error
 }
 
 // ChangePassword changes the password for a user.
@@ -106,24 +127,7 @@ func ChangePassword(conn *store.Connection, u *user.User, pw string) error {
 		return err
 	}
 	u.Password = hashed
-	return conn.Model(&u).Select(key.Password).Updates(u).Error
-}
-
-// Update updates a user
-func Update(conn *store.Connection, u *user.User, username *string, data types.Map) error {
-	if u == nil || !u.IsActive() {
-		return errors.New("invalid user")
-	}
-	if username != nil {
-		u.Username = *username
-	} else if data == nil {
-		return nil
-	}
-	err := mergo.Merge(&u.Data, data, mergo.WithOverride)
-	if err != nil {
-		return err
-	}
-	return conn.Model(u).Select(key.Username, key.Data).Updates(u).Error
+	return conn.Model(&u).Update(key.Password, u.Password).Error
 }
 
 // LockUser locks a user.
@@ -133,7 +137,7 @@ func LockUser(conn *store.Connection, u *user.User) error {
 		return nil
 	}
 	u.Status = user.Locked
-	return conn.Model(u).Select(key.Status).Updates(u).Error
+	return conn.Model(u).Update(key.Status, u.Status).Error
 }
 
 // BanUser bans a user.
@@ -143,7 +147,7 @@ func BanUser(conn *store.Connection, u *user.User) error {
 		return nil
 	}
 	u.Status = user.Banned
-	return conn.Model(u).Select(key.Status).Updates(u).Error
+	return conn.Model(u).Update(key.Status, u.Status).Error
 }
 
 // DeleteUser deletes a user.

@@ -316,7 +316,7 @@ func testSend(t *testing.T, a *API, u *user.User, action string,
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	testToken(tok)
 	// rate limit
 	if rateLimit != nil {

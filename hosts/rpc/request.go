@@ -13,12 +13,10 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
+// RPC metadata keys
 const (
-	// RealIP is the context metadata key for real ip
-	RealIP = "X-Real-IP"
-	// ForwardedFor is the context metadata key for forwarded for ip
-	ForwardedFor = "X-Forwarded-For"
-	// ReCaptchaToken is the context metadata key for a recaptcha token
+	RealIP         = "X-Real-IP"
+	ForwardedFor   = "X-Forwarded-For"
 	ReCaptchaToken = "X-ReCaptcha-Token"
 )
 

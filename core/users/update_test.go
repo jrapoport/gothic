@@ -16,6 +16,55 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestUpdate(t *testing.T) {
+	t.Parallel()
+	const (
+		name1 = "peaches"
+		name2 = "foobar"
+	)
+	conn, c := tconn.TempConn(t)
+	u := testUser(t, conn, c.Provider())
+	username := u.Username
+	_, err := Update(conn, u, nil, types.Map{
+		key.FirstName: name1,
+	})
+	assert.Error(t, err)
+	err = ConfirmUser(conn, u, time.Now())
+	require.NoError(t, err)
+	ok, err := Update(conn, u, nil, types.Map{
+		key.FirstName: name1,
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, username, u.Username)
+	assert.Equal(t, name1, u.Data[key.FirstName])
+	username = name1
+	ok, err = Update(conn, u, &username, nil)
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, username, u.Username)
+	username = name2
+	ok, err = Update(conn, u, &username, types.Map{
+		key.FirstName: name2,
+		key.LastName:  name1,
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, username, u.Username)
+	assert.Equal(t, name2, u.Data[key.FirstName])
+	assert.Equal(t, name1, u.Data[key.LastName])
+	ok, err = Update(conn, u, nil, nil)
+	assert.NoError(t, err)
+	assert.False(t, ok)
+	banUser(t, conn, u)
+	ok, err = Update(conn, u, &username, nil)
+	assert.Error(t, err)
+	assert.False(t, ok)
+	ok, err = Update(conn, nil, &username, nil)
+	assert.Error(t, err)
+	assert.False(t, ok)
+}
+
 func TestConfirmUser(t *testing.T) {
 	t.Parallel()
 	conn, c := tconn.TempConn(t)
@@ -109,9 +158,8 @@ func TestChangeEmail(t *testing.T) {
 	assert.Equal(t, newEmail, u.Email)
 	err = ChangeEmail(conn, u, "@")
 	assert.Error(t, err)
-	u.Provider = provider.Google
 	err = ChangeEmail(conn, u, newEmail)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	banUser(t, conn, u)
 	err = ChangeEmail(conn, u, newEmail)
 	assert.Error(t, err)
@@ -135,49 +183,6 @@ func TestChangePassword(t *testing.T) {
 	err = ChangePassword(conn, u, newPassword)
 	assert.Error(t, err)
 	err = ChangePassword(conn, nil, newPassword)
-	assert.Error(t, err)
-}
-
-func TestUpdate(t *testing.T) {
-	t.Parallel()
-	const (
-		name1 = "peaches"
-		name2 = "foobar"
-	)
-	conn, c := tconn.TempConn(t)
-	u := testUser(t, conn, c.Provider())
-	username := u.Username
-	err := Update(conn, u, nil, types.Map{
-		key.FirstName: name1,
-	})
-	assert.Error(t, err)
-	err = ConfirmUser(conn, u, time.Now())
-	require.NoError(t, err)
-	err = Update(conn, u, nil, types.Map{
-		key.FirstName: name1,
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, username, u.Username)
-	assert.Equal(t, name1, u.Data[key.FirstName])
-	username = name1
-	err = Update(conn, u, &username, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, username, u.Username)
-	username = name2
-	err = Update(conn, u, &username, types.Map{
-		key.FirstName: name2,
-		key.LastName:  name1,
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, username, u.Username)
-	assert.Equal(t, name2, u.Data[key.FirstName])
-	assert.Equal(t, name1, u.Data[key.LastName])
-	err = Update(conn, u, nil, nil)
-	assert.NoError(t, err)
-	banUser(t, conn, u)
-	err = Update(conn, u, &username, nil)
-	assert.Error(t, err)
-	err = Update(conn, nil, &username, nil)
 	assert.Error(t, err)
 }
 

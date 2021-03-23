@@ -17,7 +17,6 @@ func TestAction_Type(t *testing.T) {
 		{ConfirmSent, Account},
 		{Confirmed, Account},
 		{Deleted, Account},
-		{Linked, Account},
 		{Signup, Account},
 		{Startup, System},
 		{Shutdown, System},
@@ -27,6 +26,7 @@ func TestAction_Type(t *testing.T) {
 		{RevokedAll, Token},
 		{ChangeRole, User},
 		{Email, User},
+		{Linked, User},
 		{Login, User},
 		{Logout, User},
 		{Password, User},
@@ -37,4 +37,5 @@ func TestAction_Type(t *testing.T) {
 		typ := test.a.Type()
 		assert.Equal(t, test.t, typ)
 	}
+	assert.Equal(t, string(Banned), Banned.String())
 }
