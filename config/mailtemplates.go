@@ -85,7 +85,7 @@ type MailTemplate struct {
 // FormatLink formats the link URL replacing the ':token' and ':action' in the link format.
 // This function assumes you know what you doing and will produce a valid link.
 func FormatLink(linkFormat, action, token string) string {
-	link := strings.ReplaceAll(linkFormat, mailLinkAction, action)
-	link = strings.ReplaceAll(link, mailLinkToken, token)
-	return link
+	l := strings.ReplaceAll(linkFormat, mailLinkAction, action)
+	l = strings.ReplaceAll(l, mailLinkToken, token)
+	return l
 }

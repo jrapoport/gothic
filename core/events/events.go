@@ -3,17 +3,12 @@ package events
 // Event dispatch event
 type Event string
 
+// Events
 const (
-	// Unknown event
-	Unknown Event = ""
-	// Confirmed event
+	Unknown   Event = ""
 	Confirmed Event = "confirmed"
-	// Login event
-	Login Event = "login"
-	// Logout event
-	Logout Event = "logout"
-	// Signup event
-	Signup Event = "signup"
-	// All must be last
-	All Event = "all"
+	Login     Event = "login"
+	Logout    Event = "logout"
+	Signup    Event = "signup"
+	All       Event = "all" // must be last
 )

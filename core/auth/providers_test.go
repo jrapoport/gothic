@@ -1,4 +1,4 @@
-package providers
+package auth
 
 import (
 	"os"

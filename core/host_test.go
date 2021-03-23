@@ -37,7 +37,7 @@ func TestNewHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.lis != nil
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	assert.True(t, h.Online())
 	assert.Equal(t, name, h.Name())
 	assert.NotEmpty(t, h.Address())
@@ -70,7 +70,7 @@ func TestNewHost_Error(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.lis != nil
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	h.Stop(func(ctx context.Context) error {
 		return errors.New("fake")
 	})

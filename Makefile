@@ -93,7 +93,7 @@ static: $(GO_STATIC) ## Run static analysis
 tidy: ## Tidy module
 	$(GO_MOD) tidy
 
-deps:: tidy ## Install dependencies
+deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
 rpc::

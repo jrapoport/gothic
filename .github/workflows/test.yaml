@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install workflow dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y make gcc protobuf-compiler
+        run: sudo apt install -y make gcc
       - name: Install images
         run: |
           docker pull mysql:8.0.22

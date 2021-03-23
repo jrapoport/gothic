@@ -59,7 +59,7 @@ func testWebhookEvent(t *testing.T, evt events.Event, test events.Event) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return rec.Code == http.StatusOK
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	var msg types.Map
 	err = json.Unmarshal(rec.Body.Bytes(), &msg)
 	assert.NoError(t, err)
@@ -190,7 +190,7 @@ func TestAPI_WebhookNotFound(t *testing.T) {
 		mu.RLock()
 		defer mu.RUnlock()
 		return rec.Code == http.StatusOK
-	}, time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestAPI_WebhookDisabled(t *testing.T) {

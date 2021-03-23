@@ -3,8 +3,8 @@ package core
 import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/audit"
+	"github.com/jrapoport/gothic/core/auth"
 	"github.com/jrapoport/gothic/core/events"
-	"github.com/jrapoport/gothic/core/providers"
 	"github.com/jrapoport/gothic/mail"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
@@ -17,7 +17,7 @@ type API struct {
 	conn   *store.Connection
 	evt    *events.Dispatch
 	mail   *mail.Client
-	ext    *providers.Providers
+	ext    *auth.Providers
 	log    logrus.FieldLogger
 }
 
@@ -58,7 +58,7 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 	if err != nil {
 		return a.logError(err)
 	}
-	a.ext = providers.NewProviders()
+	a.ext = auth.NewProviders()
 	err = a.ext.LoadProviders(a.config)
 	if err != nil {
 		return a.logError(err)
@@ -68,7 +68,7 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 }
 
 // Providers is mainly here for testing rn
-func (a *API) Providers() *providers.Providers {
+func (a *API) Providers() *auth.Providers {
 	return a.ext
 }
 

@@ -1,12 +1,12 @@
 package core
 
 import (
-	"github.com/jrapoport/gothic/models/types"
 	"net/url"
 	"testing"
 
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
+	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tconf"
@@ -50,8 +50,9 @@ func TestAPI_GetAuthorizationURL(t *testing.T) {
 	_, err = a.GetAuthorizationURL(ctx, provider.BitBucket)
 	assert.Error(t, err)
 	// valid external provider
-	ctx.SetProvider(mock.PName())
-	authURL, err := a.GetAuthorizationURL(ctx, mock.PName())
+	p := provider.Name(mock.Name())
+	ctx.SetProvider(p)
+	authURL, err := a.GetAuthorizationURL(ctx, p)
 	assert.NoError(t, err)
 	_, err = url.Parse(authURL)
 	assert.NoError(t, err)
@@ -78,28 +79,30 @@ func TestAPI_AuthorizeUser(t *testing.T) {
 	_, err = a.AuthorizeUser(nil, at.Token, nil)
 	assert.Error(t, err)
 	// invalid session
-	at, err = tokens.GrantAuthToken(a.conn, mock.PName(), 0)
+	p := provider.Name(mock.Name())
+	at, err = tokens.GrantAuthToken(a.conn, p, 0)
 	require.NoError(t, err)
 	_, err = a.AuthorizeUser(nil, at.Token, nil)
 	assert.Error(t, err)
 	// create
-	tok, data := authToken(t, a, mock.PName())
+	tok, data := authToken(t, a, p)
 	u, err := a.AuthorizeUser(context.Background(), tok, data)
 	assert.NoError(t, err)
 	require.NotNil(t, u)
 	assert.True(t, u.IsConfirmed())
 	assert.True(t, u.IsActive())
-	assert.Equal(t, mock.PName(), u.Provider)
-	assert.Equal(t, mock.Username, u.Username)
-	assert.Equal(t, mock.Email, u.Email)
+	assert.Equal(t, p, u.Provider)
+	mp := tconf.ToMockProvider(mock)
+	assert.Equal(t, mp.Username, u.Username)
+	assert.Equal(t, mp.Email, u.Email)
 	// update
 	username := u.Username
-	tok, data = authToken(t, a, mock.PName())
+	tok, data = authToken(t, a, p)
 	u, err = a.AuthorizeUser(context.Background(), tok, data)
 	assert.NoError(t, err)
 	require.NotNil(t, u)
 	assert.NoError(t, err)
-	assert.Equal(t, mock.PName(), u.Provider)
+	assert.Equal(t, p, u.Provider)
 	assert.Equal(t, username, u.Username)
-	assert.Equal(t, mock.Email, u.Email)
+	assert.Equal(t, mp.Email, u.Email)
 }

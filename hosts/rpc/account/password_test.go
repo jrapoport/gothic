@@ -47,7 +47,7 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
@@ -71,7 +71,7 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
 				return sent != ""
-			}, 200*time.Millisecond, 10*time.Millisecond)
+			}, 1*time.Second, 10*time.Millisecond)
 		} else {
 			test := s.RPCError(codes.DeadlineExceeded,
 				config.ErrRateLimitExceeded)
@@ -79,7 +79,7 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 			assert.EqualError(t, err, test.Error())
 			assert.Never(t, func() bool {
 				return sent != ""
-			}, 200*time.Millisecond, 10*time.Millisecond)
+			}, 1*time.Second, 10*time.Millisecond)
 		}
 	}
 }
@@ -118,7 +118,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// now use the token to change the password
 	req = &ConfirmPasswordRequest{
 		Token:    tok,

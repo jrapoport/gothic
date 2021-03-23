@@ -23,8 +23,10 @@ func TestConfirmToken_HasToken(t *testing.T) {
 	conn, _ := tconn.TempConn(t)
 	createToken := func() *ConfirmToken {
 		tk := NewConfirmToken(uuid.New(), 0)
+		assert.False(t, tk.Usable())
 		err := conn.Create(tk).Error
 		require.NoError(t, err)
+		assert.True(t, tk.Usable())
 		return tk
 	}
 	deletedToken := createToken()

@@ -9,6 +9,19 @@ import (
 // Filters hols the search filters.
 type Filters types.Map
 
+func (f Filters) Copy() Filters {
+	return Filters(types.Map(f).Copy())
+}
+
+// FiltersFromMap returns a set of filters from a string map.
+func FiltersFromMap(m map[string]string) Filters {
+	d := make(Filters, len(m))
+	for k, v := range m {
+		d[k] = v
+	}
+	return d
+}
+
 // Filter to apply
 type Filter struct {
 	Filters   Filters
@@ -17,13 +30,15 @@ type Filter struct {
 }
 
 // Search searches a table for hits
-func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination, cond ...string) error {
+func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination) error {
 	if s == "" {
 		s = Descending
 	}
-	filters := make(Filters, len(f.Filters))
-	for k, v := range f.Filters {
-		filters[k] = v
+	filters := f.Filters.Copy()
+	for k, v := range filters {
+		if v == "" {
+			delete(filters, k)
+		}
 	}
 	for _, field := range f.Fields {
 		if v, ok := filters[field]; ok {
@@ -35,11 +50,6 @@ func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination, co
 		if v, ok := filters[field+"!"]; ok {
 			tx = tx.Where(field+" <> ?", v)
 			delete(filters, field+"!")
-		}
-	}
-	if len(cond) > 0 {
-		for _, c := range cond {
-			tx = tx.Where(c)
 		}
 	}
 	for k, v := range filters {

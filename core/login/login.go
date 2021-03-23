@@ -32,10 +32,12 @@ func UserLogin(conn *store.Connection, p provider.Name, email, pw string) (*user
 		if u.Provider != p {
 			return errors.New("invalid provider")
 		}
-		err = u.Authenticate(pw)
-		if err != nil {
-			err = fmt.Errorf("incorrect password %w", err)
-			return err
+		if !p.IsExternal() {
+			err = u.Authenticate(pw)
+			if err != nil {
+				err = fmt.Errorf("incorrect password %w", err)
+				return err
+			}
 		}
 		now := time.Now().UTC()
 		u.LoginAt = &now

@@ -29,7 +29,7 @@ func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 	RegisterUserServer(s, newUserServer(srv))
 }
 
-func (s *userServer) GetUser(ctx context.Context, _ *GetUserRequest) (*rpc.UserResponse, error) {
+func (s *userServer) GetUser(ctx context.Context, _ *UserRequest) (*rpc.UserResponse, error) {
 	uid, err := rpc.GetUserID(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
@@ -118,7 +118,7 @@ func (s *userServer) ChangePassword(ctx context.Context, req *ChangePasswordRequ
 	}
 	rtx := rpc.RequestContext(ctx)
 	s.Debugf("change password %s: %v", u.ID, req)
-	u, err = s.API.ChangePassword(rtx, u.ID, req.OldPassword, req.Password)
+	u, err = s.API.ChangePassword(rtx, u.ID, req.Password, req.NewPassword)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
 	}

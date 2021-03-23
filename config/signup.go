@@ -3,15 +3,12 @@ package config
 // Invites config
 type Invites string
 
+// Invite permissions
 const (
-	// Disabled invites are disabled
 	Disabled Invites = ""
-	// Users invites are available to any active user
-	Users Invites = "user"
-	// Admins invites are available to admins only
-	Admins Invites = "admin"
-	// Super invites are available to super admins only
-	Super Invites = "super"
+	Users    Invites = "user"
+	Admins   Invites = "admin"
+	Super    Invites = "super"
 )
 
 // Signup config

@@ -15,6 +15,7 @@ import (
 
 func Test_Main(t *testing.T) {
 	c := tconf.TempDB(t)
+	c.Network.Admin = "127.0.0.1:0"
 	c.Network.REST = "127.0.0.1:0"
 	c.Network.RPC = "127.0.0.1:0"
 	c.Network.RPCWeb = "127.0.0.1:0"

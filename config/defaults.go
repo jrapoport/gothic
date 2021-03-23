@@ -50,10 +50,11 @@ var serviceDefaults = Service{
 
 var networkDefaults = Network{
 	Host:   "localhost",
-	REST:   "localhost:7727",
-	RPC:    "localhost:7721",
-	RPCWeb: "localhost:7729",
 	Health: "localhost:7720",
+	RPC:    "localhost:7721",
+	Admin:  "localhost:7722",
+	REST:   "localhost:7727",
+	RPCWeb: "localhost:7729",
 }
 
 var securityDefaults = Security{

@@ -2,7 +2,6 @@ package tconf
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/models/types/key"
 	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
@@ -21,133 +21,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testRole = "mock-user"
-
-type MockSession struct {
-	goth.Session
-	Role string
-	t    *testing.T
-}
-
-// MockProvider is a provider mock.
-type MockProvider struct {
-	faux      faux.Provider
-	Role      string
-	AccountID string
-	Email     string
-	Username  string
-	Callback  string
-	t         *testing.T
-}
-
-var _ goth.Provider = (*MockProvider)(nil)
-
-func NewMockProvider(t *testing.T, callback string) *MockProvider {
-	return &MockProvider{
-		faux:      faux.Provider{},
-		Role:      testRole,
-		AccountID: uuid.NewString(),
-		Username:  utils.RandomUsername(),
-		Email:     tutils.RandomEmail(),
-		Callback:  callback,
-		t:         t,
-	}
-}
-
-func (fp MockProvider) Name() string {
-	return fp.faux.Name()
-}
-
-// PName returns a typed provider name for tests.
-func (fp MockProvider) PName() provider.Name {
-	return provider.Name(fp.Name())
-}
-
-// BeginAuth satisfies the goth.Provider
-func (fp MockProvider) BeginAuth(state string) (goth.Session, error) {
-	s, err := fp.faux.BeginAuth(state)
-	if err != nil {
-		return nil, err
-	}
-	authURL, err := s.GetAuthURL()
-	if err != nil {
-		return nil, err
-	}
-	authURL += fmt.Sprintf("&%s=%s", key.Role, fp.Role)
-	if fp.Callback != "" {
-		au, err := url.Parse(authURL)
-		if err != nil {
-			return nil, err
-		}
-		authURL = fp.Callback + "?" + au.RawQuery
-	}
-	return &MockSession{
-		Session: &faux.Session{
-			ID:      fp.AccountID,
-			Name:    fp.Username,
-			Email:   fp.Email,
-			AuthURL: authURL,
-		},
-		t: fp.t,
-	}, nil
-}
-
-func (fp MockProvider) SetName(name string) {
-	fp.faux.SetName(name)
-}
-
-func (fp MockProvider) UnmarshalSession(s string) (goth.Session, error) {
-	sess, err := fp.faux.UnmarshalSession(s)
-	if err != nil {
-		return nil, err
-	}
-	return &MockSession{
-		sess,
-		fp.Role,
-		fp.t,
-	}, nil
-}
-
-func (fp MockProvider) FetchUser(session goth.Session) (goth.User, error) {
-	sess := session.(*MockSession)
-	return fp.faux.FetchUser(sess.Session)
-}
-
-func (fp MockProvider) Debug(b bool) {
-	fp.faux.Debug(b)
-}
-
-func (fp MockProvider) RefreshToken(refreshToken string) (*oauth2.Token, error) {
-	return fp.faux.RefreshToken(refreshToken)
-}
-
-func (fp MockProvider) RefreshTokenAvailable() bool {
-	return fp.faux.RefreshTokenAvailable()
-}
-
-// Authorize is used only for testing.
-func (s *MockSession) Authorize(provider goth.Provider, params goth.Params) (string, error) {
-	tok := params.Get(key.Role)
-	require.Equal(s.t, s.Role, tok)
-	return s.Session.Authorize(provider, params)
-}
-
 // MockedProvider returns a mocked provider for tests.
-func MockedProvider(t *testing.T, c *config.Config, callback string) (*config.Config, *MockProvider) {
+func MockedProvider(t *testing.T, c *config.Config, callback string) (*config.Config, goth.Provider) {
 	const (
 		testClientKey = "provider-test-client-key"
 		testSecret    = "provider-test-secret"
 		testCallback  = "http://auth.exmaple.com/test/callback"
 	)
-	mp := NewMockProvider(t, callback)
-	provider.AddExternal(mp.PName())
+	mp := newMockProvider(t, callback)
+	p := provider.Name(mp.Name())
+	provider.AddExternal(p)
 	t.Cleanup(func() {
-		delete(provider.External, mp.PName())
+		delete(provider.External, p)
 	})
 	if callback == "" {
 		callback = testCallback
 	}
-	c.Authorization.Providers[mp.PName()] = config.Provider{
+	c.Authorization.Providers[p] = config.Provider{
 		ClientKey:   testClientKey,
 		Secret:      testSecret,
 		CallbackURL: callback,
@@ -219,4 +109,114 @@ func ProvidersConfig(t *testing.T) *config.Config {
 	}
 	c.Authorization = a
 	return c
+}
+
+type mockSession struct {
+	goth.Session
+	Role string
+	t    *testing.T
+}
+
+type mockProvider struct {
+	faux      faux.Provider
+	Role      string
+	AccountID string
+	Email     string
+	Username  string
+	Callback  string
+	t         *testing.T
+}
+
+var _ goth.Provider = (*mockProvider)(nil)
+
+const testRole = "mock-user"
+
+func newMockProvider(t *testing.T, callback string) *mockProvider {
+	return &mockProvider{
+		faux:      faux.Provider{},
+		Role:      testRole,
+		AccountID: uuid.NewString(),
+		Username:  utils.RandomUsername(),
+		Email:     tutils.RandomEmail(),
+		Callback:  callback,
+		t:         t,
+	}
+}
+
+func (fp mockProvider) Name() string {
+	return fp.faux.Name()
+}
+
+// BeginAuth satisfies the goth.Provider
+func (fp mockProvider) BeginAuth(state string) (goth.Session, error) {
+	s, err := fp.faux.BeginAuth(state)
+	if err != nil {
+		return nil, err
+	}
+	authURL, err := s.GetAuthURL()
+	if err != nil {
+		return nil, err
+	}
+	authURL += fmt.Sprintf("&%s=%s", key.Role, fp.Role)
+	if fp.Callback != "" {
+		au, err := url.Parse(authURL)
+		if err != nil {
+			return nil, err
+		}
+		authURL = fp.Callback + "?" + au.RawQuery
+	}
+	return &mockSession{
+		Session: &faux.Session{
+			ID:      fp.AccountID,
+			Name:    fp.Username,
+			Email:   fp.Email,
+			AuthURL: authURL,
+		},
+		t: fp.t,
+	}, nil
+}
+
+func (fp mockProvider) SetName(name string) {
+	fp.faux.SetName(name)
+}
+
+func (fp mockProvider) UnmarshalSession(s string) (goth.Session, error) {
+	sess, err := fp.faux.UnmarshalSession(s)
+	if err != nil {
+		return nil, err
+	}
+	return &mockSession{
+		sess,
+		fp.Role,
+		fp.t,
+	}, nil
+}
+
+func (fp mockProvider) FetchUser(session goth.Session) (goth.User, error) {
+	sess := session.(*mockSession)
+	return fp.faux.FetchUser(sess.Session)
+}
+
+func (fp mockProvider) Debug(b bool) {
+	fp.faux.Debug(b)
+}
+
+func (fp mockProvider) RefreshToken(refreshToken string) (*oauth2.Token, error) {
+	return fp.faux.RefreshToken(refreshToken)
+}
+
+func (fp mockProvider) RefreshTokenAvailable() bool {
+	return fp.faux.RefreshTokenAvailable()
+}
+
+// Authorize is used only for testing.
+func (s *mockSession) Authorize(provider goth.Provider, params goth.Params) (string, error) {
+	tok := params.Get(key.Role)
+	require.Equal(s.t, s.Role, tok)
+	return s.Session.Authorize(provider, params)
+}
+
+// ToMockProvider returns the mock provider for tests
+func ToMockProvider(p goth.Provider) *mockProvider {
+	return p.(*mockProvider)
 }

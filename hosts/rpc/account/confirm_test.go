@@ -50,7 +50,7 @@ func TestAccountServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
@@ -69,7 +69,7 @@ func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	// resend
 	sent = ""
 	req := &SendConfirmRequest{
@@ -82,7 +82,7 @@ func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.EqualError(t, err, test.Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
 
 func TestAccountServer_ConfirmUser(t *testing.T) {
@@ -112,7 +112,7 @@ func TestAccountServer_ConfirmUser(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok != ""
-	}, 200*time.Millisecond, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 	req = &ConfirmUserRequest{
 		Token: tok,
 	}

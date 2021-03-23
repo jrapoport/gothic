@@ -28,13 +28,10 @@ type Usage uint8
 const (
 	// Infinite indicates this code may be used an infinite number of times.
 	Infinite Usage = iota
-
 	// Single is a token that can be used once.
 	Single
-
 	// Multi is a token that can be used repeatedly.
 	Multi
-
 	// Timed is a token that must be used before it expires.
 	Timed
 )
@@ -64,13 +61,10 @@ func (c Class) String() string {
 const (
 	// Access is a generic access token
 	Access Class = "access"
-
 	// Confirm is an email confirmation token.
 	Confirm Class = "confirm"
-
 	// Refresh is a refresh token.
 	Refresh Class = "refresh"
-
 	// Auth is an authorization token.
 	Auth Class = "auth"
 )

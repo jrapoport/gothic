@@ -1,4 +1,4 @@
-package providers
+package auth
 
 import (
 	"errors"
@@ -20,8 +20,8 @@ type AuthURL struct {
 }
 
 // GrantAuthURL returns the auth url for a named provider.
-func (p *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp time.Duration) (*AuthURL, error) {
-	gp, err := p.GetProvider(name)
+func (pv *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp time.Duration) (*AuthURL, error) {
+	p, err := pv.GetProvider(name)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (p *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp
 		if err != nil {
 			return err
 		}
-		s, err := gp.BeginAuth(au.Token.String())
+		s, err := p.BeginAuth(au.Token.String())
 		if err != nil {
 			return err
 		}
@@ -51,14 +51,14 @@ func (p *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp
 }
 
 // AuthorizeUser checks the token and turns the oauth authorized user.
-func (p *Providers) AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
+func (pv *Providers) AuthorizeUser(conn *store.Connection, tok string, data types.Map) (*goth.User, error) {
 	var u goth.User
 	err := conn.Transaction(func(tx *store.Connection) error {
 		t, err := tokens.GetAuthToken(tx, tok)
 		if err != nil {
 			return err
 		}
-		gp, err := p.GetProvider(t.Provider)
+		p, err := pv.GetProvider(t.Provider)
 		if err != nil {
 			return err
 		}
@@ -66,15 +66,15 @@ func (p *Providers) AuthorizeUser(conn *store.Connection, tok string, data types
 		if !ok {
 			return errors.New("invalid session")
 		}
-		s, err := gp.UnmarshalSession(sd)
+		s, err := p.UnmarshalSession(sd)
 		if err != nil {
 			return err
 		}
-		_, err = s.Authorize(gp, data)
+		_, err = s.Authorize(p, data)
 		if err != nil {
 			return err
 		}
-		u, err = gp.FetchUser(s)
+		u, err = p.FetchUser(s)
 		if err != nil {
 			return err
 		}
