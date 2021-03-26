@@ -5,28 +5,28 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc"
 )
 
-//go:generate protoc -I=. -I=.. --go_out=plugins=grpc:. --go_opt=paths=source_relative account.proto
-
 type accountServer struct {
+	account.UnimplementedAccountServer
 	*rpc.Server
 }
 
 var (
-	_ AccountServer                     = (*accountServer)(nil)
+	_ account.AccountServer             = (*accountServer)(nil)
 	_ grpc_auth.ServiceAuthFuncOverride = (*accountServer)(nil)
 )
 
 func newAccountServer(srv *rpc.Server) *accountServer {
 	srv.FieldLogger = srv.WithField("module", "account")
-	return &accountServer{srv}
+	return &accountServer{Server: srv}
 }
 
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	RegisterAccountServer(s, newAccountServer(srv))
+	account.RegisterAccountServer(s, newAccountServer(srv))
 }
 
 func (s *accountServer) AuthFuncOverride(ctx context.Context, _ string) (context.Context, error) {

@@ -5,11 +5,13 @@ import (
 	"errors"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
+	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 )
 
 func (s *accountServer) Signup(ctx context.Context,
-	req *SignupRequest) (*rpc.UserResponse, error) {
+	req *account.SignupRequest) (*rpcpb.UserResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -34,5 +36,5 @@ func (s *accountServer) Signup(ctx context.Context,
 		return nil, s.RPCError(codes.PermissionDenied, err)
 	}
 	res.Token = rpc.NewBearerResponse(bt)
-	return res, nil
+	return (*rpcpb.UserResponse)(res), nil
 }

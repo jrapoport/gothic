@@ -6,12 +6,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *accountServer) Logout(ctx context.Context,
-	_ *LogoutRequest) (*emptypb.Empty, error) {
+	_ *account.LogoutRequest) (*emptypb.Empty, error) {
 	rtx := rpc.RequestContext(ctx)
 	uid := rtx.GetUserID()
 	if uid == uuid.Nil {

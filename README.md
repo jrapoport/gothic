@@ -64,6 +64,24 @@ handful of configuration options to get started.
 
 For a full list of configuration options please see the [Configuration](#configuration) section below.
 
+### Using gRPC-Web
+
+First start your instance of `gothic`, or use the container:
+
+```sh
+$ make db
+$ make gothic
+```
+
+Next, you will need to start the `envoy` server
+
+```sh
+$ make envoy
+```
+
+Once `gothic`, the db, & `envoy` are running you can make gRPC-Web calls
+using the [javascript bindings](https://github.com/jrapoport/gothic/blob/master/protobuf/grpc/web).
+
 #### Startup
 
 By default, Gothic will search a config file named `gothic.env`, `gothic.json`, or `gothic.yaml` in the following

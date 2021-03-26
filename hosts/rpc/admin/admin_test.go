@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/codes"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/settings"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,10 +36,10 @@ func TestAdminServer_Codes(t *testing.T) {
 		RegisterServer,
 	})
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return codes.NewCodesClient(cc)
-	}).(codes.CodesClient)
+		return signup.NewSignupClient(cc)
+	}).(signup.SignupClient)
 	ctx := context.Background()
-	list, err := client.CreateSignupCodes(ctx, &codes.CreateSignupCodesRequest{
+	list, err := client.CreateSignupCodes(ctx, &signup.CreateSignupCodesRequest{
 		Uses:  1,
 		Count: 1,
 	})
@@ -47,17 +47,17 @@ func TestAdminServer_Codes(t *testing.T) {
 	require.NotNil(t, list)
 	assert.Len(t, list.GetCodes(), 1)
 	code := list.GetCodes()[0]
-	sc, err := client.CheckSignupCode(ctx, &codes.CheckSignupCodeRequest{
+	sc, err := client.CheckSignupCode(ctx, &signup.CheckSignupCodeRequest{
 		Code: code,
 	})
 	assert.NoError(t, err)
 	assert.True(t, sc.Usable)
 	assert.Equal(t, code, sc.Code)
-	_, err = client.VoidSignupCode(ctx, &codes.VoidSignupCodeRequest{
+	_, err = client.VoidSignupCode(ctx, &signup.VoidSignupCodeRequest{
 		Code: code,
 	})
 	assert.NoError(t, err)
-	_, err = client.CheckSignupCode(ctx, &codes.CheckSignupCodeRequest{
+	_, err = client.CheckSignupCode(ctx, &signup.CheckSignupCodeRequest{
 		Code: code,
 	})
 	assert.Error(t, err)

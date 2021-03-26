@@ -8,6 +8,7 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/mail/template"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
@@ -27,7 +28,7 @@ func TestAccountServer_SendConfirmUser(t *testing.T) {
 	_, err := srv.SendConfirmUser(ctx, nil)
 	assert.Error(t, err)
 	// empty email
-	req := &SendConfirmRequest{}
+	req := &account.SendConfirmRequest{}
 	_, err = srv.SendConfirmUser(ctx, req)
 	assert.Error(t, err)
 	// bad email
@@ -72,7 +73,7 @@ func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
 	}, 1*time.Second, 10*time.Millisecond)
 	// resend
 	sent = ""
-	req := &SendConfirmRequest{
+	req := &account.SendConfirmRequest{
 		Email: u.Email,
 	}
 	_, err := srv.SendConfirmUser(ctx, req)
@@ -96,7 +97,7 @@ func TestAccountServer_ConfirmUser(t *testing.T) {
 	_, err := srv.ConfirmUser(ctx, nil)
 	assert.Error(t, err)
 	// empty token
-	req := &ConfirmUserRequest{}
+	req := &account.ConfirmUserRequest{}
 	_, err = srv.ConfirmUser(ctx, req)
 	assert.Error(t, err)
 	// bad token
@@ -113,7 +114,7 @@ func TestAccountServer_ConfirmUser(t *testing.T) {
 	assert.Eventually(t, func() bool {
 		return tok != ""
 	}, 1*time.Second, 10*time.Millisecond)
-	req = &ConfirmUserRequest{
+	req = &account.ConfirmUserRequest{
 		Token: tok,
 	}
 	res, err := srv.ConfirmUser(ctx, req)

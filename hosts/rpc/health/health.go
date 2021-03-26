@@ -1,30 +1,30 @@
 package health
 
-//go:generate protoc -I=. --go_out=plugins=grpc:. --go_opt=paths=source_relative health.proto
-
 import (
 	"context"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/health"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type healthServer struct {
+	health.UnimplementedHealthServer
 	*rpc.Server
 }
 
-var _ HealthServer = (*healthServer)(nil)
+var _ health.HealthServer = (*healthServer)(nil)
 
 func newHealthServer(srv *rpc.Server) *healthServer {
-	hs := &healthServer{srv}
+	hs := &healthServer{Server: srv}
 	hs.FieldLogger = srv.WithField("module", "health")
 	return hs
 }
 
 // RegisterServer registers a new health server.
 func RegisterServer(s *grpc.Server, e *rpc.Server) {
-	RegisterHealthServer(s, newHealthServer(e))
+	health.RegisterHealthServer(s, newHealthServer(e))
 }
 
 func (s *healthServer) AuthFuncOverride(ctx context.Context, _ string) (context.Context, error) {
@@ -32,9 +32,9 @@ func (s *healthServer) AuthFuncOverride(ctx context.Context, _ string) (context.
 }
 
 // HealthCheck performs a health check.
-func (s *healthServer) HealthCheck(_ context.Context, _ *emptypb.Empty) (*HealthCheckResponse, error) {
+func (s *healthServer) HealthCheck(_ context.Context, _ *emptypb.Empty) (*health.HealthCheckResponse, error) {
 	hc := s.API.HealthCheck()
-	return &HealthCheckResponse{
+	return &health.HealthCheckResponse{
 		Name:    hc.Name,
 		Version: hc.Version,
 		Status:  hc.Status,
