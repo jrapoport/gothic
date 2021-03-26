@@ -12,8 +12,8 @@ require (
 	github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804
 	github.com/flashmob/go-guerrilla v1.6.1
 	github.com/go-chi/chi v1.5.4 // indirect
-	github.com/go-chi/chi/v5 v5.0.1
-	github.com/go-chi/cors v1.1.1
+	github.com/go-chi/chi/v5 v5.0.2
+	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/httprate v0.4.0
 	github.com/go-chi/httptracer v0.3.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
@@ -25,7 +25,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/imdario/mergo v0.3.12
 	github.com/improbable-eng/go-httpwares v0.0.0-20200609095714-edc8019f93cc
-	github.com/jackc/pgx/v4 v4.10.1
+	github.com/jackc/pgx/v4 v4.11.0
 	github.com/joho/godotenv v1.3.0
 	github.com/jrapoport/sillyname-go v0.0.0-20191016072109-82c270b69bff
 	github.com/lestrrat-go/tcputil v0.0.0-20180223003554-d3c7f98154fb // indirect
@@ -45,10 +45,10 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/vcraescu/go-paginator/v2 v2.0.0
 	github.com/xhit/go-simple-mail/v2 v2.8.0
-	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670
-	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
-	google.golang.org/grpc v1.36.0
-	google.golang.org/grpc/examples v0.0.0-20210318230139-bce1cded4b05 // indirect
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
+	google.golang.org/grpc v1.36.1
+	google.golang.org/grpc/examples v0.0.0-20210326035646-2456c5cff04b // indirect
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.29.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -57,6 +57,6 @@ require (
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.0.8
 	gorm.io/driver/sqlite v1.1.4
-	gorm.io/driver/sqlserver v1.0.6
-	gorm.io/gorm v1.21.4
+	gorm.io/driver/sqlserver v1.0.7
+	gorm.io/gorm v1.21.6
 )

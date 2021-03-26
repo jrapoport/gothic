@@ -1,14 +1,15 @@
 package rpc
 
-//go:generate protoc -I=. --go_out=plugins=grpc:. --go_opt=paths=source_relative response.proto
-
 import (
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc"
 	"github.com/jrapoport/gothic/utils"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+type UserResponse rpc.UserResponse
 
 // NewUserResponse returns a UserResponse for the supplied user.
 func NewUserResponse(u *user.User) (*UserResponse, error) {
@@ -24,14 +25,14 @@ func NewUserResponse(u *user.User) (*UserResponse, error) {
 	}, nil
 }
 
-// MaskEmail masks the email field of the user response
-func (x *UserResponse) MaskEmail() {
-	x.Email = utils.MaskEmail(x.Email)
+// MaskEmail masks Personally Identifiable Information (PII) from the user response
+func (r *UserResponse) MaskEmail() {
+	r.Email = utils.MaskEmail(r.Email)
 }
 
 // NewBearerResponse returns a BearerResponse from a BearerToken
-func NewBearerResponse(bt *tokens.BearerToken) *BearerResponse {
-	res := &BearerResponse{
+func NewBearerResponse(bt *tokens.BearerToken) *rpc.BearerResponse {
+	res := &rpc.BearerResponse{
 		Type:    bt.Class().String(),
 		Access:  bt.String(),
 		Refresh: bt.RefreshToken.String(),

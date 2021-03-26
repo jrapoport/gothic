@@ -6,6 +6,7 @@ import (
 
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,20 +21,20 @@ func TestAccountServer_Login(t *testing.T) {
 	_, err := srv.Login(ctx, nil)
 	assert.Error(t, err)
 	// no email
-	_, err = srv.Login(ctx, &LoginRequest{})
+	_, err = srv.Login(ctx, &account.LoginRequest{})
 	assert.Error(t, err)
 	// bad email
-	_, err = srv.Login(ctx, &LoginRequest{
+	_, err = srv.Login(ctx, &account.LoginRequest{
 		Email: "bad",
 	})
 	assert.Error(t, err)
 	// not found
-	_, err = srv.Login(ctx, &LoginRequest{
+	_, err = srv.Login(ctx, &account.LoginRequest{
 		Email: "bad@example.com",
 	})
 	assert.Error(t, err)
 	// bad password
-	_, err = srv.Login(ctx, &LoginRequest{
+	_, err = srv.Login(ctx, &account.LoginRequest{
 		Email:    u.Email,
 		Password: "",
 	})
@@ -41,7 +42,7 @@ func TestAccountServer_Login(t *testing.T) {
 	// login
 	_, err = srv.GetAuthenticatedUser(u.ID)
 	assert.Error(t, err)
-	res, err := srv.Login(ctx, &LoginRequest{
+	res, err := srv.Login(ctx, &account.LoginRequest{
 		Email:    u.Email,
 		Password: testPass,
 	})

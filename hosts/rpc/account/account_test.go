@@ -9,6 +9,7 @@ import (
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/user"
+	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
@@ -43,7 +44,7 @@ func testAuthCtx(t *testing.T, srv *accountServer, u *user.User) context.Context
 	return context.WithContext(rpc.WithClaims(ctx, claims))
 }
 
-func assertUserResponse(t *testing.T, srv *accountServer, test *rpc.UserResponse, res *rpc.UserResponse) {
+func assertUserResponse(t *testing.T, srv *accountServer, test *rpc.UserResponse, res *rpcpb.UserResponse) {
 	assert.Equal(t, test.Username, res.Username)
 	assert.Equal(t, test.Role, res.Role)
 	em := test.Email

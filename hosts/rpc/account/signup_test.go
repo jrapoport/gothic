@@ -9,6 +9,7 @@ import (
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
-func testCase(t *testing.T) (*SignupRequest, *rpc.UserResponse) {
+func testCase(t *testing.T) (*account.SignupRequest, *rpc.UserResponse) {
 	em := tutils.RandomEmail()
 	un := utils.RandomUsername()
 	data, err := structpb.NewStruct(types.Map{
@@ -24,7 +25,7 @@ func testCase(t *testing.T) (*SignupRequest, *rpc.UserResponse) {
 		"tasty": "salad",
 	})
 	require.NoError(t, err)
-	req := &SignupRequest{
+	req := &account.SignupRequest{
 		Email:    em,
 		Password: testPass,
 		Username: un,
@@ -48,10 +49,10 @@ func TestAccountServer_Signup(t *testing.T) {
 	_, err := srv.Signup(ctx, nil)
 	assert.Error(t, err)
 	// no email
-	_, err = srv.Signup(ctx, &SignupRequest{})
+	_, err = srv.Signup(ctx, &account.SignupRequest{})
 	assert.Error(t, err)
 	// bad email
-	_, err = srv.Signup(ctx, &SignupRequest{
+	_, err = srv.Signup(ctx, &account.SignupRequest{
 		Email: "bad",
 	})
 	assert.Error(t, err)

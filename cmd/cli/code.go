@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/codes"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
 )
@@ -49,9 +49,9 @@ func codeRunE(_ *cobra.Command, args []string) error {
 	defer func() {
 		conn.Close()
 	}()
-	client := codes.NewCodesClient(conn)
+	client := signup.NewSignupClient(conn)
 	ctx := context.Background()
-	res, err := client.CreateSignupCodes(ctx, &codes.CreateSignupCodesRequest{
+	res, err := client.CreateSignupCodes(ctx, &signup.CreateSignupCodesRequest{
 		Uses:  int64(codeUses),
 		Count: int64(count),
 	})
