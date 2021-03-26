@@ -8,6 +8,7 @@ import (
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/mail/template"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +25,7 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 	_, err := srv.SendResetPassword(ctx, nil)
 	assert.Error(t, err)
 	// empty email
-	req := &ResetPasswordRequest{}
+	req := &account.ResetPasswordRequest{}
 	_, err = srv.SendResetPassword(ctx, req)
 	assert.Error(t, err)
 	// bad email
@@ -63,7 +64,7 @@ func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 	})
 	for i := 0; i < 2; i++ {
 		sent = ""
-		req := &ResetPasswordRequest{
+		req := &account.ResetPasswordRequest{
 			Email: u.Email,
 		}
 		_, err := srv.SendResetPassword(ctx, req)
@@ -96,7 +97,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	_, err := srv.ConfirmResetPassword(ctx, nil)
 	assert.Error(t, err)
 	// empty token
-	req := &ConfirmPasswordRequest{}
+	req := &account.ConfirmPasswordRequest{}
 	_, err = srv.ConfirmResetPassword(ctx, req)
 	assert.Error(t, err)
 	// bad token
@@ -111,7 +112,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	smtp.AddHook(t, func(email string) {
 		tok = tconf.GetEmailToken(act, email)
 	})
-	pw := &ResetPasswordRequest{
+	pw := &account.ResetPasswordRequest{
 		Email: u.Email,
 	}
 	_, err = srv.SendResetPassword(ctx, pw)
@@ -120,7 +121,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 		return tok != ""
 	}, 1*time.Second, 10*time.Millisecond)
 	// now use the token to change the password
-	req = &ConfirmPasswordRequest{
+	req = &account.ConfirmPasswordRequest{
 		Token:    tok,
 		Password: newPass,
 	}

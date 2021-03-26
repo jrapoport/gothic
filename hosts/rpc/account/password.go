@@ -6,12 +6,14 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *accountServer) SendResetPassword(ctx context.Context,
-	req *ResetPasswordRequest) (*emptypb.Empty, error) {
+	req *account.ResetPasswordRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -42,7 +44,7 @@ func (s *accountServer) SendResetPassword(ctx context.Context,
 }
 
 func (s *accountServer) ConfirmResetPassword(ctx context.Context,
-	req *ConfirmPasswordRequest) (*rpc.BearerResponse, error) {
+	req *account.ConfirmPasswordRequest) (*rpcpb.BearerResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)

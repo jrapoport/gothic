@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/markbates/goth"
 	"github.com/segmentio/encoding/json"
