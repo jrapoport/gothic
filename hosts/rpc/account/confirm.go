@@ -6,12 +6,14 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *accountServer) SendConfirmUser(ctx context.Context,
-	req *SendConfirmRequest) (*emptypb.Empty, error) {
+	req *account.SendConfirmRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -41,7 +43,7 @@ func (s *accountServer) SendConfirmUser(ctx context.Context,
 }
 
 func (s *accountServer) ConfirmUser(ctx context.Context,
-	req *ConfirmUserRequest) (*rpc.BearerResponse, error) {
+	req *account.ConfirmUserRequest) (*rpcpb.BearerResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)

@@ -2,21 +2,20 @@ package system
 
 import (
 	"context"
+	"testing"
+
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
-	"github.com/stretchr/testify/require"
-	"testing"
-
-	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/system"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
-const testPass = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
 
 func testServer(t *testing.T) *systemServer {
 	srv, _ := tsrv.RPCServer(t, false)
@@ -30,23 +29,23 @@ func TestSystemServer_GetUser(t *testing.T) {
 	srv.Config().MaskEmails = false
 	ctx := context.Background()
 	// no id or email
-	req := &UserRequest{}
+	req := &system.UserRequest{}
 	_, err := srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// bad id
-	req.Id = &UserRequest_UserId{"1"}
+	req.Id = &system.UserRequest_UserId{UserId: "1"}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// id not found
-	req.Id = &UserRequest_UserId{
-		uuid.New().String(),
+	req.Id = &system.UserRequest_UserId{
+		UserId: uuid.New().String(),
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// success
 	u, _ := tcore.TestUser(t, srv.API, "", false)
-	req.Id = &UserRequest_UserId{
-		u.ID.String(),
+	req.Id = &system.UserRequest_UserId{
+		UserId: u.ID.String(),
 	}
 	res, err := srv.GetUser(ctx, req)
 	assert.NoError(t, err)
@@ -54,21 +53,21 @@ func TestSystemServer_GetUser(t *testing.T) {
 	assert.Equal(t, u.Email, res.Email)
 	assert.Equal(t, u.Username, res.Username)
 	// bad email
-	req = &UserRequest{}
-	req.Id = &UserRequest_Email{
-		"@",
+	req = &system.UserRequest{}
+	req.Id = &system.UserRequest_Email{
+		Email: "@",
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// email not found
-	req.Id = &UserRequest_Email{
-		tutils.RandomEmail(),
+	req.Id = &system.UserRequest_Email{
+		Email: tutils.RandomEmail(),
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// success
-	req.Id = &UserRequest_Email{
-		u.Email,
+	req.Id = &system.UserRequest_Email{
+		Email: u.Email,
 	}
 	res, err = srv.GetUser(ctx, req)
 	assert.NoError(t, err)
@@ -93,25 +92,25 @@ func TestSystemServer_LinkAccount(t *testing.T) {
 	ctx := context.Background()
 	u, _ := tcore.TestUser(t, srv.API, "", false)
 	// errors
-	req := &LinkAccountRequest{
+	req := &system.LinkAccountRequest{
 		UserId: uuid.Nil.String(),
 	}
 	_, err := srv.LinkAccount(ctx, req)
 	assert.Error(t, err)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId: "1",
 	}
 	_, err = srv.LinkAccount(ctx, req)
 	assert.Error(t, err)
 	bad := account.NewAccount(p, aid, email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  uuid.Nil.String(),
 		Account: NewAccount(bad),
 	}
 	_, err = srv.LinkAccount(ctx, req)
 	assert.Error(t, err)
 	bad = account.NewAccount(provider.Unknown, aid, email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  u.ID.String(),
 		Account: NewAccount(bad),
 	}
@@ -121,7 +120,7 @@ func TestSystemServer_LinkAccount(t *testing.T) {
 	_, err = srv.LinkAccount(ctx, req)
 	assert.Error(t, err)
 	bad = account.NewAccount(p, "", email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  u.ID.String(),
 		Account: NewAccount(bad),
 	}
@@ -129,7 +128,7 @@ func TestSystemServer_LinkAccount(t *testing.T) {
 	assert.Error(t, err)
 	// success
 	la1 := account.NewAccount(p, aid, email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  u.ID.String(),
 		Account: NewAccount(la1),
 	}
@@ -143,14 +142,14 @@ func TestSystemServer_LinkAccount(t *testing.T) {
 	assert.Equal(t, email, links[0].Email)
 	// relink error
 	la1 = account.NewAccount(p, aid, email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  u.ID.String(),
 		Account: NewAccount(la1),
 	}
 	_, err = srv.LinkAccount(ctx, req)
 	assert.Error(t, err)
 	la2 := account.NewAccount(provider.GitHub, aid, email, data)
-	req = &LinkAccountRequest{
+	req = &system.LinkAccountRequest{
 		UserId:  u.ID.String(),
 		Account: NewAccount(la2),
 	}
@@ -185,45 +184,45 @@ func TestSystemServer_GetLinkedAccounts(t *testing.T) {
 		testAccount(provider.PayPal),
 	}
 	for _, link := range links {
-		req := &LinkAccountRequest{
+		req := &system.LinkAccountRequest{
 			UserId:  u.ID.String(),
 			Account: NewAccount(link),
 		}
 		_, err := srv.LinkAccount(ctx, req)
 		require.NoError(t, err)
 	}
-	type filters map[string]string
+	type Filters map[string]string
 	tests := []struct {
 		typ      account.Type
-		filters  filters
+		filters  Filters
 		expected []int
 	}{
 		{account.Any, nil, []int{0, 1, 2, 3}},
 		{account.Payment, nil, []int{2, 3}},
 		{account.Wallet, nil, []int{3}},
 		{account.Payment | account.Wallet, nil, []int{2, 3}},
-		{account.Any, filters{
+		{account.Any, Filters{
 			key.Provider: links[0].Provider.String(),
 		}, []int{0}},
-		{account.Any, filters{
+		{account.Any, Filters{
 			key.Email: links[2].Email,
 		}, []int{2}},
-		{account.Any, filters{
+		{account.Any, Filters{
 			key.Token: links[1].Provider.ID().String(),
 		}, []int{1}},
-		{account.Any, filters{
+		{account.Any, Filters{
 			"hello": "world",
 		}, []int{0, 1, 2, 3}},
-		{account.Payment, filters{
+		{account.Payment, Filters{
 			"hello": "world",
 		}, []int{2, 3}},
-		{account.Any, filters{
+		{account.Any, Filters{
 			"bad": "unknown",
 		}, []int{}},
 	}
 	for _, test := range tests {
 		var reqType = uint32(test.typ)
-		req := &LinkedAccountsRequest{
+		req := &system.LinkedAccountsRequest{
 			UserId:  u.ID.String(),
 			Type:    &reqType,
 			Filters: test.filters,

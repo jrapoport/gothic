@@ -1,6 +1,9 @@
 package utils
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 var dns = "8.8.8.8:80"
 
@@ -13,4 +16,8 @@ func OutboundIP() (net.IP, error) {
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP, nil
+}
+
+func MakeAddress(host string, port int) string {
+	return fmt.Sprint(host, ":", port)
 }

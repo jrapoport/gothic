@@ -1,35 +1,36 @@
 package user
 
-//go:generate protoc -I=. -I=.. --go_out=plugins=grpc:. --go_opt=paths=source_relative user.proto
-
 import (
 	"context"
 	"errors"
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type userServer struct {
+	user.UnimplementedUserServer
 	*rpc.Server
 }
 
-var _ UserServer = (*userServer)(nil)
+var _ user.UserServer = (*userServer)(nil)
 
 func newUserServer(srv *rpc.Server) *userServer {
 	srv.FieldLogger = srv.WithField("module", "user")
-	return &userServer{srv}
+	return &userServer{Server: srv}
 }
 
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	RegisterUserServer(s, newUserServer(srv))
+	user.RegisterUserServer(s, newUserServer(srv))
 }
 
-func (s *userServer) GetUser(ctx context.Context, _ *UserRequest) (*rpc.UserResponse, error) {
+func (s *userServer) GetUser(ctx context.Context, _ *user.UserRequest) (*rpcpb.UserResponse, error) {
 	uid, err := rpc.GetUserID(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
@@ -47,10 +48,10 @@ func (s *userServer) GetUser(ctx context.Context, _ *UserRequest) (*rpc.UserResp
 		res.MaskEmail()
 	}
 	s.Debugf("got user %s: %v", uid, res)
-	return res, nil
+	return (*rpcpb.UserResponse)(res), nil
 }
 
-func (s *userServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*rpc.UserResponse, error) {
+func (s *userServer) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*rpcpb.UserResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -76,7 +77,7 @@ func (s *userServer) UpdateUser(ctx context.Context, req *UpdateUserRequest) (*r
 		res.MaskEmail()
 	}
 	s.Debugf("got user %s: %v", uid, res)
-	return res, nil
+	return (*rpcpb.UserResponse)(res), nil
 }
 
 func (s *userServer) SendConfirmUser(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
@@ -104,7 +105,7 @@ func (s *userServer) SendConfirmUser(ctx context.Context, _ *emptypb.Empty) (*em
 	return &emptypb.Empty{}, nil
 }
 
-func (s *userServer) ChangePassword(ctx context.Context, req *ChangePasswordRequest) (*rpc.BearerResponse, error) {
+func (s *userServer) ChangePassword(ctx context.Context, req *user.ChangePasswordRequest) (*rpcpb.BearerResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}

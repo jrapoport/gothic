@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/jrapoport/gothic/protobuf/grpc/rpc/user";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "rpc.proto";
+
+service User {
+  rpc GetUser (UserRequest) returns (rpc.UserResponse) {
+  }
+
+  rpc UpdateUser (UpdateUserRequest) returns (rpc.UserResponse) {
+  }
+
+  rpc SendConfirmUser (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  }
+
+  rpc ChangePassword (ChangePasswordRequest) returns (rpc.BearerResponse) {
+  }
+}
+
+message UserRequest {
+}
+
+message UpdateUserRequest {
+  string username = 1;
+  google.protobuf.Struct data = 2;
+}
+
+message ChangePasswordRequest {
+  string password = 1;
+  string new_password = 2;
+}

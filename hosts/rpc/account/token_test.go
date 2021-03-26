@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,7 +20,7 @@ func TestAccountServer_RefreshBearerToken(t *testing.T) {
 	_, err := srv.RefreshBearerToken(ctx, nil)
 	assert.Error(t, err)
 	// empty email
-	req := &RefreshTokenRequest{}
+	req := &account.RefreshTokenRequest{}
 	_, err = srv.RefreshBearerToken(ctx, req)
 	assert.Error(t, err)
 	// bad email
@@ -29,7 +30,7 @@ func TestAccountServer_RefreshBearerToken(t *testing.T) {
 	u, _ := tcore.TestUser(t, srv.API, "", false)
 	bt, err := srv.GrantBearerToken(context.Background(), u)
 	require.NoError(t, err)
-	req = &RefreshTokenRequest{
+	req = &account.RefreshTokenRequest{
 		Token: bt.RefreshToken.Token,
 	}
 	res, err := srv.RefreshBearerToken(ctx, req)

@@ -35,8 +35,9 @@ GO_LINT_REPO := golang.org/x/lint/golint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
 
-GRPC_PREFIX := github.com/jrapoport/gothic/hosts/rpc
-PROTO_INCLUDES := -I=hosts/rpc $(PROTO_INCLUDES)
+GRPC_DIR := protobuf/grpc
+GRPC_PREFIX := github.com/jrapoport/gothic/protobuf/grpc/rpc
+PROTO_INCLUDES := -I=protobuf/service $(PROTO_INCLUDES)
 
 DEBUG_TAGS := -tags "debug"
 RELEASE_TAGS := -tags "osusergo,netgo,release"
@@ -54,7 +55,7 @@ VER_PKG := $(PKG)/config
 # make sure this is = and not := so it gets expanded properly
 VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
 
-TEST_FLAGS :=-failfast
+TEST_FLAGS :=-failfast $(TEST_FLAGS)
 COVERAGE_FILE=coverage.txt
 COVERAGE_FLAGS=-race -covermode=atomic -coverpkg=./... -coverprofile=$(COVERAGE_FILE)
 COVERAGE=0
@@ -96,12 +97,10 @@ tidy: ## Tidy module
 deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
-rpc::
-	$(GO_GEN) ./...
-
-rpcw:: GRPC_PREFIX := github.com/jrapoport/gothic/hosts
-# rpcw:: PROTO_WILDCARD := *_web.proto
-# rpcw:: PROTO_FILES += ./hosts/rpc/response.proto
+rpcw:: PROTO_FILES = \
+	./protobuf/service/rpc.proto \
+	./protobuf/service/user.proto \
+	./protobuf/service/account.proto
 
 test: ## Run tests
 ifeq (, $(shell which docker))
@@ -111,7 +110,7 @@ endif
 	$(GO_TEST) $(BUILD_TAGS) $(TEST_FLAGS) ./...
 
 cover: TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
-cover: clean test
+cover: test
 	curl -fsSL https://codecov.io/bash | bash
 	$(RM) $(COVERAGE_FILE)
 

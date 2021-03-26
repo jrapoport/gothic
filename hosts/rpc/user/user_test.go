@@ -11,6 +11,7 @@ import (
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/user"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
@@ -33,7 +34,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	srv.Config().MaskEmails = false
-	req := &UserRequest{}
+	req := &user.UserRequest{}
 	ctx := context.Background()
 	// no id
 	_, err := srv.GetUser(ctx, req)
@@ -68,7 +69,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 		"tasty": "salad",
 	})
 	require.NoError(t, err)
-	req := &UpdateUserRequest{
+	req := &user.UpdateUserRequest{
 		Username: "peaches",
 		Data:     data,
 	}
@@ -93,7 +94,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 		"peaches": "happy",
 	})
 	require.NoError(t, err)
-	req = &UpdateUserRequest{
+	req = &user.UpdateUserRequest{
 		Username: "mario",
 		Data:     data,
 	}
@@ -145,7 +146,7 @@ func TestUserServer_ChangePassword(t *testing.T) {
 	srv := testServer(t)
 	u, tok := tcore.TestUser(t, srv.API, "", false)
 	ctx := tsrv.RPCAuthContext(t, srv.Config(), tok)
-	req := &ChangePasswordRequest{
+	req := &user.ChangePasswordRequest{
 		NewPassword: newPassword,
 	}
 	// invalid password
@@ -174,19 +175,19 @@ func TestRequestErrors(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
-	_, err := srv.GetUser(ctx, &UserRequest{})
+	_, err := srv.GetUser(ctx, &user.UserRequest{})
 	assert.Error(t, err)
-	_, err = srv.UpdateUser(ctx, &UpdateUserRequest{})
+	_, err = srv.UpdateUser(ctx, &user.UpdateUserRequest{})
 	assert.Error(t, err)
-	_, err = srv.ChangePassword(ctx, &ChangePasswordRequest{})
+	_, err = srv.ChangePassword(ctx, &user.ChangePasswordRequest{})
 	assert.Error(t, err)
 	claims := jwt.UserClaims{}
 	claims.Subject = uuid.New().String()
 	ctx = context.WithContext(rpc.WithClaims(ctx, claims))
-	_, err = srv.GetUser(ctx, &UserRequest{})
+	_, err = srv.GetUser(ctx, &user.UserRequest{})
 	assert.Error(t, err)
-	_, err = srv.UpdateUser(ctx, &UpdateUserRequest{})
+	_, err = srv.UpdateUser(ctx, &user.UpdateUserRequest{})
 	assert.Error(t, err)
-	_, err = srv.ChangePassword(ctx, &ChangePasswordRequest{})
+	_, err = srv.ChangePassword(ctx, &user.ChangePasswordRequest{})
 	assert.Error(t, err)
 }

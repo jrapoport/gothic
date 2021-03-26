@@ -117,7 +117,6 @@ func TestSignupServer_Signup_AutoConfirm(t *testing.T) {
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		signup.RegisterServer,
 	}, false)
-	//
 	srv.Config().Signup.AutoConfirm = true
 	v, _ := testCase(t, srv, web)
 	_, err := thttp.DoRequest(t, web, http.MethodPost, signup.Signup, v, nil)
