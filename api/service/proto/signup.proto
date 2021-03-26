@@ -8,10 +8,10 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 
 service Signup {
-  rpc CreateSignupCodes (CreateSignupCodesRequest) returns (CreateSignupCodesResponse) {
+  rpc CreateSignupCodes (CreateSignupCodesRequest) returns (SignupCodesResponse) {
   }
 
-  rpc CheckSignupCode (CheckSignupCodeRequest) returns (CheckSignupCodeResponse) {
+  rpc CheckSignupCode (CheckSignupCodeRequest) returns (SignupCodeResponse) {
   }
 
   rpc VoidSignupCode (VoidSignupCodeRequest) returns (google.protobuf.Empty) {
@@ -23,7 +23,7 @@ message CreateSignupCodesRequest {
   int64 count = 2;
 }
 
-message CreateSignupCodesResponse {
+message SignupCodesResponse {
   repeated string codes = 1;
 }
 
@@ -43,7 +43,7 @@ enum CodeUsage {
   Timed = 3;
 }
 
-message CheckSignupCodeResponse {
+message SignupCodeResponse {
   bool usable = 1;
   string code = 2;
   CodeFormat code_format = 3;
