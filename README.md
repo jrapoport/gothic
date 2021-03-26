@@ -80,7 +80,14 @@ $ make envoy
 ```
 
 Once `gothic`, the db, & `envoy` are running you can make gRPC-Web calls
-using the [javascript bindings](https://github.com/jrapoport/gothic/blob/master/protobuf/grpc/web).
+using the [javascript bindings](https://github.com/jrapoport/gothic/blob/master/api/grpc/web).
+
+to regenerate the protobuf typescript bindings:
+```sh
+$ make rpcw
+# or
+$ make grpc
+```
 
 #### Startup
 

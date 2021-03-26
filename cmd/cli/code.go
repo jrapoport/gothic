@@ -5,8 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
 )

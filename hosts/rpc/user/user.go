@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc"
+	"github.com/jrapoport/gothic/api/grpc/rpc/user"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -30,7 +30,7 @@ func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 	user.RegisterUserServer(s, newUserServer(srv))
 }
 
-func (s *userServer) GetUser(ctx context.Context, _ *user.UserRequest) (*rpcpb.UserResponse, error) {
+func (s *userServer) GetUser(ctx context.Context, _ *user.UserRequest) (*api.UserResponse, error) {
 	uid, err := rpc.GetUserID(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
@@ -48,10 +48,10 @@ func (s *userServer) GetUser(ctx context.Context, _ *user.UserRequest) (*rpcpb.U
 		res.MaskEmail()
 	}
 	s.Debugf("got user %s: %v", uid, res)
-	return (*rpcpb.UserResponse)(res), nil
+	return (*api.UserResponse)(res), nil
 }
 
-func (s *userServer) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*rpcpb.UserResponse, error) {
+func (s *userServer) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*api.UserResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -77,7 +77,7 @@ func (s *userServer) UpdateUser(ctx context.Context, req *user.UpdateUserRequest
 		res.MaskEmail()
 	}
 	s.Debugf("got user %s: %v", uid, res)
-	return (*rpcpb.UserResponse)(res), nil
+	return (*api.UserResponse)(res), nil
 }
 
 func (s *userServer) SendConfirmUser(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
@@ -105,7 +105,7 @@ func (s *userServer) SendConfirmUser(ctx context.Context, _ *emptypb.Empty) (*em
 	return &emptypb.Empty{}, nil
 }
 
-func (s *userServer) ChangePassword(ctx context.Context, req *user.ChangePasswordRequest) (*rpcpb.BearerResponse, error) {
+func (s *userServer) ChangePassword(ctx context.Context, req *user.ChangePasswordRequest) (*api.BearerResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}

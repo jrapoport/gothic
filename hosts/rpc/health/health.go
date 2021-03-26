@@ -3,8 +3,8 @@ package health
 import (
 	"context"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/health"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/settings"
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/settings"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

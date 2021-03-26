@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc"
 )
 

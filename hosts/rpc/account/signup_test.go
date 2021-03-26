@@ -3,13 +3,13 @@ package account
 import (
 	"testing"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/validate"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
