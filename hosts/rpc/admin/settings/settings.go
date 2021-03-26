@@ -2,7 +2,7 @@ package settings
 
 import (
 	"context"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/settings"
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/settings"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/segmentio/encoding/json"

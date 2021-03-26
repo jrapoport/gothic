@@ -35,9 +35,9 @@ GO_LINT_REPO := golang.org/x/lint/golint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
 
-GRPC_DIR := protobuf/grpc
-GRPC_PREFIX := github.com/jrapoport/gothic/protobuf/grpc/rpc
-PROTO_INCLUDES := -I=protobuf/service $(PROTO_INCLUDES)
+GRPC_DIR := api/grpc
+GRPC_PREFIX := github.com/jrapoport/gothic/api/grpc/rpc
+PROTO_INCLUDES := -I=api/service/proto $(PROTO_INCLUDES)
 
 DEBUG_TAGS := -tags "debug"
 RELEASE_TAGS := -tags "osusergo,netgo,release"
@@ -98,9 +98,9 @@ deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
 rpcw:: PROTO_FILES = \
-	./protobuf/service/rpc.proto \
-	./protobuf/service/user.proto \
-	./protobuf/service/account.proto
+	./api/service/proto/api.proto \
+	./api/service/proto/user.proto \
+	./api/service/proto/account.proto
 
 test: ## Run tests
 ifeq (, $(shell which docker))
@@ -110,7 +110,7 @@ endif
 	$(GO_TEST) $(BUILD_TAGS) $(TEST_FLAGS) ./...
 
 cover: TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
-cover: test
+cover: test ## Run tests w/ coverage
 	curl -fsSL https://codecov.io/bash | bash
 	$(RM) $(COVERAGE_FILE)
 

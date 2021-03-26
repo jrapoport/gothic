@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	rpc_account "github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	rpc_account "github.com/jrapoport/gothic/hosts/rpc/account"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
+	"github.com/jrapoport/gothic/hosts/rpc/account"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -16,12 +16,12 @@ import (
 func TestLogin(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
-		rpc_account.RegisterServer,
+		account.RegisterServer,
 	})
 	t.Log(srv.Address())
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return account.NewAccountClient(cc)
-	}).(account.AccountClient)
+		return rpc_account.NewAccountClient(cc)
+	}).(rpc_account.AccountClient)
 	// new request context
 	ctx := context.Background()
 	// add key-value pairs of metadata to context
@@ -29,7 +29,7 @@ func TestLogin(t *testing.T) {
 		ctx,
 		metadata.Pairs("key1", "val1", "key2", "val2"),
 	)
-	req := &account.LoginRequest{}
+	req := &rpc_account.LoginRequest{}
 	_, err := client.Login(ctx, req)
 	assert.Error(t, err)
 }

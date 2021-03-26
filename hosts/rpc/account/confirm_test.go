@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/mail/template"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"

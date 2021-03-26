@@ -1,15 +1,15 @@
 package rpc
 
 import (
+	"github.com/jrapoport/gothic/api/grpc/rpc"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc"
 	"github.com/jrapoport/gothic/utils"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type UserResponse rpc.UserResponse
+type UserResponse api.UserResponse
 
 // NewUserResponse returns a UserResponse for the supplied user.
 func NewUserResponse(u *user.User) (*UserResponse, error) {
@@ -31,8 +31,8 @@ func (r *UserResponse) MaskEmail() {
 }
 
 // NewBearerResponse returns a BearerResponse from a BearerToken
-func NewBearerResponse(bt *tokens.BearerToken) *rpc.BearerResponse {
-	res := &rpc.BearerResponse{
+func NewBearerResponse(bt *tokens.BearerToken) *api.BearerResponse {
+	res := &api.BearerResponse{
 		Type:    bt.Class().String(),
 		Access:  bt.String(),
 		Refresh: bt.RefreshToken.String(),

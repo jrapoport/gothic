@@ -6,12 +6,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/imdario/mergo"
+	"github.com/jrapoport/gothic/api/grpc/rpc/user"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/models/types"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/user"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"

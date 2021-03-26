@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc"
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	rpcpb "github.com/jrapoport/gothic/protobuf/grpc/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 )
 
 func (s *accountServer) Login(ctx context.Context,
-	req *account.LoginRequest) (*rpcpb.UserResponse, error) {
+	req *account.LoginRequest) (*api.UserResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -35,5 +35,5 @@ func (s *accountServer) Login(ctx context.Context,
 		return nil, s.RPCError(codes.PermissionDenied, err)
 	}
 	res.Token = rpc.NewBearerResponse(bt)
-	return (*rpcpb.UserResponse)(res), nil
+	return (*api.UserResponse)(res), nil
 }

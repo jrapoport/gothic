@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package system;
+
+option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/system";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+service System {
+  rpc GetUser (UserRequest) returns (UserResponse) {
+  }
+  rpc LinkAccount (LinkAccountRequest) returns (google.protobuf.Empty) {
+  }
+  rpc GetLinkedAccounts (LinkedAccountsRequest) returns (LinkedAccountsResponse) {
+  }
+}
+
+message UserRequest {
+  oneof id {
+    string user_id = 1;
+    string email = 2;
+  }
+}
+
+message UserResponse{
+  string id = 1;
+  string provider = 2;
+  string role = 3;
+  enum Status {
+    Banned = 0;
+    Locked = 1;
+    Restricted = 2;
+    Active = 3;
+    Verified = 4;
+  }
+  Status status = 4;
+  string email = 5;
+  string username = 6;
+  google.protobuf.Struct data = 7;
+  google.protobuf.Struct metadata = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp confirmed_at = 10;
+  google.protobuf.Timestamp verified_at = 11;
+}
+
+enum LinkedType {
+  None = 0;
+  Auth = 1;
+  Payment = 2;
+  Wallet = 4;
+  Any = 0xfffffff;
+}
+
+message Account {
+  fixed32 type = 1;
+  string provider = 2;
+  string account_id = 3;
+  string email = 4;
+  google.protobuf.Struct data = 5;
+}
+
+message LinkAccountRequest {
+  string user_id = 1;
+  Account account = 2;
+}
+
+message LinkedAccountsRequest {
+  string user_id = 1;
+  optional fixed32 type = 2;
+  optional string provider = 3;
+  map<string, string> filters = 4;
+}
+
+message LinkedAccountsResponse {
+  repeated Account linked = 1;
+}

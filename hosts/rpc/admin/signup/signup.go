@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/code"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"

@@ -6,12 +6,12 @@ import (
 	"net/mail"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/api/grpc/rpc/system"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/system"
 	"github.com/jrapoport/gothic/store"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
