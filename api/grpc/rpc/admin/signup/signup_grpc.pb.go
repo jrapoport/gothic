@@ -19,8 +19,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SignupClient interface {
-	CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*CreateSignupCodesResponse, error)
-	CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*CheckSignupCodeResponse, error)
+	CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*SignupCodesResponse, error)
+	CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*SignupCodeResponse, error)
 	VoidSignupCode(ctx context.Context, in *VoidSignupCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -32,8 +32,8 @@ func NewSignupClient(cc grpc.ClientConnInterface) SignupClient {
 	return &signupClient{cc}
 }
 
-func (c *signupClient) CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*CreateSignupCodesResponse, error) {
-	out := new(CreateSignupCodesResponse)
+func (c *signupClient) CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*SignupCodesResponse, error) {
+	out := new(SignupCodesResponse)
 	err := c.cc.Invoke(ctx, "/signup.Signup/CreateSignupCodes", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -41,8 +41,8 @@ func (c *signupClient) CreateSignupCodes(ctx context.Context, in *CreateSignupCo
 	return out, nil
 }
 
-func (c *signupClient) CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*CheckSignupCodeResponse, error) {
-	out := new(CheckSignupCodeResponse)
+func (c *signupClient) CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*SignupCodeResponse, error) {
+	out := new(SignupCodeResponse)
 	err := c.cc.Invoke(ctx, "/signup.Signup/CheckSignupCode", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +63,8 @@ func (c *signupClient) VoidSignupCode(ctx context.Context, in *VoidSignupCodeReq
 // All implementations must embed UnimplementedSignupServer
 // for forward compatibility
 type SignupServer interface {
-	CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*CreateSignupCodesResponse, error)
-	CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*CheckSignupCodeResponse, error)
+	CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*SignupCodesResponse, error)
+	CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*SignupCodeResponse, error)
 	VoidSignupCode(context.Context, *VoidSignupCodeRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedSignupServer()
 }
@@ -73,10 +73,10 @@ type SignupServer interface {
 type UnimplementedSignupServer struct {
 }
 
-func (UnimplementedSignupServer) CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*CreateSignupCodesResponse, error) {
+func (UnimplementedSignupServer) CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*SignupCodesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSignupCodes not implemented")
 }
-func (UnimplementedSignupServer) CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*CheckSignupCodeResponse, error) {
+func (UnimplementedSignupServer) CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*SignupCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckSignupCode not implemented")
 }
 func (UnimplementedSignupServer) VoidSignupCode(context.Context, *VoidSignupCodeRequest) (*emptypb.Empty, error) {

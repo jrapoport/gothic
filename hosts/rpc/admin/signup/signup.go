@@ -32,7 +32,7 @@ func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 
 // CreateSignupCodes returns the settings for a server.
 func (s *signupServer) CreateSignupCodes(ctx context.Context,
-	req *signup.CreateSignupCodesRequest) (*signup.CreateSignupCodesResponse, error) {
+	req *signup.CreateSignupCodesRequest) (*signup.SignupCodesResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -48,14 +48,14 @@ func (s *signupServer) CreateSignupCodes(ctx context.Context,
 		s.Warnf("expected %d but created %d", count, len(list))
 	}
 	s.Debugf("created %d codes", len(list))
-	res := &signup.CreateSignupCodesResponse{
+	res := &signup.SignupCodesResponse{
 		Codes: list,
 	}
 	return res, nil
 }
 
 func (s *signupServer) CheckSignupCode(_ context.Context,
-	req *signup.CheckSignupCodeRequest) (*signup.CheckSignupCodeResponse, error) {
+	req *signup.CheckSignupCodeRequest) (*signup.SignupCodeResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -64,7 +64,7 @@ func (s *signupServer) CheckSignupCode(_ context.Context,
 	sc, err := s.API.CheckSignupCode(cd)
 	if err != nil && errors.Is(err, code.ErrUnusableCode) {
 		s.Debugf("checked signup code is invalid: %s", cd)
-		res := &signup.CheckSignupCodeResponse{
+		res := &signup.SignupCodeResponse{
 			Usable: false,
 			Code:   cd,
 		}
@@ -73,7 +73,7 @@ func (s *signupServer) CheckSignupCode(_ context.Context,
 		return nil, s.RPCError(codes.Internal, err)
 	}
 	s.Debugf("checked signup code is valid: %s", cd)
-	res := &signup.CheckSignupCodeResponse{
+	res := &signup.SignupCodeResponse{
 		Usable:     true,
 		Code:       sc.Token,
 		CodeFormat: signup.CodeFormat(sc.Format),
