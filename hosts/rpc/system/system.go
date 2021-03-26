@@ -1,20 +1,18 @@
 package system
 
-//go:generate protoc -I=. -I=.. --go_out=plugins=grpc:. --go_opt=paths=source_relative system.proto
-
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/jrapoport/gothic/models/types/key"
-	"github.com/jrapoport/gothic/store"
 	"net/mail"
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/account"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/system"
+	"github.com/jrapoport/gothic/store"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -23,25 +21,26 @@ import (
 )
 
 type systemServer struct {
+	system.UnimplementedSystemServer
 	*rpc.Server
 }
 
-var _ SystemServer = (*systemServer)(nil)
+var _ system.SystemServer = (*systemServer)(nil)
 
 func newSystemServer(srv *rpc.Server) *systemServer {
 	srv.FieldLogger = srv.WithField("module", "user")
-	return &systemServer{srv}
+	return &systemServer{Server: srv}
 }
 
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	RegisterSystemServer(s, newSystemServer(srv))
+	system.RegisterSystemServer(s, newSystemServer(srv))
 }
 
-func (s *systemServer) GetUser(_ context.Context, req *UserRequest) (*UserResponse, error) {
+func (s *systemServer) GetUser(_ context.Context, req *system.UserRequest) (*system.UserResponse, error) {
 	var u *user.User
 	switch msg := req.GetId().(type) {
-	case *UserRequest_UserId:
+	case *system.UserRequest_UserId:
 		s.Debugf("get user %s", msg.UserId)
 		uid, err := uuid.Parse(msg.UserId)
 		if err != nil {
@@ -51,7 +50,7 @@ func (s *systemServer) GetUser(_ context.Context, req *UserRequest) (*UserRespon
 		if err != nil {
 			return nil, s.RPCError(codes.InvalidArgument, err)
 		}
-	case *UserRequest_Email:
+	case *system.UserRequest_Email:
 		s.Debugf("get user %s", req.GetEmail())
 		addr, err := mail.ParseAddress(req.GetEmail())
 		if err != nil {
@@ -73,7 +72,7 @@ func (s *systemServer) GetUser(_ context.Context, req *UserRequest) (*UserRespon
 }
 
 func (s *systemServer) LinkAccount(ctx context.Context,
-	req *LinkAccountRequest) (*emptypb.Empty, error) {
+	req *system.LinkAccountRequest) (*emptypb.Empty, error) {
 	uid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -112,7 +111,7 @@ func (s *systemServer) LinkAccount(ctx context.Context,
 }
 
 func (s *systemServer) GetLinkedAccounts(ctx context.Context,
-	req *LinkedAccountsRequest) (*LinkedAccountsResponse, error) {
+	req *system.LinkedAccountsRequest) (*system.LinkedAccountsResponse, error) {
 	uid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -128,24 +127,23 @@ func (s *systemServer) GetLinkedAccounts(ctx context.Context,
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}
-	fmt.Println(linked)
-	list := make([]*Account, len(linked))
+	list := make([]*system.Account, len(linked))
 	for i, link := range linked {
 		list[i] = NewAccount(link)
 	}
-	res := &LinkedAccountsResponse{
+	res := &system.LinkedAccountsResponse{
 		Linked: list,
 	}
 	return res, nil
 }
 
 // NewUserResponse returns a UserResponse for a user.
-func NewUserResponse(u *user.User) *UserResponse {
-	ur := &UserResponse{
+func NewUserResponse(u *user.User) *system.UserResponse {
+	ur := &system.UserResponse{
 		Id:        u.ID.String(),
 		Provider:  u.Provider.String(),
 		Role:      u.Role.String(),
-		Status:    UserResponse_Status(u.Status),
+		Status:    system.UserResponse_Status(u.Status),
 		Email:     u.Email,
 		Username:  u.Username,
 		CreatedAt: timestamppb.New(u.CreatedAt),
@@ -161,8 +159,8 @@ func NewUserResponse(u *user.User) *UserResponse {
 	return ur
 }
 
-func NewAccount(a *account.Account) *Account {
-	res := &Account{
+func NewAccount(a *account.Account) *system.Account {
+	res := &system.Account{
 		Type:      uint32(a.Type),
 		Provider:  a.Provider.String(),
 		AccountId: a.AccountID,

@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/hosts/rpc/account"
+	rpc_account "github.com/jrapoport/gothic/hosts/rpc/account"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -15,7 +16,7 @@ import (
 func TestLogin(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
-		account.RegisterServer,
+		rpc_account.RegisterServer,
 	})
 	t.Log(srv.Address())
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {

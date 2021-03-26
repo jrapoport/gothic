@@ -2,7 +2,6 @@ package account
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/types"
@@ -44,11 +43,10 @@ func NewAccount(p provider.Name, accountID, email string, data types.Map) *Accou
 }
 
 // BeforeSave runs before create or update.
-func (la *Account) BeforeCreate(db *gorm.DB) error {
+func (la *Account) BeforeCreate(*gorm.DB) error {
 	if la.Data == nil {
 		la.Data = types.Map{}
 	}
-	fmt.Println(db)
 	return la.Valid()
 }
 

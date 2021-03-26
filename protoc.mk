@@ -8,20 +8,19 @@ GO_GET := $(GO) get -v
 BASE_DIR := .
 BUILD_DIR := build
 
-GRPC_DIR := $(BUILD_DIR)/grpc
-GRPC_PLUGIN_WEB := $(PLUGIN_BIN)/protoc-gen-grpc-web
-GRPC_PLUGIN_CSHARP := $(PLUGIN_BIN)/grpc_csharp_plugin
-GRPC_PREFIX_OPT = $(if $(GRPC_PREFIX), --go_opt=module=$(GRPC_PREFIX),)
-GRPC_RELATIVE_OPT = $(if $(GRPC_RELATIVE), --go_opt=paths=source_relative,)
-
-PROTOC = $(shell which protoc)
-
 ifeq ($(OS),Linux)
 	PLUGIN_BIN := ./bin/linux
 else ifeq ($(OS),Darwin)
 	PLUGIN_BIN := ./bin/macos
 endif
 
+GRPC_DIR := $(BUILD_DIR)/grpc
+GRPC_PLUGIN_WEB := $(PLUGIN_BIN)/protoc-gen-grpc-web
+GRPC_PLUGIN_CSHARP := $(PLUGIN_BIN)/grpc_csharp_plugin
+GRPC_PREFIX_OPT = $(if $(GRPC_PREFIX), --go_opt=module=$(GRPC_PREFIX) --go-grpc_opt=module=$(GRPC_PREFIX),)
+GRPC_RELATIVE_OPT = $(if $(GRPC_RELATIVE), --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative,)
+
+PROTOC = $(shell which protoc)
 PROTO_WILDCARD ?= "*.proto"
 PROTO_FIND = find $(BASE_DIR) -type f \( -iname $(PROTO_WILDCARD) ! -iname "_*" \)
 ifneq (BASE_DIR,.)
@@ -30,12 +29,17 @@ endif
 PROTO_FILES = $(shell $(PROTO_FIND))
 PROTO_INCLUDES = -I=$(BASE_DIR)
 
-PROTOC_GEN := $(GO_BIN)/protoc-gen-go
-PROTOC_REPO := github.com/golang/protobuf/protoc-gen-go
-$(PROTOC_GEN):
-	$(GO_GET) $(PROTOC_REPO)
+PROTOC_GO := $(GO_BIN)/protoc-gen-go
+PROTOC_REPO_GO := google.golang.org/protobuf/cmd/protoc-gen-go
+$(PROTOC_GO):
+	$(GO_GET) $(PROTOC_GO)
 
-proto: $(PROTOC_GEN)
+PROTOC_GRPC := $(GO_BIN)/protoc-gen-go-grpc
+PROTOC_REPO_GRPC := google.golang.org/grpc/cmd/protoc-gen-go-grpc
+$(PROTOC_GRPC):
+	$(GO_GET) $(PROTOC_REPO_GRPC)
+
+proto: $(PROTOC_GO) $(PROTOC_GRPC)
 ifeq (, $(PROTOC))
 ifeq ($(OS),Linux)
 	apt install -y protobuf-compiler
@@ -49,7 +53,8 @@ GRPC_RPC_DIR = $(GRPC_DIR)/rpc
 rpc:: proto ## Protobuf gRPC
 	mkdir -p $(GRPC_RPC_DIR)
 	$(PROTOC) $(PROTO_INCLUDES) \
-	--go_out=plugins=grpc:$(GRPC_RPC_DIR) \
+	--go_out=$(GRPC_RPC_DIR) \
+	--go-grpc_out=$(GRPC_RPC_DIR) \
 	$(GRPC_RELATIVE_OPT) $(GRPC_PREFIX_OPT) \
 	$(PROTO_FILES)
 

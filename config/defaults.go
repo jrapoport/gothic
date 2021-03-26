@@ -5,6 +5,7 @@ import (
 
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store/drivers"
+	"github.com/jrapoport/gothic/utils"
 )
 
 const (
@@ -48,13 +49,14 @@ var serviceDefaults = Service{
 	Name: serviceName,
 }
 
+const Host = "localhost"
+
 var networkDefaults = Network{
-	Host:   "localhost",
-	Health: "localhost:7720",
-	RPC:    "localhost:7721",
-	Admin:  "localhost:7722",
-	REST:   "localhost:7727",
-	RPCWeb: "localhost:7729",
+	Health: utils.MakeAddress(Host, 7720),
+	RPC:    utils.MakeAddress(Host, 7721),
+	Admin:  utils.MakeAddress(Host, 7722),
+	REST:   utils.MakeAddress(Host, 7727),
+	RPCWeb: utils.MakeAddress(Host, 7729),
 }
 
 var securityDefaults = Security{

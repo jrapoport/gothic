@@ -6,7 +6,7 @@ import (
 
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
+	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/settings"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
