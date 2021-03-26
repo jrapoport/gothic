@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/account"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

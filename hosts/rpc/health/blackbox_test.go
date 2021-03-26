@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	rpc_health "github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	rpc_health "github.com/jrapoport/gothic/hosts/rpc/health"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/health"
+	 "github.com/jrapoport/gothic/hosts/rpc/health"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -16,11 +16,11 @@ import (
 func TestHealthServer_HealthCheck(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
-		rpc_health.RegisterServer,
+		health.RegisterServer,
 	})
 	hc := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return health.NewHealthClient(cc)
-	}).(health.HealthClient)
+		return rpc_health.NewHealthClient(cc)
+	}).(rpc_health.HealthClient)
 	ctx := context.Background()
 	res, err := hc.HealthCheck(ctx, &emptypb.Empty{})
 	assert.NoError(t, err)

@@ -1,7 +1,7 @@
 package signup
 
 import (
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/admin/signup"
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
 	"testing"
 
 	"github.com/jrapoport/gothic/core/codes"

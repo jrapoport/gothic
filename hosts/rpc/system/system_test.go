@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/api/grpc/rpc/system"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
-	"github.com/jrapoport/gothic/protobuf/grpc/rpc/system"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/jrapoport/gothic/test/tutils"
