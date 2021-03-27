@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/jrapoport/gothic/core"
@@ -22,6 +23,23 @@ func NewServer(s *core.Server) *Server {
 // Clone returns a clone of the server.
 func (s *Server) Clone() *Server {
 	return &Server{s.Server.Clone()}
+}
+
+// ValidateAdmin re-checks that a token belongs to an active admin user
+func (s *Server) ValidateAdmin(r *http.Request) error {
+	aid, err := GetUserID(r)
+	if err != nil {
+		return err
+	}
+	adm, err := s.GetAuthenticatedUser(aid)
+	if err != nil {
+		return err
+	}
+	if !adm.IsAdmin() {
+		err = fmt.Errorf("admin required: %s", adm.ID)
+		return err
+	}
+	return nil
 }
 
 // Response wraps an http JSONContent response. If v is an

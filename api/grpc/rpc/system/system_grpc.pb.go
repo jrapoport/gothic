@@ -170,5 +170,5 @@ var System_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "system.proto",
+	Metadata: "system/system.proto",
 }

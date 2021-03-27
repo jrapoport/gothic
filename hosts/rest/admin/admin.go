@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/jrapoport/gothic/hosts/rest/admin/codes"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
@@ -10,8 +11,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
 )
 
-// Endpoint is the admin endpoint.
-const Endpoint = "/admin"
+// Admin is the admin endpoint.
+const Admin = "/admin"
 
 // TODO: admin CRUD for users
 type adminServer struct {
@@ -35,10 +36,11 @@ func register(s *http.Server, srv *adminServer) {
 }
 
 func (s *adminServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Admin().Route(Endpoint, func(rt *rest.Router) {
+	r.Authenticated().Admin().Route(Admin, func(rt *rest.Router) {
 		audit.RegisterServer(&http.Server{Handler: rt}, s.Clone())
-		settings.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		invite.RegisterServer(&http.Server{Handler: rt}, s.Clone())
+		settings.RegisterServer(&http.Server{Handler: rt}, s.Clone())
+		codes.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 		users.RegisterServer(&http.Server{Handler: rt}, s.Clone())
 	})
 }

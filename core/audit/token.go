@@ -41,7 +41,7 @@ func logToken(t token.Token) types.Map {
 	data := types.Map{
 		key.Token:  t.String(),
 		key.Class:  t.Class().String(),
-		key.Usage:  t.Usage().String(),
+		key.Type:   t.Usage().String(),
 		key.Issued: t.Issued().UTC().Format(time.RFC3339),
 	}
 	if !t.LastUsed().IsZero() {

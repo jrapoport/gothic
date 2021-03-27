@@ -1,4 +1,4 @@
-package settings
+package admin
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ import (
 func TestSettingsServer_Settings(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
-	srv := newSettingsServer(s)
+	srv := newAdminServer(s)
 	ctx := context.Background()
 	res, err := srv.Settings(ctx, nil)
 	assert.NoError(t, err)

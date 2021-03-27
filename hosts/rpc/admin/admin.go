@@ -1,24 +1,22 @@
 package admin
 
 import (
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/settings"
-	"github.com/jrapoport/gothic/hosts/rpc/admin/signup"
 	"google.golang.org/grpc"
 )
 
 type adminServer struct {
+	admin.UnimplementedAdminServer
 	*rpc.Server
 }
 
 func newAdminServer(srv *rpc.Server) *adminServer {
 	srv.FieldLogger = srv.WithField("module", "admin")
-	return &adminServer{srv}
+	return &adminServer{Server: srv}
 }
 
 // RegisterServer registers a new admin server.
 func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	as := newAdminServer(srv).Server
-	settings.RegisterServer(s, as)
-	signup.RegisterServer(s, as)
+	admin.RegisterAdminServer(s, newAdminServer(srv))
 }

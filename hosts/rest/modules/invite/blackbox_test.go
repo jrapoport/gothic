@@ -50,7 +50,7 @@ func TestInviteServer_SendInviteUser(t *testing.T) {
 	req := &invite.Request{
 		Email: u.Email,
 	}
-	_, err := thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err := thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return inviteTok != ""
@@ -70,30 +70,30 @@ func TestInviteServer_SendInviteUser_Error(t *testing.T) {
 	srv.Config().Signup.Invites = config.Users
 	tok := thttp.UserToken(t, srv.Config().JWT, false, true)
 	// bad request
-	_, err := thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, []byte("\n"))
+	_, err := thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, []byte("\n"))
 	assert.Error(t, err)
 	// no email
 	req := &invite.Request{Email: ""}
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 	// bad email
 	req = &invite.Request{Email: "@"}
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 	// user not found
 	req = &invite.Request{Email: tutils.RandomEmail()}
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 	// only admins
 	srv.Config().Signup.Invites = config.Admins
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 	// invites disabled
 	srv.Config().Signup.Invites = config.Disabled
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 	// signups disabled
 	srv.Config().Signup.Disabled = true
-	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Endpoint, tok, nil, req)
+	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, invite.Invite, tok, nil, req)
 	assert.Error(t, err)
 }
