@@ -58,7 +58,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	srv.Config().Signup.AutoConfirm = true
 	srv.Config().MaskEmails = false
 	getUser := func(tok string) *httptest.ResponseRecorder {
-		r := thttp.Request(t, http.MethodGet, Endpoint, tok, nil, nil)
+		r := thttp.Request(t, http.MethodGet, User, tok, nil, nil)
 		r, err := rest.ParseClaims(r, srv.Config().JWT, tok)
 		require.NoError(t, err)
 		w := httptest.NewRecorder()
@@ -91,7 +91,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
 	updateUser := func(tok string, body interface{}) *httptest.ResponseRecorder {
-		r := thttp.Request(t, http.MethodPut, Endpoint, tok, nil, body)
+		r := thttp.Request(t, http.MethodPut, User, tok, nil, body)
 		r, err := rest.ParseClaims(r, srv.Config().JWT, tok)
 		require.NoError(t, err)
 		w := httptest.NewRecorder()
@@ -235,15 +235,15 @@ func TestRequestErrors(t *testing.T) {
 		r = thttp.Request(t, method, route, tok, nil, nil)
 		assert.NotEqual(t, http.StatusOK, w.Code)
 	}
-	const PassRoute = Endpoint + Password
+	const PassRoute = User + Password
 	tests := []struct {
 		m        string
 		r        string
 		checkReq bool
 		h        http.HandlerFunc
 	}{
-		{http.MethodGet, Endpoint, false, srv.GetUser},
-		{http.MethodPut, Endpoint, true, srv.UpdateUser},
+		{http.MethodGet, User, false, srv.GetUser},
+		{http.MethodPut, User, true, srv.UpdateUser},
 		{http.MethodPut, PassRoute, true, srv.ChangePassword},
 	}
 	for _, test := range tests {

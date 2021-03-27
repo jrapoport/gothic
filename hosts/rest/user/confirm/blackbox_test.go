@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const send = confirm.Endpoint + rest.Root
+const send = confirm.Confirm + rest.Root
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
 	srv, web, smtp := tsrv.RESTHost(t, []rest.RegisterServer{

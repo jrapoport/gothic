@@ -1,12 +1,12 @@
-package admin
+package admin_test
 
 import (
 	"context"
 	"testing"
 
-	"github.com/jrapoport/gothic/api/grpc/rpc/admin/settings"
-	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
+	rpc_admin "github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/hosts/rpc"
+	"github.com/jrapoport/gothic/hosts/rpc/admin"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,13 +16,13 @@ import (
 func TestAdminServer_Config(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
-		RegisterServer,
+		admin.RegisterServer,
 	})
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return settings.NewSettingsClient(cc)
-	}).(settings.SettingsClient)
+		return rpc_admin.NewAdminClient(cc)
+	}).(rpc_admin.AdminClient)
 	ctx := context.Background()
-	res, err := client.Settings(ctx, &settings.SettingsRequest{})
+	res, err := client.Settings(ctx, &rpc_admin.SettingsRequest{})
 	assert.NoError(t, err)
 	test := srv.HealthCheck()
 	assert.Equal(t, test.Name, res.Name)
@@ -33,13 +33,13 @@ func TestAdminServer_Config(t *testing.T) {
 func TestAdminServer_Codes(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
-		RegisterServer,
+		admin.RegisterServer,
 	})
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return signup.NewSignupClient(cc)
-	}).(signup.SignupClient)
+		return rpc_admin.NewAdminClient(cc)
+	}).(rpc_admin.AdminClient)
 	ctx := context.Background()
-	list, err := client.CreateSignupCodes(ctx, &signup.CreateSignupCodesRequest{
+	list, err := client.CreateSignupCodes(ctx, &rpc_admin.CreateSignupCodesRequest{
 		Uses:  1,
 		Count: 1,
 	})
@@ -47,17 +47,17 @@ func TestAdminServer_Codes(t *testing.T) {
 	require.NotNil(t, list)
 	assert.Len(t, list.GetCodes(), 1)
 	code := list.GetCodes()[0]
-	sc, err := client.CheckSignupCode(ctx, &signup.CheckSignupCodeRequest{
+	sc, err := client.CheckSignupCode(ctx, &rpc_admin.CheckSignupCodeRequest{
 		Code: code,
 	})
 	assert.NoError(t, err)
-	assert.True(t, sc.Usable)
+	assert.True(t, sc.Valid)
 	assert.Equal(t, code, sc.Code)
-	_, err = client.VoidSignupCode(ctx, &signup.VoidSignupCodeRequest{
+	_, err = client.DeleteSignupCode(ctx, &rpc_admin.DeleteSignupCodeRequest{
 		Code: code,
 	})
 	assert.NoError(t, err)
-	_, err = client.CheckSignupCode(ctx, &signup.CheckSignupCodeRequest{
+	_, err = client.CheckSignupCode(ctx, &rpc_admin.CheckSignupCodeRequest{
 		Code: code,
 	})
 	assert.Error(t, err)

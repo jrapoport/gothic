@@ -7,8 +7,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
-// Endpoint is the health check endpoint.
-const Endpoint = config.HealthCheck
+// Check is the health check endpoint.
+const Check = config.HealthCheck
 
 type healthServer struct {
 	*rest.Server
@@ -31,7 +31,7 @@ func register(s *http.Server, srv *healthServer) {
 }
 
 func (s *healthServer) addRoutes(r *rest.Router) {
-	r.Get(Endpoint, s.HealthCheck)
+	r.Get(Check, s.HealthCheck)
 }
 
 // HealthCheck performs a health check.
