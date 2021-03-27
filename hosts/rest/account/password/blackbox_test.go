@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	resetEndpoint   = password.Password + password.Reset
-	confirmEndpoint = password.Password + password.Confirm
+	reset   = password.Password + password.Reset
+	confirm = password.Password + password.Confirm
 )
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {
@@ -57,23 +57,23 @@ func TestPasswordServer_SendResetPassword(t *testing.T) {
 	srv, web, smtp := testServer(t)
 	u := testUser(t, srv)
 	// invalid req
-	_, err := thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, []byte("\n"))
+	_, err := thttp.DoRequest(t, web, http.MethodPost, reset, nil, []byte("\n"))
 	assert.Error(t, err)
 	// empty email
 	req := new(password.Request)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 	assert.Error(t, err)
 	// bad email
 	req = &password.Request{
 		Email: "bad",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 	assert.Error(t, err)
 	// not found
 	req = &password.Request{
 		Email: "i-dont-exist@example.com",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 	assert.NoError(t, err)
 	var tok string
 	act := template.ResetPasswordAction
@@ -83,7 +83,7 @@ func TestPasswordServer_SendResetPassword(t *testing.T) {
 	req = &password.Request{
 		Email: u.Email,
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
@@ -105,7 +105,7 @@ func TestPasswordServer_SendResetPassword_RateLimit(t *testing.T) {
 		req := &password.Request{
 			Email: u.Email,
 		}
-		_, err := thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+		_, err := thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 		if i == 0 {
 			assert.NoError(t, err)
 			assert.Eventually(t, func() bool {
@@ -126,17 +126,17 @@ func TestPasswordServer_ConfirmResetPassword(t *testing.T) {
 	srv, web, smtp := testServer(t)
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"
 	// invalid req
-	_, err := thttp.DoRequest(t, web, http.MethodPost, confirmEndpoint, nil, []byte("\n"))
+	_, err := thttp.DoRequest(t, web, http.MethodPost, confirm, nil, []byte("\n"))
 	assert.Error(t, err)
 	// empty token
 	req := new(password.Request)
-	_, err = thttp.DoRequest(t, web, http.MethodPost, confirmEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
 	assert.Error(t, err)
 	// bad token
 	req = &password.Request{
 		Token: "bad",
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, confirmEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
 	assert.Error(t, err)
 	// first get the change token
 	u := testUser(t, srv)
@@ -149,7 +149,7 @@ func TestPasswordServer_ConfirmResetPassword(t *testing.T) {
 	req = &password.Request{
 		Email: u.Email,
 	}
-	_, err = thttp.DoRequest(t, web, http.MethodPost, resetEndpoint, nil, req)
+	_, err = thttp.DoRequest(t, web, http.MethodPost, reset, nil, req)
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok != ""
@@ -159,7 +159,7 @@ func TestPasswordServer_ConfirmResetPassword(t *testing.T) {
 		Password: newPass,
 		Token:    tok,
 	}
-	res, err := thttp.DoRequest(t, web, http.MethodPost, confirmEndpoint, nil, req)
+	res, err := thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
 	assert.NoError(t, err)
 	u, err = srv.GetUser(u.ID)
 	assert.NoError(t, err)

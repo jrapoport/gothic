@@ -11,8 +11,8 @@ import (
 // TODO: Merge this into the account endpoint to support authenticated
 // 	account confirmation in lieu of an email address.
 const (
-	// Endpoint is the confirmation rest endpoint.
-	Endpoint = "/confirm"
+	// Confirm is the confirmation rest endpoint.
+	Confirm = "/confirm"
 )
 
 type confirmServer struct {
@@ -36,7 +36,7 @@ func register(s *http.Server, srv *confirmServer) {
 }
 
 func (s *confirmServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Route(Endpoint, func(rt *rest.Router) {
+	r.Authenticated().Route(Confirm, func(rt *rest.Router) {
 		rt.Post(rest.Root, s.SendConfirmUser)
 	})
 }

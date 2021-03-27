@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -71,7 +70,7 @@ func (s *usersServer) GetUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.validateAdmin(r)
+	err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -101,7 +100,7 @@ func (s *usersServer) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	err = s.validateAdmin(r)
+	err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -126,7 +125,7 @@ func (s *usersServer) AdminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.validateAdmin(r)
+	err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -150,7 +149,7 @@ func (s *usersServer) AdminPromoteUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.validateAdmin(r)
+	err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -165,20 +164,4 @@ func (s *usersServer) AdminPromoteUser(w http.ResponseWriter, r *http.Request) {
 	res := rest.NewUserResponse(u)
 	s.Debugf("promoted user %s: %v", uid, res)
 	s.Response(w, res)
-}
-
-func (s *usersServer) validateAdmin(r *http.Request) error {
-	aid, err := rest.GetUserID(r)
-	if err != nil {
-		return err
-	}
-	adm, err := s.GetAuthenticatedUser(aid)
-	if err != nil {
-		return err
-	}
-	if !adm.IsAdmin() {
-		err = fmt.Errorf("admin required: %s", adm.ID)
-		return err
-	}
-	return nil
 }

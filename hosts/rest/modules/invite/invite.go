@@ -7,8 +7,8 @@ import (
 	"github.com/jrapoport/gothic/hosts/rest"
 )
 
-// Endpoint is the endpoint for an invite server.
-const Endpoint = "/invite"
+// Invite is the endpoint for an invite server.
+const Invite = "/invite"
 
 // Request is an invite server request
 type Request struct {
@@ -36,7 +36,7 @@ func register(s *http.Server, srv *inviteServer) {
 }
 
 func (s *inviteServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Confirmed().Post(Endpoint, s.SendInviteUser)
+	r.Authenticated().Confirmed().Post(Invite, s.SendInviteUser)
 }
 
 // SendInviteUser sends an invite to an email address.

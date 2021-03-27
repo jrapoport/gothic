@@ -38,7 +38,7 @@ func testResponse(t *testing.T, s *rest.Host) string {
 
 func TestAdminServer_Config(t *testing.T) {
 	t.Parallel()
-	const ep = admin.Endpoint + settings.Settings
+	const ep = admin.Admin + settings.Settings
 	s, web, _ := testServer(t)
 	j := s.Config().JWT
 	// bad token
