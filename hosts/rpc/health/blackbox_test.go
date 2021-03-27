@@ -6,7 +6,7 @@ import (
 
 	rpc_health "github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/hosts/rpc"
-	 "github.com/jrapoport/gothic/hosts/rpc/health"
+	"github.com/jrapoport/gothic/hosts/rpc/health"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"

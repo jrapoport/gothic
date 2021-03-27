@@ -53,7 +53,7 @@ func testNewAccessCode(t *testing.T, f Format) {
 	tests := []struct {
 		uses int
 		exp  time.Duration
-		use  token.Usage
+		use  token.Type
 		max  int
 	}{
 		{-2, NoExpiration, token.Infinite, InfiniteUse},

@@ -11,9 +11,9 @@ var migrateCmd = &cobra.Command{
 	RunE: migrateRunE,
 }
 
-func migrateRunE(*cobra.Command, []string) error {
+func migrateRunE(cmd *cobra.Command, _ []string) error {
 	c := rootConfig()
-	l := c.Log().WithField("exe", "gmd")
+	l := c.Log().WithField("exe", cmd.Use)
 	conn, err := store.Dial(c, l)
 	if err != nil {
 		return err

@@ -16,7 +16,7 @@ func TestHealthServer_HealthCheck(t *testing.T) {
 	srv, web, _ := tsrv.RESTHost(t, []rest.RegisterServer{
 		health.RegisterServer,
 	}, false)
-	res, err := thttp.DoRequest(t, web, http.MethodGet, health.Endpoint, nil, nil)
+	res, err := thttp.DoRequest(t, web, http.MethodGet, health.Check, nil, nil)
 	assert.NoError(t, err)
 	assert.JSONEq(t, health.ExpectedResponse(t, srv.API), res)
 }

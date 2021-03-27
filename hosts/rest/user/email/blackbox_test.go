@@ -20,9 +20,9 @@ import (
 
 const (
 	testPass = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
-	change   = email.Endpoint + email.Change
-	unmask   = email.Endpoint + rest.Root
-	confirm  = email.Endpoint + email.Confirm
+	change   = email.Email + email.Change
+	unmask   = email.Email + rest.Root
+	confirm  = email.Email + email.Confirm
 )
 
 func testServer(t *testing.T) (*rest.Host, *httptest.Server, *tconf.SMTPMock) {

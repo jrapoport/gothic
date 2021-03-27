@@ -24,5 +24,5 @@ func TestHealthServer_HealthCheck(t *testing.T) {
 	srv := newHealthServer(s)
 	test := ExpectedResponse(t, s.API)
 	assert.HTTPBodyContains(t, srv.HealthCheck,
-		http.MethodGet, Endpoint, nil, test)
+		http.MethodGet, Check, nil, test)
 }

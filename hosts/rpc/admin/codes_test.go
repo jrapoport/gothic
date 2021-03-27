@@ -1,9 +1,9 @@
-package signup
+package admin
 
 import (
-	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
 	"testing"
 
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/core/codes"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/models/code"
@@ -17,11 +17,11 @@ func TestSignupServer_CreateSignupCodes(t *testing.T) {
 	t.Parallel()
 	const testLen = 10
 	s, _ := tsrv.RPCServer(t, false)
-	srv := newSignupServer(s)
+	srv := newAdminServer(s)
 	ctx := context.Background()
 	_, err := srv.CreateSignupCodes(ctx, nil)
 	assert.Error(t, err)
-	req := &signup.CreateSignupCodesRequest{
+	req := &admin.CreateSignupCodesRequest{
 		Uses:  code.InfiniteUse,
 		Count: testLen,
 	}
@@ -34,9 +34,9 @@ func TestSignupServer_CreateSignupCodes(t *testing.T) {
 func TestSignupServer_CheckSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
-	srv := newSignupServer(s)
+	srv := newAdminServer(s)
 	ctx := context.Background()
-	cr, err := srv.CreateSignupCodes(ctx, &signup.CreateSignupCodesRequest{
+	cr, err := srv.CreateSignupCodes(ctx, &admin.CreateSignupCodesRequest{
 		Uses:  code.SingleUse,
 		Count: 1,
 	})
@@ -45,19 +45,19 @@ func TestSignupServer_CheckSignupCode(t *testing.T) {
 	require.Len(t, cr.GetCodes(), 1)
 	_, err = srv.CheckSignupCode(ctx, nil)
 	assert.Error(t, err)
-	req := &signup.CheckSignupCodeRequest{
+	req := &admin.CheckSignupCodeRequest{
 		Code: "bad",
 	}
 	_, err = srv.CheckSignupCode(ctx, req)
 	assert.Error(t, err)
 	test := cr.GetCodes()[0]
-	req = &signup.CheckSignupCodeRequest{
+	req = &admin.CheckSignupCodeRequest{
 		Code: test,
 	}
 	res, err := srv.CheckSignupCode(ctx, req)
 	assert.NoError(t, err)
 	require.NotNil(t, res)
-	assert.True(t, res.Usable)
+	assert.True(t, res.Valid)
 	assert.Equal(t, test, res.Code)
 	conn := tconn.Conn(t, srv.Config())
 	sc, err := codes.GetSignupCode(conn, test)
@@ -68,26 +68,26 @@ func TestSignupServer_CheckSignupCode(t *testing.T) {
 	require.NoError(t, err)
 	res, err = srv.CheckSignupCode(ctx, req)
 	assert.NoError(t, err)
-	assert.False(t, res.Usable)
+	assert.False(t, res.Valid)
 	err = conn.Delete(sc).Error
 	require.NoError(t, err)
 	_, err = srv.CheckSignupCode(ctx, req)
 	assert.Error(t, err)
 }
 
-func TestSignupServer_VoidSignupCode(t *testing.T) {
+func TestSignupServer_DeleteSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
-	srv := newSignupServer(s)
+	srv := newAdminServer(s)
 	ctx := context.Background()
-	_, err := srv.VoidSignupCode(ctx, nil)
+	_, err := srv.DeleteSignupCode(ctx, nil)
 	assert.Error(t, err)
-	req := &signup.VoidSignupCodeRequest{
+	req := &admin.DeleteSignupCodeRequest{
 		Code: "bad",
 	}
-	_, err = srv.VoidSignupCode(ctx, req)
+	_, err = srv.DeleteSignupCode(ctx, req)
 	assert.Error(t, err)
-	cr, err := srv.CreateSignupCodes(ctx, &signup.CreateSignupCodesRequest{
+	cr, err := srv.CreateSignupCodes(ctx, &admin.CreateSignupCodesRequest{
 		Uses:  code.SingleUse,
 		Count: 1,
 	})
@@ -95,10 +95,10 @@ func TestSignupServer_VoidSignupCode(t *testing.T) {
 	require.NotNil(t, cr)
 	require.Len(t, cr.GetCodes(), 1)
 	test := cr.GetCodes()[0]
-	req = &signup.VoidSignupCodeRequest{
+	req = &admin.DeleteSignupCodeRequest{
 		Code: test,
 	}
-	_, err = srv.VoidSignupCode(ctx, req)
+	_, err = srv.DeleteSignupCode(ctx, req)
 	assert.NoError(t, err)
 	conn := tconn.Conn(t, srv.Config())
 	_, err = codes.GetSignupCode(conn, test)
