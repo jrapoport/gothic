@@ -22,8 +22,8 @@ import (
 
 const (
 	testPass  = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
-	Endpoint  = rest_user.Endpoint
-	PassRoute = rest_user.Endpoint + rest_user.Password
+	Endpoint  = rest_user.User
+	PassRoute = rest_user.User + rest_user.Password
 )
 
 func userResponse(t *testing.T, res string) *rest.UserResponse {

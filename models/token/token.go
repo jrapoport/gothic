@@ -10,7 +10,7 @@ import (
 // Token is the interface for tokens.
 type Token interface {
 	Class() Class
-	Usage() Usage
+	Usage() Type
 	IssuedTo() uuid.UUID
 	Issued() time.Time
 	LastUsed() time.Time
@@ -22,12 +22,12 @@ type Token interface {
 	fmt.Stringer
 }
 
-// Usage is the type of code (e.g. single use)
-type Usage uint8
+// Type is the type of code (e.g. single use)
+type Type uint8 // TODO: rename this to Type?
 
 const (
 	// Infinite indicates this code may be used an infinite number of times.
-	Infinite Usage = iota
+	Infinite Type = iota
 	// Single is a token that can be used once.
 	Single
 	// Multi is a token that can be used repeatedly.
@@ -36,7 +36,7 @@ const (
 	Timed
 )
 
-func (t Usage) String() string {
+func (t Type) String() string {
 	switch t {
 	case Infinite:
 		return "infinite"

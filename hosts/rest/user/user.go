@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	// Endpoint is the user endpoint.
-	Endpoint = "/user"
+	// User is the user endpoint.
+	User = "/user"
 	// Password changes a user password.
 	Password = "/password"
 )
@@ -46,7 +46,7 @@ func register(s *http.Server, srv *userServer) {
 }
 
 func (s *userServer) addRoutes(r *rest.Router) {
-	r.Authenticated().Confirmed().Route(Endpoint, func(rt *rest.Router) {
+	r.Authenticated().Confirmed().Route(User, func(rt *rest.Router) {
 		rt.Get(rest.Root, s.GetUser)
 		rt.Put(rest.Root, s.UpdateUser)
 		rt.Put(Password, s.ChangePassword)

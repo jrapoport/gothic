@@ -62,7 +62,7 @@ func TestRESTHost(t *testing.T) {
 	// authenticated call (error)
 	getUserURI := func() string {
 		require.NotEmpty(t, h.Address())
-		return "http://" + h.Address() + user.Endpoint
+		return "http://" + h.Address() + user.User
 	}
 	req := thttp.Request(t, http.MethodGet, getUserURI(), ur.Token.Access, nil, nil)
 	res, err = http.DefaultClient.Do(req)

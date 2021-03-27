@@ -55,9 +55,9 @@ func (a *API) CheckSignupCode(tok string) (*code.SignupCode, error) {
 	return codes.GetUsableSignupCode(a.conn, tok)
 }
 
-// VoidSignupCode returns nil if the code is valid and usable.
-func (a *API) VoidSignupCode(tok string) error {
-	return codes.VoidSignupCode(a.conn, tok)
+// DeleteSignupCode returns nil if the code is valid and usable.
+func (a *API) DeleteSignupCode(tok string) error {
+	return codes.DeleteSignupCode(a.conn, tok)
 }
 
 type (

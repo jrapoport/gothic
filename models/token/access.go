@@ -27,7 +27,7 @@ const NoExpiration time.Duration = 0
 type AccessToken struct {
 	gorm.Model
 	UserID     uuid.UUID     `json:"user_id" gorm:"index:idx_user_id;uniqueIndex:idx_user_id_token;type:char(36)"`
-	Type       Usage         `json:"type"`
+	Type       Type          `json:"type"`
 	Token      string        `json:"token" gorm:"index:idx_token;uniqueIndex:idx_user_id_token"`
 	MaxUses    int           `json:"max_uses"`
 	Used       int           `json:"used"`
@@ -102,8 +102,8 @@ func (at AccessToken) Class() Class {
 	return Access
 }
 
-// Usage returns usage for the token.
-func (at AccessToken) Usage() Usage {
+// Type returns usage for the token.
+func (at AccessToken) Usage() Type {
 	return at.Type
 }
 

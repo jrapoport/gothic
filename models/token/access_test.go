@@ -21,7 +21,7 @@ var (
 	tokenTests   = []struct {
 		uses int
 		exp  time.Duration
-		use  Usage
+		use  Type
 		max  int
 	}{
 		{-2, NoExpiration, Infinite, InfiniteUse},

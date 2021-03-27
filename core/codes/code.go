@@ -40,14 +40,14 @@ func CreateSignupCode(conn *store.Connection, userID uuid.UUID, f code.Format, u
 }
 
 // CreateSignupCodes generates a list of unique signup codes.
-func CreateSignupCodes(conn *store.Connection, userID uuid.UUID, f code.Format, uses, count int) ([]*code.SignupCode, error) {
+func CreateSignupCodes(conn *store.Connection, userID uuid.UUID, f code.Format, typ, count int) ([]*code.SignupCode, error) {
 	if count < 0 {
 		count = 0
 	}
 	list := make([]*code.SignupCode, count)
 	err := conn.Transaction(func(tx *store.Connection) error {
 		for i := 0; i < count; i++ {
-			c, err := CreateSignupCode(tx, userID, f, uses, true)
+			c, err := CreateSignupCode(tx, userID, f, typ, true)
 			if err != nil {
 				return err
 			}
@@ -112,8 +112,8 @@ func GetLastSentSignupCode(conn *store.Connection, userID uuid.UUID) (*code.Sign
 	return sc, nil
 }
 
-// VoidSignupCode removes a signup code from use
-func VoidSignupCode(conn *store.Connection, tok string) error {
+// DeleteSignupCode removes a signup code from use
+func DeleteSignupCode(conn *store.Connection, tok string) error {
 	return conn.Transaction(func(tx *store.Connection) error {
 		sc, err := GetUsableSignupCode(tx, tok)
 		if err != nil {

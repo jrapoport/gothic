@@ -1,38 +1,20 @@
-package signup
+package admin
 
 import (
 	"context"
 	"errors"
 
-	"github.com/jrapoport/gothic/api/grpc/rpc/admin/signup"
+	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/code"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type signupServer struct {
-	signup.UnimplementedSignupServer
-	*rpc.Server
-}
-
-var _ signup.SignupServer = (*signupServer)(nil)
-
-func newSignupServer(srv *rpc.Server) *signupServer {
-	srv.FieldLogger = srv.WithField("module", "codes")
-	return &signupServer{Server: srv}
-}
-
-// RegisterServer registers a new admin server.
-func RegisterServer(s *grpc.Server, srv *rpc.Server) {
-	signup.RegisterSignupServer(s, newSignupServer(srv))
-}
-
 // CreateSignupCodes returns the settings for a server.
-func (s *signupServer) CreateSignupCodes(ctx context.Context,
-	req *signup.CreateSignupCodesRequest) (*signup.SignupCodesResponse, error) {
+func (s *adminServer) CreateSignupCodes(ctx context.Context,
+	req *admin.CreateSignupCodesRequest) (*admin.SignupCodesResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -48,14 +30,14 @@ func (s *signupServer) CreateSignupCodes(ctx context.Context,
 		s.Warnf("expected %d but created %d", count, len(list))
 	}
 	s.Debugf("created %d codes", len(list))
-	res := &signup.SignupCodesResponse{
+	res := &admin.SignupCodesResponse{
 		Codes: list,
 	}
 	return res, nil
 }
 
-func (s *signupServer) CheckSignupCode(_ context.Context,
-	req *signup.CheckSignupCodeRequest) (*signup.SignupCodeResponse, error) {
+func (s *adminServer) CheckSignupCode(_ context.Context,
+	req *admin.CheckSignupCodeRequest) (*admin.SignupCodeResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -64,37 +46,37 @@ func (s *signupServer) CheckSignupCode(_ context.Context,
 	sc, err := s.API.CheckSignupCode(cd)
 	if err != nil && errors.Is(err, code.ErrUnusableCode) {
 		s.Debugf("checked signup code is invalid: %s", cd)
-		res := &signup.SignupCodeResponse{
-			Usable: false,
-			Code:   cd,
+		res := &admin.SignupCodeResponse{
+			Valid: false,
+			Code:  cd,
 		}
 		return res, nil
 	} else if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}
 	s.Debugf("checked signup code is valid: %s", cd)
-	res := &signup.SignupCodeResponse{
-		Usable:     true,
+	res := &admin.SignupCodeResponse{
+		Valid:      true,
 		Code:       sc.Token,
-		CodeFormat: signup.CodeFormat(sc.Format),
-		CodeType:   signup.CodeUsage(sc.Usage()),
+		Format:     admin.CodeFormat(sc.Format),
+		Type:       admin.CodeType(sc.Type),
 		Expiration: durationpb.New(sc.Expiration),
 		UserId:     sc.UserID.String(),
 	}
 	return res, nil
 }
 
-func (s *signupServer) VoidSignupCode(_ context.Context,
-	req *signup.VoidSignupCodeRequest) (*emptypb.Empty, error) {
+func (s *adminServer) DeleteSignupCode(_ context.Context,
+	req *admin.DeleteSignupCodeRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
 	cd := req.GetCode()
-	s.Debugf("void signup code: %s", cd)
-	err := s.API.VoidSignupCode(cd)
+	s.Debugf("delete signup code: %s", cd)
+	err := s.API.DeleteSignupCode(cd)
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}
-	s.Debugf("voided signup code: %s", cd)
+	s.Debugf("deleted signup code: %s", cd)
 	return &emptypb.Empty{}, nil
 }
