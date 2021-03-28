@@ -62,7 +62,7 @@ func assertUserResponse(t *testing.T, srv *accountServer, test *rpc.UserResponse
 	require.NoError(t, err)
 	require.NotNil(t, claims)
 	assert.EqualValues(t, tokens.Bearer, res.Token.Type)
-	u, err := srv.GetUser(uuid.MustParse(claims.Subject))
+	u, err := srv.GetUser(uuid.MustParse(claims.Subject()))
 	require.NoError(t, err)
 	require.NotNil(t, u)
 	assert.Equal(t, user.RoleUser, u.Role)
