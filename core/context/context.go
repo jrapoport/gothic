@@ -12,21 +12,26 @@ import (
 type Context interface {
 	context.Context
 
-	GetCode() string
-	GetIPAddress() string
-	GetProvider() provider.Name
-	GetReCaptcha() string
-	GetSort() store.Sort
-	GetUserID() uuid.UUID
-	GetAdminID() uuid.UUID
-
-	SetCode(string)
+	IPAddress() string
 	SetIPAddress(string)
+
+	Provider() provider.Name
 	SetProvider(provider.Name)
-	SetReCaptcha(string)
-	SetSort(store.Sort)
+
+	UserID() uuid.UUID
 	SetUserID(uuid.UUID)
+
+	AdminID() uuid.UUID
 	SetAdminID(uuid.UUID)
+
+	Code() string
+	SetCode(string)
+
+	ReCaptcha() string
+	SetReCaptcha(string)
+
+	Sort() store.Sort
+	SetSort(store.Sort)
 }
 
 // Background returns a new wrapped background context.
@@ -45,54 +50,11 @@ type apiContext struct {
 
 var _ Context = (*apiContext)(nil)
 
-type codeKey struct{}
 type ipKey struct{}
-type providerKey struct{}
-type recaptchaKey struct{}
-type sortKey struct{}
-type uidKey struct{}
-type aidKey struct{}
 
-func (ctx apiContext) GetCode() string {
-	tok, _ := ctx.Value(codeKey{}).(string)
-	return tok
-}
-
-func (ctx apiContext) GetIPAddress() string {
+func (ctx apiContext) IPAddress() string {
 	e, _ := ctx.Value(ipKey{}).(string)
 	return e
-}
-
-func (ctx apiContext) GetProvider() provider.Name {
-	e, _ := ctx.Value(providerKey{}).(provider.Name)
-	return e
-}
-
-func (ctx apiContext) GetReCaptcha() string {
-	tok, _ := ctx.Value(recaptchaKey{}).(string)
-	return tok
-}
-
-func (ctx apiContext) GetSort() store.Sort {
-	s, _ := ctx.Value(sortKey{}).(store.Sort)
-	return s
-}
-
-func (ctx apiContext) GetUserID() uuid.UUID {
-	e, _ := ctx.Value(uidKey{}).(uuid.UUID)
-	return e
-}
-
-func (ctx apiContext) GetAdminID() uuid.UUID {
-	e, _ := ctx.Value(aidKey{}).(uuid.UUID)
-	return e
-}
-
-func (ctx *apiContext) SetCode(code string) {
-	if code == "" {
-		return
-	}
-	ctx.setValue(codeKey{}, code)
 }
 
 func (ctx *apiContext) SetIPAddress(ip string) {
@@ -102,6 +64,13 @@ func (ctx *apiContext) SetIPAddress(ip string) {
 	ctx.setValue(ipKey{}, ip)
 }
 
+type providerKey struct{}
+
+func (ctx apiContext) Provider() provider.Name {
+	e, _ := ctx.Value(providerKey{}).(provider.Name)
+	return e
+}
+
 func (ctx *apiContext) SetProvider(s provider.Name) {
 	if s == provider.Unknown {
 		return
@@ -109,18 +78,11 @@ func (ctx *apiContext) SetProvider(s provider.Name) {
 	ctx.setValue(providerKey{}, s)
 }
 
-func (ctx *apiContext) SetReCaptcha(tok string) {
-	if tok == "" {
-		return
-	}
-	ctx.setValue(recaptchaKey{}, tok)
-}
+type uidKey struct{}
 
-func (ctx *apiContext) SetSort(s store.Sort) {
-	if s == "" {
-		return
-	}
-	ctx.setValue(sortKey{}, s)
+func (ctx apiContext) UserID() uuid.UUID {
+	e, _ := ctx.Value(uidKey{}).(uuid.UUID)
+	return e
 }
 
 func (ctx *apiContext) SetUserID(uid uuid.UUID) {
@@ -130,11 +92,60 @@ func (ctx *apiContext) SetUserID(uid uuid.UUID) {
 	ctx.setValue(uidKey{}, uid)
 }
 
+type aidKey struct{}
+
+func (ctx apiContext) AdminID() uuid.UUID {
+	e, _ := ctx.Value(aidKey{}).(uuid.UUID)
+	return e
+}
+
 func (ctx *apiContext) SetAdminID(uid uuid.UUID) {
 	if uid == uuid.Nil {
 		return
 	}
 	ctx.setValue(aidKey{}, uid)
+}
+
+type codeKey struct{}
+
+func (ctx apiContext) Code() string {
+	tok, _ := ctx.Value(codeKey{}).(string)
+	return tok
+}
+
+func (ctx *apiContext) SetCode(code string) {
+	if code == "" {
+		return
+	}
+	ctx.setValue(codeKey{}, code)
+}
+
+type recaptchaKey struct{}
+
+func (ctx apiContext) ReCaptcha() string {
+	tok, _ := ctx.Value(recaptchaKey{}).(string)
+	return tok
+}
+
+func (ctx *apiContext) SetReCaptcha(tok string) {
+	if tok == "" {
+		return
+	}
+	ctx.setValue(recaptchaKey{}, tok)
+}
+
+type sortKey struct{}
+
+func (ctx apiContext) Sort() store.Sort {
+	s, _ := ctx.Value(sortKey{}).(store.Sort)
+	return s
+}
+
+func (ctx *apiContext) SetSort(s store.Sort) {
+	if s == "" {
+		return
+	}
+	ctx.setValue(sortKey{}, s)
 }
 
 func (ctx *apiContext) setValue(key, val interface{}) {

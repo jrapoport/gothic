@@ -36,6 +36,7 @@ func HasAccount(conn *store.Connection, p provider.Name, accountID string) (bool
 	return true, nil
 }
 
+// UpdateAccount updates an external account
 func UpdateAccount(conn *store.Connection,
 	la *account.Account, email *string, data types.Map) (bool, error) {
 	if email != nil && la.Email != *email {

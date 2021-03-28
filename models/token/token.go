@@ -23,7 +23,7 @@ type Token interface {
 }
 
 // Type is the type of code (e.g. single use)
-type Type uint8 // TODO: rename this to Type?
+type Type uint8
 
 const (
 	// Infinite indicates this code may be used an infinite number of times.

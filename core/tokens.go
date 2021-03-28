@@ -70,9 +70,9 @@ func (a *API) sendConfirmToken(ctx context.Context, userID uuid.UUID, check chec
 		a.log.Warn("mail not found")
 		return nil
 	}
-	if ctx.GetProvider().IsExternal() {
+	if ctx.Provider().IsExternal() {
 		// log the error but hide it so we don't leak information
-		err := fmt.Errorf("invalid provider: %s", ctx.GetProvider())
+		err := fmt.Errorf("invalid provider: %s", ctx.Provider())
 		return err
 	}
 	err := a.conn.Transaction(func(tx *store.Connection) error {

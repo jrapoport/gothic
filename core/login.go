@@ -23,8 +23,8 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	ip := ctx.GetIPAddress()
-	recaptcha := ctx.GetReCaptcha()
+	ip := ctx.IPAddress()
+	recaptcha := ctx.ReCaptcha()
 	p := a.Provider()
 	ctx.SetProvider(p)
 	a.log.Debugf("login: %s %s (%s %s %s)", email, pw, p, ip, recaptcha)
@@ -102,7 +102,7 @@ func (a *API) userLogin(ctx context.Context, conn *store.Connection,
 	}
 	a.dispatchEvent(events.Login, types.Map{
 		key.Provider:  p,
-		key.IPAddress: ctx.GetIPAddress(),
+		key.IPAddress: ctx.IPAddress(),
 		key.UserID:    u.ID,
 		key.Timestamp: time.Now().UTC(),
 	})
@@ -114,8 +114,8 @@ func (a *API) Logout(ctx context.Context, userID uuid.UUID) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	p := ctx.GetProvider()
-	ip := ctx.GetIPAddress()
+	p := ctx.Provider()
+	ip := ctx.IPAddress()
 	err := a.conn.Transaction(func(tx *store.Connection) error {
 		err := login.UserLogout(tx, userID)
 		if err != nil {

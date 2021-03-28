@@ -21,9 +21,16 @@ const (
 	Any       = All
 )
 
-func (t Type) Has(flag Type) bool    { return t&flag != 0 }
-func (t Type) Set(flag Type) Type    { return t | flag }
-func (t Type) Clear(flag Type) Type  { return t &^ flag }
+// Has returns true if the flags is set
+func (t Type) Has(flag Type) bool { return t&flag != 0 }
+
+// Set sets a flag on
+func (t Type) Set(flag Type) Type { return t | flag }
+
+// Clear sets a flag off
+func (t Type) Clear(flag Type) Type { return t &^ flag }
+
+// Toggle changes a flag from on to off or off to on
 func (t Type) Toggle(flag Type) Type { return t ^ flag }
 
 func (t Type) String() string {

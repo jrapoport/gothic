@@ -5,7 +5,7 @@ import "github.com/lestrrat-go/jwx/jwt"
 // Claims interface for jwt.
 type Claims interface {
 	jwt.Token
-	ParseToken(*Token)
+	parseToken(*Token)
 }
 
 // StandardClaims holds standard jwt claims.
@@ -22,6 +22,7 @@ func NewStandardClaims(sub string) *StandardClaims {
 	return std
 }
 
+// SetSubject sets the subject for the token
 func (c *StandardClaims) SetSubject(sub string) {
 	// we can safely ignore an error here
 	// because the it is strongly typed
@@ -29,6 +30,6 @@ func (c *StandardClaims) SetSubject(sub string) {
 }
 
 // ParseToken handles the parsed values coming back from a token
-func (c *StandardClaims) ParseToken(tok *Token) {
+func (c *StandardClaims) parseToken(tok *Token) {
 	c.Token = tok.Token
 }

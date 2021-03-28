@@ -18,7 +18,7 @@ func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, d
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.GetAdminID()
+	uid := ctx.AdminID()
 	if uid == uuid.Nil {
 		err := errors.New("admin user id required")
 		return nil, a.logError(err)
@@ -72,7 +72,7 @@ func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.Use
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.GetAdminID()
+	uid := ctx.AdminID()
 	if uid == uuid.Nil {
 		err := errors.New("admin user id required")
 		return nil, a.logError(err)
@@ -110,7 +110,7 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.GetAdminID()
+	uid := ctx.AdminID()
 	if uid == uuid.Nil {
 		err := errors.New("context user id required")
 		return a.logError(err)

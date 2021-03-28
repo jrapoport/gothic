@@ -1,8 +1,6 @@
 package rpc
 
 import (
-	"fmt"
-
 	"github.com/jrapoport/gothic/core"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,10 +41,12 @@ func (s *Server) RPCError(c codes.Code, err error) error {
 	return err
 }
 
+/* This remains unused so commenting it out for now
 // RPCErrorf wraps an rpc error code formatted according to a format specifier.
 func (s *Server) RPCErrorf(c codes.Code, format string, a ...interface{}) error {
 	return s.RPCError(c, fmt.Errorf(format, a...))
 }
+*/
 
 func statusText(c codes.Code) string {
 	switch c {
