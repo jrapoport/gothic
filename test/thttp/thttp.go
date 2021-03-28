@@ -95,11 +95,11 @@ func token(t *testing.T, c config.JWT, uid uuid.UUID, confirmed, admin bool) str
 	if admin {
 		confirmed = true
 	}
-	claims := jwt.NewUserClaims(c, &user.User{})
+	claims := jwt.NewUserClaims(&user.User{})
+	claims.StandardClaims = *jwt.NewStandardClaims(uid.String())
 	claims.Admin = admin
 	claims.Confirmed = confirmed
-	claims.Subject = uid.String()
-	tk, err := jwt.NewToken(claims).Bearer()
+	tk, err := jwt.NewToken(c, claims).Bearer()
 	require.NoError(t, err)
 	return tk
 }

@@ -16,8 +16,9 @@ import (
 // Callback holds a webhook callback.
 type Callback struct {
 	url     *url.URL
-	claims  WebhookClaims
+	claims  *jwt.WebhookClaims
 	event   events.Event
+	jwt     config.JWT
 	payload []byte
 }
 
@@ -41,11 +42,12 @@ func NewCallback(c config.Webhooks, e events.Event, msg types.Map) (*Callback, e
 	if err != nil {
 		return nil, err
 	}
-	claims := NewWebhookClaims(c.JWT, sum)
+	claims := jwt.NewWebhookClaims(sum)
 	return &Callback{
 		event:   e,
 		url:     u,
 		claims:  claims,
+		jwt:     c.JWT,
 		payload: payload,
 	}, nil
 }

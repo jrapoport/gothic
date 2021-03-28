@@ -94,7 +94,7 @@ func TestAccountServer(t *testing.T) {
 	require.NotEmpty(t, res)
 	// we were logged in
 	_, claims := tsrv.UnmarshalTokenResponse(t, c.JWT, res)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 	// check user again
 	u, err = srv.GetUserWithEmail(em)
 	assert.NoError(t, err)
@@ -126,7 +126,7 @@ func TestAccountServer(t *testing.T) {
 	assert.NoError(t, err)
 	// check that we were logged again
 	_, claims = tsrv.UnmarshalTokenResponse(t, c.JWT, res)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 	// login with the >new< password
 	route = account.Account + login.Login
 	lr := login.Request{
@@ -137,7 +137,7 @@ func TestAccountServer(t *testing.T) {
 	assert.NoError(t, err)
 	// check that we were logged correctly
 	_, claims = tsrv.UnmarshalUserResponse(t, c.JWT, res)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 	// verify the old password fails
 	lr.Password = testPass
 	_, err = thttp.DoRequest(t, web, http.MethodPost, route, nil, lr)

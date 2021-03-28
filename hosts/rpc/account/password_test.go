@@ -133,7 +133,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	claims, err := jwt.ParseUserClaims(srv.Config().JWT, res.Access)
 	assert.NoError(t, err)
 	require.NotNil(t, claims)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 	u, err = srv.GetUser(u.ID)
 	assert.NoError(t, err)
 	err = u.Authenticate(newPass)

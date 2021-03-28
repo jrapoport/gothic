@@ -103,7 +103,7 @@ func Authenticator(jc config.JWT) func(next http.Handler) http.Handler {
 
 // AdminUser creates a new JWT handler that checks for admin permissions.
 func AdminUser(next http.Handler) http.Handler {
-	return claimCheck(func(claims jwt.UserClaims) error {
+	return claimCheck(func(claims *jwt.UserClaims) error {
 		if !claims.Confirmed {
 			return errors.New("user not confirmed")
 		}
@@ -116,7 +116,7 @@ func AdminUser(next http.Handler) http.Handler {
 
 // ConfirmedUser creates a new JWT handler that checks for user confirmation.
 func ConfirmedUser(next http.Handler) http.Handler {
-	return claimCheck(func(claims jwt.UserClaims) error {
+	return claimCheck(func(claims *jwt.UserClaims) error {
 		if !claims.Confirmed {
 			return errors.New("user not confirmed")
 		}
@@ -124,7 +124,7 @@ func ConfirmedUser(next http.Handler) http.Handler {
 	})(next)
 }
 
-func claimCheck(check func(claims jwt.UserClaims) error) func(next http.Handler) http.Handler {
+func claimCheck(check func(claims *jwt.UserClaims) error) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			l := GetLogger(r)
@@ -134,7 +134,7 @@ func claimCheck(check func(claims jwt.UserClaims) error) func(next http.Handler)
 				ResponseCode(w, http.StatusUnauthorized, nil)
 				return
 			}
-			uc, ok := c.(jwt.UserClaims)
+			uc, ok := c.(*jwt.UserClaims)
 			if !ok {
 				l.Error("user claims not found")
 				return

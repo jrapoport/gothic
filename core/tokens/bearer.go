@@ -24,23 +24,23 @@ type BearerToken struct {
 var _ token.Token = (*BearerToken)(nil)
 
 // NewBearerToken generates a new bearer token.
-func NewBearerToken(t *jwt.Token) (*BearerToken, error) {
-	if t == nil {
+func NewBearerToken(tok *jwt.Token) (*BearerToken, error) {
+	if tok == nil {
 		return nil, errors.New("invalid token")
 	}
-	std := t.Claims().Standard()
-	userID, err := uuid.Parse(std.Subject)
+	userID, err := uuid.Parse(tok.Subject())
 	if err != nil {
 		return nil, err
 	}
-	tok, err := t.Bearer()
+	bearer, err := tok.Bearer()
 	if err != nil {
 		return nil, err
 	}
-	at := token.NewAccessToken(tok, token.InfiniteUse, t.Expiration())
+	at := token.NewAccessToken(bearer, token.InfiniteUse, tok.Expiration())
 	at.UserID = userID
-	if std.ExpiresAt != nil {
-		at.ExpiredAt = &std.ExpiresAt.Time
+	if !tok.ExpiresAt().IsZero() {
+		exp := tok.ExpiresAt()
+		at.ExpiredAt = &exp
 	}
 	return &BearerToken{AccessToken: at}, nil
 }
