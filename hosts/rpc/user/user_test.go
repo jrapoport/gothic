@@ -181,8 +181,9 @@ func TestRequestErrors(t *testing.T) {
 	assert.Error(t, err)
 	_, err = srv.ChangePassword(ctx, &user.ChangePasswordRequest{})
 	assert.Error(t, err)
-	claims := jwt.NewUserClaims(nil)
-	claims.SetSubject(uuid.New().String())
+	claims := &jwt.UserClaims{
+		StandardClaims: *jwt.NewStandardClaims(uuid.New().String()),
+	}
 	ctx = context.WithContext(rpc.WithClaims(ctx, claims))
 	_, err = srv.GetUser(ctx, &user.UserRequest{})
 	assert.Error(t, err)
