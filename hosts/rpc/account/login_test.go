@@ -51,7 +51,7 @@ func TestAccountServer_Login(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, claims)
 	assert.EqualValues(t, tokens.Bearer, res.Token.Type)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 	assert.Equal(t, res.Email, utils.MaskEmail(u.Email))
 	au, err := srv.GetAuthenticatedUser(u.ID)
 	assert.NoError(t, err)

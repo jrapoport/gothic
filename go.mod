@@ -8,7 +8,6 @@ require (
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef // indirect
 	github.com/badoux/checkmail v1.2.1
 	github.com/cenkalti/backoff/v4 v4.1.0
-	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804
 	github.com/flashmob/go-guerrilla v1.6.1
 	github.com/go-chi/chi v1.5.4 // indirect
@@ -28,6 +27,7 @@ require (
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/joho/godotenv v1.3.0
 	github.com/jrapoport/sillyname-go v0.0.0-20191016072109-82c270b69bff
+	github.com/lestrrat-go/jwx v1.1.5
 	github.com/lestrrat-go/tcputil v0.0.0-20180223003554-d3c7f98154fb // indirect
 	github.com/lestrrat-go/test-mysqld v0.0.0-20190527004737-6c91be710371
 	github.com/lib/pq v1.10.0
@@ -36,7 +36,7 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/opentracing/opentracing-go v1.2.0
-	github.com/orlangure/gnomock v0.12.0
+	github.com/orlangure/gnomock v0.12.1
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/segmentio/encoding v0.2.11
 	github.com/sirupsen/logrus v1.8.1
@@ -48,7 +48,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
 	google.golang.org/grpc v1.36.1
-	google.golang.org/grpc/examples v0.0.0-20210326035646-2456c5cff04b // indirect
+	google.golang.org/grpc/examples v0.0.0-20210326170912-4a19753e9dfd // indirect
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.29.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

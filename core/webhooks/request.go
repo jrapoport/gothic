@@ -24,7 +24,7 @@ func NewWebhookRequest(cb *Callback) (*http.Request, error) {
 		return nil, err
 	}
 	req.Header.Set(ContentType, JSONContent)
-	token := jwt.NewToken(cb.RequestClaims())
+	token := jwt.NewToken(cb.jwt, cb.RequestClaims())
 	bearer, err := token.Bearer()
 	if err != nil {
 		return nil, err

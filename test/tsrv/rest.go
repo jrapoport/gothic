@@ -39,7 +39,7 @@ func RESTHost(t *testing.T, reg []rest.RegisterServer, smtp bool) (*rest.Host, *
 }
 
 // UnmarshalTokenResponse extracts the token from a token response.
-func UnmarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.BearerResponse, jwt.UserClaims) {
+func UnmarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.BearerResponse, *jwt.UserClaims) {
 	r := new(rest.BearerResponse)
 	err := json.Unmarshal([]byte(res), r)
 	require.NoError(t, err)
@@ -50,12 +50,12 @@ func UnmarshalTokenResponse(t *testing.T, c config.JWT, res string) (*rest.Beare
 }
 
 // UnmarshalUserResponse extracts the token from a token response.
-func UnmarshalUserResponse(t *testing.T, c config.JWT, res string) (*rest.UserResponse, jwt.UserClaims) {
+func UnmarshalUserResponse(t *testing.T, c config.JWT, res string) (*rest.UserResponse, *jwt.UserClaims) {
 	ur := new(rest.UserResponse)
 	err := json.Unmarshal([]byte(res), ur)
 	require.NoError(t, err)
 	if ur.Token == nil {
-		return ur, jwt.UserClaims{}
+		return ur, nil
 	}
 	claims, err := jwt.ParseUserClaims(c, ur.Token.Access)
 	require.NoError(t, err)
