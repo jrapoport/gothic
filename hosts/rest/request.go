@@ -114,12 +114,12 @@ func GetUserClaims(r *http.Request) (*jwt.UserClaims, error) {
 		err := errors.New("jwt claims not found")
 		return nil, err
 	}
-	uc, ok := claims.(jwt.UserClaims)
+	uc, ok := claims.(*jwt.UserClaims)
 	if !ok {
 		err := errors.New("invalid jwt user claims")
 		return nil, err
 	}
-	return &uc, nil
+	return uc, nil
 }
 
 // GetUserID gets the user id from the jwt claims of an http request.

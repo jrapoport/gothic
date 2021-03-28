@@ -101,10 +101,10 @@ func GetUserID(ctx context.Context) (uuid.UUID, error) {
 	if err != nil {
 		return uuid.Nil, err
 	}
-	uid, err := uuid.Parse(uc.Subject)
+	uid, err := uuid.Parse(uc.Subject())
 	if err != nil {
 		err = fmt.Errorf("invalid user id %s: %w",
-			uc.Subject, err)
+			uc.Subject(), err)
 		return uuid.Nil, err
 	}
 	if uid == uuid.Nil {
@@ -121,10 +121,10 @@ func GetUserClaims(ctx context.Context) (*jwt.UserClaims, error) {
 		err := errors.New("jwt claims not found")
 		return nil, err
 	}
-	uc, ok := claims.(jwt.UserClaims)
+	uc, ok := claims.(*jwt.UserClaims)
 	if !ok {
 		err := errors.New("invalid jwt user claims")
 		return nil, err
 	}
-	return &uc, nil
+	return uc, nil
 }

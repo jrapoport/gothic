@@ -64,7 +64,7 @@ func TestConfirmServer_ConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, u.IsConfirmed())
 	_, claims := tsrv.UnmarshalTokenResponse(t, srv.Config().JWT, res)
-	assert.Equal(t, u.ID.String(), claims.Subject)
+	assert.Equal(t, u.ID.String(), claims.Subject())
 }
 
 func TestConfirmServer_SendConfirmUser(t *testing.T) {

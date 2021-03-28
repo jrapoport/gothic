@@ -57,7 +57,7 @@ func TestRESTHost(t *testing.T) {
 	require.NoError(t, err)
 	ur, claims := tsrv.UnmarshalUserResponse(t, c.JWT, string(b))
 	assert.EqualValues(t, tokens.Bearer, ur.Token.Type)
-	assert.Equal(t, test.ID.String(), claims.Subject)
+	assert.Equal(t, test.ID.String(), claims.Subject())
 	assert.Equal(t, test.Email, ur.Email)
 	// authenticated call (error)
 	getUserURI := func() string {

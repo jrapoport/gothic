@@ -70,7 +70,7 @@ func testWebhookEvent(t *testing.T, evt events.Event, test events.Event) {
 
 func testWebhookSignature(t *testing.T, j config.JWT, r *http.Request) {
 	sig := r.Header.Get(webhooks.WebhookSignature)
-	var claims webhooks.WebhookClaims
+	var claims jwt.WebhookClaims
 	err := jwt.ParseClaims(j, sig, &claims)
 	assert.NoError(t, err)
 }

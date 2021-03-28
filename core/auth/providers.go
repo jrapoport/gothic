@@ -10,7 +10,6 @@ import (
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/amazon"
-	"github.com/markbates/goth/providers/apple"
 	"github.com/markbates/goth/providers/auth0"
 	"github.com/markbates/goth/providers/azuread"
 	"github.com/markbates/goth/providers/azureadv2"
@@ -156,8 +155,11 @@ func (pv *Providers) useProvider(name provider.Name, clientKey, secret, callback
 	case provider.Amazon:
 		pvdr = amazon.New(clientKey, secret, callback, scopes...)
 	case provider.Apple:
-		scopes = append(scopes, apple.ScopeName, apple.ScopeEmail)
-		pvdr = apple.New(clientKey, secret, callback, nil, scopes...)
+		// FIXME: goth v1.67.1 introduced a build break. will keep an eye
+		// 	on it and un-comment it once the issue had been fixed.
+		//scopes = append(scopes, apple.ScopeName, apple.ScopeEmail)
+		//pvdr = apple.New(clientKey, secret, callback, nil, scopes...)
+		panic(errors.New("unavailable"))
 	case provider.Auth0:
 		// your Auth0 customer domain is required
 		domain := getEnv(config.Auth0DomainEnv)
