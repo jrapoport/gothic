@@ -68,7 +68,7 @@ func parseToken(c config.JWT, tok string) (jwt.Claims, error) {
 	if err != nil {
 		return nil, err
 	}
-	if claims.Subject == uuid.Nil.String() {
+	if claims.Subject() == uuid.Nil.String() {
 		err = errors.New("invalid user id")
 		return nil, err
 	}

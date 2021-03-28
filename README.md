@@ -59,7 +59,7 @@ $ make release
 
 ### Running
 
-Gothic supports configuration through environment vars, `.env` files, `.json` files or `.yaml` and only requires a 
+Gothic supports configuration through environment vars, `.env` files, `.json` files or `.yaml` and only requires a
 handful of configuration options to get started.
 
 For a full list of configuration options please see the [Configuration](#configuration) section below.
@@ -79,10 +79,11 @@ Next, you will need to start the `envoy` server
 $ make envoy
 ```
 
-Once `gothic`, the db, & `envoy` are running you can make gRPC-Web calls
-using the [javascript bindings](https://github.com/jrapoport/gothic/blob/master/api/grpc/web).
+Once `gothic`, the db, & `envoy` are running you can make gRPC-Web calls using
+the [javascript bindings](https://github.com/jrapoport/gothic/blob/master/api/grpc/web).
 
 to regenerate the protobuf typescript bindings:
+
 ```sh
 $ make rpcw
 # or
@@ -179,7 +180,7 @@ Gothic uses [go-simple-mail](https://github.com/xhit/go-simple-mail/) for smtp s
 
 ### JWT Tokens
 
-Gothic uses [jwt v4](https://github.com/dgrijalva/jwt-go) for jwt tokens.
+Gothic uses [lestrrat-go](https://github.com/lestrrat-go/jwx) for jwt tokens.
 
 ### Config Files
 
@@ -258,7 +259,6 @@ accessible address. Please see [envoy.yaml](https://github.com/jrapoport/gothic/
 [docker-compose.yaml](https://github.com/jrapoport/gothic/blob/master/docker-compose.yaml) for a working example.
 
 For more details on the `envoy` proxy, please see [https://www.envoyproxy.io/](https://www.envoyproxy.io/).
-
 
 `GOTHIC_REQUEST_ID` - `string` **in progress**
 
@@ -1391,8 +1391,9 @@ Response:
 
 The original purpose was to adopt newer, more developer friendly technologies like
 [Gorm](https://gorm.io/), [gRPC](https://grpc.io/), and [gRPC Web](https://github.com/grpc/grpc-web); newer versions of
-critical libraries like [JWT v4](https://github.com/dgrijalva/jwt-go); and migrate away from older libraries that are
-deprecated with [security flaws](https://github.com/gobuffalo/uuid).
+critical libraries for things like [JWT](https://github.com/lestrrat-go/jwx)
+and [OAuth2](https://github.com/markbates/goth); and migrate away from older libraries that are deprecated
+with [security flaws](https://github.com/gobuffalo/uuid).
 
 These changes allow for advances like self-contained database migration, expanded database driver support (e.g.,
 PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to modify and use the microservice

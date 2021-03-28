@@ -1,52 +1,98 @@
 package jwt
 
 import (
+	"errors"
+	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/models/types"
+	"github.com/lestrrat-go/jwx/jwa"
+	"github.com/lestrrat-go/jwx/jwt"
+	"github.com/segmentio/encoding/json"
 )
 
 // Token is a struct to hold extended jwt token.
+// TODO: support public/private keys etc.
 type Token struct {
-	*jwt.Token
+	jwt.Token
+	method jwa.SignatureAlgorithm
+	secret []byte
+}
+
+func newToken(c config.JWT, v interface{}) *Token {
+	if v == nil {
+		return nil
+	}
+	tok := jwt.New()
+	b, err := json.Marshal(v)
+	if err != nil {
+		return nil
+	}
+	err = json.Unmarshal(b, tok)
+	if err != nil {
+		return nil
+	}
+	iss := c.Issuer
+	iat := time.Now().UTC().Truncate(time.Microsecond)
+	_ = tok.Set(jwt.IssuerKey, iss)
+	_ = tok.Set(jwt.IssuedAtKey, iat)
+	algo := jwa.SignatureAlgorithm(c.Algorithm)
+	sec := []byte(c.Secret)
+	return &Token{tok, algo, sec}
 }
 
 // NewToken returns a new jwt token for the claims.
-func NewToken(claims Claims) *Token {
-	t := jwt.NewWithClaims(claims.Method(), claims)
-	return &Token{t}
-}
-
-// Claims returns the claims for the token.
-func (t Token) Claims() Claims {
-	return t.Token.Claims.(Claims)
+// ignoring errors here is ok because we can tightly
+// control all the incoming types.
+func NewToken(c config.JWT, claims Claims) *Token {
+	tok := newToken(c, claims)
+	if tok == nil {
+		return nil
+	}
+	iat := tok.IssuedAt()
+	sub := claims.Subject()
+	_ = tok.Set(jwt.SubjectKey, sub)
+	if c.Audience != "" {
+		aud := strings.Split(c.Audience, ",")
+		_ = tok.Set(jwt.AudienceKey, aud)
+	}
+	if c.Expiration > 0 {
+		exp := iat.Add(c.Expiration).Truncate(time.Microsecond)
+		_ = tok.Set(jwt.ExpirationKey, exp)
+	}
+	return tok
 }
 
 // Bearer signs the claims and returns the result as a string.
 func (t Token) Bearer() (string, error) {
-	return t.SignedString(t.Claims().Secret())
+	b, err := jwt.Sign(t.Token, t.method, t.secret)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
 
-// Expiration returns the expiration for the token.
+// ExpiresAt returns the expiration time for the token.
+func (t Token) ExpiresAt() time.Time {
+	return t.Token.Expiration()
+}
+
+// Expires returns the expiration for the token.
 func (t Token) Expiration() time.Duration {
-	var issued time.Time
-	std := t.Claims().Standard()
-	if std.ExpiresAt == nil {
+	iat := t.Token.IssuedAt()
+	exp := t.ExpiresAt()
+	if exp.IsZero() {
 		return 0
 	}
-	if std.IssuedAt != nil {
-		issued = std.IssuedAt.Time
-	}
-	return std.ExpiresAt.Sub(issued)
+	return exp.Sub(iat)
 }
 
 // NewSignedData returns a signed jwt token for the Map.
 func NewSignedData(c config.JWT, d types.Map) (string, error) {
-	t := jwt.New(jwt.GetSigningMethod(c.Algorithm))
-	for k, v := range d {
-		t.Header[k] = v
+	tok := newToken(c, d)
+	if tok == nil {
+		return "", errors.New("invalid token")
 	}
-	return t.SignedString([]byte(c.Secret))
+	return tok.Bearer()
 }

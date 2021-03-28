@@ -129,8 +129,9 @@ const (
 
 // External is a map of supported providers
 var External = map[Name]struct{}{
-	Amazon:          {},
-	Apple:           {},
+	Amazon: {},
+	// FIXME: core/auth/providers.go:162
+	// Apple:           {},
 	Auth0:           {},
 	AzureAD:         {},
 	AzureADv2:       {},
