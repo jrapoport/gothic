@@ -104,10 +104,10 @@ func Authenticator(jc config.JWT) func(next http.Handler) http.Handler {
 // AdminUser creates a new JWT handler that checks for admin permissions.
 func AdminUser(next http.Handler) http.Handler {
 	return claimCheck(func(claims *jwt.UserClaims) error {
-		if !claims.Confirmed {
+		if !claims.Confirmed() {
 			return errors.New("user not confirmed")
 		}
-		if !claims.Admin {
+		if !claims.Admin() {
 			return errors.New("admin access required")
 		}
 		return nil
@@ -117,7 +117,7 @@ func AdminUser(next http.Handler) http.Handler {
 // ConfirmedUser creates a new JWT handler that checks for user confirmation.
 func ConfirmedUser(next http.Handler) http.Handler {
 	return claimCheck(func(claims *jwt.UserClaims) error {
-		if !claims.Confirmed {
+		if !claims.Confirmed() {
 			return errors.New("user not confirmed")
 		}
 		return nil

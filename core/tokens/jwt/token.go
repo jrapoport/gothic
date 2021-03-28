@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"errors"
 	"strings"
 	"time"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
-	"github.com/segmentio/encoding/json"
 )
 
 // Token is a struct to hold extended jwt token.
@@ -20,39 +18,18 @@ type Token struct {
 	secret []byte
 }
 
-func newToken(c config.JWT, v interface{}) *Token {
-	if v == nil {
-		return nil
-	}
+// NewToken returns a new jwt token for the claims.
+// ignoring errors here is ok because we can tightly
+// control all the incoming types.
+func NewToken(c config.JWT, claims Claims) *Token {
 	tok := jwt.New()
-	b, err := json.Marshal(v)
-	if err != nil {
-		return nil
-	}
-	err = json.Unmarshal(b, tok)
-	if err != nil {
-		return nil
+	if claims != nil {
+		tok, _ = claims.Clone()
 	}
 	iss := c.Issuer
 	iat := time.Now().UTC().Truncate(time.Microsecond)
 	_ = tok.Set(jwt.IssuerKey, iss)
 	_ = tok.Set(jwt.IssuedAtKey, iat)
-	algo := jwa.SignatureAlgorithm(c.Algorithm)
-	sec := []byte(c.Secret)
-	return &Token{tok, algo, sec}
-}
-
-// NewToken returns a new jwt token for the claims.
-// ignoring errors here is ok because we can tightly
-// control all the incoming types.
-func NewToken(c config.JWT, claims Claims) *Token {
-	tok := newToken(c, claims)
-	if tok == nil {
-		return nil
-	}
-	iat := tok.IssuedAt()
-	sub := claims.Subject()
-	_ = tok.Set(jwt.SubjectKey, sub)
 	if c.Audience != "" {
 		aud := strings.Split(c.Audience, ",")
 		_ = tok.Set(jwt.AudienceKey, aud)
@@ -61,7 +38,9 @@ func NewToken(c config.JWT, claims Claims) *Token {
 		exp := iat.Add(c.Expiration).Truncate(time.Microsecond)
 		_ = tok.Set(jwt.ExpirationKey, exp)
 	}
-	return tok
+	algo := jwa.SignatureAlgorithm(c.Algorithm)
+	sec := []byte(c.Secret)
+	return &Token{tok, algo, sec}
 }
 
 // Bearer signs the claims and returns the result as a string.
@@ -89,10 +68,10 @@ func (t Token) Expiration() time.Duration {
 }
 
 // NewSignedData returns a signed jwt token for the Map.
-func NewSignedData(c config.JWT, d types.Map) (string, error) {
-	tok := newToken(c, d)
-	if tok == nil {
-		return "", errors.New("invalid token")
+func NewSignedData(c config.JWT, data types.Map) (string, error) {
+	tok := NewToken(c, nil)
+	for k, v := range data {
+		_ = tok.Set(k, v)
 	}
 	return tok.Bearer()
 }

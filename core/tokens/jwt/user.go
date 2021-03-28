@@ -19,51 +19,24 @@ const (
 // UserClaims is a struct to hold extended jwt claims
 type UserClaims struct {
 	StandardClaims
-	Provider   provider.Name `json:"pvd,omitempty"`
-	Admin      bool          `json:"adm,omitempty"`
-	Restricted bool          `json:"rst,omitempty"`
-	Confirmed  bool          `json:"cnf,omitempty"`
-	Verified   bool          `json:"vrd,omitempty"`
 }
 
 var _ Claims = (*UserClaims)(nil)
 
 // NewUserClaims returns a new set of claims for the user.
 func NewUserClaims(u *user.User) *UserClaims {
-	c := &UserClaims{
-		StandardClaims: *NewStandardClaims(""),
-	}
 	if u == nil {
-		return c
+		return nil
 	}
-	c.SetSubject(u.ID.String())
-	c.Provider = u.Provider
-	c.Admin = u.IsAdmin()
-	c.Restricted = u.IsRestricted()
-	c.Confirmed = u.IsConfirmed()
-	c.Verified = u.IsVerified()
+	c := &UserClaims{
+		*NewStandardClaims(u.ID.String()),
+	}
+	_ = c.Set(ProviderKey, u.Provider.String())
+	_ = c.Set(AdminKey, u.IsAdmin())
+	_ = c.Set(RestrictedKey, u.IsRestricted())
+	_ = c.Set(ConfirmedKey, u.IsConfirmed())
+	_ = c.Set(VerifiedKey, u.IsVerified())
 	return c
-}
-
-// ParseToken handles the parsed values coming back from a token
-// TODO: consider using the token directly here instead.
-func (c *UserClaims) ParseToken(tok *Token) {
-	c.StandardClaims.ParseToken(tok)
-	if v, ok := c.Get(ProviderKey); ok {
-		c.Provider = provider.Name(v.(string))
-	}
-	if v, ok := c.Get(AdminKey); ok {
-		c.Admin = v.(bool)
-	}
-	if v, ok := c.Get(RestrictedKey); ok {
-		c.Restricted = v.(bool)
-	}
-	if v, ok := c.Get(ConfirmedKey); ok {
-		c.Confirmed = v.(bool)
-	}
-	if v, ok := c.Get(VerifiedKey); ok {
-		c.Verified = v.(bool)
-	}
 }
 
 // UserID returns the jwt subject as a uuid.
@@ -73,6 +46,39 @@ func (c UserClaims) UserID() uuid.UUID {
 		return uuid.Nil
 	}
 	return uid
+}
+
+// Provider returns the provider name
+func (c UserClaims) Provider() provider.Name {
+	name, ok := c.Get(ProviderKey)
+	if !ok {
+		return provider.Unknown
+	}
+	return provider.Name(name.(string))
+}
+
+// Admin returns true if admin
+func (c UserClaims) Admin() bool {
+	v, _ := c.Get(AdminKey)
+	return v.(bool)
+}
+
+// Restricted returns true if restricted
+func (c UserClaims) Restricted() bool {
+	v, _ := c.Get(RestrictedKey)
+	return v.(bool)
+}
+
+// Confirmed returns true if confirmed
+func (c UserClaims) Confirmed() bool {
+	v, _ := c.Get(ConfirmedKey)
+	return v.(bool)
+}
+
+// Verified returns true if verified
+func (c UserClaims) Verified() bool {
+	v, _ := c.Get(VerifiedKey)
+	return v.(bool)
 }
 
 // ParseUserClaims parses and returns a set of UserClaims form a token.

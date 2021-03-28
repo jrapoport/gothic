@@ -25,8 +25,8 @@ func RequestContext(ctx context.Context) core_ctx.Context {
 	rtx := core_ctx.WithContext(ctx)
 	rtx.SetIPAddress(GetRemoteIP(rtx))
 	if c, err := GetUserClaims(rtx); err == nil {
-		rtx.SetProvider(c.Provider)
-		if c.Admin {
+		rtx.SetProvider(c.Provider())
+		if c.Admin() {
 			rtx.SetAdminID(c.UserID())
 		}
 		rtx.SetUserID(c.UserID())
