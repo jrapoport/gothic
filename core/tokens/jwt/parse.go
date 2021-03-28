@@ -36,7 +36,7 @@ func ParseClaims(c config.JWT, token string, claims Claims) error {
 	if sub == "" {
 		return errors.New("invalid subject")
 	}
-	claims.ParseToken(&Token{Token: tok})
+	claims.parseToken(&Token{Token: tok})
 	return nil
 }
 

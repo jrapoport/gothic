@@ -71,10 +71,10 @@ func testCases() []testCase {
 			test.fields = types.Map{
 				"dr_suess":    "thing1",
 				"book":        bk,
-				key.IPAddress: test.ctx.GetIPAddress(),
-				key.Provider:  test.ctx.GetProvider(),
-				key.UserID:    test.ctx.GetUserID().String(),
-				key.AdminID:   test.ctx.GetAdminID().String(),
+				key.IPAddress: test.ctx.IPAddress(),
+				key.Provider:  test.ctx.Provider(),
+				key.UserID:    test.ctx.UserID().String(),
+				key.AdminID:   test.ctx.AdminID().String(),
 			}
 			sld := fmt.Sprintf("salad-%d", x+i)
 			test.fields["extra"] = sld
@@ -107,9 +107,9 @@ func TestCreateLogEntry(t *testing.T) {
 	le, err = CreateLogEntry(ctx, conn, auditlog.Login, testUID, nil)
 	assert.NoError(t, err)
 	fields = types.Map{
-		key.IPAddress: ctx.GetIPAddress(),
-		key.Provider:  ctx.GetProvider(),
-		key.UserID:    ctx.GetUserID().String(),
+		key.IPAddress: ctx.IPAddress(),
+		key.Provider:  ctx.Provider(),
+		key.UserID:    ctx.UserID().String(),
 	}
 	assert.Equal(t, fields, le.Fields)
 	assert.Nil(t, le.Fields[key.AdminID])

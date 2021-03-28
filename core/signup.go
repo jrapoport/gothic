@@ -26,7 +26,7 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 		ctx = context.Background()
 	}
 	p := a.Provider()
-	if ctx.GetProvider() != p {
+	if ctx.Provider() != p {
 		ctx.SetProvider(p)
 	}
 	err := a.signupEnabled(p)
@@ -126,13 +126,13 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 		err = fmt.Errorf("signup: %w", err)
 		return nil, err
 	}
-	code := ctx.GetCode()
+	code := ctx.Code()
 	if a.config.Signup.Code && code == "" {
 		err = errors.New("code: required")
 		return nil, err
 	}
-	ip := ctx.GetIPAddress()
-	recaptcha := ctx.GetReCaptcha()
+	ip := ctx.IPAddress()
+	recaptcha := ctx.ReCaptcha()
 	// if recaptcha is disabled this is a no-op
 	err = validate.ReCaptcha(a.config, ip, recaptcha)
 	if err != nil {

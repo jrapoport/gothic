@@ -58,7 +58,7 @@ func (a *API) SearchUsers(ctx context.Context, f store.Filters, page *store.Pagi
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	return users.SearchUsers(a.conn, ctx.GetSort(), f, page)
+	return users.SearchUsers(a.conn, ctx.Sort(), f, page)
 }
 
 // ChangePassword changes a user password.
@@ -244,7 +244,7 @@ func (a *API) confirmUserWithChanges(ctx context.Context, token string, changes 
 		ctx = context.Background()
 	}
 	ctx.SetProvider(a.Provider())
-	ip := ctx.GetIPAddress()
+	ip := ctx.IPAddress()
 	var u *user.User
 	var confirmed bool
 	err := a.conn.Transaction(func(tx *store.Connection) error {
@@ -346,6 +346,7 @@ func (a *API) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	return nil
 }
 
+// LinkAccount links an external account
 func (a *API) LinkAccount(ctx context.Context, userID uuid.UUID, link *account.Account) error {
 	err := a.linkAccount(ctx, a.conn, userID, link)
 	if err != nil {
@@ -367,7 +368,7 @@ func (a *API) linkAccount(ctx context.Context, conn *store.Connection, userID uu
 	if link.Data == nil {
 		link.Data = types.Map{}
 	}
-	ip := ctx.GetIPAddress()
+	ip := ctx.IPAddress()
 	link.Data[key.IPAddress] = ip
 	return conn.Transaction(func(tx *store.Connection) (err error) {
 		err = users.LinkAccount(tx, userID, link)
@@ -378,6 +379,7 @@ func (a *API) linkAccount(ctx context.Context, conn *store.Connection, userID uu
 	})
 }
 
+// GetLinkedAccounts returns the externally linked accounts for a user
 func (a *API) GetLinkedAccounts(_ context.Context,
 	userID uuid.UUID, t account.Type, f store.Filters) ([]*account.Account, error) {
 	if userID == uuid.Nil {

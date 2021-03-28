@@ -57,7 +57,7 @@ func (t Token) ExpiresAt() time.Time {
 	return t.Token.Expiration()
 }
 
-// Expires returns the expiration for the token.
+// Expiration returns the expiration for the token.
 func (t Token) Expiration() time.Duration {
 	iat := t.Token.IssuedAt()
 	exp := t.ExpiresAt()

@@ -14,12 +14,12 @@ import (
 func (s *accountServer) Logout(ctx context.Context,
 	_ *account.LogoutRequest) (*emptypb.Empty, error) {
 	rtx := rpc.RequestContext(ctx)
-	uid := rtx.GetUserID()
+	uid := rtx.UserID()
 	if uid == uuid.Nil {
 		err := errors.New("invalid user id")
 		return nil, s.RPCError(codes.Unauthenticated, err)
 	}
-	s.Debugf("logout user: %s (%v)", uid, rtx.GetProvider())
+	s.Debugf("logout user: %s (%v)", uid, rtx.Provider())
 	err := s.API.Logout(rtx, uid)
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)

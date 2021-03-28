@@ -21,7 +21,7 @@ func (a *API) GetAuthorizationURL(ctx context.Context, p provider.Name) (string,
 		ctx = context.Background()
 	}
 	ctx.SetProvider(p)
-	var au *auth.AuthURL
+	var au *auth.URL
 	err := a.conn.Transaction(func(tx *store.Connection) (err error) {
 		au, err = a.ext.GrantAuthURL(a.conn, p, 60*time.Minute)
 		if err != nil {

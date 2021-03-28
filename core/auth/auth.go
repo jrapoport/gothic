@@ -13,19 +13,19 @@ import (
 	"github.com/markbates/goth"
 )
 
-// AuthURL holds a authorization url and token.
-type AuthURL struct {
+// URL holds a authorization url and token.
+type URL struct {
 	URL   string
 	Token *token.AuthToken
 }
 
 // GrantAuthURL returns the auth url for a named provider.
-func (pv *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp time.Duration) (*AuthURL, error) {
+func (pv *Providers) GrantAuthURL(conn *store.Connection, name provider.Name, exp time.Duration) (*URL, error) {
 	p, err := pv.GetProvider(name)
 	if err != nil {
 		return nil, err
 	}
-	var au = &AuthURL{}
+	var au = &URL{}
 	err = conn.Transaction(func(tx *store.Connection) error {
 		au.Token, err = tokens.GrantAuthToken(tx, name, exp)
 		if err != nil {

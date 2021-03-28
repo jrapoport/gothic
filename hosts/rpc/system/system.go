@@ -159,6 +159,7 @@ func NewUserResponse(u *user.User) *system.UserResponse {
 	return ur
 }
 
+// NewAccount returns a new system account
 func NewAccount(a *account.Account) *system.Account {
 	res := &system.Account{
 		Type:      uint32(a.Type),

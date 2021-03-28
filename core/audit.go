@@ -17,5 +17,5 @@ func (a *API) SearchAuditLogs(ctx context.Context, f store.Filters, page *store.
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	return audit.SearchEntries(a.conn, ctx.GetSort(), f, page)
+	return audit.SearchEntries(a.conn, ctx.Sort(), f, page)
 }

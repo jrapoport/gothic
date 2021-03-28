@@ -1,5 +1,6 @@
 package jwt
 
+// ChecksumKey is the checksum claims key
 const ChecksumKey = "chk"
 
 // WebhookClaims the jwt claims for a webhook.

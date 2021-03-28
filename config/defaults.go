@@ -31,6 +31,7 @@ const (
 	smtpSpamProtection = true
 	webhookMaxRetry    = 3
 	webhookTimeout     = 30 * time.Second
+	host               = "localhost"
 )
 
 var configDefaults = Config{
@@ -49,14 +50,12 @@ var serviceDefaults = Service{
 	Name: serviceName,
 }
 
-const Host = "localhost"
-
 var networkDefaults = Network{
-	Health: utils.MakeAddress(Host, 7720),
-	RPC:    utils.MakeAddress(Host, 7721),
-	Admin:  utils.MakeAddress(Host, 7722),
-	REST:   utils.MakeAddress(Host, 7727),
-	RPCWeb: utils.MakeAddress(Host, 7729),
+	Health: utils.MakeAddress(host, 7720),
+	RPC:    utils.MakeAddress(host, 7721),
+	Admin:  utils.MakeAddress(host, 7722),
+	REST:   utils.MakeAddress(host, 7727),
+	RPCWeb: utils.MakeAddress(host, 7729),
 }
 
 var securityDefaults = Security{

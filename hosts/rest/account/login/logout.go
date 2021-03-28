@@ -10,13 +10,13 @@ import (
 
 func (s *loginServer) Logout(w http.ResponseWriter, r *http.Request) {
 	rtx := rest.FromRequest(r)
-	uid := rtx.GetUserID()
+	uid := rtx.UserID()
 	if uid == uuid.Nil {
 		err := errors.New("invalid user id")
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	s.Debugf("logout user: %s (%v)", uid, rtx.GetProvider())
+	s.Debugf("logout user: %s (%v)", uid, rtx.Provider())
 	rest.ClearCookie(w)
 	err := s.API.Logout(rtx, uid)
 	if err != nil {

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/jrapoport/gothic/store"
 	"sync"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"

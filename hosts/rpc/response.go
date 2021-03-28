@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// UserResponse maps the protobuf rpc UserResponse
 type UserResponse api.UserResponse
 
 // NewUserResponse returns a UserResponse for the supplied user.

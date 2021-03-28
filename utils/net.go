@@ -18,6 +18,7 @@ func OutboundIP() (net.IP, error) {
 	return localAddr.IP, nil
 }
 
+// MakeAddress returns a host:port address
 func MakeAddress(host string, port int) string {
 	return fmt.Sprint(host, ":", port)
 }
