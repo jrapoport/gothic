@@ -65,8 +65,9 @@ func TestParseClaims(t *testing.T) {
 	err = ParseClaims(c, nosub, s)
 	assert.Error(t, err)
 	// bad claims
-	tok = NewToken(c, Claims(nil))
-	assert.Nil(t, tok)
+	tok = NewToken(c, nil)
+	assert.NotNil(t, tok)
+	assert.Equal(t, c.Issuer, tok.Issuer())
 }
 
 func TestParseValue(t *testing.T) {

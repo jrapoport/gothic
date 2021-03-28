@@ -97,8 +97,8 @@ func token(t *testing.T, c config.JWT, uid uuid.UUID, confirmed, admin bool) str
 	}
 	claims := jwt.NewUserClaims(&user.User{})
 	claims.StandardClaims = *jwt.NewStandardClaims(uid.String())
-	claims.Admin = admin
-	claims.Confirmed = confirmed
+	_ = claims.Set(jwt.AdminKey, admin)
+	_ = claims.Set(jwt.ConfirmedKey, confirmed)
 	tk, err := jwt.NewToken(c, claims).Bearer()
 	require.NoError(t, err)
 	return tk
