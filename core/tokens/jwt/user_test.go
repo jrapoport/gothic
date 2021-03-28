@@ -30,11 +30,11 @@ func TestNewUserClaims(t *testing.T) {
 	}
 	claims := NewUserClaims(u)
 	assert.Equal(t, u.ID, claims.UserID())
-	assert.Equal(t, u.Provider, claims.Provider)
-	assert.True(t, claims.Admin)
-	assert.True(t, claims.Restricted)
-	assert.True(t, claims.Confirmed)
-	assert.False(t, claims.Verified)
+	assert.Equal(t, u.Provider, claims.Provider())
+	assert.True(t, claims.Admin())
+	assert.True(t, claims.Restricted())
+	assert.True(t, claims.Confirmed())
+	assert.False(t, claims.Verified())
 	u.Status = user.Verified
 	tok := NewUserToken(c.JWT, u)
 	assert.NotNil(t, tok)
@@ -43,7 +43,7 @@ func TestNewUserClaims(t *testing.T) {
 	claims, err = ParseUserClaims(c.JWT, b)
 	assert.NoError(t, err)
 	assert.Equal(t, u.ID, claims.UserID())
-	assert.True(t, claims.Verified)
+	assert.True(t, claims.Verified())
 }
 
 func TestNewUserToken(t *testing.T) {
@@ -86,6 +86,8 @@ func TestNewUserToken(t *testing.T) {
 	assert.Error(t, err)
 	// bad subject
 	claims = NewUserClaims(nil)
+	assert.Nil(t, claims)
+	claims = NewUserClaims(u)
 	claims.SetSubject("1")
 	assert.Equal(t, uuid.Nil, claims.UserID())
 }

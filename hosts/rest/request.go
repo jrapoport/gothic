@@ -65,8 +65,8 @@ func FromRequest(r *http.Request) context.Context {
 	if err != nil {
 		return ctx
 	}
-	ctx.SetProvider(c.Provider)
-	if c.Admin {
+	ctx.SetProvider(c.Provider())
+	if c.Admin() {
 		ctx.SetAdminID(c.UserID())
 	} else {
 		ctx.SetUserID(c.UserID())
