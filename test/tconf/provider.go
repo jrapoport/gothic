@@ -2,7 +2,6 @@ package tconf
 
 import (
 	"fmt"
-	"golang.org/x/oauth2"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -19,6 +18,7 @@ import (
 	"github.com/markbates/goth/providers/azureadv2"
 	"github.com/markbates/goth/providers/faux"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
 )
 
 // MockedProvider returns a mocked provider for tests.
@@ -120,7 +120,8 @@ type mockSession struct {
 	t    *testing.T
 }
 
-type mockProvider struct {
+// MockProvider is used only for testing.
+type MockProvider struct {
 	faux      faux.Provider
 	Role      string
 	AccountID string
@@ -130,12 +131,12 @@ type mockProvider struct {
 	t         *testing.T
 }
 
-var _ goth.Provider = (*mockProvider)(nil)
+var _ goth.Provider = (*MockProvider)(nil)
 
 const testRole = "mock-user"
 
-func newMockProvider(t *testing.T, callback string) *mockProvider {
-	return &mockProvider{
+func newMockProvider(t *testing.T, callback string) *MockProvider {
+	return &MockProvider{
 		faux:      faux.Provider{},
 		Role:      testRole,
 		AccountID: uuid.NewString(),
@@ -146,12 +147,18 @@ func newMockProvider(t *testing.T, callback string) *mockProvider {
 	}
 }
 
-func (fp mockProvider) Name() string {
+// Name is used only for testing.
+func (fp MockProvider) Name() string {
 	return fp.faux.Name()
 }
 
-// BeginAuth satisfies the goth.Provider
-func (fp mockProvider) BeginAuth(state string) (goth.Session, error) {
+// SetName is used only for testing.
+func (fp MockProvider) SetName(name string) {
+	fp.faux.SetName(name)
+}
+
+// BeginAuth is used only for testing.
+func (fp MockProvider) BeginAuth(state string) (goth.Session, error) {
 	s, err := fp.faux.BeginAuth(state)
 	if err != nil {
 		return nil, err
@@ -179,11 +186,8 @@ func (fp mockProvider) BeginAuth(state string) (goth.Session, error) {
 	}, nil
 }
 
-func (fp mockProvider) SetName(name string) {
-	fp.faux.SetName(name)
-}
-
-func (fp mockProvider) UnmarshalSession(s string) (goth.Session, error) {
+// UnmarshalSession is used only for testing.
+func (fp MockProvider) UnmarshalSession(s string) (goth.Session, error) {
 	sess, err := fp.faux.UnmarshalSession(s)
 	if err != nil {
 		return nil, err
@@ -195,20 +199,24 @@ func (fp mockProvider) UnmarshalSession(s string) (goth.Session, error) {
 	}, nil
 }
 
-func (fp mockProvider) FetchUser(session goth.Session) (goth.User, error) {
+// FetchUser is used only for testing.
+func (fp MockProvider) FetchUser(session goth.Session) (goth.User, error) {
 	sess := session.(*mockSession)
 	return fp.faux.FetchUser(sess.Session)
 }
 
-func (fp mockProvider) Debug(b bool) {
+// Debug is used only for testing.
+func (fp MockProvider) Debug(b bool) {
 	fp.faux.Debug(b)
 }
 
-func (fp mockProvider) RefreshToken(refreshToken string) (*oauth2.Token, error) {
+// RefreshToken is used only for testing.
+func (fp MockProvider) RefreshToken(refreshToken string) (*oauth2.Token, error) {
 	return fp.faux.RefreshToken(refreshToken)
 }
 
-func (fp mockProvider) RefreshTokenAvailable() bool {
+// RefreshTokenAvailable is used only for testing.
+func (fp MockProvider) RefreshTokenAvailable() bool {
 	return fp.faux.RefreshTokenAvailable()
 }
 
@@ -220,6 +228,6 @@ func (s *mockSession) Authorize(provider goth.Provider, params goth.Params) (str
 }
 
 // ToMockProvider returns the mock provider for tests
-func ToMockProvider(p goth.Provider) *mockProvider {
-	return p.(*mockProvider)
+func ToMockProvider(p goth.Provider) *MockProvider {
+	return p.(*MockProvider)
 }

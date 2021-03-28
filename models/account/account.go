@@ -29,6 +29,7 @@ type Account struct {
 	UserID    uuid.UUID     `json:"user_id" gorm:"<-:create;type:char(36)"`
 }
 
+// NewAccount returns a new external account
 func NewAccount(p provider.Name, accountID, email string, data types.Map) *Account {
 	if data == nil {
 		data = types.Map{}
@@ -42,7 +43,7 @@ func NewAccount(p provider.Name, accountID, email string, data types.Map) *Accou
 	}
 }
 
-// BeforeSave runs before create or update.
+// BeforeCreate runs before create or update.
 func (la *Account) BeforeCreate(*gorm.DB) error {
 	if la.Data == nil {
 		la.Data = types.Map{}
@@ -67,6 +68,7 @@ func (la *Account) Valid() error {
 	return nil
 }
 
+// HasType returns true if the type is present
 func (la Account) HasType(t Type) bool { return la.Type.Has(t) }
 
 // providerType returns the type for the provider (if known).

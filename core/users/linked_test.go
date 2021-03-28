@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/jrapoport/gothic/store"
 	"testing"
 
 	"github.com/google/uuid"
@@ -9,6 +8,7 @@ import (
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
+	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"

@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/models/account"
 	"math"
 	"strings"
 	"sync"
@@ -11,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens"
+	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"

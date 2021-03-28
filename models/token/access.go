@@ -102,7 +102,7 @@ func (at AccessToken) Class() Class {
 	return Access
 }
 
-// Type returns usage for the token.
+// Usage returns type for the token.
 func (at AccessToken) Usage() Type {
 	return at.Type
 }

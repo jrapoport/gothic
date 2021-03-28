@@ -19,19 +19,19 @@ func CreateLogEntry(ctx context.Context, conn *store.Connection,
 		if fields == nil {
 			fields = types.Map{}
 		}
-		if fields[key.IPAddress] == nil && ctx.GetIPAddress() != "" {
-			fields[key.IPAddress] = ctx.GetIPAddress()
+		if fields[key.IPAddress] == nil && ctx.IPAddress() != "" {
+			fields[key.IPAddress] = ctx.IPAddress()
 		}
 		if fields[key.Provider] == nil &&
-			ctx.GetProvider() != provider.Unknown {
-			fields[key.Provider] = ctx.GetProvider()
+			ctx.Provider() != provider.Unknown {
+			fields[key.Provider] = ctx.Provider()
 		}
 		if fields[key.AdminID] == nil &&
-			ctx.GetAdminID() != uuid.Nil {
-			fields[key.AdminID] = ctx.GetAdminID().String()
+			ctx.AdminID() != uuid.Nil {
+			fields[key.AdminID] = ctx.AdminID().String()
 		} else if fields[key.UserID] == nil &&
-			ctx.GetUserID() != uuid.Nil {
-			fields[key.UserID] = ctx.GetUserID().String()
+			ctx.UserID() != uuid.Nil {
+			fields[key.UserID] = ctx.UserID().String()
 		}
 	}
 	// conn.Logger.LogMode(0).Info(ctx, "%s %s: %s: %v", t, action, userID, fields)

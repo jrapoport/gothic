@@ -9,6 +9,7 @@ import (
 // Filters hols the search filters.
 type Filters types.Map
 
+// Copy returns a copy of the filter
 func (f Filters) Copy() Filters {
 	return Filters(types.Map(f).Copy())
 }

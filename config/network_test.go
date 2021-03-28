@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	host       = "example.com"
+	testHost   = "example.com"
 	restPort   = ":80"
 	rpcPort    = ":90"
 	webPort    = ":100"
@@ -18,11 +18,11 @@ const (
 func TestNetwork(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		n := c.Network
-		assert.Equal(t, host+test.mark, n.Host)
-		assert.Equal(t, host+test.mark+restPort, n.REST)
-		assert.Equal(t, host+test.mark+rpcPort, n.RPC)
-		assert.Equal(t, host+test.mark+webPort, n.RPCWeb)
-		assert.Equal(t, host+test.mark+healthPort, n.Health)
+		assert.Equal(t, testHost+test.mark, n.Host)
+		assert.Equal(t, testHost+test.mark+restPort, n.REST)
+		assert.Equal(t, testHost+test.mark+rpcPort, n.RPC)
+		assert.Equal(t, testHost+test.mark+webPort, n.RPCWeb)
+		assert.Equal(t, testHost+test.mark+healthPort, n.Health)
 		assert.Equal(t, requestID+test.mark, n.RequestID)
 	})
 }
@@ -36,11 +36,11 @@ func TestNetwork_Env(t *testing.T) {
 			c, err := loadNormalized(test.file)
 			assert.NoError(t, err)
 			n := c.Network
-			assert.Equal(t, host, n.Host)
-			assert.Equal(t, host+restPort, n.REST)
-			assert.Equal(t, host+rpcPort, n.RPC)
-			assert.Equal(t, host+webPort, n.RPCWeb)
-			assert.Equal(t, host+healthPort, n.Health)
+			assert.Equal(t, testHost, n.Host)
+			assert.Equal(t, testHost+restPort, n.REST)
+			assert.Equal(t, testHost+rpcPort, n.RPC)
+			assert.Equal(t, testHost+webPort, n.RPCWeb)
+			assert.Equal(t, testHost+healthPort, n.Health)
 			assert.Equal(t, requestID, n.RequestID)
 		})
 	}
@@ -73,32 +73,32 @@ func TestNetwork_Normalization(t *testing.T) {
 		nRPCWeb string
 	}{
 		{
-			host, host + restPort, host + rpcPort, host + webPort,
-			host, host + restPort, host + rpcPort, host + webPort,
+			testHost, testHost + restPort, testHost + rpcPort, testHost + webPort,
+			testHost, testHost + restPort, testHost + rpcPort, testHost + webPort,
 		},
 		{
 			host2, "", "", "",
 			host2, "", "", "",
 		},
 		{
-			host2, host + restPort, host + rpcPort, host + webPort,
-			host2, host + restPort, host + rpcPort, host + webPort,
+			host2, testHost + restPort, testHost + rpcPort, testHost + webPort,
+			host2, testHost + restPort, testHost + rpcPort, testHost + webPort,
 		},
 		{
 			host2, def.REST, def.RPC, def.RPCWeb,
 			host2, host2 + ":7727", host2 + ":7721", host2 + ":7729",
 		},
 		{
-			host2, host + restPort, def.RPC, def.RPCWeb,
-			host2, host + restPort, host2 + ":7721", host2 + ":7729",
+			host2, testHost + restPort, def.RPC, def.RPCWeb,
+			host2, testHost + restPort, host2 + ":7721", host2 + ":7729",
 		},
 		{
-			host2, host + restPort, host + restPort, host + restPort,
-			host2, host + restPort, host + restPort, host + restPort,
+			host2, testHost + restPort, testHost + restPort, testHost + restPort,
+			host2, testHost + restPort, testHost + restPort, testHost + restPort,
 		},
 		{
-			def.Host, def.REST, host + restPort, host + restPort,
-			def.Host, def.REST, host + restPort, host + restPort,
+			def.Host, def.REST, testHost + restPort, testHost + restPort,
+			def.Host, def.REST, testHost + restPort, testHost + restPort,
 		},
 	}
 	for _, test := range netTests {

@@ -67,7 +67,7 @@ func (s *codesServer) CreateSignupCodes(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	ctx := rest.FromRequest(r)
-	s.Debugf("create signup codes %s", ctx.GetAdminID())
+	s.Debugf("create signup codes %s", ctx.AdminID())
 	list, err := s.API.CreateSignupCodes(ctx, req.Uses, req.Count)
 	if err != nil {
 		s.ResponseError(w, err)
