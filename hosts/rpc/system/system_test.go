@@ -29,22 +29,22 @@ func TestSystemServer_GetUser(t *testing.T) {
 	srv.Config().MaskEmails = false
 	ctx := context.Background()
 	// no id or email
-	req := &system.UserRequest{}
+	req := &system.UserAccountRequest{}
 	_, err := srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// bad id
-	req.Id = &system.UserRequest_UserId{UserId: "1"}
+	req.Id = &system.UserAccountRequest_UserId{UserId: "1"}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// id not found
-	req.Id = &system.UserRequest_UserId{
+	req.Id = &system.UserAccountRequest_UserId{
 		UserId: uuid.New().String(),
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// success
 	u, _ := tcore.TestUser(t, srv.API, "", false)
-	req.Id = &system.UserRequest_UserId{
+	req.Id = &system.UserAccountRequest_UserId{
 		UserId: u.ID.String(),
 	}
 	res, err := srv.GetUser(ctx, req)
@@ -53,20 +53,20 @@ func TestSystemServer_GetUser(t *testing.T) {
 	assert.Equal(t, u.Email, res.Email)
 	assert.Equal(t, u.Username, res.Username)
 	// bad email
-	req = &system.UserRequest{}
-	req.Id = &system.UserRequest_Email{
+	req = &system.UserAccountRequest{}
+	req.Id = &system.UserAccountRequest_Email{
 		Email: "@",
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// email not found
-	req.Id = &system.UserRequest_Email{
+	req.Id = &system.UserAccountRequest_Email{
 		Email: tutils.RandomEmail(),
 	}
 	_, err = srv.GetUser(ctx, req)
 	assert.Error(t, err)
 	// success
-	req.Id = &system.UserRequest_Email{
+	req.Id = &system.UserAccountRequest_Email{
 		Email: u.Email,
 	}
 	res, err = srv.GetUser(ctx, req)

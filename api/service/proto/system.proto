@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package system;
+package gothic.api;
 
 option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/system";
 
@@ -9,7 +9,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 service System {
-  rpc GetUser (UserRequest) returns (UserResponse) {
+  rpc GetUserAccount (UserAccountRequest) returns (UserAccountResponse) {
   }
   rpc LinkAccount (LinkAccountRequest) returns (google.protobuf.Empty) {
   }
@@ -17,14 +17,14 @@ service System {
   }
 }
 
-message UserRequest {
+message UserAccountRequest {
   oneof id {
     string user_id = 1;
     string email = 2;
   }
 }
 
-message UserResponse{
+message UserAccountResponse{
   string id = 1;
   string provider = 2;
   string role = 3;
@@ -53,7 +53,7 @@ enum LinkedType {
   Any = 0xfffffff;
 }
 
-message Account {
+message LinkedAccount {
   fixed32 type = 1;
   string provider = 2;
   string account_id = 3;
@@ -63,7 +63,7 @@ message Account {
 
 message LinkAccountRequest {
   string user_id = 1;
-  Account account = 2;
+  LinkedAccount account = 2;
 }
 
 message LinkedAccountsRequest {
@@ -74,5 +74,5 @@ message LinkedAccountsRequest {
 }
 
 message LinkedAccountsResponse {
-  repeated Account linked = 1;
+  repeated LinkedAccount linked = 1;
 }

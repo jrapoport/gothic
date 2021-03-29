@@ -98,7 +98,7 @@ deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
 rpcw:: PROTO_FILES = \
-	./api/service/proto/api.proto \
+	./api/service/proto/response.proto \
 	./api/service/proto/user.proto \
 	./api/service/proto/account.proto
 
