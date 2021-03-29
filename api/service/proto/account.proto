@@ -1,24 +1,24 @@
 syntax = "proto3";
 
-package account;
+package gothic.api;
 
 option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/account";
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
-import "api.proto";
+import "response.proto";
 
 service Account {
-  rpc Signup (SignupRequest) returns (api.UserResponse) {
+  rpc Signup (SignupRequest) returns (gothic.api.UserResponse) {
   }
 
   rpc SendConfirmUser (SendConfirmRequest) returns (google.protobuf.Empty) {
   }
 
-  rpc ConfirmUser (ConfirmUserRequest) returns (api.BearerResponse) {
+  rpc ConfirmUser (ConfirmUserRequest) returns (gothic.api.BearerResponse) {
   }
 
-  rpc Login (LoginRequest) returns (api.UserResponse) {
+  rpc Login (LoginRequest) returns (gothic.api.UserResponse) {
   }
 
   rpc Logout (LogoutRequest) returns (google.protobuf.Empty) {
@@ -27,10 +27,10 @@ service Account {
   rpc SendResetPassword (ResetPasswordRequest) returns (google.protobuf.Empty) {
   }
 
-  rpc ConfirmResetPassword (ConfirmPasswordRequest) returns (api.BearerResponse) {
+  rpc ConfirmResetPassword (ConfirmPasswordRequest) returns (gothic.api.BearerResponse) {
   }
 
-  rpc RefreshBearerToken (RefreshTokenRequest) returns (api.BearerResponse) {
+  rpc RefreshBearerToken (RefreshTokenRequest) returns (gothic.api.BearerResponse) {
   }
 }
 

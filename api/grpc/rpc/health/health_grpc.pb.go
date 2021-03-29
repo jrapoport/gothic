@@ -32,7 +32,7 @@ func NewHealthClient(cc grpc.ClientConnInterface) HealthClient {
 
 func (c *healthClient) HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
 	out := new(HealthCheckResponse)
-	err := c.cc.Invoke(ctx, "/health.Health/HealthCheck", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Health/HealthCheck", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func _Health_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/health.Health/HealthCheck",
+		FullMethod: "/gothic.api.Health/HealthCheck",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HealthServer).HealthCheck(ctx, req.(*emptypb.Empty))
@@ -89,7 +89,7 @@ func _Health_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Health_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "health.Health",
+	ServiceName: "gothic.api.Health",
 	HandlerType: (*HealthServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

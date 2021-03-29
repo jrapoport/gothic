@@ -27,7 +27,7 @@ require (
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/joho/godotenv v1.3.0
 	github.com/jrapoport/sillyname-go v0.0.0-20191016072109-82c270b69bff
-	github.com/lestrrat-go/jwx v1.1.5
+	github.com/lestrrat-go/jwx v1.1.6
 	github.com/lestrrat-go/tcputil v0.0.0-20180223003554-d3c7f98154fb // indirect
 	github.com/lestrrat-go/test-mysqld v0.0.0-20190527004737-6c91be710371
 	github.com/lib/pq v1.10.0

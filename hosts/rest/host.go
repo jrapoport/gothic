@@ -24,21 +24,21 @@ var _ core.Hosted = (*Host)(nil)
 
 // NewHost creates a new Host.
 func NewHost(a *core.API, name string, address string, reg []RegisterServer) *Host {
-	s := core.NewHost(a, name, address)
-	s.FieldLogger = s.Log().WithField("protocol", "http")
-	rt := NewRouter(s.Config())
-	rt.UseLogger(s.FieldLogger)
+	h := core.NewHost(a, name, address)
+	h.FieldLogger = h.Log().WithField("protocol", "http")
+	rt := NewRouter(h.Config())
+	rt.UseLogger(h.FieldLogger)
 	server := &http.Server{
 		Handler: rt,
 	}
-	if el, ok := s.FieldLogger.(*logrus.Entry); ok {
+	if el, ok := h.FieldLogger.(*logrus.Entry); ok {
 		server.ErrorLog = http_logrus.AsHttpLogger(el)
 	}
 	for _, r := range reg {
-		srv := NewServer(s.Server.Clone())
+		srv := NewServer(h.Server.Clone())
 		r(server, srv)
 	}
-	return &Host{s, server}
+	return &Host{h, server}
 }
 
 // ListenAndServe starts the http server.
