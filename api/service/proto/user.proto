@@ -1,24 +1,24 @@
 syntax = "proto3";
 
-package user;
+package gothic.api;
 
 option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/user";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
-import "api.proto";
+import "response.proto";
 
 service User {
-  rpc GetUser (UserRequest) returns (api.UserResponse) {
+  rpc GetUser (UserRequest) returns (gothic.api.UserResponse) {
   }
 
-  rpc UpdateUser (UpdateUserRequest) returns (api.UserResponse) {
+  rpc UpdateUser (UpdateUserRequest) returns (gothic.api.UserResponse) {
   }
 
   rpc SendConfirmUser (google.protobuf.Empty) returns (google.protobuf.Empty) {
   }
 
-  rpc ChangePassword (ChangePasswordRequest) returns (api.BearerResponse) {
+  rpc ChangePassword (ChangePasswordRequest) returns (gothic.api.BearerResponse) {
   }
 }
 

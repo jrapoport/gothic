@@ -32,9 +32,9 @@ func Authentication() grpc.ServerOption {
 
 // NewHost creates a new Host.
 func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt ...grpc.ServerOption) *Host {
-	s := core.NewHost(a, name, address)
-	l := s.WithField("protocol", "grpc")
-	s.FieldLogger = l
+	h := core.NewHost(a, name, address)
+	l := h.WithField("protocol", "grpc")
+	h.FieldLogger = l
 	unary := []grpc.UnaryServerInterceptor{
 		grpc_logrus.UnaryServerInterceptor(l, grpc_logrus.WithDecider(func(fullMethodName string, err error) bool {
 			if fullMethodName == "/health.Health/HealthCheck" {
@@ -50,7 +50,7 @@ func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt
 		grpc_recovery.StreamServerInterceptor(),
 		// ratelimit.StreamServerInterceptor(),
 	}
-	if s.Config().Tracer.Enabled {
+	if h.Config().Tracer.Enabled {
 		unary = append(unary, grpc_opentracing.UnaryServerInterceptor())
 		stream = append(stream, grpc_opentracing.StreamServerInterceptor())
 	}
@@ -62,7 +62,7 @@ func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt
 			//if s.Config().IsDebug() {
 			//	break
 			//}
-			auth := NewAuthenticator(s.Config().JWT, s.Log())
+			auth := NewAuthenticator(h.Config().JWT, h.Log())
 			unary = append(unary, auth.UnaryServerInterceptor())
 			stream = append(stream, auth.StreamServerInterceptor())
 		}
@@ -77,10 +77,10 @@ func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt
 	}
 	server := grpc.NewServer(opt...)
 	for _, r := range reg {
-		srv := NewServer(s.Server.Clone())
+		srv := NewServer(h.Server.Clone())
 		r(server, srv)
 	}
-	return &Host{s, server}
+	return &Host{h, server}
 }
 
 // ListenAndServe starts the rpc server.

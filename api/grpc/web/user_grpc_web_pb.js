@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for user
+ * @fileoverview gRPC-Web generated client stub for gothic.api
  * @enhanceable
  * @public
  */
@@ -20,9 +20,10 @@ var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb
 
 var google_protobuf_struct_pb = require('google-protobuf/google/protobuf/struct_pb.js')
 
-var api_pb = require('./api_pb.js')
+var response_pb = require('./response_pb.js')
 const proto = {};
-proto.user = require('./user_pb.js');
+proto.gothic = {};
+proto.gothic.api = require('./user_pb.js');
 
 /**
  * @param {string} hostname
@@ -32,7 +33,7 @@ proto.user = require('./user_pb.js');
  * @struct
  * @final
  */
-proto.user.UserClient =
+proto.gothic.api.UserClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -58,7 +59,7 @@ proto.user.UserClient =
  * @struct
  * @final
  */
-proto.user.UserPromiseClient =
+proto.gothic.api.UserPromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -79,58 +80,58 @@ proto.user.UserPromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.user.UserRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.UserRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodDescriptor_User_GetUser = new grpc.web.MethodDescriptor(
-  '/user.User/GetUser',
+  '/gothic.api.User/GetUser',
   grpc.web.MethodType.UNARY,
-  proto.user.UserRequest,
-  api_pb.UserResponse,
+  proto.gothic.api.UserRequest,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.user.UserRequest} request
+   * @param {!proto.gothic.api.UserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.user.UserRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.UserRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodInfo_User_GetUser = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.UserResponse,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.user.UserRequest} request
+   * @param {!proto.gothic.api.UserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.user.UserRequest} request The
+ * @param {!proto.gothic.api.UserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.UserResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.UserResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.UserResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.UserResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.user.UserClient.prototype.getUser =
+proto.gothic.api.UserClient.prototype.getUser =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/user.User/GetUser',
+      '/gothic.api.User/GetUser',
       request,
       metadata || {},
       methodDescriptor_User_GetUser,
@@ -139,17 +140,17 @@ proto.user.UserClient.prototype.getUser =
 
 
 /**
- * @param {!proto.user.UserRequest} request The
+ * @param {!proto.gothic.api.UserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.UserResponse>}
+ * @return {!Promise<!proto.gothic.api.UserResponse>}
  *     Promise that resolves to the response
  */
-proto.user.UserPromiseClient.prototype.getUser =
+proto.gothic.api.UserPromiseClient.prototype.getUser =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/user.User/GetUser',
+      '/gothic.api.User/GetUser',
       request,
       metadata || {},
       methodDescriptor_User_GetUser);
@@ -159,58 +160,58 @@ proto.user.UserPromiseClient.prototype.getUser =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.user.UpdateUserRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.UpdateUserRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodDescriptor_User_UpdateUser = new grpc.web.MethodDescriptor(
-  '/user.User/UpdateUser',
+  '/gothic.api.User/UpdateUser',
   grpc.web.MethodType.UNARY,
-  proto.user.UpdateUserRequest,
-  api_pb.UserResponse,
+  proto.gothic.api.UpdateUserRequest,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.user.UpdateUserRequest} request
+   * @param {!proto.gothic.api.UpdateUserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.user.UpdateUserRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.UpdateUserRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodInfo_User_UpdateUser = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.UserResponse,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.user.UpdateUserRequest} request
+   * @param {!proto.gothic.api.UpdateUserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.user.UpdateUserRequest} request The
+ * @param {!proto.gothic.api.UpdateUserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.UserResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.UserResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.UserResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.UserResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.user.UserClient.prototype.updateUser =
+proto.gothic.api.UserClient.prototype.updateUser =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/user.User/UpdateUser',
+      '/gothic.api.User/UpdateUser',
       request,
       metadata || {},
       methodDescriptor_User_UpdateUser,
@@ -219,17 +220,17 @@ proto.user.UserClient.prototype.updateUser =
 
 
 /**
- * @param {!proto.user.UpdateUserRequest} request The
+ * @param {!proto.gothic.api.UpdateUserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.UserResponse>}
+ * @return {!Promise<!proto.gothic.api.UserResponse>}
  *     Promise that resolves to the response
  */
-proto.user.UserPromiseClient.prototype.updateUser =
+proto.gothic.api.UserPromiseClient.prototype.updateUser =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/user.User/UpdateUser',
+      '/gothic.api.User/UpdateUser',
       request,
       metadata || {},
       methodDescriptor_User_UpdateUser);
@@ -243,7 +244,7 @@ proto.user.UserPromiseClient.prototype.updateUser =
  *   !proto.google.protobuf.Empty>}
  */
 const methodDescriptor_User_SendConfirmUser = new grpc.web.MethodDescriptor(
-  '/user.User/SendConfirmUser',
+  '/gothic.api.User/SendConfirmUser',
   grpc.web.MethodType.UNARY,
   google_protobuf_empty_pb.Empty,
   google_protobuf_empty_pb.Empty,
@@ -287,10 +288,10 @@ const methodInfo_User_SendConfirmUser = new grpc.web.AbstractClientBase.MethodIn
  * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.user.UserClient.prototype.sendConfirmUser =
+proto.gothic.api.UserClient.prototype.sendConfirmUser =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/user.User/SendConfirmUser',
+      '/gothic.api.User/SendConfirmUser',
       request,
       metadata || {},
       methodDescriptor_User_SendConfirmUser,
@@ -306,10 +307,10 @@ proto.user.UserClient.prototype.sendConfirmUser =
  * @return {!Promise<!proto.google.protobuf.Empty>}
  *     Promise that resolves to the response
  */
-proto.user.UserPromiseClient.prototype.sendConfirmUser =
+proto.gothic.api.UserPromiseClient.prototype.sendConfirmUser =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/user.User/SendConfirmUser',
+      '/gothic.api.User/SendConfirmUser',
       request,
       metadata || {},
       methodDescriptor_User_SendConfirmUser);
@@ -319,58 +320,58 @@ proto.user.UserPromiseClient.prototype.sendConfirmUser =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.user.ChangePasswordRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ChangePasswordRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodDescriptor_User_ChangePassword = new grpc.web.MethodDescriptor(
-  '/user.User/ChangePassword',
+  '/gothic.api.User/ChangePassword',
   grpc.web.MethodType.UNARY,
-  proto.user.ChangePasswordRequest,
-  api_pb.BearerResponse,
+  proto.gothic.api.ChangePasswordRequest,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.user.ChangePasswordRequest} request
+   * @param {!proto.gothic.api.ChangePasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.user.ChangePasswordRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ChangePasswordRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodInfo_User_ChangePassword = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.BearerResponse,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.user.ChangePasswordRequest} request
+   * @param {!proto.gothic.api.ChangePasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.user.ChangePasswordRequest} request The
+ * @param {!proto.gothic.api.ChangePasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.BearerResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.BearerResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.BearerResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.BearerResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.user.UserClient.prototype.changePassword =
+proto.gothic.api.UserClient.prototype.changePassword =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/user.User/ChangePassword',
+      '/gothic.api.User/ChangePassword',
       request,
       metadata || {},
       methodDescriptor_User_ChangePassword,
@@ -379,22 +380,22 @@ proto.user.UserClient.prototype.changePassword =
 
 
 /**
- * @param {!proto.user.ChangePasswordRequest} request The
+ * @param {!proto.gothic.api.ChangePasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.BearerResponse>}
+ * @return {!Promise<!proto.gothic.api.BearerResponse>}
  *     Promise that resolves to the response
  */
-proto.user.UserPromiseClient.prototype.changePassword =
+proto.gothic.api.UserPromiseClient.prototype.changePassword =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/user.User/ChangePassword',
+      '/gothic.api.User/ChangePassword',
       request,
       metadata || {},
       methodDescriptor_User_ChangePassword);
 };
 
 
-module.exports = proto.user;
+module.exports = proto.gothic.api;
 

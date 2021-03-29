@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package admin;
+package gothic.api;
 
 option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/admin";
 

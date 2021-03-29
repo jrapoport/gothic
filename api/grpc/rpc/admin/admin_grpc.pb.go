@@ -35,7 +35,7 @@ func NewAdminClient(cc grpc.ClientConnInterface) AdminClient {
 
 func (c *adminClient) CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*SignupCodesResponse, error) {
 	out := new(SignupCodesResponse)
-	err := c.cc.Invoke(ctx, "/admin.Admin/CreateSignupCodes", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/CreateSignupCodes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *adminClient) CreateSignupCodes(ctx context.Context, in *CreateSignupCod
 
 func (c *adminClient) CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*SignupCodeResponse, error) {
 	out := new(SignupCodeResponse)
-	err := c.cc.Invoke(ctx, "/admin.Admin/CheckSignupCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/CheckSignupCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *adminClient) CheckSignupCode(ctx context.Context, in *CheckSignupCodeRe
 
 func (c *adminClient) DeleteSignupCode(ctx context.Context, in *DeleteSignupCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/admin.Admin/DeleteSignupCode", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/DeleteSignupCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *adminClient) DeleteSignupCode(ctx context.Context, in *DeleteSignupCode
 
 func (c *adminClient) Settings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error) {
 	out := new(SettingsResponse)
-	err := c.cc.Invoke(ctx, "/admin.Admin/Settings", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/Settings", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func _Admin_CreateSignupCodes_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/admin.Admin/CreateSignupCodes",
+		FullMethod: "/gothic.api.Admin/CreateSignupCodes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServer).CreateSignupCodes(ctx, req.(*CreateSignupCodesRequest))
@@ -137,7 +137,7 @@ func _Admin_CheckSignupCode_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/admin.Admin/CheckSignupCode",
+		FullMethod: "/gothic.api.Admin/CheckSignupCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServer).CheckSignupCode(ctx, req.(*CheckSignupCodeRequest))
@@ -155,7 +155,7 @@ func _Admin_DeleteSignupCode_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/admin.Admin/DeleteSignupCode",
+		FullMethod: "/gothic.api.Admin/DeleteSignupCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServer).DeleteSignupCode(ctx, req.(*DeleteSignupCodeRequest))
@@ -173,7 +173,7 @@ func _Admin_Settings_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/admin.Admin/Settings",
+		FullMethod: "/gothic.api.Admin/Settings",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServer).Settings(ctx, req.(*SettingsRequest))
@@ -185,7 +185,7 @@ func _Admin_Settings_Handler(srv interface{}, ctx context.Context, dec func(inte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Admin_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "admin.Admin",
+	ServiceName: "gothic.api.Admin",
 	HandlerType: (*AdminServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -206,5 +206,5 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/admin.proto",
+	Metadata: "admin.proto",
 }

@@ -37,10 +37,10 @@ func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 	system.RegisterSystemServer(s, newSystemServer(srv))
 }
 
-func (s *systemServer) GetUser(_ context.Context, req *system.UserRequest) (*system.UserResponse, error) {
+func (s *systemServer) GetUser(_ context.Context, req *system.UserAccountRequest) (*system.UserAccountResponse, error) {
 	var u *user.User
 	switch msg := req.GetId().(type) {
-	case *system.UserRequest_UserId:
+	case *system.UserAccountRequest_UserId:
 		s.Debugf("get user %s", msg.UserId)
 		uid, err := uuid.Parse(msg.UserId)
 		if err != nil {
@@ -50,7 +50,7 @@ func (s *systemServer) GetUser(_ context.Context, req *system.UserRequest) (*sys
 		if err != nil {
 			return nil, s.RPCError(codes.InvalidArgument, err)
 		}
-	case *system.UserRequest_Email:
+	case *system.UserAccountRequest_Email:
 		s.Debugf("get user %s", req.GetEmail())
 		addr, err := mail.ParseAddress(req.GetEmail())
 		if err != nil {
@@ -127,7 +127,7 @@ func (s *systemServer) GetLinkedAccounts(ctx context.Context,
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}
-	list := make([]*system.Account, len(linked))
+	list := make([]*system.LinkedAccount, len(linked))
 	for i, link := range linked {
 		list[i] = NewAccount(link)
 	}
@@ -138,12 +138,12 @@ func (s *systemServer) GetLinkedAccounts(ctx context.Context,
 }
 
 // NewUserResponse returns a UserResponse for a user.
-func NewUserResponse(u *user.User) *system.UserResponse {
-	ur := &system.UserResponse{
+func NewUserResponse(u *user.User) *system.UserAccountResponse {
+	ur := &system.UserAccountResponse{
 		Id:        u.ID.String(),
 		Provider:  u.Provider.String(),
 		Role:      u.Role.String(),
-		Status:    system.UserResponse_Status(u.Status),
+		Status:    system.UserAccountResponse_Status(u.Status),
 		Email:     u.Email,
 		Username:  u.Username,
 		CreatedAt: timestamppb.New(u.CreatedAt),
@@ -160,8 +160,8 @@ func NewUserResponse(u *user.User) *system.UserResponse {
 }
 
 // NewAccount returns a new system account
-func NewAccount(a *account.Account) *system.Account {
-	res := &system.Account{
+func NewAccount(a *account.Account) *system.LinkedAccount {
+	res := &system.LinkedAccount{
 		Type:      uint32(a.Type),
 		Provider:  a.Provider.String(),
 		AccountId: a.AccountID,

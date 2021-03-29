@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SystemClient interface {
-	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	GetUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
 	LinkAccount(ctx context.Context, in *LinkAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetLinkedAccounts(ctx context.Context, in *LinkedAccountsRequest, opts ...grpc.CallOption) (*LinkedAccountsResponse, error)
 }
@@ -32,9 +32,9 @@ func NewSystemClient(cc grpc.ClientConnInterface) SystemClient {
 	return &systemClient{cc}
 }
 
-func (c *systemClient) GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
-	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, "/system.System/GetUser", in, out, opts...)
+func (c *systemClient) GetUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error) {
+	out := new(UserAccountResponse)
+	err := c.cc.Invoke(ctx, "/gothic.api.System/GetUserAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *systemClient) GetUser(ctx context.Context, in *UserRequest, opts ...grp
 
 func (c *systemClient) LinkAccount(ctx context.Context, in *LinkAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/system.System/LinkAccount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.System/LinkAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *systemClient) LinkAccount(ctx context.Context, in *LinkAccountRequest, 
 
 func (c *systemClient) GetLinkedAccounts(ctx context.Context, in *LinkedAccountsRequest, opts ...grpc.CallOption) (*LinkedAccountsResponse, error) {
 	out := new(LinkedAccountsResponse)
-	err := c.cc.Invoke(ctx, "/system.System/GetLinkedAccounts", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.System/GetLinkedAccounts", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *systemClient) GetLinkedAccounts(ctx context.Context, in *LinkedAccounts
 // All implementations must embed UnimplementedSystemServer
 // for forward compatibility
 type SystemServer interface {
-	GetUser(context.Context, *UserRequest) (*UserResponse, error)
+	GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
 	LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error)
 	GetLinkedAccounts(context.Context, *LinkedAccountsRequest) (*LinkedAccountsResponse, error)
 	mustEmbedUnimplementedSystemServer()
@@ -73,8 +73,8 @@ type SystemServer interface {
 type UnimplementedSystemServer struct {
 }
 
-func (UnimplementedSystemServer) GetUser(context.Context, *UserRequest) (*UserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+func (UnimplementedSystemServer) GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserAccount not implemented")
 }
 func (UnimplementedSystemServer) LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LinkAccount not implemented")
@@ -95,20 +95,20 @@ func RegisterSystemServer(s grpc.ServiceRegistrar, srv SystemServer) {
 	s.RegisterService(&System_ServiceDesc, srv)
 }
 
-func _System_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserRequest)
+func _System_GetUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SystemServer).GetUser(ctx, in)
+		return srv.(SystemServer).GetUserAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/system.System/GetUser",
+		FullMethod: "/gothic.api.System/GetUserAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SystemServer).GetUser(ctx, req.(*UserRequest))
+		return srv.(SystemServer).GetUserAccount(ctx, req.(*UserAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -123,7 +123,7 @@ func _System_LinkAccount_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/system.System/LinkAccount",
+		FullMethod: "/gothic.api.System/LinkAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SystemServer).LinkAccount(ctx, req.(*LinkAccountRequest))
@@ -141,7 +141,7 @@ func _System_GetLinkedAccounts_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/system.System/GetLinkedAccounts",
+		FullMethod: "/gothic.api.System/GetLinkedAccounts",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SystemServer).GetLinkedAccounts(ctx, req.(*LinkedAccountsRequest))
@@ -153,12 +153,12 @@ func _System_GetLinkedAccounts_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var System_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "system.System",
+	ServiceName: "gothic.api.System",
 	HandlerType: (*SystemServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetUser",
-			Handler:    _System_GetUser_Handler,
+			MethodName: "GetUserAccount",
+			Handler:    _System_GetUserAccount_Handler,
 		},
 		{
 			MethodName: "LinkAccount",
@@ -170,5 +170,5 @@ var System_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "system/system.proto",
+	Metadata: "system.proto",
 }

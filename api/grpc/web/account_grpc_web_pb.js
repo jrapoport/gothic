@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for account
+ * @fileoverview gRPC-Web generated client stub for gothic.api
  * @enhanceable
  * @public
  */
@@ -20,9 +20,10 @@ var google_protobuf_struct_pb = require('google-protobuf/google/protobuf/struct_
 
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js')
 
-var api_pb = require('./api_pb.js')
+var response_pb = require('./response_pb.js')
 const proto = {};
-proto.account = require('./account_pb.js');
+proto.gothic = {};
+proto.gothic.api = require('./account_pb.js');
 
 /**
  * @param {string} hostname
@@ -32,7 +33,7 @@ proto.account = require('./account_pb.js');
  * @struct
  * @final
  */
-proto.account.AccountClient =
+proto.gothic.api.AccountClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -58,7 +59,7 @@ proto.account.AccountClient =
  * @struct
  * @final
  */
-proto.account.AccountPromiseClient =
+proto.gothic.api.AccountPromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -79,58 +80,58 @@ proto.account.AccountPromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.SignupRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.SignupRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodDescriptor_Account_Signup = new grpc.web.MethodDescriptor(
-  '/account.Account/Signup',
+  '/gothic.api.Account/Signup',
   grpc.web.MethodType.UNARY,
-  proto.account.SignupRequest,
-  api_pb.UserResponse,
+  proto.gothic.api.SignupRequest,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.account.SignupRequest} request
+   * @param {!proto.gothic.api.SignupRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.SignupRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.SignupRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodInfo_Account_Signup = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.UserResponse,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.account.SignupRequest} request
+   * @param {!proto.gothic.api.SignupRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.account.SignupRequest} request The
+ * @param {!proto.gothic.api.SignupRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.UserResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.UserResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.UserResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.UserResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.signup =
+proto.gothic.api.AccountClient.prototype.signup =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/Signup',
+      '/gothic.api.Account/Signup',
       request,
       metadata || {},
       methodDescriptor_Account_Signup,
@@ -139,17 +140,17 @@ proto.account.AccountClient.prototype.signup =
 
 
 /**
- * @param {!proto.account.SignupRequest} request The
+ * @param {!proto.gothic.api.SignupRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.UserResponse>}
+ * @return {!Promise<!proto.gothic.api.UserResponse>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.signup =
+proto.gothic.api.AccountPromiseClient.prototype.signup =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/Signup',
+      '/gothic.api.Account/Signup',
       request,
       metadata || {},
       methodDescriptor_Account_Signup);
@@ -159,16 +160,16 @@ proto.account.AccountPromiseClient.prototype.signup =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.SendConfirmRequest,
+ *   !proto.gothic.api.SendConfirmRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodDescriptor_Account_SendConfirmUser = new grpc.web.MethodDescriptor(
-  '/account.Account/SendConfirmUser',
+  '/gothic.api.Account/SendConfirmUser',
   grpc.web.MethodType.UNARY,
-  proto.account.SendConfirmRequest,
+  proto.gothic.api.SendConfirmRequest,
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.SendConfirmRequest} request
+   * @param {!proto.gothic.api.SendConfirmRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -181,13 +182,13 @@ const methodDescriptor_Account_SendConfirmUser = new grpc.web.MethodDescriptor(
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.SendConfirmRequest,
+ *   !proto.gothic.api.SendConfirmRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodInfo_Account_SendConfirmUser = new grpc.web.AbstractClientBase.MethodInfo(
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.SendConfirmRequest} request
+   * @param {!proto.gothic.api.SendConfirmRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -198,7 +199,7 @@ const methodInfo_Account_SendConfirmUser = new grpc.web.AbstractClientBase.Metho
 
 
 /**
- * @param {!proto.account.SendConfirmRequest} request The
+ * @param {!proto.gothic.api.SendConfirmRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -207,10 +208,10 @@ const methodInfo_Account_SendConfirmUser = new grpc.web.AbstractClientBase.Metho
  * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.sendConfirmUser =
+proto.gothic.api.AccountClient.prototype.sendConfirmUser =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/SendConfirmUser',
+      '/gothic.api.Account/SendConfirmUser',
       request,
       metadata || {},
       methodDescriptor_Account_SendConfirmUser,
@@ -219,17 +220,17 @@ proto.account.AccountClient.prototype.sendConfirmUser =
 
 
 /**
- * @param {!proto.account.SendConfirmRequest} request The
+ * @param {!proto.gothic.api.SendConfirmRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
  * @return {!Promise<!proto.google.protobuf.Empty>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.sendConfirmUser =
+proto.gothic.api.AccountPromiseClient.prototype.sendConfirmUser =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/SendConfirmUser',
+      '/gothic.api.Account/SendConfirmUser',
       request,
       metadata || {},
       methodDescriptor_Account_SendConfirmUser);
@@ -239,58 +240,58 @@ proto.account.AccountPromiseClient.prototype.sendConfirmUser =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.ConfirmUserRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ConfirmUserRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodDescriptor_Account_ConfirmUser = new grpc.web.MethodDescriptor(
-  '/account.Account/ConfirmUser',
+  '/gothic.api.Account/ConfirmUser',
   grpc.web.MethodType.UNARY,
-  proto.account.ConfirmUserRequest,
-  api_pb.BearerResponse,
+  proto.gothic.api.ConfirmUserRequest,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.ConfirmUserRequest} request
+   * @param {!proto.gothic.api.ConfirmUserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.ConfirmUserRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ConfirmUserRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodInfo_Account_ConfirmUser = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.BearerResponse,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.ConfirmUserRequest} request
+   * @param {!proto.gothic.api.ConfirmUserRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.account.ConfirmUserRequest} request The
+ * @param {!proto.gothic.api.ConfirmUserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.BearerResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.BearerResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.BearerResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.BearerResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.confirmUser =
+proto.gothic.api.AccountClient.prototype.confirmUser =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/ConfirmUser',
+      '/gothic.api.Account/ConfirmUser',
       request,
       metadata || {},
       methodDescriptor_Account_ConfirmUser,
@@ -299,17 +300,17 @@ proto.account.AccountClient.prototype.confirmUser =
 
 
 /**
- * @param {!proto.account.ConfirmUserRequest} request The
+ * @param {!proto.gothic.api.ConfirmUserRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.BearerResponse>}
+ * @return {!Promise<!proto.gothic.api.BearerResponse>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.confirmUser =
+proto.gothic.api.AccountPromiseClient.prototype.confirmUser =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/ConfirmUser',
+      '/gothic.api.Account/ConfirmUser',
       request,
       metadata || {},
       methodDescriptor_Account_ConfirmUser);
@@ -319,58 +320,58 @@ proto.account.AccountPromiseClient.prototype.confirmUser =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.LoginRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.LoginRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodDescriptor_Account_Login = new grpc.web.MethodDescriptor(
-  '/account.Account/Login',
+  '/gothic.api.Account/Login',
   grpc.web.MethodType.UNARY,
-  proto.account.LoginRequest,
-  api_pb.UserResponse,
+  proto.gothic.api.LoginRequest,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.account.LoginRequest} request
+   * @param {!proto.gothic.api.LoginRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.LoginRequest,
- *   !proto.api.UserResponse>}
+ *   !proto.gothic.api.LoginRequest,
+ *   !proto.gothic.api.UserResponse>}
  */
 const methodInfo_Account_Login = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.UserResponse,
+  response_pb.UserResponse,
   /**
-   * @param {!proto.account.LoginRequest} request
+   * @param {!proto.gothic.api.LoginRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.UserResponse.deserializeBinary
+  response_pb.UserResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.account.LoginRequest} request The
+ * @param {!proto.gothic.api.LoginRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.UserResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.UserResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.UserResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.UserResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.login =
+proto.gothic.api.AccountClient.prototype.login =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/Login',
+      '/gothic.api.Account/Login',
       request,
       metadata || {},
       methodDescriptor_Account_Login,
@@ -379,17 +380,17 @@ proto.account.AccountClient.prototype.login =
 
 
 /**
- * @param {!proto.account.LoginRequest} request The
+ * @param {!proto.gothic.api.LoginRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.UserResponse>}
+ * @return {!Promise<!proto.gothic.api.UserResponse>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.login =
+proto.gothic.api.AccountPromiseClient.prototype.login =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/Login',
+      '/gothic.api.Account/Login',
       request,
       metadata || {},
       methodDescriptor_Account_Login);
@@ -399,16 +400,16 @@ proto.account.AccountPromiseClient.prototype.login =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.LogoutRequest,
+ *   !proto.gothic.api.LogoutRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodDescriptor_Account_Logout = new grpc.web.MethodDescriptor(
-  '/account.Account/Logout',
+  '/gothic.api.Account/Logout',
   grpc.web.MethodType.UNARY,
-  proto.account.LogoutRequest,
+  proto.gothic.api.LogoutRequest,
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.LogoutRequest} request
+   * @param {!proto.gothic.api.LogoutRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -421,13 +422,13 @@ const methodDescriptor_Account_Logout = new grpc.web.MethodDescriptor(
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.LogoutRequest,
+ *   !proto.gothic.api.LogoutRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodInfo_Account_Logout = new grpc.web.AbstractClientBase.MethodInfo(
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.LogoutRequest} request
+   * @param {!proto.gothic.api.LogoutRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -438,7 +439,7 @@ const methodInfo_Account_Logout = new grpc.web.AbstractClientBase.MethodInfo(
 
 
 /**
- * @param {!proto.account.LogoutRequest} request The
+ * @param {!proto.gothic.api.LogoutRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -447,10 +448,10 @@ const methodInfo_Account_Logout = new grpc.web.AbstractClientBase.MethodInfo(
  * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.logout =
+proto.gothic.api.AccountClient.prototype.logout =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/Logout',
+      '/gothic.api.Account/Logout',
       request,
       metadata || {},
       methodDescriptor_Account_Logout,
@@ -459,17 +460,17 @@ proto.account.AccountClient.prototype.logout =
 
 
 /**
- * @param {!proto.account.LogoutRequest} request The
+ * @param {!proto.gothic.api.LogoutRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
  * @return {!Promise<!proto.google.protobuf.Empty>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.logout =
+proto.gothic.api.AccountPromiseClient.prototype.logout =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/Logout',
+      '/gothic.api.Account/Logout',
       request,
       metadata || {},
       methodDescriptor_Account_Logout);
@@ -479,16 +480,16 @@ proto.account.AccountPromiseClient.prototype.logout =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.ResetPasswordRequest,
+ *   !proto.gothic.api.ResetPasswordRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodDescriptor_Account_SendResetPassword = new grpc.web.MethodDescriptor(
-  '/account.Account/SendResetPassword',
+  '/gothic.api.Account/SendResetPassword',
   grpc.web.MethodType.UNARY,
-  proto.account.ResetPasswordRequest,
+  proto.gothic.api.ResetPasswordRequest,
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.ResetPasswordRequest} request
+   * @param {!proto.gothic.api.ResetPasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -501,13 +502,13 @@ const methodDescriptor_Account_SendResetPassword = new grpc.web.MethodDescriptor
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.ResetPasswordRequest,
+ *   !proto.gothic.api.ResetPasswordRequest,
  *   !proto.google.protobuf.Empty>}
  */
 const methodInfo_Account_SendResetPassword = new grpc.web.AbstractClientBase.MethodInfo(
   google_protobuf_empty_pb.Empty,
   /**
-   * @param {!proto.account.ResetPasswordRequest} request
+   * @param {!proto.gothic.api.ResetPasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -518,7 +519,7 @@ const methodInfo_Account_SendResetPassword = new grpc.web.AbstractClientBase.Met
 
 
 /**
- * @param {!proto.account.ResetPasswordRequest} request The
+ * @param {!proto.gothic.api.ResetPasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -527,10 +528,10 @@ const methodInfo_Account_SendResetPassword = new grpc.web.AbstractClientBase.Met
  * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.sendResetPassword =
+proto.gothic.api.AccountClient.prototype.sendResetPassword =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/SendResetPassword',
+      '/gothic.api.Account/SendResetPassword',
       request,
       metadata || {},
       methodDescriptor_Account_SendResetPassword,
@@ -539,17 +540,17 @@ proto.account.AccountClient.prototype.sendResetPassword =
 
 
 /**
- * @param {!proto.account.ResetPasswordRequest} request The
+ * @param {!proto.gothic.api.ResetPasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
  * @return {!Promise<!proto.google.protobuf.Empty>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.sendResetPassword =
+proto.gothic.api.AccountPromiseClient.prototype.sendResetPassword =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/SendResetPassword',
+      '/gothic.api.Account/SendResetPassword',
       request,
       metadata || {},
       methodDescriptor_Account_SendResetPassword);
@@ -559,58 +560,58 @@ proto.account.AccountPromiseClient.prototype.sendResetPassword =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.ConfirmPasswordRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ConfirmPasswordRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodDescriptor_Account_ConfirmResetPassword = new grpc.web.MethodDescriptor(
-  '/account.Account/ConfirmResetPassword',
+  '/gothic.api.Account/ConfirmResetPassword',
   grpc.web.MethodType.UNARY,
-  proto.account.ConfirmPasswordRequest,
-  api_pb.BearerResponse,
+  proto.gothic.api.ConfirmPasswordRequest,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.ConfirmPasswordRequest} request
+   * @param {!proto.gothic.api.ConfirmPasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.ConfirmPasswordRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.ConfirmPasswordRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodInfo_Account_ConfirmResetPassword = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.BearerResponse,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.ConfirmPasswordRequest} request
+   * @param {!proto.gothic.api.ConfirmPasswordRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.account.ConfirmPasswordRequest} request The
+ * @param {!proto.gothic.api.ConfirmPasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.BearerResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.BearerResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.BearerResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.BearerResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.confirmResetPassword =
+proto.gothic.api.AccountClient.prototype.confirmResetPassword =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/ConfirmResetPassword',
+      '/gothic.api.Account/ConfirmResetPassword',
       request,
       metadata || {},
       methodDescriptor_Account_ConfirmResetPassword,
@@ -619,17 +620,17 @@ proto.account.AccountClient.prototype.confirmResetPassword =
 
 
 /**
- * @param {!proto.account.ConfirmPasswordRequest} request The
+ * @param {!proto.gothic.api.ConfirmPasswordRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.BearerResponse>}
+ * @return {!Promise<!proto.gothic.api.BearerResponse>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.confirmResetPassword =
+proto.gothic.api.AccountPromiseClient.prototype.confirmResetPassword =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/ConfirmResetPassword',
+      '/gothic.api.Account/ConfirmResetPassword',
       request,
       metadata || {},
       methodDescriptor_Account_ConfirmResetPassword);
@@ -639,58 +640,58 @@ proto.account.AccountPromiseClient.prototype.confirmResetPassword =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.account.RefreshTokenRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.RefreshTokenRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodDescriptor_Account_RefreshBearerToken = new grpc.web.MethodDescriptor(
-  '/account.Account/RefreshBearerToken',
+  '/gothic.api.Account/RefreshBearerToken',
   grpc.web.MethodType.UNARY,
-  proto.account.RefreshTokenRequest,
-  api_pb.BearerResponse,
+  proto.gothic.api.RefreshTokenRequest,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.RefreshTokenRequest} request
+   * @param {!proto.gothic.api.RefreshTokenRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
- *   !proto.account.RefreshTokenRequest,
- *   !proto.api.BearerResponse>}
+ *   !proto.gothic.api.RefreshTokenRequest,
+ *   !proto.gothic.api.BearerResponse>}
  */
 const methodInfo_Account_RefreshBearerToken = new grpc.web.AbstractClientBase.MethodInfo(
-  api_pb.BearerResponse,
+  response_pb.BearerResponse,
   /**
-   * @param {!proto.account.RefreshTokenRequest} request
+   * @param {!proto.gothic.api.RefreshTokenRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  api_pb.BearerResponse.deserializeBinary
+  response_pb.BearerResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.account.RefreshTokenRequest} request The
+ * @param {!proto.gothic.api.RefreshTokenRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.api.BearerResponse)}
+ * @param {function(?grpc.web.Error, ?proto.gothic.api.BearerResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.api.BearerResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.gothic.api.BearerResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.account.AccountClient.prototype.refreshBearerToken =
+proto.gothic.api.AccountClient.prototype.refreshBearerToken =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/account.Account/RefreshBearerToken',
+      '/gothic.api.Account/RefreshBearerToken',
       request,
       metadata || {},
       methodDescriptor_Account_RefreshBearerToken,
@@ -699,22 +700,22 @@ proto.account.AccountClient.prototype.refreshBearerToken =
 
 
 /**
- * @param {!proto.account.RefreshTokenRequest} request The
+ * @param {!proto.gothic.api.RefreshTokenRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.api.BearerResponse>}
+ * @return {!Promise<!proto.gothic.api.BearerResponse>}
  *     Promise that resolves to the response
  */
-proto.account.AccountPromiseClient.prototype.refreshBearerToken =
+proto.gothic.api.AccountPromiseClient.prototype.refreshBearerToken =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/account.Account/RefreshBearerToken',
+      '/gothic.api.Account/RefreshBearerToken',
       request,
       metadata || {},
       methodDescriptor_Account_RefreshBearerToken);
 };
 
 
-module.exports = proto.account;
+module.exports = proto.gothic.api;
 

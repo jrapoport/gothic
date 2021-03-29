@@ -1,6 +1,6 @@
 import * as grpcWeb from 'grpc-web';
 
-import * as api_pb from './api_pb';
+import * as response_pb from './response_pb';
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as user_pb from './user_pb';
 
@@ -14,15 +14,15 @@ export class UserClient {
     request: user_pb.UserRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: api_pb.UserResponse) => void
-  ): grpcWeb.ClientReadableStream<api_pb.UserResponse>;
+               response: response_pb.UserResponse) => void
+  ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   updateUser(
     request: user_pb.UpdateUserRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: api_pb.UserResponse) => void
-  ): grpcWeb.ClientReadableStream<api_pb.UserResponse>;
+               response: response_pb.UserResponse) => void
+  ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   sendConfirmUser(
     request: google_protobuf_empty_pb.Empty,
@@ -35,8 +35,8 @@ export class UserClient {
     request: user_pb.ChangePasswordRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: api_pb.BearerResponse) => void
-  ): grpcWeb.ClientReadableStream<api_pb.BearerResponse>;
+               response: response_pb.BearerResponse) => void
+  ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 
 }
 
@@ -48,12 +48,12 @@ export class UserPromiseClient {
   getUser(
     request: user_pb.UserRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<api_pb.UserResponse>;
+  ): Promise<response_pb.UserResponse>;
 
   updateUser(
     request: user_pb.UpdateUserRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<api_pb.UserResponse>;
+  ): Promise<response_pb.UserResponse>;
 
   sendConfirmUser(
     request: google_protobuf_empty_pb.Empty,
@@ -63,7 +63,7 @@ export class UserPromiseClient {
   changePassword(
     request: user_pb.ChangePasswordRequest,
     metadata?: grpcWeb.Metadata
-  ): Promise<api_pb.BearerResponse>;
+  ): Promise<response_pb.BearerResponse>;
 
 }
 

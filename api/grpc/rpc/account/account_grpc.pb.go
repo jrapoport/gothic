@@ -40,7 +40,7 @@ func NewAccountClient(cc grpc.ClientConnInterface) AccountClient {
 
 func (c *accountClient) Signup(ctx context.Context, in *SignupRequest, opts ...grpc.CallOption) (*rpc.UserResponse, error) {
 	out := new(rpc.UserResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/Signup", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/Signup", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *accountClient) Signup(ctx context.Context, in *SignupRequest, opts ...g
 
 func (c *accountClient) SendConfirmUser(ctx context.Context, in *SendConfirmRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/account.Account/SendConfirmUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/SendConfirmUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *accountClient) SendConfirmUser(ctx context.Context, in *SendConfirmRequ
 
 func (c *accountClient) ConfirmUser(ctx context.Context, in *ConfirmUserRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
 	out := new(rpc.BearerResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/ConfirmUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/ConfirmUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *accountClient) ConfirmUser(ctx context.Context, in *ConfirmUserRequest,
 
 func (c *accountClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*rpc.UserResponse, error) {
 	out := new(rpc.UserResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/Login", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *accountClient) Login(ctx context.Context, in *LoginRequest, opts ...grp
 
 func (c *accountClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/account.Account/Logout", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/Logout", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *accountClient) Logout(ctx context.Context, in *LogoutRequest, opts ...g
 
 func (c *accountClient) SendResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/account.Account/SendResetPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/SendResetPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *accountClient) SendResetPassword(ctx context.Context, in *ResetPassword
 
 func (c *accountClient) ConfirmResetPassword(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
 	out := new(rpc.BearerResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/ConfirmResetPassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/ConfirmResetPassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *accountClient) ConfirmResetPassword(ctx context.Context, in *ConfirmPas
 
 func (c *accountClient) RefreshBearerToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
 	out := new(rpc.BearerResponse)
-	err := c.cc.Invoke(ctx, "/account.Account/RefreshBearerToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.Account/RefreshBearerToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func _Account_Signup_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/Signup",
+		FullMethod: "/gothic.api.Account/Signup",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).Signup(ctx, req.(*SignupRequest))
@@ -194,7 +194,7 @@ func _Account_SendConfirmUser_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/SendConfirmUser",
+		FullMethod: "/gothic.api.Account/SendConfirmUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).SendConfirmUser(ctx, req.(*SendConfirmRequest))
@@ -212,7 +212,7 @@ func _Account_ConfirmUser_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/ConfirmUser",
+		FullMethod: "/gothic.api.Account/ConfirmUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).ConfirmUser(ctx, req.(*ConfirmUserRequest))
@@ -230,7 +230,7 @@ func _Account_Login_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/Login",
+		FullMethod: "/gothic.api.Account/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).Login(ctx, req.(*LoginRequest))
@@ -248,7 +248,7 @@ func _Account_Logout_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/Logout",
+		FullMethod: "/gothic.api.Account/Logout",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).Logout(ctx, req.(*LogoutRequest))
@@ -266,7 +266,7 @@ func _Account_SendResetPassword_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/SendResetPassword",
+		FullMethod: "/gothic.api.Account/SendResetPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).SendResetPassword(ctx, req.(*ResetPasswordRequest))
@@ -284,7 +284,7 @@ func _Account_ConfirmResetPassword_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/ConfirmResetPassword",
+		FullMethod: "/gothic.api.Account/ConfirmResetPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).ConfirmResetPassword(ctx, req.(*ConfirmPasswordRequest))
@@ -302,7 +302,7 @@ func _Account_RefreshBearerToken_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/account.Account/RefreshBearerToken",
+		FullMethod: "/gothic.api.Account/RefreshBearerToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).RefreshBearerToken(ctx, req.(*RefreshTokenRequest))
@@ -314,7 +314,7 @@ func _Account_RefreshBearerToken_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Account_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "account.Account",
+	ServiceName: "gothic.api.Account",
 	HandlerType: (*AccountServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
