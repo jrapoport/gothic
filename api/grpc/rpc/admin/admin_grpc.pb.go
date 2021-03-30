@@ -4,6 +4,7 @@ package admin
 
 import (
 	context "context"
+	rpc "github.com/jrapoport/gothic/api/grpc/rpc"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,6 +23,7 @@ type AdminClient interface {
 	CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*SignupCodesResponse, error)
 	CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*SignupCodeResponse, error)
 	DeleteSignupCode(ctx context.Context, in *DeleteSignupCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SearchAuditLogs(ctx context.Context, in *rpc.SearchRequest, opts ...grpc.CallOption) (*AuditLogsResult, error)
 	Settings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error)
 }
 
@@ -60,6 +62,15 @@ func (c *adminClient) DeleteSignupCode(ctx context.Context, in *DeleteSignupCode
 	return out, nil
 }
 
+func (c *adminClient) SearchAuditLogs(ctx context.Context, in *rpc.SearchRequest, opts ...grpc.CallOption) (*AuditLogsResult, error) {
+	out := new(AuditLogsResult)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/SearchAuditLogs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminClient) Settings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error) {
 	out := new(SettingsResponse)
 	err := c.cc.Invoke(ctx, "/gothic.api.Admin/Settings", in, out, opts...)
@@ -76,6 +87,7 @@ type AdminServer interface {
 	CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*SignupCodesResponse, error)
 	CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*SignupCodeResponse, error)
 	DeleteSignupCode(context.Context, *DeleteSignupCodeRequest) (*emptypb.Empty, error)
+	SearchAuditLogs(context.Context, *rpc.SearchRequest) (*AuditLogsResult, error)
 	Settings(context.Context, *SettingsRequest) (*SettingsResponse, error)
 	mustEmbedUnimplementedAdminServer()
 }
@@ -92,6 +104,9 @@ func (UnimplementedAdminServer) CheckSignupCode(context.Context, *CheckSignupCod
 }
 func (UnimplementedAdminServer) DeleteSignupCode(context.Context, *DeleteSignupCodeRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSignupCode not implemented")
+}
+func (UnimplementedAdminServer) SearchAuditLogs(context.Context, *rpc.SearchRequest) (*AuditLogsResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchAuditLogs not implemented")
 }
 func (UnimplementedAdminServer) Settings(context.Context, *SettingsRequest) (*SettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Settings not implemented")
@@ -163,6 +178,24 @@ func _Admin_DeleteSignupCode_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_SearchAuditLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(rpc.SearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).SearchAuditLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gothic.api.Admin/SearchAuditLogs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).SearchAuditLogs(ctx, req.(*rpc.SearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Admin_Settings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SettingsRequest)
 	if err := dec(in); err != nil {
@@ -199,6 +232,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSignupCode",
 			Handler:    _Admin_DeleteSignupCode_Handler,
+		},
+		{
+			MethodName: "SearchAuditLogs",
+			Handler:    _Admin_SearchAuditLogs_Handler,
 		},
 		{
 			MethodName: "Settings",

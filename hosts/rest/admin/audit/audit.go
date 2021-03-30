@@ -27,9 +27,13 @@ func NewRequest(r *http.Request) (*Request, error) {
 	if err != nil {
 		return nil, err
 	}
+	// form:"sort" will be picked up by
+	// ctx := rest.FromRequest(r)
 	delete(data, key.Sort)
+	// Page & PageSize will be picked up
+	// page := rest.PaginateRequest(r)
 	delete(data, key.Page)
-	delete(data, key.PageCount)
+	delete(data, key.PageSize)
 	req.Filters = data
 	return req, nil
 }
@@ -67,11 +71,7 @@ func (s *auditServer) SearchAuditLogs(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	page, err := rest.PaginateRequest(r)
-	if err != nil {
-		s.ResponseCode(w, http.StatusBadRequest, err)
-		return
-	}
+	page := rest.PaginateRequest(r)
 	ctx := rest.FromRequest(r)
 	logs, err := s.API.SearchAuditLogs(ctx, req.Filters, page)
 	if err != nil {

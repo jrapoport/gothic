@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package gothic.api;
+
+option go_package = "github.com/jrapoport/gothic/api/grpc/rpc;api";
+
+import "google/protobuf/struct.proto";
+
+enum Sort {
+  Ascending = 0;
+  Descending = 1;
+}
+
+message SearchRequest {
+  int64 page = 1;
+  optional int64 page_size = 2;
+  optional Sort sort = 3;
+  optional google.protobuf.Struct filters = 4;
+}

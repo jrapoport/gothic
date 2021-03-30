@@ -3,6 +3,7 @@ package confirm_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 
@@ -91,16 +92,21 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	srv.Config().Mail.SendLimit = 0
 	var tok1 string
+	var mu sync.Mutex
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		tok1 = tconf.GetEmailToken(template.ConfirmUserAction, email)
 	})
 	u, _ := tcore.TestUser(t, srv.API, "", false)
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return tok1 != ""
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 	var tok2 string
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		tok2 = tconf.GetEmailToken(template.ConfirmUserAction, email)
 	})
 	req = &confirm.Request{
@@ -110,7 +116,7 @@ func TestConfirmServer_SendConfirmUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return tok2 != ""
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 	assert.Equal(t, tok1, tok2)
 }
 
@@ -119,7 +125,10 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	srv, web, smtp := testServer(t)
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	var sent string
+	var mu sync.Mutex
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		sent = email
 	})
 	// sent initial
@@ -127,7 +136,7 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.False(t, u.IsConfirmed())
 	assert.Eventually(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 	// resend
 	sent = ""
 	req := &confirm.Request{
@@ -137,5 +146,5 @@ func TestConfirmServer_SendConfirmUser_RateLimit(t *testing.T) {
 	assert.EqualError(t, err, thttp.FmtError(http.StatusTooEarly).Error())
 	assert.Never(t, func() bool {
 		return sent != ""
-	}, 1*time.Second, 10*time.Millisecond)
+	}, 2*time.Second, 10*time.Millisecond)
 }
