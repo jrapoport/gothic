@@ -18,7 +18,7 @@ func TestFromContext(t *testing.T) {
 		ip        = "127.0.0.1"
 		prov      = provider.Google
 		recaptcha = utils.SecureToken()
-		sort      = store.Ascending
+		sort      = store.Descending
 		token     = utils.SecureToken()
 	)
 	ctx := Background()
@@ -42,14 +42,14 @@ func TestFromContext(t *testing.T) {
 	ctx.SetIPAddress("")
 	ctx.SetProvider("")
 	ctx.SetReCaptcha("")
-	ctx.SetSort("")
+	ctx.SetSort(store.Ascending)
 	ctx.SetCode("")
 	ctx.SetUserID(uuid.Nil)
 	ctx.SetAdminID(uuid.Nil)
 	assert.Equal(t, "", ctx.IPAddress())
 	assert.EqualValues(t, "", ctx.Provider())
 	assert.Equal(t, "", ctx.ReCaptcha())
-	assert.EqualValues(t, "", ctx.Sort())
+	assert.EqualValues(t, store.Ascending.String(), ctx.Sort().String())
 	assert.Equal(t, "", ctx.Code())
 	assert.Equal(t, uuid.Nil, ctx.UserID())
 	assert.Equal(t, uuid.Nil, ctx.AdminID())

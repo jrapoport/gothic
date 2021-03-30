@@ -32,9 +32,6 @@ type Filter struct {
 
 // Search searches a table for hits
 func Search(tx *gorm.DB, models interface{}, s Sort, f Filter, p *Pagination) error {
-	if s == "" {
-		s = Descending
-	}
 	filters := f.Filters.Copy()
 	for k, v := range filters {
 		if v == "" {
