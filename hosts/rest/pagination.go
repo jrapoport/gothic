@@ -9,6 +9,7 @@ import (
 
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/store"
+	"github.com/jrapoport/gothic/utils"
 )
 
 const (
@@ -18,39 +19,34 @@ const (
 	PageNumber = "X-Page-Number"
 	// PageCount is the total pages of pages.
 	PageCount = "X-Page-Count"
-	// PageLength is the actual number of items in the page.
-	PageLength = "X-Page-Length"
+	// PageSize is the number of items in the page.
+	PageSize = "X-Page-Size"
 	// PageTotal is the total number of items across all pages.
 	PageTotal = "X-Page-Total"
 )
 
 // PaginateRequest paginates an http request
-func PaginateRequest(r *http.Request) (*store.Pagination, error) {
+func PaginateRequest(r *http.Request) *store.Pagination {
 	if r.Form == nil {
 		const defaultMaxMemory = 32 << 20 // 32 MB
 		// it looks like it will return "no body" but still do the right
 		// thing with the form. net/http/request.go ignores it also.
 		_ = r.ParseMultipartForm(defaultMaxMemory)
 	}
-	var page int64 = 1
-	var perPage int64 = store.MaxPerPage
-	var err error
+	var page = 1
 	if v := r.FormValue(key.Page); v != "" {
-		page, err = strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
-		}
+		num, _ := strconv.ParseInt(v, 10, 64)
+		page = utils.Max(int(num), page)
 	}
-	if v := r.FormValue(key.PageCount); v != "" {
-		perPage, err = strconv.ParseInt(v, 10, 64)
-		if err != nil {
-			return nil, err
-		}
+	var perPage = store.MaxPageSize
+	if v := r.FormValue(key.PageSize); v != "" {
+		per, _ := strconv.ParseInt(v, 10, 64)
+		perPage = utils.Clamp(int(per), 1, perPage)
 	}
 	return &store.Pagination{
-		Page: int(page),
-		Size: int(perPage),
-	}, nil
+		Page: page,
+		Size: perPage,
+	}
 }
 
 const (
@@ -64,56 +60,56 @@ func linkRel(u *url.URL, rel string) string {
 	return fmt.Sprintf(`<%s>; rel="%s"`, u.String(), rel)
 }
 
-func firstLink(u *url.URL, p *store.Pagination) string {
-	if p.Page <= 1 {
+func firstLink(u *url.URL, page *store.Pagination) string {
+	if page.Page <= 1 {
 		return ""
 	}
 	u.RawQuery = url.Values{
 		key.Page:    []string{"1"},
-		key.PerPage: []string{strconv.Itoa(p.Size)},
+		key.PerPage: []string{strconv.Itoa(page.Size)},
 	}.Encode()
 	return linkRel(u, firstRel)
 }
 
-func prevLink(u *url.URL, p *store.Pagination) string {
-	if p.Prev == 0 {
+func prevLink(u *url.URL, page *store.Pagination) string {
+	if page.Prev == 0 {
 		return ""
 	}
 	u.RawQuery = url.Values{
-		key.Page:    []string{strconv.Itoa(p.Prev)},
-		key.PerPage: []string{strconv.Itoa(p.Size)},
+		key.Page:    []string{strconv.Itoa(page.Prev)},
+		key.PerPage: []string{strconv.Itoa(page.Size)},
 	}.Encode()
 	return linkRel(u, prevRel)
 }
 
-func nextLink(u *url.URL, p *store.Pagination) string {
-	if p.Next == 0 {
+func nextLink(u *url.URL, page *store.Pagination) string {
+	if page.Next == 0 {
 		return ""
 	}
 	u.RawQuery = url.Values{
-		key.Page:    []string{strconv.Itoa(p.Next)},
-		key.PerPage: []string{strconv.Itoa(p.Size)},
+		key.Page:    []string{strconv.Itoa(page.Next)},
+		key.PerPage: []string{strconv.Itoa(page.Size)},
 	}.Encode()
 	return linkRel(u, nextRel)
 }
 
-func lastLink(u *url.URL, p *store.Pagination) string {
-	if p.Page == p.Count {
+func lastLink(u *url.URL, page *store.Pagination) string {
+	if page.Page == page.Count {
 		return ""
 	}
 	u.RawQuery = url.Values{
-		key.Page:    []string{strconv.Itoa(p.Count)},
-		key.PerPage: []string{strconv.Itoa(p.Size)},
+		key.Page:    []string{strconv.Itoa(page.Count)},
+		key.PerPage: []string{strconv.Itoa(page.Size)},
 	}.Encode()
 	return linkRel(u, lastRel)
 }
 
 // PaginateResponse writes a paginated http response.
-func PaginateResponse(w http.ResponseWriter, r *http.Request, p *store.Pagination) {
-	w.Header().Add(PageNumber, strconv.Itoa(p.Page))
-	w.Header().Add(PageCount, strconv.Itoa(p.Count))
-	w.Header().Add(PageTotal, strconv.FormatInt(p.Total, 10))
-	w.Header().Add(PageLength, strconv.Itoa(p.Length))
+func PaginateResponse(w http.ResponseWriter, r *http.Request, page *store.Pagination) {
+	w.Header().Add(PageNumber, strconv.Itoa(page.Page))
+	w.Header().Add(PageCount, strconv.Itoa(page.Count))
+	w.Header().Add(PageTotal, strconv.FormatInt(page.Total, 10))
+	w.Header().Add(PageSize, strconv.Itoa(page.Length))
 	u := &url.URL{}
 	u.Scheme = "http"
 	if r.TLS != nil {
@@ -125,16 +121,16 @@ func PaginateResponse(w http.ResponseWriter, r *http.Request, p *store.Paginatio
 	u.Host = r.Host
 	u.Path = r.URL.Path
 	var links []string
-	if l := firstLink(u, p); l != "" {
+	if l := firstLink(u, page); l != "" {
 		links = append(links, l)
 	}
-	if l := prevLink(u, p); l != "" {
+	if l := prevLink(u, page); l != "" {
 		links = append(links, l)
 	}
-	if l := nextLink(u, p); l != "" {
+	if l := nextLink(u, page); l != "" {
 		links = append(links, l)
 	}
-	if l := lastLink(u, p); l != "" {
+	if l := lastLink(u, page); l != "" {
 		links = append(links, l)
 	}
 	linkHeader := strings.Join(links, ",")

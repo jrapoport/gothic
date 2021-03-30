@@ -130,13 +130,13 @@ func (ts *AuditServerTestSuite) TestErrors() {
 	w := httptest.NewRecorder()
 	ts.srv.SearchAuditLogs(w, r)
 	ts.NotEqual(http.StatusOK, w.Code)
-	// bad paging
+	// bad paging (we handle this now)
 	r = thttp.Request(ts.T(), http.MethodGet, Audit, "", url.Values{
 		key.Page: []string{"\n"},
 	}, nil)
 	w = httptest.NewRecorder()
 	ts.srv.SearchAuditLogs(w, r)
-	ts.NotEqual(http.StatusOK, w.Code)
+	ts.Equal(http.StatusOK, w.Code)
 }
 
 func (ts *AuditServerTestSuite) TestPageHeaders() {
@@ -145,7 +145,7 @@ func (ts *AuditServerTestSuite) TestPageHeaders() {
 	var logs []interface{}
 	err := json.NewDecoder(res.Body).Decode(&logs)
 	ts.NoError(err)
-	ts.Len(logs, store.MaxPerPage)
+	ts.Len(logs, store.MaxPageSize)
 	e := logs[0].(map[string]interface{})
 	f := e[key.Fields].(map[string]interface{})
 	id := uint(e["ID"].(float64))
@@ -156,12 +156,12 @@ func (ts *AuditServerTestSuite) TestPageHeaders() {
 	pn := res.Header().Get(rest.PageNumber)
 	ts.Equal("1", pn)
 	pc := res.Header().Get(rest.PageCount)
-	cnt := int(math.Ceil(float64(len(ts.tests)) / float64(store.MaxPerPage)))
+	cnt := int(math.Ceil(float64(len(ts.tests)) / float64(store.MaxPageSize)))
 	testCount := strconv.Itoa(cnt)
 	ts.Equal(testCount, pc)
-	pl := res.Header().Get(rest.PageLength)
-	testLen := strconv.Itoa(store.MaxPerPage)
-	ts.Equal(testLen, pl)
+	sz := res.Header().Get(rest.PageSize)
+	testLen := strconv.Itoa(store.MaxPageSize)
+	ts.Equal(testLen, sz)
 	tot := res.Header().Get(rest.PageTotal)
 	// +1 because of audit.LogStartup
 	testTotal := strconv.Itoa(len(ts.tests) + 1)
@@ -171,7 +171,7 @@ func (ts *AuditServerTestSuite) TestPageHeaders() {
 func (ts *AuditServerTestSuite) TestPageLinks() {
 	startLink := func() string {
 		return fmt.Sprintf("%s?%s=1&%s=%d",
-			Audit, key.Page, key.PerPage, store.MaxPerPage)
+			Audit, key.Page, key.PerPage, store.MaxPageSize)
 	}
 	var nextLink = startLink()
 	for {
@@ -189,8 +189,8 @@ func (ts *AuditServerTestSuite) TestPageLinks() {
 		var logs []interface{}
 		err = json.NewDecoder(res.Body).Decode(&logs)
 		ts.Require().NoError(err)
-		pc := res.Header().Get(rest.PageLength)
-		cnt, err := strconv.Atoi(pc)
+		sz := res.Header().Get(rest.PageSize)
+		cnt, err := strconv.Atoi(sz)
 		ts.Require().NoError(err)
 		ts.Len(logs, cnt)
 		l := res.Header().Get(rest.Link)

@@ -142,9 +142,6 @@ func (ctx apiContext) Sort() store.Sort {
 }
 
 func (ctx *apiContext) SetSort(s store.Sort) {
-	if s == "" {
-		return
-	}
 	ctx.setValue(sortKey{}, s)
 }
 
