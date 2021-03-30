@@ -2,7 +2,11 @@ package store
 
 import "github.com/jrapoport/gothic/store/migration"
 
-var plan migration.Plan
+var plan *migration.Plan
+
+func init() {
+	plan = migration.NewPlan()
+}
 
 // AddAutoMigrationToPlan adds a model to the global migration plan
 func AddAutoMigrationToPlan(m *migration.Migration) {

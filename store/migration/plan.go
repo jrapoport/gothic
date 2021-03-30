@@ -3,6 +3,7 @@ package migration
 import (
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/jrapoport/gothic/store/drivers"
@@ -10,7 +11,14 @@ import (
 )
 
 // Plan represents a database migration plan as an ordered slice of migrations.
-type Plan []*Migration
+type Plan struct {
+	migs []*Migration
+	mu sync.RWMutex
+}
+
+func NewPlan() *Plan {
+	return &Plan{migs: []*Migration{}}
+}
 
 // AddMigration add the Migration to the migration Plan.
 func (plan *Plan) AddMigration(mg *Migration) {
@@ -19,27 +27,34 @@ func (plan *Plan) AddMigration(mg *Migration) {
 
 // AddMigrations adds a slice of Migration to the migration Plan.
 func (plan *Plan) AddMigrations(mgs []*Migration) {
-	*plan = append(*plan, mgs...)
+	plan.mu.Lock()
+	defer plan.mu.Unlock()
+	plan.migs = append(plan.migs, mgs...)
 }
 
 // Clear removes all migrations from the Plan.
 func (plan *Plan) Clear() {
-	*plan = Plan{}
+	plan.mu.Lock()
+	defer plan.mu.Unlock()
+	plan.migs = []*Migration{}
 }
 
 // Run executed all migrations in the Plan in a FIFO order. When sorted
 // is true, the migrations are run in alphabetical order by id.
-func (plan Plan) Run(db *gorm.DB, sorted bool) error {
+func (plan *Plan) Run(db *gorm.DB, sorted bool) error {
+	plan.mu.RLock()
+	defer plan.mu.RUnlock()
 	name := db.Migrator().CurrentDatabase()
 	log := db.Logger
 	log.Info(nil, "migrating %s", name)
-	if len(plan) <= 0 {
+	migs := plan.migs
+	if len(migs) <= 0 {
 		log.Info(nil, "no migrations")
 		return nil
 	}
-	planned := make(Plan, len(plan))
-	for i, p := range plan {
-		planned[i] = p
+	planned := make([]*Migration, len(migs))
+	for i, mig := range migs {
+		planned[i] = mig
 	}
 	if sorted {
 		sort.Slice(planned, func(i, j int) bool {

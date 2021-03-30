@@ -104,7 +104,7 @@ func (conn *Connection) RunMigration(m *migration.Migration) error {
 }
 
 // Migrate runs the migration plan.
-func (conn *Connection) Migrate(p migration.Plan) error {
+func (conn *Connection) Migrate(p *migration.Plan) error {
 	return p.Run(conn.DB, true)
 }
 
