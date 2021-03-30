@@ -118,9 +118,9 @@ func TestSearch(t *testing.T) {
 	conn, err := Dial(c, nil)
 	require.NoError(t, err)
 	require.NotNil(t, conn)
-	p := migration.Plan{
-		migration.NewMigration("1", SearchModel{}),
-	}
+	m := migration.NewMigration("1", SearchModel{})
+	p := migration.NewPlan()
+	p.AddMigration(m)
 	err = p.Run(conn.DB, false)
 	require.NoError(t, err)
 	var tests []testCase

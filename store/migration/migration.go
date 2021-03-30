@@ -14,7 +14,9 @@ type Migration struct {
 
 // Run returns the migration on the the db.
 func (m *Migration) Run(db *gorm.DB) error {
-	return Plan{m}.Run(db, false)
+	plan := NewPlan()
+	plan.AddMigration(m)
+	return plan.Run(db, false)
 }
 
 // NewMigration returns a new Migration for the model with id.

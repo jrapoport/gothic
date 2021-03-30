@@ -23,10 +23,11 @@ func TestHas(t *testing.T) {
 	}
 	const testValue = "test-value"
 	db := tdb.DB(t)
-	p := migration.Plan{
+	p := migration.NewPlan()
+	p.AddMigrations([]*migration.Migration{
 		migration.NewMigration("1", ModA{}),
 		migration.NewMigration("2", ModB{}),
-	}
+	})
 	err := p.Run(db, false)
 	require.NoError(t, err)
 	var has bool
@@ -74,10 +75,11 @@ func TestHasLast(t *testing.T) {
 	}
 	const testValue = "test-value"
 	db := tdb.DB(t)
-	p := migration.Plan{
+	p := migration.NewPlan()
+	p.AddMigrations([]*migration.Migration{
 		migration.NewMigration("1", ModA{}),
 		migration.NewMigration("2", ModB{}),
-	}
+	})
 	err := p.Run(db, false)
 	require.NoError(t, err)
 	var has bool

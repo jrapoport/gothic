@@ -35,7 +35,7 @@ func TestPlan_Run(t *testing.T) {
 	require.NotNil(t, migA)
 	migD := NewMigration("D", md)
 	require.NotNil(t, migB)
-	p := Plan{}
+	p := NewPlan()
 	err := p.Run(db, false)
 	assert.NoError(t, err)
 	p.AddMigration(migA)
