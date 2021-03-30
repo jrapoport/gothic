@@ -23,7 +23,7 @@ func NewSearchRequest(r *http.Request) (*SearchRequest, error) {
 	}
 	delete(data, key.Sort)
 	delete(data, key.Page)
-	delete(data, key.PageCount)
+	delete(data, key.PageSize)
 	req.Filters = data
 	return req, nil
 }
@@ -34,11 +34,7 @@ func (s *usersServer) SearchUsers(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	page, err := rest.PaginateRequest(r)
-	if err != nil {
-		s.ResponseCode(w, http.StatusBadRequest, err)
-		return
-	}
+	page := rest.PaginateRequest(r)
 	ctx := rest.FromRequest(r)
 	users, err := s.API.SearchUsers(ctx, req.Filters, page)
 	if err != nil {

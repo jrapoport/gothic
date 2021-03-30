@@ -51,6 +51,7 @@ endif
 
 GRPC_RPC_DIR = $(GRPC_DIR)/rpc
 rpc:: proto ## Protobuf gRPC
+	$(RM) -rf $(GRPC_RPC_DIR)
 	mkdir -p $(GRPC_RPC_DIR)
 	$(PROTOC) $(PROTO_INCLUDES) \
 	--go_out=$(GRPC_RPC_DIR) \
@@ -60,6 +61,7 @@ rpc:: proto ## Protobuf gRPC
 
 GRPC_WEB_DIR = $(GRPC_DIR)/web
 rpcw:: proto ## Protobuf gRPC-Web
+	$(RM) -rf $(GRPC_WEB_DIR)
 	mkdir -p $(GRPC_WEB_DIR)
 	$(PROTOC) $(PROTO_INCLUDES) \
 	--js_out=import_style=commonjs:$(GRPC_WEB_DIR) \

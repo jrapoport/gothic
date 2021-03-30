@@ -63,7 +63,7 @@ func (ts *AuditTestSuite) TestPageHeaders() {
 	var logs []interface{}
 	err = json.NewDecoder(res.Body).Decode(&logs)
 	ts.NoError(err)
-	ts.Len(logs, store.MaxPerPage)
+	ts.Len(logs, store.MaxPageSize)
 	e := logs[0].(map[string]interface{})
 	f := e[key.Fields].(map[string]interface{})
 	id := uint(e["ID"].(float64))
@@ -74,12 +74,12 @@ func (ts *AuditTestSuite) TestPageHeaders() {
 	pn := res.Header.Get(rest.PageNumber)
 	ts.Equal("1", pn)
 	pc := res.Header.Get(rest.PageCount)
-	cnt := int(math.Ceil(float64(len(ts.tests)) / float64(store.MaxPerPage)))
+	cnt := int(math.Ceil(float64(len(ts.tests)) / float64(store.MaxPageSize)))
 	testCount := strconv.Itoa(cnt)
 	ts.Equal(testCount, pc)
-	pl := res.Header.Get(rest.PageLength)
-	testLen := strconv.Itoa(store.MaxPerPage)
-	ts.Equal(testLen, pl)
+	sz := res.Header.Get(rest.PageSize)
+	testLen := strconv.Itoa(store.MaxPageSize)
+	ts.Equal(testLen, sz)
 	tot := res.Header.Get(rest.PageTotal)
 	// +1 because of audit.LogStartup
 	testTotal := strconv.Itoa(len(ts.tests) + 1)
@@ -89,7 +89,7 @@ func (ts *AuditTestSuite) TestPageHeaders() {
 func (ts *AuditTestSuite) TestPageLinks() {
 	startLink := func() string {
 		return fmt.Sprintf("%s%s?%s=1&%s=%d",
-			ts.web.URL, endpoint, key.Page, key.PerPage, store.MaxPerPage)
+			ts.web.URL, endpoint, key.Page, key.PerPage, store.MaxPageSize)
 	}
 	var nextLink = startLink()
 	for {
@@ -107,7 +107,7 @@ func (ts *AuditTestSuite) TestPageLinks() {
 		var logs []interface{}
 		err = json.NewDecoder(res.Body).Decode(&logs)
 		ts.Require().NoError(err)
-		pc := res.Header.Get(rest.PageLength)
+		pc := res.Header.Get(rest.PageSize)
 		cnt, err := strconv.Atoi(pc)
 		ts.Require().NoError(err)
 		ts.Len(logs, cnt)

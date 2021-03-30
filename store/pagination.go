@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// MaxPerPage is the default max per page.
-const MaxPerPage = 50
+// MaxPageSize is the default max per page.
+const MaxPageSize = 50
 
 // Pagination holds paged results.
 type Pagination struct {
@@ -32,21 +32,31 @@ type Pagination struct {
 }
 
 // Sort is the sort order for the results.
-type Sort string
+type Sort uint8
 
+// Sort orders
 const (
-	// Ascending sorts the results in ascending order.
-	Ascending Sort = "ASC"
-	// Descending sorts the results in descending order.
-	Descending Sort = "DESC"
+	Ascending Sort = iota
+	Descending
 )
+
+func (s Sort) String() string {
+	switch s {
+	case Descending:
+		return "DESC"
+	case Ascending:
+		fallthrough
+	default:
+		return "ASC"
+	}
+}
 
 // NextPage fetches the next page.
 func NextPage(query *gorm.DB, page *Pagination, s Sort) (*Pagination, error) {
 	if page.Size == 0 {
-		page.Size = MaxPerPage
+		page.Size = MaxPageSize
 	}
-	q := query.Order("created_at " + s)
+	q := query.Order("created_at " + s.String())
 	p := paginator.New(adapter.NewGORMAdapter(q), page.Size)
 	p.SetPage(page.Page)
 	err := p.Results(page.Items)
