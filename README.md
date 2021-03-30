@@ -13,7 +13,8 @@ handle user signup, authentication and custom user data.
 
 ## All NEW!
 
-This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete.
+This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete. It 
+started off as a fork, but doesn't share a single line of code anymore.
 
 The basic idea was to support most of the existing functionality of GoTrue while modernizing it and expanding support
 for additional external providers and functionality. At a certain point it just made more sense to start over from
@@ -1399,8 +1400,12 @@ These changes allow for advances like self-contained database migration, expande
 PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to modify and use the microservice
 outside of Netlify tool chain, and in a more active development environment.
 
+Since this project shares no code with GoTrue and is only conceptually similar at this point, I might truncate the 
+commit history for clarity in the future.
+
 While the Netlify team did a good job with GoTrue, their use in production means they cannot easily adopt these kinds of
 significant changes. In many cases, they will likely never make them given the impacts to their tooling, deployment, and
 production systems — which makes perfect sense for their situation.
 
 I'd like to thank Netlify team for their hard work on the original version of this microservice.
+

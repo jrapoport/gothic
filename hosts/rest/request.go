@@ -48,7 +48,7 @@ type Request struct {
 	Code      string        `json:"code" form:"code"`
 	Provider  provider.Name `json:"provider" form:"provider"`
 	ReCaptcha string        `json:"recaptcha" form:"recaptcha"`
-	Sort      store.Sort    `json:"sort"  form:"sort"`
+	Sort      string        `json:"sort"  form:"sort"`
 }
 
 // FromRequest adds the authenticated request context to a context
@@ -60,7 +60,11 @@ func FromRequest(r *http.Request) context.Context {
 	ctx.SetCode(req.Code)
 	ctx.SetProvider(req.Provider)
 	ctx.SetReCaptcha(req.ReCaptcha)
-	ctx.SetSort(req.Sort)
+	srt := store.Ascending
+	if req.Sort == store.Descending.String() {
+		srt = store.Descending
+	}
+	ctx.SetSort(srt)
 	c, err := GetUserClaims(r)
 	if err != nil {
 		return ctx

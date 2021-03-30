@@ -33,7 +33,7 @@ const (
 	Name               = "name"
 	Nickname           = "nickname"
 	Page               = "page"
-	PageCount          = "page_count"
+	PageSize           = "page_size"
 	Password           = "password"
 	PerPage            = "per_page"
 	Provider           = "provider"

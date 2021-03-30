@@ -16,9 +16,20 @@ message UserResponse {
 }
 
 message BearerResponse {
- string type = 1;
- string access = 2;
- string refresh = 3;
- string id = 4;
+  string type = 1;
+  string access = 2;
+  string refresh = 3;
+  string id = 4;
   google.protobuf.Timestamp expires_at = 5;
+}
+
+message PagedResponse {
+  int64 number = 1;
+  int64 count = 2;
+  int64 total = 3;
+  int64 size  = 4;
+  int64 first = 7;
+  int64 prev = 5;
+  int64 next = 6;
+  int64 last = 8;
 }
