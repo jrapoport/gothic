@@ -122,10 +122,7 @@ func ChangePassword(conn *store.Connection, u *user.User, pw string) error {
 	if u.Provider.IsExternal() {
 		return errors.New("invalid provider")
 	}
-	hashed, err := utils.HashPassword(pw)
-	if err != nil {
-		return err
-	}
+	hashed := utils.HashPassword(pw)
 	u.Password = hashed
 	return conn.Model(&u).Update(key.Password, u.Password).Error
 }

@@ -84,9 +84,9 @@ func TestUser_Authenticate(t *testing.T) {
 	const testPass = "password"
 	conn, c := tconn.TempConn(t)
 	email := tutils.RandomEmail()
-	hash, err := utils.HashPassword(testPass)
+	hash := utils.HashPassword(testPass)
 	u := NewUser(c.Provider(), RoleUser, email, "", hash, nil, nil)
-	err = u.Authenticate(testPass)
+	err := u.Authenticate(testPass)
 	assert.Error(t, err)
 	err = conn.Save(u).Error
 	require.NoError(t, err)

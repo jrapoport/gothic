@@ -12,7 +12,7 @@ import (
 
 // PrettyPrint the contents of the obj
 func PrettyPrint(data interface{}) {
-	b, _ := json.MarshalIndent(data, "", "    ")
+	b, _ := json.MarshalIndent(data, "", "\t")
 	fmt.Printf("%s \n", string(b))
 }
 
