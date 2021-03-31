@@ -1,38 +1,38 @@
 package log
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUseFileOutput(t *testing.T) {
-	const emptyName = ""
-	randName := func() string { return uuid.New().String() }
+	const (
+		emptyName = ""
+		testName  = "test.log"
+	)
 	tests := []struct {
 		newLogger func(level Level) Logger
-		file      string
-		name      string
+
+		name string
 	}{
-		{NewLogrusLoggerWithLevel, emptyName, emptyName},
-		{NewLogrusLoggerWithLevel, randName(), emptyName},
-		{NewLogrusLoggerWithLevel, randName(), randName()},
+		{NewLogrusLoggerWithLevel, emptyName},
+		{NewLogrusLoggerWithLevel, testName},
 
-		{NewStdLoggerWithLevel, emptyName, emptyName},
-		{NewStdLoggerWithLevel, randName(), emptyName},
-		{NewStdLoggerWithLevel, randName(), randName()},
+		{NewStdLoggerWithLevel, emptyName},
+		{NewStdLoggerWithLevel, testName},
 
-		{NewZapLoggerWithLevel, emptyName, emptyName},
-		{NewZapLoggerWithLevel, randName(), emptyName},
-		{NewZapLoggerWithLevel, randName(), randName()},
+		{NewZapLoggerWithLevel, emptyName},
+		{NewZapLoggerWithLevel, testName},
 	}
 
-	for _, test := range tests {
-		file := filepath.Join(t.TempDir(), test.file+".log")
+	for i, test := range tests {
+		file := fmt.Sprintf("%d-%s", i, testName)
+		file = filepath.Join(t.TempDir(), file)
 		logger := test.newLogger(ErrorLevel).WithName(test.name)
 		logger = logger.UseFileOutput(file)
 		require.NotNil(t, logger)
