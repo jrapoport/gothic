@@ -19,25 +19,16 @@ func TestSecureToken(t *testing.T) {
 func TestHashPassword(t *testing.T) {
 	t.Parallel()
 	const pw = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
-	hash, err := HashPassword(pw)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, hash)
-}
-
-func TestMustHashPassword(t *testing.T) {
-	t.Parallel()
-	const pw = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
-	hash := MustHashPassword(pw)
+	hash := HashPassword(pw)
 	assert.NotEmpty(t, hash)
 }
 
 func TestCheckPassword(t *testing.T) {
 	t.Parallel()
 	const pw = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
-	hash, err := HashPassword(pw)
-	require.NoError(t, err)
+	hash := HashPassword(pw)
 	require.NotEmpty(t, hash)
-	err = CheckPassword(hash, pw)
+	err := CheckPassword(hash, pw)
 	assert.NoError(t, err)
 	err = CheckPassword(hash, "")
 	assert.Error(t, err)

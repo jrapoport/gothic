@@ -41,12 +41,9 @@ func CreateUser(conn *store.Connection, p provider.Name, email, username, pw str
 }
 
 func createUser(conn *store.Connection, p provider.Name, email, username, pw string, data, sys types.Map) (*user.User, error) {
-	hashed, err := utils.HashPassword(pw)
-	if err != nil {
-		return nil, err
-	}
+	hashed := utils.HashPassword(pw)
 	u := user.NewUser(p, user.RoleUser, email, username, hashed, data, sys)
-	err = conn.Create(u).Error
+	err := conn.Create(u).Error
 	if err != nil {
 		return nil, err
 	}
