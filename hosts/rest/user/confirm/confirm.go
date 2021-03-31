@@ -20,7 +20,7 @@ type confirmServer struct {
 }
 
 func newConfirmServer(srv *rest.Server) *confirmServer {
-	srv.FieldLogger = srv.WithField("module", "confirm")
+	srv.Logger = srv.WithName("confirm")
 	return &confirmServer{srv}
 }
 

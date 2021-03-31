@@ -36,7 +36,7 @@ func initConfig(cmd *cobra.Command, _ []string) (err error) {
 	//cfg.Signup.AutoConfirm = confirm
 	cfg.Signup.Default.Username = true
 	cfg.Validation.PasswordRegex = ""
-	cfg.ReplaceLog(cfg.Log().WithField("exe", cmd.Use))
+	cfg.ReplaceLog(cfg.Log().WithName(cmd.Use))
 	return nil
 }
 

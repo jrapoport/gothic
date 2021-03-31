@@ -8,6 +8,7 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/jrapoport/gothic/core"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -33,8 +34,8 @@ func Authentication() grpc.ServerOption {
 // NewHost creates a new Host.
 func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt ...grpc.ServerOption) *Host {
 	h := core.NewHost(a, name, address)
-	l := h.WithField("protocol", "grpc")
-	h.FieldLogger = l
+	h.Logger = h.WithName("grpc")
+	l := grpcLogger(h.Config().Level)
 	unary := []grpc.UnaryServerInterceptor{
 		grpc_logrus.UnaryServerInterceptor(l, grpc_logrus.WithDecider(func(fullMethodName string, err error) bool {
 			if fullMethodName == "/health.Health/HealthCheck" {
@@ -103,4 +104,11 @@ func (h *Host) Shutdown() error {
 		return nil
 	})
 	return h.Host.Shutdown()
+}
+
+func grpcLogger(level string) *logrus.Entry {
+	lvl, _ := logrus.ParseLevel(level)
+	l := logrus.New()
+	l.SetLevel(lvl)
+	return l.WithField("protocol", "grpc")
 }

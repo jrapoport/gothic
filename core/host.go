@@ -107,8 +107,8 @@ func (s *Host) ListenAndServe() error {
 		s.mu.Unlock()
 		started.Done()
 		if err := s.start(s.lis); err != nil {
-			s.WithError(err).
-				Errorf("%s server %s failed to start", s.name, s.addr)
+			err = fmt.Errorf("%s server %s failed to start: %w", s.name, s.addr, err)
+			s.Error(err)
 			return
 		}
 		s.mu.Lock()

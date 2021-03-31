@@ -30,7 +30,7 @@ type userServer struct {
 }
 
 func newUserServer(srv *rest.Server) *userServer {
-	srv.FieldLogger = srv.WithField("service", "user")
+	srv.Logger = srv.WithName("user")
 	return &userServer{srv}
 }
 

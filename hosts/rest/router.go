@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
 	"github.com/jrapoport/gothic/config"
-	"github.com/sirupsen/logrus"
+	"github.com/jrapoport/gothic/log"
 )
 
 // Root is the base route
@@ -93,7 +93,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 // UseLogger sets the logger to use for the Router stack.
-func (r *Router) UseLogger(log logrus.FieldLogger) {
+func (r *Router) UseLogger(log log.Logger) {
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			r = WithLogger(r, log)

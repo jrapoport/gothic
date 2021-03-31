@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/jrapoport/gothic/utils"
@@ -15,7 +16,7 @@ const (
 	dbMaxRetry         = 3
 	jwtAlgorithm       = "HS256"
 	jwtExpiration      = 60 * time.Minute
-	logLevel           = LevelInfo
+	logLevel           = log.LevelInfo
 	logTimeFormat      = time.RFC3339Nano
 	mailFrom           = ":name <do-not-reply@:link_hostname>"
 	mailTheme          = "default"
@@ -34,7 +35,7 @@ const (
 	host               = "localhost"
 )
 
-var configDefaults = Config{
+var configDefaults = &Config{
 	Service:       serviceDefaults,
 	Network:       networkDefaults,
 	Security:      securityDefaults,

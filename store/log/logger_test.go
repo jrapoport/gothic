@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/jrapoport/gothic/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 func TestWithLogger(t *testing.T) {
 	t.Parallel()
-	fld := logrus.New().WithField("logger", "test")
+	fld := log.NewStdLoggerWithLevel(log.InfoLevel)
 	loggers := []logger.Interface{
 		WithLogger(nil),
 		WithLogger(fld),

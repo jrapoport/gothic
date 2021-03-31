@@ -12,7 +12,7 @@ type adminServer struct {
 }
 
 func newAdminServer(srv *rpc.Server) *adminServer {
-	srv.FieldLogger = srv.WithField("module", "admin")
+	srv.Logger = srv.WithName("admin")
 	return &adminServer{Server: srv}
 }
 

@@ -73,8 +73,7 @@ func TestLogger_NewLogger(t *testing.T) {
 		"source=peaches",
 		"priority=1",
 	}
-	log, err := l.NewLogger()
-	assert.NoError(t, err)
+	log := l.NewLogger()
 	assert.NotNil(t, log)
 	log.Debug("hello world")
 }
