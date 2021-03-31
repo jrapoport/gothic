@@ -1,7 +1,6 @@
 package gothic
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,14 +8,13 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/hosts"
-	"github.com/segmentio/encoding/json"
+	"github.com/jrapoport/gothic/utils"
 )
 
 // Main is the application main
 func Main(c *config.Config) error {
 	if c.IsDebug() {
-		b, _ := json.MarshalIndent(c, "", "\t")
-		fmt.Println(string(b))
+		utils.PrettyPrint(c)
 	}
 	signalsToCatch := []os.Signal{
 		os.Interrupt,

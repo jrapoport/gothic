@@ -54,6 +54,9 @@ func TestPrintGrid(t *testing.T) {
 		PrintGrid(&b, test.list, 4)
 		assert.Equal(t, test.grid, b.String())
 	}
+	var b bytes.Buffer
+	PrintGrid(&b, tests[0].list, 0)
+	assert.Equal(t, "1234\t\n1234\t\n1234\t\n", b.String())
 }
 
 func TestWriteCSV(t *testing.T) {

@@ -19,20 +19,9 @@ func SecureToken() string {
 }
 
 // HashPassword generates a hashed password from a plaintext string
-func HashPassword(password string) ([]byte, error) {
-	pw, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	return pw, nil
-}
-
-// MustHashPassword will panic if hash password fails
-func MustHashPassword(password string) []byte {
-	pw, err := HashPassword(password)
-	if err != nil {
-		panic(`HashPassword(` + password + `): ` + err.Error())
-	}
+func HashPassword(password string) []byte {
+	// we can safely ignore any error because we control the cost
+	pw, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return pw
 }
 

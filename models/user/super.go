@@ -14,6 +14,6 @@ func NewSuperAdmin(password string) *User {
 		ID:       SuperAdminID,
 		Role:     RoleSuper,
 		Status:   Verified,
-		Password: utils.MustHashPassword(password),
+		Password: utils.HashPassword(password),
 	}
 }
