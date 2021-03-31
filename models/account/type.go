@@ -1,8 +1,6 @@
 package account
 
-import (
-	"strings"
-)
+import "strings"
 
 // Type is a bitmask for the provider
 type Type uint32

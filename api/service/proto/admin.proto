@@ -83,8 +83,8 @@ message AuditLog {
 }
 
 message AuditLogsResult {
-    repeated AuditLog logs = 1;
-    PagedResponse page = 2;
+  repeated AuditLog logs = 1;
+  PagedResponse page = 2;
 }
 
 message SettingsRequest {

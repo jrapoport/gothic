@@ -23,7 +23,7 @@ type signupServer struct {
 }
 
 func newSignupServer(srv *rest.Server) *signupServer {
-	srv.FieldLogger = srv.WithField("module", "signup")
+	srv.Logger = srv.WithName("signup")
 	return &signupServer{srv}
 }
 

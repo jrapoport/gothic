@@ -13,9 +13,10 @@ import (
 // Plan represents a database migration plan as an ordered slice of migrations.
 type Plan struct {
 	migs []*Migration
-	mu sync.RWMutex
+	mu   sync.RWMutex
 }
 
+// NewPlan returns a new migration Plan.
 func NewPlan() *Plan {
 	return &Plan{migs: []*Migration{}}
 }

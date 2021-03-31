@@ -8,11 +8,11 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/store/drivers"
-	"github.com/jrapoport/gothic/store/log"
+	slog "github.com/jrapoport/gothic/store/log"
 	"github.com/jrapoport/gothic/store/migration"
 	"github.com/jrapoport/gothic/utils"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -23,7 +23,7 @@ type Connection struct {
 }
 
 // Dial will connect to the database.
-func Dial(c *config.Config, l logrus.FieldLogger) (*Connection, error) {
+func Dial(c *config.Config, l log.Logger) (*Connection, error) {
 	conn, err := NewConnection(context.Background(), c, l)
 	if err != nil {
 		return nil, err
@@ -38,19 +38,19 @@ func Dial(c *config.Config, l logrus.FieldLogger) (*Connection, error) {
 }
 
 // NewConnection returns a new db connection.
-func NewConnection(ctx context.Context, c *config.Config, l logrus.FieldLogger) (*Connection, error) {
+func NewConnection(ctx context.Context, c *config.Config, l log.Logger) (*Connection, error) {
 	if c == nil {
 		return nil, errors.New("configuration required")
 	}
-	l = ensureLog(c, l)
+	l = c.Log()
 	d, err := drivers.NewDialect(ctx, c.DB.Driver, c.DB.DSN)
 	if err != nil {
 		return nil, err
 	}
-	l = l.WithField("db", d.DBName())
+	l = l.WithName(d.DBName())
 	ns := utils.Namespaced(c.DB.Namespace, "")
 	dbc := &gorm.Config{
-		Logger:                   log.WithLogger(l),
+		Logger:                   slog.WithLogger(l),
 		DisableNestedTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix: ns, // table name prefix
@@ -67,10 +67,8 @@ func NewConnection(ctx context.Context, c *config.Config, l logrus.FieldLogger) 
 		retry,
 		func(err error, duration time.Duration) {
 			if l != nil && max > 0 {
-				l.WithError(err).
-					Warn("database connection failed")
-				l.WithField("duration", duration).
-					Info("retrying in...")
+				l.Error("database connection failed")
+				l.Warnf("retrying in %d...", duration)
 			}
 		},
 	)
@@ -79,16 +77,6 @@ func NewConnection(ctx context.Context, c *config.Config, l logrus.FieldLogger) 
 		return nil, err
 	}
 	return &Connection{db}, nil
-}
-
-func ensureLog(c *config.Config, l logrus.FieldLogger) logrus.FieldLogger {
-	if l == nil {
-		l = c.Log()
-	}
-	if l == nil {
-		l = logrus.New()
-	}
-	return l
 }
 
 // Transaction opens a database transaction.
@@ -201,7 +189,7 @@ func (conn *Connection) HasLast(v interface{}, c ...interface{}) (bool, error) {
 }
 
 /*
-func (conn *Connection) withContext(ctx context.Context, l logrus.FieldLogger) *Connection {
+func (conn *Connection) withContext(ctx context.Context, l log.Logger) *Connection {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -211,7 +199,7 @@ func (conn *Connection) withContext(ctx context.Context, l logrus.FieldLogger) *
 }
 
 // Log gets the log was used to initialize the database context.
-func (conn *Connection) Log() logrus.FieldLogger {
-	return conn.DB.Statement.Context.Value(types.LoggerKey).(logrus.FieldLogger)
+func (conn *Connection) Log() log.Logger {
+	return conn.DB.Statement.Context.Value(types.LoggerKey).(log.Logger)
 }
 */

@@ -9,11 +9,11 @@ import (
 	"database/sql/driver"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jrapoport/gothic/config"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/jrapoport/gothic/store/migration"
 	"github.com/jrapoport/gothic/test/tconf"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/datatypes"
@@ -317,19 +317,19 @@ func TestDial(t *testing.T) {
 	type dialTest struct {
 		ctx context.Context
 		c   *config.Config
-		l   logrus.FieldLogger
+		l   log.Logger
 		Err assert.ErrorAssertionFunc
 	}
-	log := logrus.New()
+	l := log.New()
 	tests := []dialTest{
 		{nil, nil, nil, assert.Error},
-		{nil, nil, log, assert.Error},
+		{nil, nil, l, assert.Error},
 		{nil, url, nil, assert.Error},
-		{nil, url, log, assert.Error},
-		{nil, host, log, assert.Error},
-		{nil, retry, log, assert.Error},
-		{mctx, mocked, log, assert.NoError},
-		{nil, tconf.TempDB(t), log, assert.NoError},
+		{nil, url, l, assert.Error},
+		{nil, host, l, assert.Error},
+		{nil, retry, l, assert.Error},
+		{mctx, mocked, l, assert.NoError},
+		{nil, tconf.TempDB(t), l, assert.NoError},
 	}
 	for _, test := range tests {
 		if test.c != nil {

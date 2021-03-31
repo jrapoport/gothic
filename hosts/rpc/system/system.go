@@ -28,7 +28,7 @@ type systemServer struct {
 var _ system.SystemServer = (*systemServer)(nil)
 
 func newSystemServer(srv *rpc.Server) *systemServer {
-	srv.FieldLogger = srv.WithField("module", "user")
+	srv.Logger = srv.WithName("user")
 	return &systemServer{Server: srv}
 }
 

@@ -18,7 +18,7 @@ var _ health.HealthServer = (*healthServer)(nil)
 
 func newHealthServer(srv *rpc.Server) *healthServer {
 	hs := &healthServer{Server: srv}
-	hs.FieldLogger = srv.WithField("module", "health")
+	hs.Logger = srv.WithName("health")
 	return hs
 }
 

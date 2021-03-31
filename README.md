@@ -13,7 +13,7 @@ handle user signup, authentication and custom user data.
 
 ## All NEW!
 
-This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete. It 
+This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete. It
 started off as a fork, but doesn't share a single line of code anymore.
 
 The basic idea was to support most of the existing functionality of GoTrue while modernizing it and expanding support
@@ -775,12 +775,17 @@ Please see the section on [JWT](#JWT) for a more detailed explanation of these s
 #### Log
 
 ```properties
+GOTHIC_LOG_PACKAGE=zap
 GOTHIC_LOG_LEVEL=info
 GOTHIC_LOG_FILE="./logs/gothic.log"
-GOTHIC_LOG_COLORS=false
-GOTHIC_LOG_TIMESTAMP="Mon, 02 Jan 2006 15:04:05 -0700"
-GOTHIC_LOG_FIELDS=source=gothic,priority=1
+# GOTHIC_LOG_COLORS=false
+# GOTHIC_LOG_TIMESTAMP="Mon, 02 Jan 2006 15:04:05 -0700"
+# GOTHIC_LOG_FIELDS=source=gothic,priority=1
 ```
+
+`GOTHIC_LOG_PACKAGE` - `string`
+
+The logger to use. Possible values are: `std`, `logrus`, or `zap`. Defaults to `std`.
 
 `GOTHIC_LOG_LEVEL` - `string`
 
@@ -791,7 +796,7 @@ to `info`.
 
 The path use for a written log file. Defaults to `""` (none).
 
-`GOTHIC_LOG_COLORS` - `boolean ("true" or "false")`
+<s>`GOTHIC_LOG_COLORS` - `boolean ("true" or "false")`
 
 If `true` logs will be color coded. Defaults to `false`.
 
@@ -802,7 +807,7 @@ The timestamp format to use for log entries. Defaults to `2006-01-02T15:04:05.99
 `GOTHIC_LOG_FIELDS` - `comma seperated string array of key value pairs`
 
 A comma separated string of the fields to include for log entries. Format should be a comma separated list of key/value
-pared. Defaults to `""` (none).
+pared. Defaults to `""` (none).</s>
 
 #### Tracer
 
@@ -1400,7 +1405,7 @@ These changes allow for advances like self-contained database migration, expande
 PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to modify and use the microservice
 outside of Netlify tool chain, and in a more active development environment.
 
-Since this project shares no code with GoTrue and is only conceptually similar at this point, I might truncate the 
+Since this project shares no code with GoTrue and is only conceptually similar at this point, I might truncate the
 commit history for clarity in the future.
 
 While the Netlify team did a good job with GoTrue, their use in production means they cannot easily adopt these kinds of

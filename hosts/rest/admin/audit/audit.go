@@ -44,7 +44,7 @@ type auditServer struct {
 
 // NewAuditServer returns a new config rest server.
 func newAuditServer(srv *rest.Server) *auditServer {
-	srv.FieldLogger = srv.WithField("module", "audit")
+	srv.Logger = srv.WithName("audit")
 	return &auditServer{srv}
 }
 

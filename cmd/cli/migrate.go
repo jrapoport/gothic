@@ -13,7 +13,7 @@ var migrateCmd = &cobra.Command{
 
 func migrateRunE(cmd *cobra.Command, _ []string) error {
 	c := rootConfig()
-	l := c.Log().WithField("exe", cmd.Use)
+	l := c.Log().WithName("exe" + cmd.Use)
 	conn, err := store.Dial(c, l)
 	if err != nil {
 		return err

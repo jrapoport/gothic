@@ -1,4 +1,5 @@
 ## protoc-gen-grpc-web
+
 ### Version 1.2.1
 
 * **Linux**  

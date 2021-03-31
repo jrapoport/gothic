@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,10 +22,8 @@ func allEvents() []Event {
 }
 
 func testDispatch(t *testing.T) *Dispatch {
-	l := logrus.New()
-	l.SetLevel(logrus.DebugLevel)
 	n := utils.RandomUsername()
-	d := NewDispatch(n, l)
+	d := NewDispatch(n, log.Log)
 	t.Cleanup(func() {
 		d.Close()
 	})

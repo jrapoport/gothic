@@ -31,7 +31,7 @@ type emailServer struct {
 }
 
 func newEmailServer(srv *rest.Server) *emailServer {
-	srv.FieldLogger = srv.WithField("module", "email")
+	srv.Logger = srv.WithName("email")
 	return &emailServer{srv}
 }
 

@@ -6,7 +6,6 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/jrapoport/gothic/store/drivers"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 // MigrateFunc is the func signature for migrating.
@@ -89,6 +88,7 @@ func tableName(tx *gorm.DB, model interface{}) (string, error) {
 	return stmt.Schema.Table, nil
 }
 
+/*
 // NamespacedTable returns the table name with namespacing applied.
 func NamespacedTable(tx *gorm.DB, dst interface{}) *gorm.DB {
 	if mod, ok := dst.(schema.Tabler); ok {
@@ -99,3 +99,4 @@ func NamespacedTable(tx *gorm.DB, dst interface{}) *gorm.DB {
 	}
 	return tx
 }
+*/

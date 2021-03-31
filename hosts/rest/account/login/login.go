@@ -23,7 +23,7 @@ type loginServer struct {
 }
 
 func newLoginServer(srv *rest.Server) *loginServer {
-	srv.FieldLogger = srv.WithField("module", "login")
+	srv.Logger = srv.WithName("login")
 	return &loginServer{srv}
 }
 

@@ -5,10 +5,10 @@ import (
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/auth"
 	"github.com/jrapoport/gothic/core/events"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/mail"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
-	"github.com/sirupsen/logrus"
 )
 
 // API is the main API
@@ -18,7 +18,7 @@ type API struct {
 	evt    *events.Dispatch
 	mail   *mail.Client
 	ext    *auth.Providers
-	log    logrus.FieldLogger
+	log    log.Logger
 }
 
 // NewAPI creates a new core API with a configured storage connection
@@ -37,10 +37,10 @@ func (a *API) LoadConfig(c *config.Config) (err error) {
 	a.config = c
 	l := a.config.Log()
 	if l == nil {
-		l = logrus.New()
+		l = log.New()
 	}
 	// set the log first so we can log other errors appropriately
-	a.log = l.WithField("api", a.config.Env())
+	a.log = l.WithName("api-" + a.config.Env())
 	a.evt = events.NewDispatch(c.Name, l)
 	a.conn, err = store.Dial(c, a.log)
 	if err != nil {

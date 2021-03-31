@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"github.com/jrapoport/gothic/hosts/rest/admin/codes"
 	"net/http"
 
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/admin/audit"
+	"github.com/jrapoport/gothic/hosts/rest/admin/codes"
 	"github.com/jrapoport/gothic/hosts/rest/admin/settings"
 	"github.com/jrapoport/gothic/hosts/rest/admin/users"
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
@@ -14,13 +14,12 @@ import (
 // Admin is the admin endpoint.
 const Admin = "/admin"
 
-// TODO: admin CRUD for users
 type adminServer struct {
 	*rest.Server
 }
 
 func newAdminServer(srv *rest.Server) *adminServer {
-	srv.FieldLogger = srv.WithField("service", "admin")
+	srv.Logger = srv.WithName("admin")
 	return &adminServer{srv}
 }
 
