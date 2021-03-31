@@ -21,7 +21,7 @@ type userServer struct {
 var _ user.UserServer = (*userServer)(nil)
 
 func newUserServer(srv *rpc.Server) *userServer {
-	srv.FieldLogger = srv.WithField("module", "user")
+	srv.Logger = srv.WithName("user")
 	return &userServer{Server: srv}
 }
 

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
+	"github.com/jrapoport/gothic/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -90,22 +90,13 @@ func TestLoadConfig(t *testing.T) {
 		_, err := LoadConfig("")
 		test.Err(t, err)
 	}
-	_, err := LoadConfig(testEnv)
-	assert.Error(t, err)
-	setEnv(t, ENVPrefix+"LOG_LEVEL", "bad")
-	_, err = LoadConfig("")
-	assert.Error(t, err)
-	_, err = LoadConfig("bad path")
-	assert.Error(t, err)
-	_, err = LoadConfig("\n.json")
-	assert.Error(t, err)
 }
 
 func TestLog(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		l := c.Log()
 		c.Log().Info("test")
-		c.ReplaceLog(logrus.New())
+		c.ReplaceLog(log.New())
 		c.Log().Info("test")
 		c.ReplaceLog(l)
 	})
@@ -118,7 +109,7 @@ func TestConfig_Defaults(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	def := configDefaults
-	assert.Equal(t, def, *c)
+	assert.Equal(t, def, c)
 }
 
 func TestConfig_Normalization(t *testing.T) {

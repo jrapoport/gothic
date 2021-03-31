@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -55,12 +56,9 @@ func (a *API) callback(evt events.Event, msg types.Map) {
 		},
 		b,
 		func(err error, duration time.Duration) {
-			a.log.
-				WithError(err).
-				Warn("webhook failed")
-			a.log.
-				WithField("duration", duration).
-				Info("webhook retry in...")
+			err = fmt.Errorf("webhook failed: %w", err)
+			a.log.Error(err)
+			a.log.Warnf("webhook retry in %f...", duration)
 		},
 	)
 	_ = a.logError(err)

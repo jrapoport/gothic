@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/segmentio/encoding/json"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -59,15 +59,15 @@ func LoadConfig(filename string) (*Config, error) {
 }
 
 // Log returns a configured log or a default log if one is not found.
-func (c *Config) Log() logrus.FieldLogger {
+func (c *Config) Log() log.Logger {
 	if c.log == nil {
-		c.log = logrus.New()
+		c.log = log.New()
 	}
 	return c.log
 }
 
 // ReplaceLog replaces the configured log.
-func (c *Config) ReplaceLog(l logrus.FieldLogger) {
+func (c *Config) ReplaceLog(l log.Logger) {
 	c.log = l
 }
 
