@@ -127,6 +127,7 @@
     "timeout": "1h40m0s"
   },
   "log": {
+    "package": "zap.json",
     "colors": false,
     "file": "./logs/debug.log.json",
     "level": "debug.json",

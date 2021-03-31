@@ -1,9 +1,10 @@
 package log
 
 import (
+	"log"
+
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap"
-	"log"
 )
 
 // A Level is a logging priority. Higher levels are more important.

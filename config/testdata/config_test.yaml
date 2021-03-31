@@ -115,6 +115,7 @@ webhook:
   timeout: 1h40m0s
 
 log:
+  package: "zap.yaml"
   colors: false
   file: "./logs/debug.log.yaml"
   level: "debug.yaml"

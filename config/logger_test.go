@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/jrapoport/gothic/log"
 	"testing"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 )
 
 const (
+	testPkg    = "zap"
 	testLevel    = "debug"
 	logFile      = "./logs/debug.log"
 	logColors    = false
@@ -22,6 +24,7 @@ var testFields = map[string]string{
 func TestLogger(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		l := c.Logger
+		assert.Equal(t, testPkg+test.mark, l.Package)
 		assert.Equal(t, testLevel+test.mark, l.Level)
 		assert.Equal(t, logFile+test.mark, l.File)
 		assert.Equal(t, logColors, l.Colors)
@@ -43,6 +46,7 @@ func TestLogger_Env(t *testing.T) {
 			c, err := loadNormalized(test.file)
 			assert.NoError(t, err)
 			l := c.Logger
+			assert.Equal(t, testPkg, l.Package)
 			assert.Equal(t, testLevel, l.Level)
 			assert.Equal(t, logFile, l.File)
 			assert.Equal(t, logColors, l.Colors)
@@ -73,7 +77,20 @@ func TestLogger_NewLogger(t *testing.T) {
 		"source=peaches",
 		"priority=1",
 	}
-	log := l.NewLogger()
-	assert.NotNil(t, log)
-	log.Debug("hello world")
+	logger := l.NewLogger()
+	assert.NotNil(t, logger)
+	logger.Debug("hello world")
+	l.Package = log.LogrusLogger
+	logger = l.NewLogger()
+	assert.NotNil(t, logger)
+	l.Package = log.StdLogger
+	logger = l.NewLogger()
+	assert.NotNil(t, logger)
+	l.Package = log.ZapLogger
+	logger = l.NewLogger()
+	assert.NotNil(t, logger)
+	l.Package = "bad"
+	logger = l.NewLogger()
+	assert.NotNil(t, logger)
 }
+
