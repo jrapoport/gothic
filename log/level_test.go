@@ -1,14 +1,14 @@
 package log
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 	"log"
 	"os"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 )
 
 func TestLevel(t *testing.T) {
