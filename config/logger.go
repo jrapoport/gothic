@@ -1,24 +1,12 @@
 package config
 
 import (
-	"os"
-
-	"github.com/sirupsen/logrus"
-)
-
-// Log Levels
-const (
-	LevelDebug = "debug"
-	LevelInfo  = "info"
-	LevelWarn  = "warn"
-	LevelError = "error"
-	LevelFatal = "fatal"
-	LevelPanic = "panic"
-	LevelTrace = "trace"
+	"github.com/jrapoport/gothic/log"
 )
 
 // Logger config
 type Logger struct {
+	Package   string   `json:"package"`
 	Level     string   `json:"level"`
 	File      string   `json:"file"`
 	Colors    bool     `json:"colors"`
@@ -29,20 +17,40 @@ type Logger struct {
 	Tracer Tracer `json:"tracer"`
 
 	// log is a configured instance of a log based on the Logger settings.
-	log logrus.FieldLogger
+	log log.Logger
 }
 
-func (l *Logger) load(srv Service) error {
-	log, err := l.NewLogger()
-	if err != nil {
-		return err
-	}
-	l.log = log.WithField("logger", srv.Name)
-	return l.Tracer.StartTracer(srv.Name, srv.Version())
+func (c *Logger) load(srv Service) error {
+	lg := c.NewLogger()
+	c.log = lg.WithName(srv.Name)
+	return c.Tracer.StartTracer(srv.Name, srv.Version())
 }
 
 // NewLogger returns a new instance of the configured logger.
-func (l *Logger) NewLogger() (logrus.FieldLogger, error) {
+func (c *Logger) NewLogger() log.Logger {
+	lvl := log.LevelFromString(c.Level)
+	var l log.Logger
+	switch c.Package {
+	case log.LogrusLogger:
+		l = log.NewLogrusLoggerWithLevel(lvl)
+	case log.ZapLogger:
+		l = log.NewZapLoggerWithLevel(lvl)
+	case log.StdLogger:
+		fallthrough
+	default:
+		l = log.NewStdLoggerWithLevel(lvl)
+	}
+	// use a file if you want
+	if c.File != "" {
+		l = l.UseFileOutput(c.File)
+		l.Infof("Set output file to %s", c.File)
+	}
+	return l
+}
+
+/*
+// NewLogger returns a new instance of the configured logger.
+func (l *Logger) NewLogger() (log.Logger, error) {
 	log := logrus.New()
 	// always use the full timestamp
 	log.SetFormatter(&logrus.TextFormatter{
@@ -76,3 +84,4 @@ func (l *Logger) NewLogger() (logrus.FieldLogger, error) {
 	}
 	return log.WithFields(f), nil
 }
+*/

@@ -38,13 +38,14 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/orlangure/gnomock v0.12.1
 	github.com/philhofer/fwd v1.1.1 // indirect
-	github.com/segmentio/encoding v0.2.11
+	github.com/segmentio/encoding v0.2.13
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vcraescu/go-paginator/v2 v2.0.0
 	github.com/xhit/go-simple-mail/v2 v2.8.0
+	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
 	google.golang.org/grpc v1.36.1

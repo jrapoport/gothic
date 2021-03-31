@@ -63,10 +63,13 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 		IsEnabled:       true,
 	}
 	cfg.Servers = append(cfg.Servers, sc)
-	hl := &log.HookedLogger{Logger: (c.Log().(*logrus.Entry)).Logger}
+	l := logrus.New()
+	level, err := logrus.ParseLevel(c.Level)
+	require.NoError(t, err)
+	l.SetLevel(level)
 	smtp := guerrilla.Daemon{
 		Config: cfg,
-		Logger: hl,
+		Logger: &log.HookedLogger{Logger: l},
 	}
 	mock := &SMTPMock{
 		smtp:  smtp,

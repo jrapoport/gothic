@@ -20,7 +20,7 @@ type accountServer struct {
 
 // newAccountServer returns a new account server.
 func newAccountServer(srv *rest.Server) *accountServer {
-	srv.FieldLogger = srv.WithField("service", "account")
+	srv.Logger = srv.WithName("account")
 	return &accountServer{srv}
 }
 

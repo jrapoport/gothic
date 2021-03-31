@@ -5,15 +5,15 @@ import (
 	"sync/atomic"
 
 	"github.com/gookit/event"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
-	"github.com/sirupsen/logrus"
 )
 
 // Dispatch for events
 type Dispatch struct {
 	mgr       *event.Manager
-	log       logrus.FieldLogger
+	log       log.Logger
 	listeners map[chan types.Map]Event
 	closed    uint32
 	quit      chan struct{}
@@ -21,12 +21,12 @@ type Dispatch struct {
 }
 
 // NewDispatch creates a new event dispatch
-func NewDispatch(name string, l logrus.FieldLogger) *Dispatch {
+func NewDispatch(name string, l log.Logger) *Dispatch {
 	d := &Dispatch{
 		mgr:       event.NewManager(name),
 		listeners: map[chan types.Map]Event{},
 		quit:      make(chan struct{}),
-		log:       l.WithField("dispatch", name),
+		log:       l.WithName(name),
 	}
 	return d
 }

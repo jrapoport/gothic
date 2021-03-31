@@ -15,7 +15,7 @@ type settingsServer struct {
 
 // NewSettingsServer returns a new config rest server.
 func newSettingsServer(srv *rest.Server) *settingsServer {
-	srv.FieldLogger = srv.WithField("module", "settings")
+	srv.Logger = srv.WithName("settings")
 	return &settingsServer{srv}
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
-	"github.com/sirupsen/logrus"
+	"github.com/jrapoport/gothic/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,12 +23,12 @@ const (
 // Authenticator is a jwt authenticator
 type Authenticator struct {
 	c   config.JWT
-	log logrus.FieldLogger
+	log log.Logger
 }
 
 // NewAuthenticator returns a new jwt authenticator
-func NewAuthenticator(c config.JWT, log logrus.FieldLogger) *Authenticator {
-	log = log.WithField("grpc-middleware", "jwt")
+func NewAuthenticator(c config.JWT, log log.Logger) *Authenticator {
+	log = log.WithName("grpc-jwt")
 	return &Authenticator{c, log}
 }
 

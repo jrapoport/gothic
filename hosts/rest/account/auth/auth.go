@@ -33,7 +33,7 @@ type authServer struct {
 }
 
 func newAuthServer(srv *rest.Server) *authServer {
-	srv.FieldLogger = srv.WithField("module", "authorize")
+	srv.Logger = srv.WithName("authorize")
 	return &authServer{srv}
 }
 

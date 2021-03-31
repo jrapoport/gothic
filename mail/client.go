@@ -13,9 +13,9 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/validate"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/utils"
-	"github.com/sirupsen/logrus"
 	smtp "github.com/xhit/go-simple-mail/v2"
 )
 
@@ -25,7 +25,7 @@ type Client struct {
 	client    *smtp.SMTPClient
 	server    *smtp.SMTPServer
 	config    config.Mail
-	log       logrus.FieldLogger
+	log       log.Logger
 	mu        sync.RWMutex
 	keepalive *time.Ticker
 	// validate email addresses against the smtp server
@@ -33,7 +33,7 @@ type Client struct {
 }
 
 // NewMailClient returns a new mail client.
-func NewMailClient(c *config.Config, log logrus.FieldLogger) (*Client, error) {
+func NewMailClient(c *config.Config, l log.Logger) (*Client, error) {
 	m := c.Mail
 	if _, err := validate.Email(m.From); err != nil {
 		err = fmt.Errorf("from address %w", err)
@@ -42,14 +42,14 @@ func NewMailClient(c *config.Config, log logrus.FieldLogger) (*Client, error) {
 	// it is impossible for this to fail if validate.Email()
 	// succeeds because validate.Email() calls parseAddress()
 	from, _ := parseAddress(m.From)
-	if log == nil {
-		log = logrus.New()
+	if l == nil {
+		l = log.New()
 	}
 	if m.Host == "" {
-		log = log.WithField("smtp", "offline")
-		return &Client{from: from, log: log}, nil
+		l = l.WithName("smtp-offline")
+		return &Client{from: from, log: l}, nil
 	}
-	log = log.WithField("smtp", m.Host)
+	l = l.WithName("smtp-" + m.Host)
 	s := smtp.NewSMTPClient()
 	s.Host = m.Host
 	s.Port = m.Port
@@ -73,7 +73,7 @@ func NewMailClient(c *config.Config, log logrus.FieldLogger) (*Client, error) {
 		s.Encryption = smtp.EncryptionSSL
 	case "tls":
 		if s.Port == defaultPort || s.Port == sslPort {
-			log.Warnf("using smtp tls port: %d", tlsPort)
+			l.Warnf("using smtp tls port: %d", tlsPort)
 			s.Port = tlsPort
 		}
 		s.Encryption = smtp.EncryptionTLS
@@ -93,7 +93,7 @@ func NewMailClient(c *config.Config, log logrus.FieldLogger) (*Client, error) {
 		from:   from,
 		server: s,
 		config: m,
-		log:    log,
+		log:    l,
 	}, nil
 }
 

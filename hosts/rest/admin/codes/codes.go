@@ -25,7 +25,7 @@ type codesServer struct {
 }
 
 func newSignupServer(srv *rest.Server) *codesServer {
-	srv.FieldLogger = srv.WithField("service", "user")
+	srv.Logger = srv.WithName("user")
 	return &codesServer{srv}
 }
 
