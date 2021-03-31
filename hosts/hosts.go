@@ -8,6 +8,7 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/hosts/health"
+	"github.com/sirupsen/logrus"
 )
 
 type hostMan struct {
@@ -53,7 +54,7 @@ func Start(a *core.API, c *config.Config) error {
 		*h.addr = s.Address()
 	}
 	hm.running = true
-	l := c.Log().WithField("logger", "grpc")
+	l := grpcLogger(c.Level)
 	grpc_logrus.ReplaceGrpcLogger(l)
 	return nil
 }
@@ -78,4 +79,11 @@ func Shutdown() error {
 	}
 	hm.running = false
 	return err
+}
+
+func grpcLogger(level string) *logrus.Entry {
+	lvl, _ := logrus.ParseLevel(level)
+	l := logrus.New()
+	l.SetLevel(lvl)
+	return l.WithField("protocol", "grpc")
 }

@@ -20,7 +20,7 @@ var (
 )
 
 func newAccountServer(srv *rpc.Server) *accountServer {
-	srv.FieldLogger = srv.WithField("module", "account")
+	srv.Logger = srv.WithName("account")
 	return &accountServer{Server: srv}
 }
 

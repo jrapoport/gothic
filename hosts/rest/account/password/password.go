@@ -27,7 +27,7 @@ type passwordServer struct {
 }
 
 func newPasswordServer(srv *rest.Server) *passwordServer {
-	srv.FieldLogger = srv.WithField("module", "password")
+	srv.Logger = srv.WithName("password")
 	return &passwordServer{srv}
 }
 

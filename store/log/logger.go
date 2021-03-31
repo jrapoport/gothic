@@ -2,38 +2,31 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/jrapoport/gothic/log"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 // Logger wraps a logger.Interface
 type Logger struct {
-	logrus.FieldLogger
+	log.Logger
 }
 
 var _ logger.Interface = (*Logger)(nil)
 
-// WithLogger takes a logrus.FieldLogger and returns a
+// WithLogger takes a log.Logger and returns a
 // *Logger that conforms to the gorm logger.Interface.
-func WithLogger(l logrus.FieldLogger) *Logger {
-	if l == nil {
-		l = logrus.New()
-	}
+func WithLogger(l log.Logger) *Logger {
 	return &Logger{l}
 }
 
 // LogMode sets the log level for the logger.
-func (g Logger) LogMode(level logger.LogLevel) logger.Interface {
+func (g *Logger) LogMode(level logger.LogLevel) logger.Interface {
 	lvl := logLevel(level)
-	switch l := g.FieldLogger.(type) {
-	case *logrus.Entry:
-		l.Level = lvl
-	case *logrus.Logger:
-		l.Level = lvl
-	}
+	g.Logger = log.WithLevel(g.Logger, lvl)
 	return g
 }
 
@@ -63,36 +56,26 @@ func (g Logger) Trace(_ context.Context, begin time.Time, fc func() (string, int
 		if err == gorm.ErrRecordNotFound {
 			return
 		}
-		g.WithFields(logrus.Fields{
-			"error":    err,
-			"rows":     rows,
-			"duration": duration,
-		}).Warn(sql)
-
+		err = fmt.Errorf("%d %f: %w", rows, duration, err)
+		g.Error(nil, err.Error())
+		g.Warn(nil, sql)
 	case elapsed > 100*time.Millisecond:
-		g.WithFields(logrus.Fields{
-			"rows":     rows,
-			"duration": duration,
-		}).Warn(sql)
-
+		g.Warnf("%d %f: %s", rows, duration, sql)
 	default:
-		g.WithFields(logrus.Fields{
-			"rows":     rows,
-			"duration": duration,
-		}).Debug(sql)
+		g.Debugf("%d %f: %s", rows, duration, sql)
 	}
 }
 
-func logLevel(l logger.LogLevel) logrus.Level {
+func logLevel(l logger.LogLevel) log.Level {
 	switch l {
 	case logger.Silent:
-		return logrus.FatalLevel
+		return log.FatalLevel
 	case logger.Error:
-		return logrus.ErrorLevel
+		return log.ErrorLevel
 	case logger.Warn:
-		return logrus.WarnLevel
+		return log.WarnLevel
 	case logger.Info:
-		return logrus.DebugLevel
+		return log.DebugLevel
 	}
-	return logrus.FatalLevel
+	return log.FatalLevel
 }

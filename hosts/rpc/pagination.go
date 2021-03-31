@@ -20,6 +20,7 @@ func PaginateRequest(req *api.SearchRequest) *store.Pagination {
 	}
 }
 
+// PaginateResponse paginates an http response
 func PaginateResponse(page *store.Pagination) *api.PagedResponse {
 	res := &api.PagedResponse{
 		Number: int64(page.Page),

@@ -24,12 +24,11 @@ func initConfig() (*config.Config, error) {
 	return config.LoadConfig(configFile)
 }
 
-func rootRunE(cmd *cobra.Command, _ []string) error {
+func rootRunE(*cobra.Command,[]string) error {
 	c, err := initConfig()
 	if err != nil {
 		return err
 	}
-	c.ReplaceLog(c.Log().WithField("exe", cmd.Use))
 	return gothic.Main(c)
 }
 

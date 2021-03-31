@@ -20,7 +20,7 @@ type inviteServer struct {
 }
 
 func newInviteServer(srv *rest.Server) *inviteServer {
-	srv.FieldLogger = srv.WithField("module", "config")
+	srv.Logger = srv.WithName("config")
 	return &inviteServer{srv}
 }
 

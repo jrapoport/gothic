@@ -14,13 +14,13 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/segmentio/encoding/json"
-	"github.com/sirupsen/logrus"
 )
 
 // HTTP Headers
@@ -81,20 +81,18 @@ func FromRequest(r *http.Request) context.Context {
 type loggerKey struct{}
 
 // WithLogger adds a logger to the context of an http request.
-func WithLogger(r *http.Request, l logrus.FieldLogger) *http.Request {
+func WithLogger(r *http.Request, l log.Logger) *http.Request {
 	ctx := context.WithValue(r.Context(), loggerKey{}, l)
 	return r.WithContext(ctx)
 }
 
 // GetLogger gets a logger to the context of an http request.
-func GetLogger(r *http.Request) logrus.FieldLogger {
-	log, ok := r.Context().Value(loggerKey{}).(logrus.FieldLogger)
+func GetLogger(r *http.Request) log.Logger {
+	l, ok := r.Context().Value(loggerKey{}).(log.Logger)
 	if !ok {
-		l := logrus.New()
-		l.SetLevel(logrus.PanicLevel)
-		return l
+		return log.New()
 	}
-	return log
+	return l
 }
 
 type claimsKey struct{}

@@ -7,7 +7,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: [ 1.15.x, 1.16.x]
+        go-version: [ 1.15.x, 1.16.x ]
     runs-on: ubuntu-latest
     steps:
       - name: Install workflow dependencies
@@ -26,6 +26,6 @@ jobs:
       - name: Install dependencies
         run: make deps
       - name: Lint and test
-        run:  make all COVERAGE=1
+        run: make all COVERAGE=1
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

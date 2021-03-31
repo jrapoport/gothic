@@ -15,7 +15,7 @@ type healthServer struct {
 }
 
 func newHealthServer(srv *rest.Server) *healthServer {
-	srv.FieldLogger = srv.WithField("module", "health")
+	srv.Logger = srv.WithName("health")
 	return &healthServer{srv}
 }
 
