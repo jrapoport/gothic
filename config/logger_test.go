@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	testPkg    = "zap"
+	testPkg      = "zap"
 	testLevel    = "debug"
 	logFile      = "./logs/debug.log"
 	logColors    = false
@@ -93,4 +93,3 @@ func TestLogger_NewLogger(t *testing.T) {
 	logger = l.NewLogger()
 	assert.NotNil(t, logger)
 }
-
