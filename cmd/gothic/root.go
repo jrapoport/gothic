@@ -24,7 +24,7 @@ func initConfig() (*config.Config, error) {
 	return config.LoadConfig(configFile)
 }
 
-func rootRunE(*cobra.Command,[]string) error {
+func rootRunE(*cobra.Command, []string) error {
 	c, err := initConfig()
 	if err != nil {
 		return err
