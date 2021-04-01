@@ -17,8 +17,8 @@ require (
 	github.com/go-chi/httptracer v0.3.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
 	github.com/go-playground/form/v4 v4.1.3
-	github.com/go-sql-driver/mysql v1.5.0
-	github.com/golang/protobuf v1.5.1
+	github.com/go-sql-driver/mysql v1.6.0
+	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.2.0
 	github.com/gookit/event v1.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
@@ -38,20 +38,20 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/orlangure/gnomock v0.12.1
 	github.com/philhofer/fwd v1.1.1 // indirect
-	github.com/segmentio/encoding v0.2.13
+	github.com/segmentio/encoding v0.2.17
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vcraescu/go-paginator/v2 v2.0.0
 	github.com/xhit/go-simple-mail/v2 v2.8.0
-	go.uber.org/zap v1.15.0
+	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
 	google.golang.org/grpc v1.36.1
-	google.golang.org/grpc/examples v0.0.0-20210326170912-4a19753e9dfd // indirect
+	google.golang.org/grpc/examples v0.0.0-20210331235824-f6bb3972ed15 // indirect
 	google.golang.org/protobuf v1.26.0
-	gopkg.in/DataDog/dd-trace-go.v1 v1.29.1
+	gopkg.in/DataDog/dd-trace-go.v1 v1.29.2
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/datatypes v1.0.0
 	gorm.io/driver/clickhouse v0.1.0
