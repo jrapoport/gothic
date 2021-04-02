@@ -108,6 +108,7 @@ func TestURLValuesToMap(t *testing.T) {
 	v := url.Values{
 		testVal: []string{testVal},
 		"data":  []string{testJSON},
+		"data2": []string{},
 	}
 	m := URLValuesToMap(v, false)
 	val, ok := m[testVal]
@@ -126,4 +127,6 @@ func TestURLValuesToMap(t *testing.T) {
 	val, ok = data[testVal]
 	assert.True(t, ok)
 	assert.Equal(t, testVal, val)
+	_, ok = data["data2"]
+	assert.False(t, ok)
 }

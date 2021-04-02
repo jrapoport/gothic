@@ -42,12 +42,12 @@ type AccessCode struct {
 func NewAccessCode(f Format, uses int, exp time.Duration) *AccessCode {
 	var c string
 	switch f {
-	case Invite:
-		c = utils.SecureToken()
 	case PIN:
 		c = utils.PINCode()
+	case Invite:
+		fallthrough
 	default:
-		return nil
+		c = utils.SecureToken()
 	}
 	t := *token.NewAccessToken(c, uses, exp)
 	return &AccessCode{t, f}
