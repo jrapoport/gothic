@@ -96,7 +96,7 @@ func testNewAccessCode(t *testing.T, f Format) {
 	})
 	require.NoError(t, err)
 	code := NewAccessCode(255, SingleUse, NoExpiration)
-	assert.Nil(t, code)
+	assert.NotNil(t, code)
 }
 
 func TestAccessCode_BeforeCreate(t *testing.T) {

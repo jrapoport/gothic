@@ -17,9 +17,6 @@ func CreateSignupCode(conn *store.Connection, userID uuid.UUID, f code.Format, u
 	err := conn.Transaction(func(tx *store.Connection) error {
 		for {
 			sc = code.NewSignupCode(userID, f, uses)
-			if sc == nil {
-				return errors.New("invalid code")
-			}
 			if !unique {
 				break
 			}
@@ -55,10 +52,7 @@ func CreateSignupCodes(conn *store.Connection, userID uuid.UUID, f code.Format, 
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return list, nil
+	return list, err
 }
 
 // GetSignupCode finds the signup code that matches code.
@@ -103,11 +97,8 @@ func SignupCodeSent(conn *store.Connection, sc *code.SignupCode) error {
 func GetLastSentSignupCode(conn *store.Connection, userID uuid.UUID) (*code.SignupCode, error) {
 	sc := new(code.SignupCode)
 	has, err := conn.HasLast(sc, "user_id = ? AND sent_at NOT NULL", userID)
-	if err != nil {
+	if err != nil || !has {
 		return nil, err
-	}
-	if !has {
-		return nil, nil
 	}
 	return sc, nil
 }
