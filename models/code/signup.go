@@ -32,9 +32,6 @@ var _ token.Token = (*SignupCode)(nil)
 // NewSignupCode generates a new code of the format and type.
 func NewSignupCode(userID uuid.UUID, f Format, uses int) *SignupCode {
 	ac := NewAccessCode(f, uses, token.NoExpiration)
-	if ac == nil {
-		return nil
-	}
 	ac.UserID = userID
 	return &SignupCode{AccessCode: *ac}
 }

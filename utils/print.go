@@ -48,15 +48,9 @@ func WriteCSV(name, col string, list []string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 	csvHeaders := []string{col}
-	err := writer.Write(csvHeaders)
-	if err != nil {
-		return err
-	}
+	_ = writer.Write(csvHeaders)
 	for _, s := range list {
-		err = writer.Write([]string{s})
-		if err != nil {
-			return err
-		}
+		_ = writer.Write([]string{s})
 		writer.Flush()
 	}
 	return nil

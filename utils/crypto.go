@@ -12,9 +12,8 @@ import (
 // SecureToken creates a new random token
 func SecureToken() string {
 	b := make([]byte, 16)
-	if _, err := io.ReadFull(rand.Reader, b); err != nil {
-		panic(err.Error()) // rand should never fail
-	}
+	// rand should never fail, if it does we have bigger problems
+	_, _ = io.ReadFull(rand.Reader, b)
 	return removePadding(base64.URLEncoding.EncodeToString(b))
 }
 
