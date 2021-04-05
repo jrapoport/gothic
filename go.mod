@@ -27,7 +27,7 @@ require (
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/joho/godotenv v1.3.0
 	github.com/jrapoport/sillyname-go v0.0.0-20191016072109-82c270b69bff
-	github.com/lestrrat-go/jwx v1.1.6
+	github.com/lestrrat-go/jwx v1.1.7
 	github.com/lestrrat-go/tcputil v0.0.0-20180223003554-d3c7f98154fb // indirect
 	github.com/lestrrat-go/test-mysqld v0.0.0-20190527004737-6c91be710371
 	github.com/lib/pq v1.10.0
@@ -44,12 +44,12 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vcraescu/go-paginator/v2 v2.0.0
-	github.com/xhit/go-simple-mail/v2 v2.8.0
+	github.com/xhit/go-simple-mail/v2 v2.8.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
-	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
+	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	google.golang.org/grpc v1.36.1
-	google.golang.org/grpc/examples v0.0.0-20210331235824-f6bb3972ed15 // indirect
+	google.golang.org/grpc/examples v0.0.0-20210402181922-5730f8d113ee // indirect
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.29.2
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

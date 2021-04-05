@@ -180,8 +180,8 @@ func TestSearchUsers(t *testing.T) {
 	// find all page
 	var size = len(tests) / 2
 	page := &store.Pagination{
-		Page: 1,
-		Size: size,
+		Index: 1,
+		Size:  size,
 	}
 	list, err = a.SearchUsers(ctx, nil, page)
 	assert.NoError(t, err)
@@ -304,8 +304,8 @@ func filtersTest(t *testing.T, a *API, f store.Filters, tests []testUsers, paged
 	var page *store.Pagination
 	if paged {
 		page = &store.Pagination{
-			Page: 0,
-			Size: pageSize,
+			Index: 0,
+			Size:  pageSize,
 		}
 	}
 	ctx := context.Background()

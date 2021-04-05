@@ -140,8 +140,8 @@ func TestSearch(t *testing.T) {
 	// find all page
 	var size = len(tests) / 2
 	page := &Pagination{
-		Page: 1,
-		Size: size,
+		Index: 1,
+		Size:  size,
 	}
 	list = doSearch(t, conn, Descending, nil, page)
 	assert.NoError(t, err)
@@ -228,8 +228,8 @@ func TestSearch(t *testing.T) {
 	}
 	// NOT name paged
 	page = &Pagination{
-		Page: 1,
-		Size: pageSize,
+		Index: 1,
+		Size:  pageSize,
 	}
 	list = doSearch(t, conn, Descending, Filters{
 		key.Name + "!": testName,
@@ -257,8 +257,8 @@ func filtersTest(t *testing.T, conn *Connection, f Filters, tests []testCase, pa
 	var page *Pagination
 	if paged {
 		page = &Pagination{
-			Page: 0,
-			Size: pageSize,
+			Index: 0,
+			Size:  pageSize,
 		}
 	}
 	list := doSearch(t, conn, Descending, f, page)

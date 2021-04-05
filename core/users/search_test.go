@@ -123,8 +123,8 @@ func TestSearchUsers(t *testing.T) {
 	// find all page
 	var size = len(tests) / 2
 	page := &store.Pagination{
-		Page: 1,
-		Size: size,
+		Index: 1,
+		Size:  size,
 	}
 	list, err = SearchUsers(conn, store.Descending, nil, page)
 	assert.NoError(t, err)
@@ -247,8 +247,8 @@ func filtersTest(t *testing.T, conn *store.Connection, f store.Filters, tests []
 	var page *store.Pagination
 	if paged {
 		page = &store.Pagination{
-			Page: 0,
-			Size: pageSize,
+			Index: 0,
+			Size:  pageSize,
 		}
 	}
 	list, err := SearchUsers(conn, store.Descending, f, page)

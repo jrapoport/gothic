@@ -15,20 +15,20 @@ func PaginateRequest(req *api.SearchRequest) *store.Pagination {
 		perPage = utils.Clamp(perPage, 1, store.MaxPageSize)
 	}
 	return &store.Pagination{
-		Page: page,
-		Size: perPage,
+		Index: page,
+		Size:  perPage,
 	}
 }
 
 // PaginateResponse paginates an http response
 func PaginateResponse(page *store.Pagination) *api.PagedResponse {
 	res := &api.PagedResponse{
-		Number: int64(page.Page),
-		Count:  int64(page.Count),
-		Total:  page.Total,
-		Size:   int64(page.Length),
+		Index: int64(page.Index),
+		Count: int64(page.Count),
+		Total: page.Total,
+		Size:  int64(page.Length),
 	}
-	if page.Page >= 1 {
+	if page.Index >= 1 {
 		res.First = 1
 	}
 	if page.Prev != 0 {
@@ -37,7 +37,7 @@ func PaginateResponse(page *store.Pagination) *api.PagedResponse {
 	if page.Next != 0 {
 		res.Next = int64(page.Next)
 	}
-	if page.Page != page.Count {
+	if page.Index != page.Count {
 		res.Last = int64(page.Count)
 	}
 	return res

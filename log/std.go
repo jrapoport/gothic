@@ -41,7 +41,7 @@ func (l *stdLogger) Debug(v ...interface{}) {
 	if l.level > DebugLevel {
 		return
 	}
-	l.Print(v...)
+	l.Logger.Print(v...)
 }
 
 // Debugf formats args and logs the result when the logger level is debug.
@@ -49,7 +49,7 @@ func (l *stdLogger) Debugf(format string, v ...interface{}) {
 	if l.level > DebugLevel {
 		return
 	}
-	l.Printf(format, v...)
+	l.Logger.Printf(format, v...)
 }
 
 // Info logs args when the logger level is info.
@@ -57,7 +57,7 @@ func (l *stdLogger) Info(v ...interface{}) {
 	if l.level > InfoLevel {
 		return
 	}
-	l.Print(v...)
+	l.Logger.Print(v...)
 }
 
 // Infof formats args and logs the result when the logger level is info.
@@ -65,7 +65,7 @@ func (l *stdLogger) Infof(format string, v ...interface{}) {
 	if l.level > InfoLevel {
 		return
 	}
-	l.Printf(format, v...)
+	l.Logger.Printf(format, v...)
 }
 
 // Warn logs args when the logger level is warn.
@@ -73,7 +73,7 @@ func (l *stdLogger) Warn(v ...interface{}) {
 	if l.level > WarnLevel {
 		return
 	}
-	l.Print(v...)
+	l.Logger.Print(v...)
 }
 
 // Warnf formats args and logs the result when the logger level is warn.
@@ -81,7 +81,7 @@ func (l *stdLogger) Warnf(format string, v ...interface{}) {
 	if l.level > WarnLevel {
 		return
 	}
-	l.Printf(format, v...)
+	l.Logger.Printf(format, v...)
 }
 
 // Error logs args when the logger level is error.
@@ -89,7 +89,7 @@ func (l *stdLogger) Error(v ...interface{}) {
 	if l.level > ErrorLevel {
 		return
 	}
-	l.Print(v...)
+	l.Logger.Print(v...)
 }
 
 // Errorf formats args and logs the result when the logger level is debug.
@@ -97,7 +97,7 @@ func (l *stdLogger) Errorf(format string, v ...interface{}) {
 	if l.level > ErrorLevel {
 		return
 	}
-	l.Printf(format, v...)
+	l.Logger.Printf(format, v...)
 }
 
 // Panic logs args on panic.
@@ -118,6 +118,16 @@ func (l *stdLogger) Fatal(v ...interface{}) {
 // Fatalf formats args and logs the result when the error is fatal.
 func (l *stdLogger) Fatalf(format string, v ...interface{}) {
 	l.Logger.Fatalf(format, v...)
+}
+
+// Fatal logs args when the error is fatal.
+func (l *stdLogger) Print(v ...interface{}) {
+	l.Info(v...)
+}
+
+// Fatalf formats args and logs the result when the error is fatal.
+func (l *stdLogger) Printf(format string, v ...interface{}) {
+	l.Infof(format, v...)
 }
 
 func (l *stdLogger) UseFileOutput(name string) Logger {
