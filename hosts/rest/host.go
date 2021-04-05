@@ -27,7 +27,7 @@ func NewHost(a *core.API, name string, address string, reg []RegisterServer) *Ho
 	h := core.NewHost(a, name, address)
 	h.Logger = h.Log().WithName("protocol-http")
 	rt := NewRouter(h.Config())
-	rt.UseLogger(h.Logger)
+	//rt.UseLogger(h.Logger)
 	server := &http.Server{
 		Handler: rt,
 	}
