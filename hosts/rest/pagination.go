@@ -44,8 +44,8 @@ func PaginateRequest(r *http.Request) *store.Pagination {
 		perPage = utils.Clamp(int(per), 1, perPage)
 	}
 	return &store.Pagination{
-		Page: page,
-		Size: perPage,
+		Index: page,
+		Size:  perPage,
 	}
 }
 
@@ -61,7 +61,7 @@ func linkRel(u *url.URL, rel string) string {
 }
 
 func firstLink(u *url.URL, page *store.Pagination) string {
-	if page.Page <= 1 {
+	if page.Index <= 1 {
 		return ""
 	}
 	u.RawQuery = url.Values{
@@ -94,7 +94,7 @@ func nextLink(u *url.URL, page *store.Pagination) string {
 }
 
 func lastLink(u *url.URL, page *store.Pagination) string {
-	if page.Page == page.Count {
+	if page.Index == page.Count {
 		return ""
 	}
 	u.RawQuery = url.Values{
@@ -106,9 +106,9 @@ func lastLink(u *url.URL, page *store.Pagination) string {
 
 // PaginateResponse writes a paginated http response.
 func PaginateResponse(w http.ResponseWriter, r *http.Request, page *store.Pagination) {
-	w.Header().Add(PageNumber, strconv.Itoa(page.Page))
+	w.Header().Add(PageNumber, strconv.Itoa(page.Index))
 	w.Header().Add(PageCount, strconv.Itoa(page.Count))
-	w.Header().Add(PageTotal, strconv.FormatInt(page.Total, 10))
+	w.Header().Add(PageTotal, strconv.FormatUint(page.Total, 10))
 	w.Header().Add(PageSize, strconv.Itoa(page.Length))
 	u := &url.URL{}
 	u.Scheme = "http"

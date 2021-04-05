@@ -248,7 +248,7 @@ func (ts *AuditServerTestSuite) TestPaging() {
 	ts.Require().NoError(err)
 	ts.Equal(id, le.ID)
 	ts.Equal(f["dr_suess"], le.Fields["dr_suess"])
-	pn := int(res.Page.Number)
+	pn := int(res.Page.Index)
 	ts.Equal(1, pn)
 	pc := int(res.Page.Count)
 	cnt := len(ts.tests) / store.MaxPageSize
@@ -265,10 +265,10 @@ func (ts *AuditServerTestSuite) TestPaging() {
 		ts.Require().NoError(err)
 		ts.Require().NotNil(res)
 		ts.Equal(len(res.Logs), int(res.Page.Size))
-		ts.Equal(i+1, int(res.Page.Number))
+		ts.Equal(i+1, int(res.Page.Index))
 		ts.NotEqual(last, res.Logs[0].Id)
 		last = res.Logs[0].Id
-		page.Number = res.Page.Number + 1
+		page.Number = res.Page.Index + 1
 	}
 }
 
