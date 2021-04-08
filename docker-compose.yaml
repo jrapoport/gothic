@@ -7,16 +7,19 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - dev.env
+      - ${ENV_FILE:-./env/dev.env}
     expose:
       - "7720"
       - "7721"
+      - "7722"
       - "7727"
       - "7729"
     ports:
       - "7720:7720"
       - "7721:7721"
+      - "7722:7722"
       - "7727:7727"
+      - "7729:7729"
     networks:
       auth_mesh:
         aliases:
@@ -25,7 +28,7 @@ services:
 
   envoy:
     image: grpcweb/envoy:latest
-    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l debug
+    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml ${ENVOY_FLAGS:-}
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
     expose:
