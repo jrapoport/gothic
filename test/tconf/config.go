@@ -19,7 +19,7 @@ func Config(t *testing.T) *config.Config {
 }
 
 func configPath(t *testing.T) string {
-	const configPath = "test/test.env"
+	const configPath = "env/test.env"
 	root := tutils.ProjectRoot(t)
 	path := filepath.Join(root, configPath)
 	require.FileExists(t, path)
