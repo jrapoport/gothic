@@ -52,11 +52,11 @@ var serviceDefaults = Service{
 }
 
 var networkDefaults = Network{
-	Health: utils.MakeAddress(host, 7720),
-	RPC:    utils.MakeAddress(host, 7721),
-	Admin:  utils.MakeAddress(host, 7722),
-	REST:   utils.MakeAddress(host, 7727),
-	RPCWeb: utils.MakeAddress(host, 7729),
+	HealthAddress: utils.MakeAddress(host, 7720),
+	RPCAddress:    utils.MakeAddress(host, 7721),
+	AdminAddress:  utils.MakeAddress(host, 7722),
+	RESTAddress:   utils.MakeAddress(host, 7727),
+	RPCWebAddress: utils.MakeAddress(host, 7729),
 }
 
 var securityDefaults = Security{

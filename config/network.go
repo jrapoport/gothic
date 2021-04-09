@@ -10,21 +10,21 @@ type Network struct {
 	// Host is default adapter to listen on.
 	// default: localhost
 	Host string `json:"host"`
-	// Health is the address for the health check server.
+	// HealthAddress is the address for the health check server.
 	// default: [Host]:7720
-	Health string `json:"health"`
-	// RPC is the address for the gRPC server.
+	HealthAddress string `json:"health_address" yaml:"health_address" mapstructure:"health_address"`
+	// RPCAddress is the address for the gRPC server.
 	// default: [Host]:7721
-	RPC string `json:"rpc"`
-	// Admin is the address for the admin server.
+	RPCAddress string `json:"rpc_address" yaml:"rpc_address" mapstructure:"rpc_address"`
+	// AdminAddress is the address for the admin server.
 	// default: [Host]:7722
-	Admin string `json:"admin"`
+	AdminAddress string `json:"admin_address" yaml:"admin_address" mapstructure:"admin_address"`
 	// HTTP is the address for the HTTP server.
 	// default: [Host]:7727
-	REST string `json:"rest"`
-	// RPCWeb is the address for the gRPC-Web server.
+	RESTAddress string `json:"rest_address" yaml:"rest_address" mapstructure:"rest_address"`
+	// RPCWebAddress is the address for the gRPC-Web server.
 	// default: [Host]:7729
-	RPCWeb string `json:"rpcweb" mapstructure:"rpcweb"`
+	RPCWebAddress string `json:"rpcweb_address" yaml:"rpcweb_address" mapstructure:"rpcweb_address"`
 
 	// TODO: use RequestID
 	// RequestID is the request id to use
@@ -44,35 +44,32 @@ func (n *Network) normalize(Service) (err error) {
 		}
 		return net.JoinHostPort(host, p), nil
 	}
-	if n.RPC == dc.RPC {
-		n.RPC, err = updateHost(n.RPC, n.Host)
+	if n.RPCAddress == dc.RPCAddress {
+		n.RPCAddress, err = updateHost(n.RPCAddress, n.Host)
 		if err != nil {
 			return
 		}
 	}
-	if n.Admin == dc.Admin {
-		n.Admin, err = updateHost(n.Admin, n.Host)
+	if n.AdminAddress == dc.AdminAddress {
+		n.AdminAddress, err = updateHost(n.AdminAddress, n.Host)
 		if err != nil {
 			return
 		}
 	}
-	if n.REST == dc.REST {
-		n.REST, err = updateHost(n.REST, n.Host)
+	if n.RESTAddress == dc.RESTAddress {
+		n.RESTAddress, err = updateHost(n.RESTAddress, n.Host)
 		if err != nil {
 			return
 		}
 	}
-	if n.RPCWeb == dc.RPCWeb {
-		n.RPCWeb, err = updateHost(n.RPCWeb, n.Host)
+	if n.RPCWebAddress == dc.RPCWebAddress {
+		n.RPCWebAddress, err = updateHost(n.RPCWebAddress, n.Host)
 		if err != nil {
 			return
 		}
 	}
-	if n.Health == "" {
-		n.Health = dc.Health
-	}
-	if n.Health == dc.Health {
-		n.Health, err = updateHost(n.Health, n.Host)
+	if n.HealthAddress == dc.HealthAddress {
+		n.HealthAddress, err = updateHost(n.HealthAddress, n.Host)
 		if err != nil {
 			return
 		}
