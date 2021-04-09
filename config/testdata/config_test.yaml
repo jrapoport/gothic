@@ -3,10 +3,11 @@ site_url: http://example.com.yaml
 root_password: password.yaml
 
 host: example.com.yaml
-rest: example.com.yaml:80
-rpc: example.com.yaml:90
-rpcweb: example.com.yaml:100
-health: example.com.yaml:110
+admin_address: example.com.yaml:91
+rest_address: example.com.yaml:80
+rpc_address: example.com.yaml:90
+rpcweb_address: example.com.yaml:100
+health_address: example.com.yaml:110
 request_id: "foobar.yaml"
 
 mask_emails: false
