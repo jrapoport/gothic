@@ -218,10 +218,11 @@ This is base URL for your site. The base url is used to construct things like re
 
 ```properties
 GOTHIC_HOST=localhost
-GOTHIC_HEALTH=localhost:7720
-GOTHIC_RPC=localhost:7721
-GOTHIC_REST=localhost:7727
-GOTHIC_RPCWEB=localhost:7729
+GOTHIC_HEALTH_ADDRESS=localhost:7720
+GOTHIC_RPC_ADDRESS=localhost:7721
+GOTHIC_ADMIN_ADDRESS=localhost:7722
+GOTHIC_REST_ADDRESS=localhost:7727
+GOTHIC_RPCWEB_ADDRESS=localhost:7729
 GOTHIC_REQUEST_ID=gothic-req
 ```
 
@@ -229,12 +230,12 @@ GOTHIC_REQUEST_ID=gothic-req
 
 Hostname to listen on. Defaults to `localhost`.
 
-`GOTHIC_HEALTH` - `string`
+`GOTHIC_HEALTH_ADDRESS` - `string`
 
 The health check host address to listen on. The health check host currently uses `HTTP` and responds to any `GET`
 request with a `json` response. Defaults to `[GOTHIC_HOST]:7720`.
 
-`GOTHIC_RPC` - `string`
+`GOTHIC_RPC_ADDRESS` - `string`
 
 The gRPC host address to listen on. gRPC APIs are for admin operations a/o microservice communication. Defaults to
 `[GOTHIC_HOST]:7721`.
@@ -242,13 +243,18 @@ The gRPC host address to listen on. gRPC APIs are for admin operations a/o micro
 The gRPC API should be considered internal and **not** publicly available. This address should **not** be internet
 accessible.
 
-`GOTHIC_REST` - `string`
+`GOTHIC_ADMIN_ADDRESS` - `string`
+
+The gRPC admin host address to listen on. Operations on this address are secured by a valid JWT token with admin 
+permissions. Defaults to `[GOTHIC_HOST]:7722`.
+
+`GOTHIC_REST_ADDRESS` - `string`
 
 The REST host address to listen on. REST APIs are for users & administrative access. Defaults to `[GOTHIC_HOST]:7727`.
 
 The REST API should be considered external and publicly available. This address should be internet accessible.
 
-`GOTHIC_RPCWEB` - `string`
+`GOTHIC_RPCWEB_ADDRESS` - `string`
 
 The gRPC-Web host address to listen on. gRPC-Web APIs are for users & (potentially some) administrative access. Defaults
 to `[GOTHIC_HOST]:7729`.
