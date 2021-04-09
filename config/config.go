@@ -100,7 +100,7 @@ func (c *Config) normalize() error {
 	if err != nil {
 		return err
 	}
-	err = c.Authorization.normalize(c.Service, c.REST)
+	err = c.Authorization.normalize(c.Service, c.RESTAddress)
 	if err != nil {
 		return err
 	}
