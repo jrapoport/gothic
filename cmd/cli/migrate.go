@@ -11,6 +11,10 @@ var migrateCmd = &cobra.Command{
 	RunE: migrateRunE,
 }
 
+func init() {
+	AddRootCommand(migrateCmd)
+}
+
 func migrateRunE(cmd *cobra.Command, _ []string) error {
 	c := rootConfig()
 	l := c.Log().WithName("exe" + cmd.Use)

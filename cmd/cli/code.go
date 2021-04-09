@@ -27,6 +27,7 @@ func init() {
 	fs := codeCmd.Flags()
 	fs.IntVarP(&codeUses, "max-uses", "m", 1, "maximum times a code can be used")
 	fs.StringVarP(&codeOutput, "out", "o", "", "output csv to file path")
+	AddRootCommand(codeCmd)
 }
 
 func codeRunE(_ *cobra.Command, args []string) error {

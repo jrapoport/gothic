@@ -22,9 +22,6 @@ var rootCmd = &cobra.Command{
 func init() {
 	pf := rootCmd.PersistentFlags()
 	pf.StringVarP(&configFile, "config", "c", "", "the config file to use")
-	rootCmd.AddCommand(codeCmd)
-	//rootCmd.AddCommand(userCmd)
-	rootCmd.AddCommand(migrateCmd)
 }
 
 func initConfig(cmd *cobra.Command, _ []string) (err error) {
@@ -51,6 +48,10 @@ func rootConfig() *config.Config {
 // ExecuteRoot executes the main cmd
 func ExecuteRoot() error {
 	return rootCmd.Execute()
+}
+
+func AddRootCommand(cmd *cobra.Command) {
+	rootCmd.AddCommand(cmd)
 }
 
 /*

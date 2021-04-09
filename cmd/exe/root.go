@@ -29,6 +29,8 @@ func rootRunE(*cobra.Command, []string) error {
 	if err != nil {
 		return err
 	}
+	// Call the "real" main in a nested manner so the defers will properly
+	// be executed in the case of a graceful shutdown.
 	return gothic.Main(c)
 }
 
