@@ -33,7 +33,7 @@ func RESTHost(t *testing.T, reg []rest.RegisterServer, smtp bool) (*rest.Host, *
 	t.Cleanup(func() {
 		web.Close()
 	})
-	s := rest.NewHost(a, "test-rest", c.REST, reg)
+	s := rest.NewHost(a, "test-rest", c.RESTAddress, reg)
 	require.NotNil(t, s)
 	return s, web, mock
 }

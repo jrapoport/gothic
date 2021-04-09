@@ -15,11 +15,11 @@ import (
 
 func Test_Main(t *testing.T) {
 	c := tconf.TempDB(t)
-	c.Network.Admin = "127.0.0.1:0"
-	c.Network.REST = "127.0.0.1:0"
-	c.Network.RPC = "127.0.0.1:0"
-	c.Network.RPCWeb = "127.0.0.1:0"
-	c.Network.Health = "127.0.0.1:0"
+	c.Network.AdminAddress = "127.0.0.1:0"
+	c.Network.RESTAddress = "127.0.0.1:0"
+	c.Network.RPCAddress = "127.0.0.1:0"
+	c.Network.RPCWebAddress = "127.0.0.1:0"
+	c.Network.HealthAddress = "127.0.0.1:0"
 	go func() {
 		err := Main(c)
 		assert.NoError(t, err)
@@ -28,8 +28,8 @@ func Test_Main(t *testing.T) {
 		return hosts.Running()
 	}, 5*time.Second, 100*time.Millisecond)
 	healthURI := func() string {
-		require.NotEmpty(t, c.Network.Health)
-		return "http://" + c.Network.Health + config.HealthCheck
+		require.NotEmpty(t, c.Network.HealthAddress)
+		return "http://" + c.Network.HealthAddress + config.HealthCheck
 	}
 	_, err := http.Get(healthURI())
 	assert.NoError(t, err)

@@ -8,6 +8,7 @@ import (
 
 const (
 	testHost   = "example.com"
+	adminPort  = ":91"
 	restPort   = ":80"
 	rpcPort    = ":90"
 	webPort    = ":100"
@@ -19,10 +20,11 @@ func TestNetwork(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		n := c.Network
 		assert.Equal(t, testHost+test.mark, n.Host)
-		assert.Equal(t, testHost+test.mark+restPort, n.REST)
-		assert.Equal(t, testHost+test.mark+rpcPort, n.RPC)
-		assert.Equal(t, testHost+test.mark+webPort, n.RPCWeb)
-		assert.Equal(t, testHost+test.mark+healthPort, n.Health)
+		assert.Equal(t, testHost+test.mark+adminPort, n.AdminAddress)
+		assert.Equal(t, testHost+test.mark+restPort, n.RESTAddress)
+		assert.Equal(t, testHost+test.mark+rpcPort, n.RPCAddress)
+		assert.Equal(t, testHost+test.mark+webPort, n.RPCWebAddress)
+		assert.Equal(t, testHost+test.mark+healthPort, n.HealthAddress)
 		assert.Equal(t, requestID+test.mark, n.RequestID)
 	})
 }
@@ -37,10 +39,11 @@ func TestNetwork_Env(t *testing.T) {
 			assert.NoError(t, err)
 			n := c.Network
 			assert.Equal(t, testHost, n.Host)
-			assert.Equal(t, testHost+restPort, n.REST)
-			assert.Equal(t, testHost+rpcPort, n.RPC)
-			assert.Equal(t, testHost+webPort, n.RPCWeb)
-			assert.Equal(t, testHost+healthPort, n.Health)
+			assert.Equal(t, testHost+adminPort, n.AdminAddress)
+			assert.Equal(t, testHost+restPort, n.RESTAddress)
+			assert.Equal(t, testHost+rpcPort, n.RPCAddress)
+			assert.Equal(t, testHost+webPort, n.RPCWebAddress)
+			assert.Equal(t, testHost+healthPort, n.HealthAddress)
 			assert.Equal(t, requestID, n.RequestID)
 		})
 	}
@@ -62,6 +65,8 @@ func TestNetwork_Normalization(t *testing.T) {
 	t.Cleanup(func() {
 		networkDefaults = def
 	})
+	networkDefaults.HealthAddress = def.RPCAddress
+	networkDefaults.AdminAddress = def.RPCAddress
 	netTests := []struct {
 		uHost   string
 		uRest   string
@@ -85,11 +90,11 @@ func TestNetwork_Normalization(t *testing.T) {
 			host2, testHost + restPort, testHost + rpcPort, testHost + webPort,
 		},
 		{
-			host2, def.REST, def.RPC, def.RPCWeb,
+			host2, def.RESTAddress, def.RPCAddress, def.RPCWebAddress,
 			host2, host2 + ":7727", host2 + ":7721", host2 + ":7729",
 		},
 		{
-			host2, testHost + restPort, def.RPC, def.RPCWeb,
+			host2, testHost + restPort, def.RPCAddress, def.RPCWebAddress,
 			host2, testHost + restPort, host2 + ":7721", host2 + ":7729",
 		},
 		{
@@ -97,39 +102,47 @@ func TestNetwork_Normalization(t *testing.T) {
 			host2, testHost + restPort, testHost + restPort, testHost + restPort,
 		},
 		{
-			def.Host, def.REST, testHost + restPort, testHost + restPort,
-			def.Host, def.REST, testHost + restPort, testHost + restPort,
+			def.Host, def.RESTAddress, testHost + restPort, testHost + restPort,
+			def.Host, def.RESTAddress, testHost + restPort, testHost + restPort,
 		},
 	}
 	for _, test := range netTests {
 		n := Network{}
 		n.Host = test.uHost
-		n.REST = test.uRest
-		n.RPC = test.uRPC
-		n.RPCWeb = test.uRPCWeb
+		n.RESTAddress = test.uRest
+		n.RPCAddress = test.uRPC
+		n.RPCWebAddress = test.uRPCWeb
+		n.AdminAddress = test.uRPC
+		n.HealthAddress = test.uRPC
 		err := n.normalize(serviceDefaults)
 		assert.NoError(t, err)
 		assert.Equal(t, test.nHost, n.Host)
-		assert.Equal(t, test.nRest, n.REST)
-		assert.Equal(t, test.nRPC, n.RPC)
-		assert.Equal(t, test.nRPCWeb, n.RPCWeb)
+		assert.Equal(t, test.nRest, n.RESTAddress)
+		assert.Equal(t, test.nRPC, n.RPCAddress)
+		assert.Equal(t, test.nRPCWeb, n.RPCWebAddress)
+		assert.Equal(t, test.nRPC, n.AdminAddress)
+		assert.Equal(t, test.nRPC, n.HealthAddress)
 	}
 	n := Network{}
-	networkDefaults.Health = "::"
-	networkDefaults.RPCWeb = "::"
-	networkDefaults.RPC = "::"
-	networkDefaults.REST = "::"
+	networkDefaults.HealthAddress = "::"
+	networkDefaults.RPCWebAddress = "::"
+	networkDefaults.RPCAddress = "::"
+	networkDefaults.AdminAddress = "::"
+	networkDefaults.RESTAddress = "::"
 	n.Host = "::"
-	n.Health = "::"
+	n.HealthAddress = "::"
 	err := n.normalize(serviceDefaults)
 	assert.Error(t, err)
-	n.RPCWeb = "::"
+	n.RPCWebAddress = "::"
 	err = n.normalize(serviceDefaults)
 	assert.Error(t, err)
-	n.RPC = "::"
+	n.RPCAddress = "::"
 	err = n.normalize(serviceDefaults)
 	assert.Error(t, err)
-	n.REST = "::"
+	n.AdminAddress = "::"
+	err = n.normalize(serviceDefaults)
+	assert.Error(t, err)
+	n.RESTAddress = "::"
 	err = n.normalize(serviceDefaults)
 	assert.Error(t, err)
 }
