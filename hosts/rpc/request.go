@@ -18,6 +18,7 @@ const (
 	RealIP         = "X-Real-IP"
 	ForwardedFor   = "X-Forwarded-For"
 	ReCaptchaToken = "X-ReCaptcha-Token"
+	RootPassword   = "X-Root-Password"
 )
 
 // RequestContext adds the request context to a context
@@ -39,6 +40,14 @@ func RequestContext(ctx context.Context) core_ctx.Context {
 		rtx.SetReCaptcha(v)
 	}
 	return rtx
+}
+
+func GetRootPassword(ctx context.Context) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return ""
+	}
+	return getMetadata(md, RootPassword)
 }
 
 // GetRemoteIP returns the remote ip from the context.

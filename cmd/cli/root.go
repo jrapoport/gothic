@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	configFile string
-	cfg        *config.Config
+	configFile   string
+	rootPassword string
+	cfg          *config.Config
 )
 
 var rootCmd = &cobra.Command{
@@ -22,19 +23,24 @@ var rootCmd = &cobra.Command{
 func init() {
 	pf := rootCmd.PersistentFlags()
 	pf.StringVarP(&configFile, "config", "c", "", "the config file to use")
+	pf.StringVar(&rootPassword, "root", "", "the root password to use for super admin access")
 }
 
 func initConfig(cmd *cobra.Command, _ []string) (err error) {
-	cfg, err = config.LoadConfig(configFile)
+	cfg, err = config.LoadConfig(configFile, config.SkipRequired())
 	if err != nil {
 		return err
 	}
+	if cmd.Use == migrateCmd.Use || cmd.Use == utils.ExecutableName() {
+		return nil
+	}
 	cfg.DB.AutoMigrate = false
-	//cfg.Signup.AutoConfirm = confirm
 	cfg.Signup.Default.Username = true
 	cfg.Validation.PasswordRegex = ""
-	cfg.ReplaceLog(cfg.Log().WithName(cmd.Use))
-	return nil
+	if rootPassword != "" {
+		cfg.RootPassword = rootPassword
+	}
+	return cfg.Security.CheckRequired()
 }
 
 func rootRunE(cmd *cobra.Command, _ []string) error {
@@ -68,5 +74,4 @@ func confirmAction(format string, a ...interface{}) (bool, error) {
 	}
 	return result == "Yes", nil
 }
-
 */

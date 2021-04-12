@@ -70,7 +70,7 @@ func (s *usersServer) GetUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.ValidateAdmin(r)
+	_, err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -100,7 +100,7 @@ func (s *usersServer) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	err = s.ValidateAdmin(r)
+	_, err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -125,7 +125,7 @@ func (s *usersServer) AdminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.ValidateAdmin(r)
+	_, err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
@@ -149,7 +149,7 @@ func (s *usersServer) AdminPromoteUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
 	}
-	err = s.ValidateAdmin(r)
+	_, err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return

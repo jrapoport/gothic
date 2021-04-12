@@ -20,9 +20,6 @@ func (s Service) Version() string {
 }
 
 func (s *Service) normalize() error {
-	if s.SiteURL == "" {
-		return errors.New("site url is required")
-	}
 	// make sure this wasn't mucked with
 	uri, err := url.Parse(s.SiteURL)
 	if err != nil {
@@ -30,6 +27,13 @@ func (s *Service) normalize() error {
 	}
 	if s.Name == "" {
 		s.Name = strings.ToLower(uri.Host)
+	}
+	return nil
+}
+
+func (s *Service) CheckRequired() error {
+	if s.SiteURL == "" {
+		return errors.New("site url is required")
 	}
 	return nil
 }

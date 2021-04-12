@@ -1,6 +1,8 @@
 package config
 
-import "net"
+import (
+	"net"
+)
 
 // HealthCheck is the health check route to use.
 const HealthCheck = "/health"
@@ -31,48 +33,31 @@ type Network struct {
 	RequestID string `json:"request_id" yaml:"request_id" mapstructure:"request_id"`
 }
 
-func (n *Network) normalize(Service) (err error) {
+func (n *Network) normalize(Service) {
 	dc := networkDefaults
 	if n.Host == dc.Host {
 		return
 	}
-	updateHost := func(addr, host string) (string, error) {
-		var p string
-		_, p, err = net.SplitHostPort(addr)
-		if err != nil {
-			return "", err
-		}
-		return net.JoinHostPort(host, p), nil
+	updateHost := func(addr, host string) string {
+		// we can safely ignore this error because we are
+		// always parsing our own default address.
+		_, p, _ := net.SplitHostPort(addr)
+		return net.JoinHostPort(host, p)
 	}
 	if n.RPCAddress == dc.RPCAddress {
-		n.RPCAddress, err = updateHost(n.RPCAddress, n.Host)
-		if err != nil {
-			return
-		}
+		n.RPCAddress = updateHost(n.RPCAddress, n.Host)
 	}
 	if n.AdminAddress == dc.AdminAddress {
-		n.AdminAddress, err = updateHost(n.AdminAddress, n.Host)
-		if err != nil {
-			return
-		}
+		n.AdminAddress = updateHost(n.AdminAddress, n.Host)
 	}
 	if n.RESTAddress == dc.RESTAddress {
-		n.RESTAddress, err = updateHost(n.RESTAddress, n.Host)
-		if err != nil {
-			return
-		}
+		n.RESTAddress = updateHost(n.RESTAddress, n.Host)
 	}
 	if n.RPCWebAddress == dc.RPCWebAddress {
-		n.RPCWebAddress, err = updateHost(n.RPCWebAddress, n.Host)
-		if err != nil {
-			return
-		}
+		n.RPCWebAddress = updateHost(n.RPCWebAddress, n.Host)
 	}
 	if n.HealthAddress == dc.HealthAddress {
-		n.HealthAddress, err = updateHost(n.HealthAddress, n.Host)
-		if err != nil {
-			return
-		}
+		n.HealthAddress = updateHost(n.HealthAddress, n.Host)
 	}
 	return
 }
