@@ -19,6 +19,19 @@ func (s *adminServer) CreateSignupCodes(ctx context.Context,
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
 	rtx := rpc.RequestContext(ctx)
+	pw := rpc.GetRootPassword(ctx)
+	if pw != "" {
+		sa, err := s.API.GetSuperAdmin(pw)
+		if err != nil {
+			return nil, s.RPCError(codes.PermissionDenied, err)
+		}
+		rtx.SetProvider(sa.Provider)
+		rtx.SetAdminID(sa.ID)
+	}
+	_, err := s.API.ValidateAdmin(rtx.AdminID())
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
 	uses := int(req.GetUses())
 	count := int(req.GetCount())
 	s.Debugf("create signup codes: %v", req)

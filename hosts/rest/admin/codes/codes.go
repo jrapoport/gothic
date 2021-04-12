@@ -61,7 +61,7 @@ func (s *codesServer) CreateSignupCodes(w http.ResponseWriter, r *http.Request) 
 		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	err = s.ValidateAdmin(r)
+	_, err = s.ValidateAdmin(r)
 	if err != nil {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return

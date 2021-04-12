@@ -1,16 +1,19 @@
 package admin
 
 import (
+	"context"
 	"testing"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/core/codes"
-	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/jrapoport/gothic/test/tconn"
+	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 )
 
 func TestSignupServer_CreateSignupCodes(t *testing.T) {
@@ -25,6 +28,17 @@ func TestSignupServer_CreateSignupCodes(t *testing.T) {
 		Uses:  code.InfiniteUse,
 		Count: testLen,
 	}
+	_, tok := tcore.TestUser(t, srv.API, "", false)
+	ctx = tsrv.RPCAuthContext(t, srv.Config(), tok)
+	_, err = srv.CreateSignupCodes(ctx, req)
+	assert.Error(t, err)
+	ctx = metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, "bad"))
+	_, err = srv.CreateSignupCodes(ctx, req)
+	assert.Error(t, err)
+	pw := s.Config().RootPassword
+	ctx = metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, pw))
 	res, err := srv.CreateSignupCodes(ctx, req)
 	assert.NoError(t, err)
 	require.NotNil(t, res)
@@ -35,7 +49,8 @@ func TestSignupServer_CheckSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newAdminServer(s)
-	ctx := context.Background()
+	ctx := metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, s.Config().RootPassword))
 	cr, err := srv.CreateSignupCodes(ctx, &admin.CreateSignupCodesRequest{
 		Uses:  code.SingleUse,
 		Count: 1,
@@ -79,7 +94,8 @@ func TestSignupServer_DeleteSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newAdminServer(s)
-	ctx := context.Background()
+	ctx := metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, s.Config().RootPassword))
 	_, err := srv.DeleteSignupCode(ctx, nil)
 	assert.Error(t, err)
 	req := &admin.DeleteSignupCodeRequest{

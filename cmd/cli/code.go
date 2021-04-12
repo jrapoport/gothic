@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/jrapoport/gothic/hosts/rpc"
+	"google.golang.org/grpc/metadata"
 	"os"
 	"strconv"
 
@@ -51,7 +53,9 @@ func codeRunE(_ *cobra.Command, args []string) error {
 		conn.Close()
 	}()
 	client := admin.NewAdminClient(conn)
-	ctx := context.Background()
+	pw := c.RootPassword
+	ctx := metadata.NewOutgoingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, pw))
 	res, err := client.CreateSignupCodes(ctx, &admin.CreateSignupCodesRequest{
 		Uses:  int64(codeUses),
 		Count: int64(count),

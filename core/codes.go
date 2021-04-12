@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/codes"
@@ -29,9 +31,14 @@ func (a *API) CreateSignupCode(ctx context.Context, uses int) (string, error) {
 
 // CreateSignupCodes returns a list of new signup pin codes.
 func (a *API) CreateSignupCodes(ctx context.Context, uses, count int) ([]string, error) {
+	aid := ctx.AdminID()
+	if aid == uuid.Nil {
+		err := errors.New("admin user id required")
+		return nil, a.logError(err)
+	}
 	var list []string
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		cl, err := codes.CreateSignupCodes(tx, user.SystemID, code.PIN, uses, count)
+		cl, err := codes.CreateSignupCodes(tx, aid, code.PIN, uses, count)
 		if err != nil {
 			return err
 		}

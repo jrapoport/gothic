@@ -37,7 +37,7 @@ func RegisterServer(s *grpc.Server, srv *rpc.Server) {
 	system.RegisterSystemServer(s, newSystemServer(srv))
 }
 
-func (s *systemServer) GetUser(_ context.Context, req *system.UserAccountRequest) (*system.UserAccountResponse, error) {
+func (s *systemServer) GetUserAccount(_ context.Context, req *system.UserAccountRequest) (*system.UserAccountResponse, error) {
 	var u *user.User
 	switch msg := req.GetId().(type) {
 	case *system.UserAccountRequest_UserId:

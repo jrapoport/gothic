@@ -85,11 +85,17 @@ func TestLoadConfig(t *testing.T) {
 	}
 	reqTests[len(reqTests)-1].Err = assert.NoError
 	clearEnv()
+	_, err := LoadConfig("", SkipRequired())
+	assert.NoError(t, err)
 	for _, test := range reqTests {
 		setEnv(t, test.key, test.value)
-		_, err := LoadConfig("")
+		_, err = LoadConfig("")
 		test.Err(t, err)
 	}
+	_, err = LoadConfig("\n.env")
+	assert.Error(t, err)
+	_, err = LoadConfig("\n.json")
+	assert.Error(t, err)
 }
 
 func TestLog(t *testing.T) {
@@ -113,25 +119,73 @@ func TestConfig_Defaults(t *testing.T) {
 }
 
 func TestConfig_Normalization(t *testing.T) {
-	c := Config{}
+	t.Cleanup(func() {
+		clearEnv()
+	})
+	c := &Config{}
 	err := c.normalize()
-	assert.Error(t, err)
-	c = Config{
-		Service: Service{
-			SiteURL: siteURL,
-		},
-		DB: Database{
-			DSN: dsn,
-		},
-		Security: Security{
-			JWT: JWT{
-				Secret: jwtSecret,
-			},
-		},
-	}
+	assert.NoError(t, err)
+	c.SiteURL = "\n"
 	err = c.normalize()
 	assert.Error(t, err)
+	c.SiteURL = siteURL
+	c.Validation.UsernameRegex = "$$($$"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.Validation.PasswordRegex = "$$($$"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.Validation.PasswordRegex = ""
+	c.Validation.UsernameRegex = ""
+	c.Authorization.RedirectURL = "\n"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.Authorization.RedirectURL = ""
+	c.DB.Driver = driver
+	c.DB.DSN = "\n"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.DB.DSN = ""
+	c.Mail.Link = "\n"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.Mail.Link = ""
+	c.Webhook.URL = "\n"
+	err = c.normalize()
+	assert.Error(t, err)
+	c.Webhook.URL = ""
+	err = c.normalize()
+	assert.NoError(t, err)
 	assert.Equal(t, BuildVersion(), c.Version())
+	setEnv(t, ENVPrefix+"_LOG_TRACER_ENABLED", "true")
+	setEnv(t, ENVPrefix+"_LOG_TRACER_ADDRESS", "")
+	_, err = LoadConfig("")
+	assert.Error(t, err)
+	setEnv(t, ENVPrefix+"_SITE_URL", "\n")
+	_, err = LoadConfig("")
+	assert.Error(t, err)
+}
+
+func TestConfig_Required(t *testing.T) {
+	// order matters here
+	c := &Config{}
+	err := c.checkRequired()
+	assert.Error(t, err)
+	c.SiteURL = siteURL
+	err = c.checkRequired()
+	assert.Error(t, err)
+	c.Security.RootPassword = "password"
+	err = c.checkRequired()
+	assert.Error(t, err)
+	c.Security.JWT.Secret = jwtSecret
+	err = c.checkRequired()
+	assert.Error(t, err)
+	c.DB.Driver = driver
+	err = c.checkRequired()
+	assert.Error(t, err)
+	c.DB.DSN = dsn
+	err = c.checkRequired()
+	assert.NoError(t, err)
 }
 
 func TestWriteConfig(t *testing.T) {

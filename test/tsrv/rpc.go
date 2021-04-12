@@ -22,9 +22,9 @@ func RPCServer(t *testing.T, smtp bool) (*rpc.Server, *tconf.SMTPMock) {
 }
 
 // RPCHost an rpc server for tests.
-func RPCHost(t *testing.T, reg []rpc.RegisterServer) (*rpc.Host, *tconf.SMTPMock) {
+func RPCHost(t *testing.T, reg []rpc.RegisterServer, opt ...grpc.ServerOption) (*rpc.Host, *tconf.SMTPMock) {
 	a, _, mock := tcore.API(t, true)
-	h := rpc.NewHost(a, "test-rpc", "127.0.0.1:0", reg)
+	h := rpc.NewHost(a, "test-rpc", "127.0.0.1:0", reg, opt...)
 	err := h.ListenAndServe()
 	require.NoError(t, err)
 	t.Cleanup(func() {
