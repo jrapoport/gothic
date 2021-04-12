@@ -1,9 +1,11 @@
 package main
 
-import "github.com/jrapoport/gothic/log"
+import (
+	"fmt"
+)
 
 func main() {
 	if err := ExecuteRoot(); err != nil {
-		log.Fatal(err)
+		fmt.Printf("Error: %s\n\n", err)
 	}
 }

@@ -3,6 +3,7 @@ package account_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 
@@ -72,7 +73,10 @@ func TestAccountServer(t *testing.T) {
 	// resend confirmation email
 	act := template.ConfirmUserAction
 	var confirmToken string
+	var mu sync.Mutex
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		confirmToken = tconf.GetEmailToken(act, email)
 	})
 	cr := &confirm.Request{
@@ -105,6 +109,8 @@ func TestAccountServer(t *testing.T) {
 	var passToken string
 	act = template.ResetPasswordAction
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		passToken = tconf.GetEmailToken(act, email)
 	})
 	route = account.Account + password.Password + password.Reset

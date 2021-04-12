@@ -3,6 +3,7 @@ package core
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/code"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,6 +23,9 @@ func TestAPI_CreateCodes(t *testing.T) {
 	a := createAPI(t)
 	ctx := testContext(a)
 	list, err := a.CreateSignupCodes(ctx, code.SingleUse, count)
+	assert.Error(t, err)
+	ctx.SetAdminID(uuid.New())
+	list, err = a.CreateSignupCodes(ctx, code.SingleUse, count)
 	assert.NoError(t, err)
 	assert.Len(t, list, count)
 	assertUnique(t, list)
