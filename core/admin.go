@@ -18,8 +18,8 @@ func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, d
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.AdminID()
-	if uid == uuid.Nil {
+	aid := ctx.AdminID()
+	if aid == uuid.Nil {
 		err := errors.New("admin user id required")
 		return nil, a.logError(err)
 	}
@@ -34,17 +34,12 @@ func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, d
 		if err != nil {
 			return err
 		}
-		var adm *user.User
-		adm, err = users.GetAuthenticatedUser(tx, uid)
+		role, err := a.validateAdmin(tx, aid)
 		if err != nil {
 			return err
 		}
-		if !adm.IsAdmin() {
-			err = fmt.Errorf("admin required: %s", uid)
-			return err
-		}
-		if admin && adm.Role != user.RoleSuper {
-			err = fmt.Errorf("super admin required: %s", uid)
+		if admin && role != user.RoleSuper {
+			err = fmt.Errorf("super admin required: %s", aid)
 			return err
 		}
 		u, err = a.userSignup(ctx, tx, a.Provider(), email, username, pw, data)
@@ -72,8 +67,8 @@ func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.Use
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.AdminID()
-	if uid == uuid.Nil {
+	aid := ctx.AdminID()
+	if aid == uuid.Nil {
 		err := errors.New("admin user id required")
 		return nil, a.logError(err)
 	}
@@ -84,12 +79,12 @@ func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.Use
 	a.log.Debugf("promote user to admin: %s", userID)
 	var u *user.User
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		adm, err := users.GetAuthenticatedUser(tx, uid)
+		role, err := a.validateAdmin(tx, aid)
 		if err != nil {
 			return err
 		}
-		if adm.Role != user.RoleSuper {
-			err = fmt.Errorf("super admin required: %s", uid)
+		if role != user.RoleSuper {
+			err = fmt.Errorf("super admin required: %s", aid)
 			return err
 		}
 		u, err = users.GetActiveUser(tx, userID)
@@ -110,8 +105,8 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	uid := ctx.AdminID()
-	if uid == uuid.Nil {
+	aid := ctx.AdminID()
+	if aid == uuid.Nil {
 		err := errors.New("context user id required")
 		return a.logError(err)
 	}
@@ -121,19 +116,15 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 	}
 	a.log.Debugf("delete user: %s", userID)
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		adm, err := users.GetAuthenticatedUser(tx, uid)
+		role, err := a.validateAdmin(tx, aid)
 		if err != nil {
-			return err
-		}
-		if !adm.IsAdmin() {
-			err = fmt.Errorf("admin required: %s", uid)
 			return err
 		}
 		u, err := users.GetUser(tx, userID)
 		if err != nil {
 			return err
 		}
-		if u.IsAdmin() && adm.Role != user.RoleSuper {
+		if u.IsAdmin() && role != user.RoleSuper {
 			err = fmt.Errorf("super admin required to delete admin: %s", userID)
 			return err
 		}
@@ -148,4 +139,24 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 	}
 	a.log.Debugf("deleted user: %s", userID)
 	return nil
+}
+
+// ValidateAdmin validates the user id as an admin and returns the role
+func (a *API) ValidateAdmin(aid uuid.UUID) (user.Role, error) {
+	return a.validateAdmin(a.conn, aid)
+}
+
+func (a *API) validateAdmin(tx *store.Connection, aid uuid.UUID) (user.Role, error) {
+	if aid == user.SuperAdminID {
+		return user.RoleSuper, nil
+	}
+	adm, err := users.GetAuthenticatedUser(tx, aid)
+	if err != nil {
+		return user.InvalidRole, err
+	}
+	if !adm.IsAdmin() {
+		err = fmt.Errorf("admin required: %s", aid)
+		return user.InvalidRole, err
+	}
+	return adm.Role, nil
 }

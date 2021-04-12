@@ -81,6 +81,8 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 				func(e *mail.Envelope, task backends.SelectTask) (backends.Result, error) {
 					if task == backends.TaskSaveMail {
 						mock.hooks.Range(func(_, value interface{}) bool {
+							mu.Lock()
+							defer mu.Unlock()
 							hook := value.(func(string))
 							hook(e.Data.String())
 							return true

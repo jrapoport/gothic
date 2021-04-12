@@ -1,11 +1,11 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/tokens"
+	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
 	"github.com/segmentio/encoding/json"
 )
@@ -26,20 +26,16 @@ func (s *Server) Clone() *Server {
 }
 
 // ValidateAdmin re-checks that a token belongs to an active admin user
-func (s *Server) ValidateAdmin(r *http.Request) error {
+func (s *Server) ValidateAdmin(r *http.Request) (user.Role, error) {
 	aid, err := GetUserID(r)
 	if err != nil {
-		return err
+		return user.InvalidRole, err
 	}
-	adm, err := s.GetAuthenticatedUser(aid)
+	role, err := s.API.ValidateAdmin(aid)
 	if err != nil {
-		return err
+		return user.InvalidRole, err
 	}
-	if !adm.IsAdmin() {
-		err = fmt.Errorf("admin required: %s", adm.ID)
-		return err
-	}
-	return nil
+	return role, nil
 }
 
 // Response wraps an http JSONContent response. If v is an

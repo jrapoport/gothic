@@ -7,6 +7,7 @@ import (
 	rpc_admin "github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/hosts/rpc/admin"
+	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -34,11 +35,13 @@ func TestAdminServer_Codes(t *testing.T) {
 	t.Parallel()
 	srv, _ := tsrv.RPCHost(t, []rpc.RegisterServer{
 		admin.RegisterServer,
-	})
+	}, rpc.Authentication())
 	client := tsrv.RPCClient(t, srv.Address(), func(cc grpc.ClientConnInterface) interface{} {
 		return rpc_admin.NewAdminClient(cc)
 	}).(rpc_admin.AdminClient)
-	ctx := context.Background()
+	_, tok := tcore.TestUser(t, srv.API, "", true)
+	ctx := tsrv.RPCAuthContext(t, srv.Config(), tok)
+	// authenticated call (success)
 	list, err := client.CreateSignupCodes(ctx, &rpc_admin.CreateSignupCodesRequest{
 		Uses:  1,
 		Count: 1,

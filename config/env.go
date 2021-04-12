@@ -53,15 +53,11 @@ func loadEnv() (*viper.Viper, error) {
 	// set default values in viper.
 	// Viper needs to know if a key exists in order to override it.
 	// https://github.com/spf13/viper/issues/188
-	b, err := yaml.Marshal(configDefaults)
-	if err != nil {
-		return nil, err
-	}
+	// we can safely ignore this error because we control the struct
+	b, _ := yaml.Marshal(configDefaults)
 	defaults := map[string]interface{}{}
-	err = yaml.Unmarshal(b, &defaults)
-	if err != nil {
-		return nil, err
-	}
+	// we can safely ignore this error because we control the struct
+	_ = yaml.Unmarshal(b, &defaults)
 	v.SetTypeByDefaultValue(true)
 	for key, val := range defaults {
 		v.SetDefault(key, val)
