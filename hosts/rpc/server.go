@@ -1,7 +1,10 @@
 package rpc
 
 import (
+	"context"
+
 	"github.com/jrapoport/gothic/core"
+	"github.com/jrapoport/gothic/models/user"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -16,16 +19,18 @@ func NewServer(s *core.Server) *Server {
 	return &Server{s}
 }
 
-/*
-func (s *Server) Response(in interface{}, out interface{}) error {
-	b, err := json.Marshal(in)
+// ValidateAdmin re-checks that a token belongs to an active admin user
+func (s *Server) ValidateAdmin(ctx context.Context) (user.Role, error) {
+	aid, err := GetUserID(ctx)
 	if err != nil {
-		return s.RPCError(codes.Internal, err)
+		return user.InvalidRole, err
 	}
-	err = json.Unmarshal(b, out)
-	return s.RPCError(codes.Internal, err)
+	role, err := s.API.ValidateAdmin(aid)
+	if err != nil {
+		return user.InvalidRole, err
+	}
+	return role, nil
 }
-*/
 
 // RPCError wraps an rpc error code.
 func (s *Server) RPCError(c codes.Code, err error) error {

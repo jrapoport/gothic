@@ -25,7 +25,7 @@ var _ Claims = (*UserClaims)(nil)
 
 // NewUserClaims returns a new set of claims for the user.
 func NewUserClaims(u *user.User) *UserClaims {
-	if u == nil {
+	if u == nil || u.ID == user.SuperAdminID {
 		return nil
 	}
 	c := &UserClaims{
@@ -42,7 +42,7 @@ func NewUserClaims(u *user.User) *UserClaims {
 // UserID returns the jwt subject as a uuid.
 func (c UserClaims) UserID() uuid.UUID {
 	uid, err := uuid.Parse(c.Subject())
-	if err != nil {
+	if err != nil || uid == user.SuperAdminID {
 		return uuid.Nil
 	}
 	return uid

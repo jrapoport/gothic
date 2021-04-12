@@ -1,10 +1,23 @@
 package hosts
 
-/*
-func configClient(t *testing.T, h core.Hosted) settings.SettingsClient {
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/jrapoport/gothic/api/grpc/rpc/system"
+	"github.com/jrapoport/gothic/core"
+	"github.com/jrapoport/gothic/test/tcore"
+	"github.com/jrapoport/gothic/test/tsrv"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+)
+
+func systemClient(t *testing.T, h core.Hosted) system.SystemClient {
 	return tsrv.RPCClient(t, h.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return settings.NewSettingsClient(cc)
-	}).(settings.SettingsClient)
+		return system.NewSystemClient(cc)
+	}).(system.SystemClient)
 }
 
 func TestRPCHost(t *testing.T) {
@@ -17,20 +30,18 @@ func TestRPCHost(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return h.Online()
-	},1*time.Second, 10*time.Millisecond)
-	test := a.Settings()
-	// unauthenticated call
-	ctx := context.Background()
-	ac := configClient(t, h)
-	res, err := ac.Settings(ctx, &settings.SettingsRequest{})
+	}, 1*time.Second, 10*time.Millisecond)
+	u, _ := tcore.TestUser(t, a, "", false)
+	req := &system.UserAccountRequest{}
+	req.Id = &system.UserAccountRequest_UserId{UserId: u.ID.String()}
+	sc := systemClient(t, h)
+	res, err := sc.GetUserAccount(context.Background(), req)
 	assert.NoError(t, err)
-	assert.Equal(t, test.Status, res.Status)
-	assert.Equal(t, test.Signup.Provider.Internal, res.Signup.Provider.Internal)
+	assert.Equal(t, u.Email, res.Email)
 	// shut down
 	err = h.Shutdown()
 	assert.NoError(t, err)
 	assert.Eventually(t, func() bool {
 		return !h.Online()
-	},1*time.Second, 10*time.Millisecond)
+	}, 1*time.Second, 10*time.Millisecond)
 }
-*/

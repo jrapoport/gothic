@@ -19,11 +19,11 @@ type Webhooks struct {
 	JWT        `yaml:",inline" mapstructure:",squash"`
 }
 
-func (w *Webhooks) normalize(srv Service, j JWT) (err error) {
+func (w *Webhooks) normalize(srv Service, j JWT) error {
 	if w.URL == "" {
 		return nil
 	}
-	_, err = url.Parse(w.URL)
+	_, err := url.Parse(w.URL)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,8 @@ func (w *Webhooks) normalize(srv Service, j JWT) (err error) {
 		w.Events = []events.Event{events.All}
 		break
 	}
-	return w.JWT.normalize(srv, j)
+	w.JWT.normalize(srv, j)
+	return nil
 }
 
 // Enabled returns true if the enabled.

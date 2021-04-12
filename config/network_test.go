@@ -114,8 +114,7 @@ func TestNetwork_Normalization(t *testing.T) {
 		n.RPCWebAddress = test.uRPCWeb
 		n.AdminAddress = test.uRPC
 		n.HealthAddress = test.uRPC
-		err := n.normalize(serviceDefaults)
-		assert.NoError(t, err)
+		n.normalize(serviceDefaults)
 		assert.Equal(t, test.nHost, n.Host)
 		assert.Equal(t, test.nRest, n.RESTAddress)
 		assert.Equal(t, test.nRPC, n.RPCAddress)
@@ -123,26 +122,4 @@ func TestNetwork_Normalization(t *testing.T) {
 		assert.Equal(t, test.nRPC, n.AdminAddress)
 		assert.Equal(t, test.nRPC, n.HealthAddress)
 	}
-	n := Network{}
-	networkDefaults.HealthAddress = "::"
-	networkDefaults.RPCWebAddress = "::"
-	networkDefaults.RPCAddress = "::"
-	networkDefaults.AdminAddress = "::"
-	networkDefaults.RESTAddress = "::"
-	n.Host = "::"
-	n.HealthAddress = "::"
-	err := n.normalize(serviceDefaults)
-	assert.Error(t, err)
-	n.RPCWebAddress = "::"
-	err = n.normalize(serviceDefaults)
-	assert.Error(t, err)
-	n.RPCAddress = "::"
-	err = n.normalize(serviceDefaults)
-	assert.Error(t, err)
-	n.AdminAddress = "::"
-	err = n.normalize(serviceDefaults)
-	assert.Error(t, err)
-	n.RESTAddress = "::"
-	err = n.normalize(serviceDefaults)
-	assert.Error(t, err)
 }

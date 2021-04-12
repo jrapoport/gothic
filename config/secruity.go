@@ -29,16 +29,10 @@ type Security struct {
 }
 
 func (s *Security) normalize(srv Service) error {
-	if s.RootPassword == "" {
-		return errors.New("root password is required")
-	}
-	err := s.JWT.normalize(srv, jwtDefaults)
-	if err != nil {
-		return err
-	}
+	s.JWT.normalize(srv, jwtDefaults)
 	userRx := s.Validation.UsernameRegex
 	if userRx != "" {
-		_, err = regexp.Compile(userRx)
+		_, err := regexp.Compile(userRx)
 		if err != nil {
 			err = fmt.Errorf("invalid username regex %s: %s", userRx, err)
 			return err
@@ -46,7 +40,7 @@ func (s *Security) normalize(srv Service) error {
 	}
 	passRx := s.Validation.PasswordRegex
 	if passRx != "" {
-		_, err = regexp.Compile(passRx)
+		_, err := regexp.Compile(passRx)
 		if err != nil {
 			err = fmt.Errorf("invalid password regex %s: %s", passRx, err)
 			return err
@@ -54,6 +48,13 @@ func (s *Security) normalize(srv Service) error {
 	}
 	if s.Cookies.Duration == 0 {
 		s.Cookies.Duration = cookieDuration
+	}
+	return nil
+}
+
+func (s *Security) CheckRequired() error {
+	if s.RootPassword == "" {
+		return errors.New("root password is required")
 	}
 	return nil
 }
@@ -70,16 +71,16 @@ type JWT struct {
 	Expiration time.Duration `json:"expiration"`
 }
 
-func (j *JWT) normalize(srv Service, def JWT) error {
+func (j *JWT) normalize(srv Service, def JWT) {
 	if def.Issuer == "" {
 		def.Issuer = strings.ToLower(srv.Name)
 	}
-	err := mergo.Merge(j, def)
-	if err != nil {
-		return err
-	}
-	// this needs to stay here
-	// so validation will happen correctly
+	// no error is possible here since we
+	// control the struct entirely
+	_ = mergo.Merge(j, def)
+}
+
+func (j *JWT) CheckRequired() error {
 	if j.Secret == "" {
 		return errors.New("jwt secret is required")
 	}

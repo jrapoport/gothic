@@ -44,11 +44,21 @@ type Config struct {
 
 // LoadConfig loads a config from the provided path. If the
 // path is empty it will still fallback to the enn vars.
-func LoadConfig(filename string) (*Config, error) {
+func LoadConfig(filename string, opt ...Option) (*Config, error) {
+	opts := defaultOptions
+	for _, o := range opt {
+		o.apply(&opts)
+	}
 	var err error
 	c, err := loadNormalized(filename)
 	if err != nil {
 		return nil, err
+	}
+	if opts.required {
+		err = c.checkRequired()
+		if err != nil {
+			return nil, err
+		}
 	}
 	// do this first
 	err = c.Logger.load(c.Service)
@@ -92,10 +102,8 @@ func (c *Config) normalize() error {
 	if err != nil {
 		return err
 	}
-	err = c.Network.normalize(c.Service)
-	if err != nil {
-		return err
-	}
+	// no error is possible
+	c.Network.normalize(c.Service)
 	err = c.Security.normalize(c.Service)
 	if err != nil {
 		return err
@@ -114,6 +122,26 @@ func (c *Config) normalize() error {
 	}
 	// do this last
 	return c.Webhook.normalize(c.Service, c.JWT)
+}
+
+func (c *Config) checkRequired() error {
+	err := c.Service.CheckRequired()
+	if err != nil {
+		return err
+	}
+	err = c.Security.CheckRequired()
+	if err != nil {
+		return err
+	}
+	err = c.JWT.CheckRequired()
+	if err != nil {
+		return err
+	}
+	err = c.DB.CheckRequired()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // loadFromFile loads a config file, the format will be inferred from the ext
@@ -181,10 +209,8 @@ func load(path string) (*Config, error) {
 		return nil, err
 	}
 	c := &Config{}
-	err = v.Unmarshal(c)
-	if err != nil {
-		return nil, err
-	}
+	// we can ignore this error because we control the struct
+	_ = v.Unmarshal(c)
 	return c, nil
 }
 
