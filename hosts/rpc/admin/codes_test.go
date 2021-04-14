@@ -36,9 +36,9 @@ func TestSignupServer_CreateSignupCodes(t *testing.T) {
 		metadata.Pairs(rpc.RootPassword, "bad"))
 	_, err = srv.CreateSignupCodes(ctx, req)
 	assert.Error(t, err)
-	pw := s.Config().RootPassword
+	root := s.Config().RootPassword
 	ctx = metadata.NewIncomingContext(context.Background(),
-		metadata.Pairs(rpc.RootPassword, pw))
+		metadata.Pairs(rpc.RootPassword, root))
 	res, err := srv.CreateSignupCodes(ctx, req)
 	assert.NoError(t, err)
 	require.NotNil(t, res)
