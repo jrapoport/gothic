@@ -23,6 +23,7 @@ type AdminClient interface {
 	CreateSignupCodes(ctx context.Context, in *CreateSignupCodesRequest, opts ...grpc.CallOption) (*SignupCodesResponse, error)
 	CheckSignupCode(ctx context.Context, in *CheckSignupCodeRequest, opts ...grpc.CallOption) (*SignupCodeResponse, error)
 	DeleteSignupCode(ctx context.Context, in *DeleteSignupCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	SearchAuditLogs(ctx context.Context, in *rpc.SearchRequest, opts ...grpc.CallOption) (*AuditLogsResult, error)
 	Settings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error)
 }
@@ -62,6 +63,15 @@ func (c *adminClient) DeleteSignupCode(ctx context.Context, in *DeleteSignupCode
 	return out, nil
 }
 
+func (c *adminClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/CreateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminClient) SearchAuditLogs(ctx context.Context, in *rpc.SearchRequest, opts ...grpc.CallOption) (*AuditLogsResult, error) {
 	out := new(AuditLogsResult)
 	err := c.cc.Invoke(ctx, "/gothic.api.Admin/SearchAuditLogs", in, out, opts...)
@@ -87,6 +97,7 @@ type AdminServer interface {
 	CreateSignupCodes(context.Context, *CreateSignupCodesRequest) (*SignupCodesResponse, error)
 	CheckSignupCode(context.Context, *CheckSignupCodeRequest) (*SignupCodeResponse, error)
 	DeleteSignupCode(context.Context, *DeleteSignupCodeRequest) (*emptypb.Empty, error)
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	SearchAuditLogs(context.Context, *rpc.SearchRequest) (*AuditLogsResult, error)
 	Settings(context.Context, *SettingsRequest) (*SettingsResponse, error)
 	mustEmbedUnimplementedAdminServer()
@@ -104,6 +115,9 @@ func (UnimplementedAdminServer) CheckSignupCode(context.Context, *CheckSignupCod
 }
 func (UnimplementedAdminServer) DeleteSignupCode(context.Context, *DeleteSignupCodeRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSignupCode not implemented")
+}
+func (UnimplementedAdminServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedAdminServer) SearchAuditLogs(context.Context, *rpc.SearchRequest) (*AuditLogsResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAuditLogs not implemented")
@@ -178,6 +192,24 @@ func _Admin_DeleteSignupCode_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gothic.api.Admin/CreateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Admin_SearchAuditLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(rpc.SearchRequest)
 	if err := dec(in); err != nil {
@@ -232,6 +264,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSignupCode",
 			Handler:    _Admin_DeleteSignupCode_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _Admin_CreateUser_Handler,
 		},
 		{
 			MethodName: "SearchAuditLogs",
