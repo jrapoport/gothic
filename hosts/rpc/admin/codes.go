@@ -19,9 +19,9 @@ func (s *adminServer) CreateSignupCodes(ctx context.Context,
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
 	rtx := rpc.RequestContext(ctx)
-	pw := rpc.GetRootPassword(ctx)
-	if pw != "" {
-		sa, err := s.API.GetSuperAdmin(pw)
+	root := rpc.GetRootPassword(ctx)
+	if root != "" {
+		sa, err := s.API.GetSuperAdmin(root)
 		if err != nil {
 			return nil, s.RPCError(codes.PermissionDenied, err)
 		}
