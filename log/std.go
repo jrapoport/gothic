@@ -33,7 +33,7 @@ func (l *stdLogger) WithName(name string) Logger {
 	if name == "" {
 		return l
 	}
-	return named(l.Logger, name, l.level)
+	return named(NewStdLoggerWithLevel(l.level), name, l.level)
 }
 
 // Debug logs args when the logger level is debug.

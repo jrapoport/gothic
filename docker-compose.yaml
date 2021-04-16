@@ -23,7 +23,7 @@ services:
       - "7727:7727"
       - "7729:7729"
     networks:
-      auth_mesh:
+      default:
         aliases:
           - host.docker.internal
     restart: unless-stopped
@@ -41,11 +41,8 @@ services:
       - "8001:8080"
       - "9901:9901"
     networks:
-      auth_mesh: { }
+      default: { }
     restart: unless-stopped
     # make this work on linux
     # extra_hosts:
     #  host.docker.internal: 172.17.0.1
-
-networks:
-  auth_mesh: { }
