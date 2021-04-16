@@ -3,11 +3,13 @@ version: "3.7"
 services:
 
   gothic:
+    container_name: gothic
+    image: gothic:latest
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ${ENV_FILE:-./env/dev.env}
+      - ${ENV_FILE:-./env/sim.env}
     expose:
       - "7720"
       - "7721"
@@ -27,6 +29,7 @@ services:
     restart: unless-stopped
 
   envoy:
+    container_name: envoy
     image: grpcweb/envoy:latest
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml ${ENVOY_FLAGS:-}
     volumes:
