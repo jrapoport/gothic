@@ -22,9 +22,6 @@ service Admin {
   rpc DeleteSignupCode (DeleteSignupCodeRequest) returns (google.protobuf.Empty) {
   }
 
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
-  }
-
   rpc SearchAuditLogs (SearchRequest) returns (AuditLogsResult) {
   }
 
@@ -68,19 +65,6 @@ message SignupCodeResponse {
 
 message DeleteSignupCodeRequest {
   string code = 1;
-}
-
-message CreateUserRequest {
-  string email = 1;
-  string password = 2;
-  bool admin = 3;
-  optional string username = 4;
-  optional google.protobuf.Struct data = 5;
-}
-
-message CreateUserResponse {
-  string role = 1;
-  string email = 2;
 }
 
 message AuditLog {
