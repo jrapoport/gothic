@@ -1,6 +1,7 @@
 package gothic
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,6 +26,7 @@ func Main(c *config.Config) error {
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
 	}
+	name := fmt.Sprintf("%s (%s)", c.Name, utils.ExecutableName())
 	stopCh := make(chan os.Signal, 1)
 	signal.Notify(stopCh, signalsToCatch...)
 	a, err := core.NewAPI(c)
@@ -36,9 +38,9 @@ func Main(c *config.Config) error {
 			c.Log().Error(err)
 			return
 		}
-		c.Log().Infof("%s shut down", c.Name)
+		c.Log().Infof("%s shut down", name)
 	}()
-	c.Log().Infof("starting %s...", c.Name)
+	c.Log().Infof("starting %s...", name)
 	err = hosts.Start(a, c)
 	if err != nil {
 		return err
@@ -48,10 +50,10 @@ func Main(c *config.Config) error {
 			c.Log().Error(err)
 			return
 		}
-		c.Log().Infof("%s shut down", c.Name)
+		c.Log().Infof("%s shut down", name)
 	}()
-	c.Log().Infof("%s %s started", c.Name, c.Version())
+	c.Log().Infof("%s %s started", name, c.Version())
 	<-stopCh
-	c.Log().Infof("%s shutting down", c.Name)
+	c.Log().Infof("%s shutting down", name)
 	return nil
 }

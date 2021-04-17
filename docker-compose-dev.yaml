@@ -3,6 +3,7 @@ version: "3.8"
 services:
 
   mysql:
+    container_name: mysql
     image: mysql:latest
     command: --init-file /data/application/init.sql
     volumes:
@@ -16,7 +17,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      auth_mesh:
+      default:
         aliases:
           - mysql_db
     #https://stackoverflow.com/questions/55559386/how-to-fix-mbind-operation-not-permitted-in-mysql-error-log
@@ -24,6 +25,7 @@ services:
       - SYS_NICE  # CAP_SYS_NICE
 
   pg:
+    container_name: postgres
     image: postgres:latest
     volumes:
       - db_volume:/var/lib/postgresql/data/
@@ -36,12 +38,9 @@ services:
     ports:
       - "5432:5432"
     networks:
-      auth_mesh:
+      default:
         aliases:
           - pg_db
 
 volumes:
   db_volume: { }
-
-networks:
-  auth_mesh: { }
