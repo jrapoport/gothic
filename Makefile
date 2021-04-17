@@ -151,7 +151,9 @@ pg: ## Start postgres
 
 db: mysql ## Start mysql db
 
+sim: db envoy gothic
+
 .PHONY: help fmt vet lint audit static tidy deps rpc test build \
-		release install all image gothic envoy mysql pg db cover
+		release install all image gothic envoy mysql pg db cover sim
 
 .DEFAULT_GOAL := build
