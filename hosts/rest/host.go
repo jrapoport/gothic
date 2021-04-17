@@ -25,7 +25,7 @@ var _ core.Hosted = (*Host)(nil)
 // NewHost creates a new Host.
 func NewHost(a *core.API, name string, address string, reg []RegisterServer) *Host {
 	h := core.NewHost(a, name, address)
-	h.Logger = h.Log().WithName("protocol-http")
+	h.Logger = h.Log().WithName("http")
 	rt := NewRouter(h.Config())
 	//rt.UseLogger(h.Logger)
 	server := &http.Server{

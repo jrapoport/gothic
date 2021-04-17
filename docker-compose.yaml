@@ -3,11 +3,13 @@ version: "3.7"
 services:
 
   gothic:
+    container_name: gothic
+    image: gothic:latest
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - ${ENV_FILE:-./env/dev.env}
+      - ${ENV_FILE:-./env/sim.env}
     expose:
       - "7720"
       - "7721"
@@ -21,12 +23,13 @@ services:
       - "7727:7727"
       - "7729:7729"
     networks:
-      auth_mesh:
+      default:
         aliases:
           - host.docker.internal
     restart: unless-stopped
 
   envoy:
+    container_name: envoy
     image: grpcweb/envoy:latest
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml ${ENVOY_FLAGS:-}
     volumes:
@@ -38,11 +41,8 @@ services:
       - "8001:8080"
       - "9901:9901"
     networks:
-      auth_mesh: { }
+      default: { }
     restart: unless-stopped
     # make this work on linux
     # extra_hosts:
     #  host.docker.internal: 172.17.0.1
-
-networks:
-  auth_mesh: { }
