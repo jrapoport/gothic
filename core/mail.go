@@ -144,7 +144,7 @@ func (a *API) SendInviteUser(ctx context.Context, userID uuid.UUID, toAddress st
 	}
 	if userID != user.SystemID && !a.config.Signup.CanSendInvites() {
 		err := errors.New("invites disabled")
-		return err
+		return a.logError(err)
 	}
 	err := a.sendSignupCode(ctx, userID, toAddress,
 		func(tx *store.Connection) (*code.SignupCode, error) {
@@ -162,4 +162,24 @@ func (a *API) SendInviteUser(ctx context.Context, userID uuid.UUID, toAddress st
 			return a.mail.SendInviteUser(from, to, tok, referrerURL)
 		})
 	return a.logError(err)
+}
+
+// NotifyUser sends a user an email notification
+func (a *API) NotifyUser(_ context.Context, userID uuid.UUID, logo, subject, html, plain string) (bool, error) {
+	if a.mail == nil || a.mail.IsOffline() {
+		return false, nil
+	}
+	u, err := a.GetUser(userID)
+	if err != nil {
+		return false, a.logError(err)
+	}
+	if !u.IsConfirmed() || u.IsBanned() {
+		err = fmt.Errorf("invalid user: %s", u.ID)
+		return false, a.logError(err)
+	}
+	err = a.mail.Send(u.EmailAddress().String(), logo, subject, html, plain)
+	if err != nil {
+		return false, a.logError(err)
+	}
+	return true, nil
 }
