@@ -9,8 +9,12 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 service System {
+  // user
   rpc GetUserAccount (UserAccountRequest) returns (UserAccountResponse) {
   }
+  rpc NotifyUser (NotificationRequest) returns (NotificationResponse) {
+  }
+  // linked
   rpc LinkAccount (LinkAccountRequest) returns (google.protobuf.Empty) {
   }
   rpc GetLinkedAccounts (LinkedAccountsRequest) returns (LinkedAccountsResponse) {
@@ -43,6 +47,18 @@ message UserAccountResponse{
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp confirmed_at = 10;
   google.protobuf.Timestamp verified_at = 11;
+}
+
+message NotificationRequest {
+  string user_id = 1;
+  optional string logo = 2;
+  string subject = 3;
+  string html = 4;
+  optional string plain = 5;
+}
+
+message NotificationResponse {
+  bool sent = 1;
 }
 
 enum LinkedType {
