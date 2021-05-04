@@ -19,7 +19,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SystemClient interface {
+	// user
 	GetUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
+	NotifyUser(ctx context.Context, in *NotificationRequest, opts ...grpc.CallOption) (*NotificationResponse, error)
+	// linked
 	LinkAccount(ctx context.Context, in *LinkAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetLinkedAccounts(ctx context.Context, in *LinkedAccountsRequest, opts ...grpc.CallOption) (*LinkedAccountsResponse, error)
 }
@@ -35,6 +38,15 @@ func NewSystemClient(cc grpc.ClientConnInterface) SystemClient {
 func (c *systemClient) GetUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error) {
 	out := new(UserAccountResponse)
 	err := c.cc.Invoke(ctx, "/gothic.api.System/GetUserAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *systemClient) NotifyUser(ctx context.Context, in *NotificationRequest, opts ...grpc.CallOption) (*NotificationResponse, error) {
+	out := new(NotificationResponse)
+	err := c.cc.Invoke(ctx, "/gothic.api.System/NotifyUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +75,10 @@ func (c *systemClient) GetLinkedAccounts(ctx context.Context, in *LinkedAccounts
 // All implementations must embed UnimplementedSystemServer
 // for forward compatibility
 type SystemServer interface {
+	// user
 	GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
+	NotifyUser(context.Context, *NotificationRequest) (*NotificationResponse, error)
+	// linked
 	LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error)
 	GetLinkedAccounts(context.Context, *LinkedAccountsRequest) (*LinkedAccountsResponse, error)
 	mustEmbedUnimplementedSystemServer()
@@ -75,6 +90,9 @@ type UnimplementedSystemServer struct {
 
 func (UnimplementedSystemServer) GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserAccount not implemented")
+}
+func (UnimplementedSystemServer) NotifyUser(context.Context, *NotificationRequest) (*NotificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NotifyUser not implemented")
 }
 func (UnimplementedSystemServer) LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LinkAccount not implemented")
@@ -109,6 +127,24 @@ func _System_GetUserAccount_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SystemServer).GetUserAccount(ctx, req.(*UserAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _System_NotifyUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NotificationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SystemServer).NotifyUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gothic.api.System/NotifyUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SystemServer).NotifyUser(ctx, req.(*NotificationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -159,6 +195,10 @@ var System_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserAccount",
 			Handler:    _System_GetUserAccount_Handler,
+		},
+		{
+			MethodName: "NotifyUser",
+			Handler:    _System_NotifyUser_Handler,
 		},
 		{
 			MethodName: "LinkAccount",

@@ -1,9 +1,12 @@
 package core
 
 import (
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/codes"
 	"github.com/jrapoport/gothic/core/tokens"
@@ -282,6 +285,128 @@ func TestAPI_SendInviteUser(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestAPI_NotifyUser(t *testing.T) {
+	const (
+		testName    = "Test Name"
+		testSubject = "Test Subject"
+		testHTML    = "<html>test notification</html>"
+		testPlain   = "test notification"
+	)
+	a := mailAPI(t)
+	t.Cleanup(func() {
+		a.CloseMail()
+	})
+	ctx := testContext(a)
+	u := testUser(t, a)
+	// offline
+	sent, err := a.NotifyUser(ctx, uuid.Nil, "", "", "", "")
+	assert.NoError(t, err)
+	assert.False(t, sent)
+	var mock *tconf.SMTPMock
+	a.config, mock = tconf.MockSMTP(t, a.config)
+	a.config.Mail.Name = testName
+	a.config.Mail.SendLimit = 0
+	a.config.Mail.SpamProtection = false
+	err = a.OpenMail()
+	require.NoError(t, err)
+	// bad user 1
+	sent, err = a.NotifyUser(ctx, uuid.Nil, "", "", "", "")
+	assert.Error(t, err)
+	assert.False(t, sent)
+	// bad user 2
+	sent, err = a.NotifyUser(ctx, uuid.New(), "", "", "", "")
+	assert.Error(t, err)
+	assert.False(t, sent)
+	// not confirmed
+	sent, err = a.NotifyUser(ctx, u.ID, "", "", "", "")
+	assert.Error(t, err)
+	assert.False(t, sent)
+	confirmUser(t, a, u)
+	// bad body
+	sent, err = a.NotifyUser(ctx, u.ID, "", "", "", "")
+	assert.Error(t, err)
+	assert.False(t, sent)
+	// html
+	var res string
+	var mu sync.Mutex
+	mock.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
+		res = email
+	})
+	sent, err = a.NotifyUser(ctx, u.ID, "", testSubject, testHTML, "")
+	assert.NoError(t, err)
+	assert.True(t, sent)
+	assert.Eventually(t, func() bool {
+		if !strings.Contains(res, testSubject) {
+			return false
+		}
+		if !strings.Contains(res, testHTML) {
+			return false
+		}
+		return true
+	}, 1*time.Second, 10*time.Millisecond)
+	// plain
+	mock.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
+		res = email
+	})
+	sent, err = a.NotifyUser(ctx, u.ID, "", testSubject, "", testPlain)
+	assert.NoError(t, err)
+	assert.True(t, sent)
+	assert.Eventually(t, func() bool {
+		if !strings.Contains(res, testSubject) {
+			return false
+		}
+		if !strings.Contains(res, testPlain) {
+			return false
+		}
+		return true
+	}, 1*time.Second, 10*time.Millisecond)
+	// both
+	sent, err = a.NotifyUser(ctx, u.ID, "", testSubject, testHTML, testPlain)
+	assert.NoError(t, err)
+	assert.True(t, sent)
+	assert.Eventually(t, func() bool {
+		if !strings.Contains(res, testSubject) {
+			return false
+		}
+		if !strings.Contains(res, testHTML) {
+			return false
+		}
+		if !strings.Contains(res, testPlain) {
+			return false
+		}
+		return true
+	}, 1*time.Second, 10*time.Millisecond)
+	// default subject
+	sent, err = a.NotifyUser(ctx, u.ID, "", "", testHTML, testPlain)
+	assert.NoError(t, err)
+	assert.True(t, sent)
+	assert.Eventually(t, func() bool {
+		if !strings.Contains(res, testName) {
+			return false
+		}
+		if strings.Contains(res, testSubject) {
+			return false
+		}
+		if !strings.Contains(res, testHTML) {
+			return false
+		}
+		if !strings.Contains(res, testPlain) {
+			return false
+		}
+		return true
+	}, 1*time.Second, 10*time.Millisecond)
+	// banned user
+	_, err = a.BanUser(ctx, u.ID)
+	require.NoError(t, err)
+	sent, err = a.NotifyUser(ctx, u.ID, "", testSubject, testHTML, testPlain)
+	assert.Error(t, err)
+	assert.False(t, sent)
+}
+
 func testSend(t *testing.T, a *API, u *user.User, action string,
 	send func() error,
 	testToken func(tok string),
@@ -301,7 +426,7 @@ func testSend(t *testing.T, a *API, u *user.User, action string,
 	a.config.Mail.SendLimit = 0
 	a.config.Mail.SpamProtection = true
 	err = a.OpenMail()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = send()
 	assert.Error(t, err)
 	a.config.Mail.SpamProtection = false

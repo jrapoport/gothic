@@ -240,6 +240,9 @@ func (m *Client) Send(to, logo, subject, html, plain string) error {
 	msg := smtp.NewMSG()
 	msg.SetFrom(m.From())
 	msg.AddTo(to)
+	if subject == "" {
+		subject = m.defaultSubject()
+	}
 	msg.SetSubject(subject)
 	if html != "" {
 		msg.SetBody(smtp.TextHTML, html)
@@ -250,6 +253,9 @@ func (m *Client) Send(to, logo, subject, html, plain string) error {
 		} else {
 			msg.SetBody(smtp.TextPlain, plain)
 		}
+	}
+	if logo == "" {
+		logo = m.config.Logo
 	}
 	if utils.IsLocalPath(logo) {
 		msg.AddInline(logo, filepath.Base(logo))
@@ -377,6 +383,14 @@ func (m *Client) SendSignupCode(from, to, token, referrerURL string) error {
 	}
 	e := template.NewSignupCode(m.config.SignupCode, fromAddr, toAddr, token, referrerURL)
 	return m.sendEmail(e)
+}
+
+func (m *Client) defaultSubject() string {
+	name := "us"
+	if m.config.Name != "" {
+		name = m.config.Name
+	}
+	return "An important message from " + name
 }
 
 func parseAddress(address string) (mail.Address, error) {
