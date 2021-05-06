@@ -254,9 +254,6 @@ func (m *Client) Send(to, logo, subject, html, plain string) error {
 			msg.SetBody(smtp.TextPlain, plain)
 		}
 	}
-	if logo == "" {
-		logo = m.config.Logo
-	}
 	if utils.IsLocalPath(logo) {
 		msg.AddInline(logo, filepath.Base(logo))
 	}
