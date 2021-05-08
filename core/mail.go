@@ -164,8 +164,8 @@ func (a *API) SendInviteUser(ctx context.Context, userID uuid.UUID, toAddress st
 	return a.logError(err)
 }
 
-// NotifyUser sends a user an email notification
-func (a *API) NotifyUser(_ context.Context, userID uuid.UUID, logo, subject, html, plain string) (bool, error) {
+// SendEmailNotification sends a user an email notification
+func (a *API) SendEmailNotification(_ context.Context, userID uuid.UUID, subject string, content mail.Content) (bool, error) {
 	if a.mail == nil || a.mail.IsOffline() {
 		return false, nil
 	}
@@ -177,7 +177,7 @@ func (a *API) NotifyUser(_ context.Context, userID uuid.UUID, logo, subject, htm
 		err = fmt.Errorf("invalid user: %s", u.ID)
 		return false, a.logError(err)
 	}
-	err = a.mail.Send(u.EmailAddress().String(), logo, subject, html, plain)
+	err = a.mail.SendEmailContent(u.EmailAddress().String(), subject, content)
 	if err != nil {
 		return false, a.logError(err)
 	}

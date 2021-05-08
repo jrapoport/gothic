@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/api/grpc/rpc/system"
-	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/user"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -15,10 +14,11 @@ import (
 
 func (s *systemServer) GetUserAccount(_ context.Context, req *system.UserAccountRequest) (*system.UserAccountResponse, error) {
 	var u *user.User
-	switch msg := req.GetId().(type) {
+	switch req.GetUser().(type) {
 	case *system.UserAccountRequest_UserId:
-		s.Debugf("get user %s", msg.UserId)
-		uid, err := uuid.Parse(msg.UserId)
+		userID := req.GetUserId()
+		s.Debugf("get user %s", userID)
+		uid, err := uuid.Parse(userID)
 		if err != nil {
 			return nil, s.RPCError(codes.InvalidArgument, err)
 		}
@@ -27,8 +27,9 @@ func (s *systemServer) GetUserAccount(_ context.Context, req *system.UserAccount
 			return nil, s.RPCError(codes.InvalidArgument, err)
 		}
 	case *system.UserAccountRequest_Email:
-		s.Debugf("get user %s", req.GetEmail())
-		addr, err := mail.ParseAddress(req.GetEmail())
+		email := req.GetEmail()
+		s.Debugf("get user %s", email)
+		addr, err := mail.ParseAddress(email)
 		if err != nil {
 			return nil, s.RPCError(codes.Internal, err)
 		}
@@ -67,24 +68,4 @@ func NewUserResponse(u *user.User) *system.UserAccountResponse {
 		ur.VerifiedAt = timestamppb.New(*u.VerifiedAt)
 	}
 	return ur
-}
-
-func (s *systemServer) NotifyUser(ctx context.Context, req *system.NotificationRequest) (*system.NotificationResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, s.RPCError(codes.InvalidArgument, err)
-	}
-	logo := req.GetLogo()
-	sub := req.GetSubject()
-	html := req.GetHtml()
-	plain := req.GetPlain()
-	rtx := rpc.RequestContext(ctx)
-	sent, err := s.API.NotifyUser(rtx, uid, logo, sub, html, plain)
-	if err != nil {
-		return nil, s.RPCError(codes.Internal, err)
-	}
-	res := &system.NotificationResponse{
-		Sent: sent,
-	}
-	return res, nil
 }
