@@ -43,9 +43,9 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vcraescu/go-paginator/v2 v2.0.0
-	github.com/xhit/go-simple-mail/v2 v2.8.1
+	github.com/xhit/go-simple-mail/v2 v2.9.0
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
+	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0
@@ -54,7 +54,7 @@ require (
 	gorm.io/datatypes v1.0.1
 	gorm.io/driver/clickhouse v0.1.0
 	gorm.io/driver/mysql v1.0.6
-	gorm.io/driver/postgres v1.0.8
+	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/driver/sqlserver v1.0.7
 	gorm.io/gorm v1.21.9
