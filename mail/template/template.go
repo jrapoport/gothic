@@ -45,15 +45,16 @@ func LoadTemplate(c config.Mail, t Template) error {
 
 // MailTemplate holds a mail template.
 type MailTemplate struct {
-	theme   hermes.Theme
-	Prod    hermes.Product
-	Body    hermes.Body
-	config  config.MailTemplate
-	to      mail.Address
-	subject string
-	logo    string
-	link    string
-	token   string
+	theme        hermes.Theme
+	Prod         hermes.Product
+	Body         hermes.Body
+	config       config.MailTemplate
+	to           mail.Address
+	subject      string
+	logo         string
+	link         string
+	token        string
+	bodyTemplate string
 }
 
 var _ Template = (*MailTemplate)(nil)
@@ -66,18 +67,14 @@ func (e *MailTemplate) Configure(c config.MailTemplate, to mail.Address, token, 
 	e.link = linkURL
 }
 
-func loadTemplateFile(file string, v interface{}) error {
-	if file == "" {
-		return nil
-	}
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
-	return yaml.Unmarshal(data, v)
+func NewEmail(c config.MailTemplate, to mail.Address, body string) *MailTemplate {
+	e := new(MailTemplate)
+	e.bodyTemplate = body
+	e.Configure(c, to, "", "")
+	return e
 }
 
-// Config returns the config used to init a mail template.
+// Config returns the config used t init a mail template.
 func (e MailTemplate) Config() config.MailTemplate {
 	return e.config
 }
@@ -101,10 +98,17 @@ func (e *MailTemplate) LoadLayout(c config.Mail) error {
 	e.Prod.Logo = c.Logo
 	e.Prod.Copyright = e.defaultCopyright()
 	e.Prod.TroubleText = e.defaultHelp()
-	err := loadTemplateFile(c.Layout, &e.Prod)
+	tmpl, err := loadTemplateFile(c.Layout)
 	if err != nil {
-		err = fmt.Errorf("sender file: %w", err)
+		err = fmt.Errorf("layout file: %w", err)
 		return err
+	}
+	if tmpl != "" {
+		err = yaml.Unmarshal([]byte(tmpl), &e.Prod)
+		if err != nil {
+			err = fmt.Errorf("unmarshal layout template: %w", err)
+			return err
+		}
 	}
 	e.SetLogo(e.Prod.Logo)
 	return err
@@ -128,10 +132,19 @@ func (e *MailTemplate) LoadBody(action string, ct config.MailTemplate) (err erro
 		}
 		e.Body.Actions = []hermes.Action{a}
 	}
-	err = loadTemplateFile(ct.Template, &e.Body)
-	if err != nil {
-		err = fmt.Errorf("email template file: %w", err)
-		return err
+	if e.bodyTemplate == "" {
+		e.bodyTemplate, err = loadTemplateFile(ct.Template)
+		if err != nil {
+			err = fmt.Errorf("body file: %w", err)
+			return err
+		}
+	}
+	if e.bodyTemplate != "" {
+		err = yaml.Unmarshal([]byte(e.bodyTemplate), &e.Body)
+		if err != nil {
+			err = fmt.Errorf("unmarshal body template: %w", err)
+			return err
+		}
 	}
 	if len(e.Body.Actions) <= 0 {
 		return nil
@@ -263,4 +276,15 @@ func (e MailTemplate) defaultOutro() string {
 func (e MailTemplate) defaultHelp() string {
 	return "If the \"{ACTION}\" button is not working for you, just copy and " +
 		"paste the URL below into your web browser."
+}
+
+func loadTemplateFile(file string) (string, error) {
+	if file == "" {
+		return "", nil
+	}
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }

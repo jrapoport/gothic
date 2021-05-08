@@ -12,7 +12,7 @@ service System {
   // user
   rpc GetUserAccount (UserAccountRequest) returns (UserAccountResponse) {
   }
-  rpc NotifyUser (NotificationRequest) returns (NotificationResponse) {
+  rpc SendEmailNotification (EmailRequest) returns (EmailResponse) {
   }
   // linked
   rpc LinkAccount (LinkAccountRequest) returns (google.protobuf.Empty) {
@@ -22,7 +22,7 @@ service System {
 }
 
 message UserAccountRequest {
-  oneof id {
+  oneof user {
     string user_id = 1;
     string email = 2;
   }
@@ -49,15 +49,19 @@ message UserAccountResponse{
   google.protobuf.Timestamp verified_at = 11;
 }
 
-message NotificationRequest {
+message EmailRequest {
   string user_id = 1;
-  optional string logo = 2;
-  string subject = 3;
-  string html = 4;
-  optional string plain = 5;
+  string subject = 2;
+  oneof content {
+    string html = 3;
+    string markdown = 4;
+    string body = 5;
+  }
+  // only applies to content_html
+  optional string plaintext = 7;
 }
 
-message NotificationResponse {
+message EmailResponse {
   bool sent = 1;
 }
 

@@ -36,9 +36,9 @@ const (
 const (
 	testAction = "the-action"
 	testTok    = "1234567890asdfghjklqwertyuiopzxcvbnm="
-	testRef    = "http://test.example.com:3000/"
+	testRef    = "https://test.example.com:3000/"
 	linkFmt    = "/:action/#token=:token"
-	testLink2  = "http://test.example.com:3000/the-action/#token=1234567890asdfghjklqwertyuiopzxcvbnm="
+	testLink2  = "https://test.example.com:3000/the-action/#token=1234567890asdfghjklqwertyuiopzxcvbnm="
 )
 
 const (
@@ -106,7 +106,7 @@ func testTemplateLoad(t *testing.T, newTemplate func(sub string, test testCase) 
 		require.NotNil(t, tmpl)
 		err := LoadTemplate(c, tmpl)
 		require.NoError(t, err)
-		if sub == "" {
+		if sub == "" && tmpl.Subject() != "" {
 			assert.NotEqual(t, sub, tmpl.Subject())
 			assert.NotEmpty(t, tmpl.Subject())
 
@@ -302,11 +302,7 @@ func TestEmailTemplate_Content(t *testing.T) {
 	}
 	testTemplateContent(t, func(tc testCase) (string, Template) {
 		e := loadTemplate(t, tc)
-		return "email_template", &e
-	})
-	testTemplateContent(t, func(tc testCase) (string, Template) {
-		e := loadTemplate(t, tc)
-		return "email_template", &e
+		return "email_template_file", &e
 	})
 }
 
@@ -336,4 +332,32 @@ func testTemplateContent(t *testing.T, newTemplate func(test testCase) (string, 
 		plainFile := fmt.Sprintf("%s%s_test", testDir, action)
 		assertEqualContent(t, plainFile+".txt", plain)
 	}
+}
+
+func TestEmail_Load(t *testing.T) {
+	t.Parallel()
+	mc := tconf.Config(t).Mail
+	mc.Logo = testLogo
+	body, err := loadTemplateFile(testBody)
+	require.NoError(t, err)
+	require.NotEmpty(t, body)
+	c := config.MailTemplate{}
+	c.Subject = confSub
+	em := NewEmail(c, toAddr, body)
+	require.NotNil(t, em)
+	err = LoadTemplate(mc, em)
+	assert.NoError(t, err)
+}
+
+func TestEmail_Content(t *testing.T) {
+	t.Parallel()
+	body, err := loadTemplateFile(testBody)
+	require.NoError(t, err)
+	require.NotEmpty(t, body)
+	testTemplateContent(t, func(tc testCase) (string, Template) {
+		c := config.MailTemplate{}
+		c.Subject = confSub
+		e := NewEmail(c, tc.to, body)
+		return "email_template_body", e
+	})
 }

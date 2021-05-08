@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"io/ioutil"
 	"net/mail"
 	"testing"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 const (
 	logoFile = "template/testdata/template_logo.png"
+	bodyFile = "template/testdata/template_body.yaml"
 
 	toUsername   = "the_real_mr_flibble"
 	toEmail      = "mr.flibble@example.com"
@@ -21,6 +23,8 @@ const (
 	fromEmail    = "el_peaches@example.com"
 	testToken    = "1234567890asdfghjklqwertyuiopzxcvbnm="
 	testReferral = "http://test.example.com:3000/"
+
+	testSubject = "Test Subject"
 )
 
 var (
@@ -216,10 +220,9 @@ func (ts *ClientTestSuite) TestValidateEmailAccount() {
 
 func (ts *ClientTestSuite) TestSend() {
 	const (
-		testSubject = "Test Subject"
-		testHTML    = "<html></html>"
-		testPlain   = "--plain test--"
-		testLogo    = "http://example.com/logo.png"
+		testHTML  = "<html></html>"
+		testPlain = "--plain test--"
+		testLogo  = "http://example.com/logo.png"
 	)
 	from := "admin@example.com"
 	to := tutils.RandomEmail()
@@ -248,6 +251,18 @@ func (ts *ClientTestSuite) TestSend() {
 			test.Err(ts.T(), err)
 		}
 	}
+}
+
+func (ts *ClientTestSuite) TestSendEmailContent() {
+	ts.testSendEmailContent()
+}
+
+func (ts *ClientTestSuite) TestSendTemplateEmail() {
+	ts.testSendTemplateEmail()
+}
+
+func (ts *ClientTestSuite) TestSendMarkdownEmail() {
+	ts.testSendMarkdownEmail()
 }
 
 func (ts *ClientTestSuite) TestSendChangeEmail() {
@@ -279,6 +294,9 @@ func (ts *ClientTestSuite) TestKeepalive() {
 		name string
 		fn   testFunc
 	}{
+		{"SendEmailContent", ts.testSendEmailContent},
+		{"SendTemplateEmail", ts.testSendTemplateEmail},
+		{"SendMarkdownEmail", ts.testSendMarkdownEmail},
 		{"SendChangeEmail", ts.testSendChangeEmail},
 		{"SendConfirmUser", ts.testSendConfirmUser},
 		{"SendInviteUser", ts.testSendInviteUser},
@@ -321,6 +339,159 @@ func (ts *ClientTestSuite) sendTest(send func(tc testCase) error) {
 		}
 		test.to.Address = ""
 		err = send(test)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			ts.Error(err)
+		}
+	}
+}
+
+func (ts *ClientTestSuite) testSendEmailContent() {
+	const htmlText = `<html>Hello HTML</html>`
+	const plainText = `Hello Plaintext`
+	const markdownText = `
+Title: Newsletter Number 6
+Date: 12-9-2019 10:04am
+Template: newsletter
+URL: newsletter/issue-6.html
+save_as: newsletter/issue-6.html
+
+Welcome to the 6th edition of this newsletter.
+
+## Around the site
+Hello Subscriber
+`
+	body, err := ioutil.ReadFile(bodyFile)
+	ts.Require().NoError(err)
+	ts.Require().NotEmpty(body)
+	var sendTests = []struct {
+		to      mail.Address
+		content Content
+		expect  string
+		Err     assert.ErrorAssertionFunc
+	}{
+		{toAddress, Content{}, "", assert.Error},
+		{toAddress, Content{
+			Type: Template,
+			Body: string(body),
+		}, "Email Friend", assert.NoError},
+		{toAddress, Content{
+			Type: Markdown,
+			Body: markdownText,
+		}, "Hello Subscriber", assert.NoError},
+		{toAddress, Content{
+			Type:      HTML,
+			Body:      htmlText,
+			Plaintext: plainText,
+		}, "Hello HTML", assert.NoError},
+	}
+	for _, test := range sendTests {
+		var sent string
+		ts.mock.AddHook(ts.T(), func(email string) {
+			sent = email
+		})
+		err = ts.client.SendEmailContent(test.to.String(), testSubject, test.content)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			test.Err(ts.T(), err)
+			if err == nil {
+				ts.Eventually(func() bool {
+					return sent != ""
+				}, 1*time.Second, 10*time.Millisecond)
+				ts.Contains(sent, test.expect)
+			}
+		}
+		test.to.Address = ""
+		err = ts.client.SendEmailContent(test.to.String(), testSubject, test.content)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			ts.Error(err)
+		}
+	}
+}
+
+func (ts *ClientTestSuite) testSendTemplateEmail() {
+	body, err := ioutil.ReadFile(bodyFile)
+	ts.Require().NoError(err)
+	ts.Require().NotEmpty(body)
+	var sendTests = []struct {
+		to   mail.Address
+		body string
+		Err  assert.ErrorAssertionFunc
+	}{
+		{toAddress, "", assert.Error},
+		{toAddress, string(body), assert.NoError},
+	}
+	for _, test := range sendTests {
+		var sent string
+		ts.mock.AddHook(ts.T(), func(email string) {
+			sent = email
+		})
+		err = ts.client.SendTemplateEmail(test.to.String(), testSubject, test.body)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			test.Err(ts.T(), err)
+			if err == nil {
+				ts.Eventually(func() bool {
+					return sent != ""
+				}, 1*time.Second, 10*time.Millisecond)
+				ts.Contains(sent, "Email Friend")
+			}
+		}
+		test.to.Address = ""
+		err = ts.client.SendTemplateEmail(test.to.String(), testSubject, test.body)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			ts.Error(err)
+		}
+	}
+}
+
+func (ts *ClientTestSuite) testSendMarkdownEmail() {
+	const markdownText = `
+Title: Newsletter Number 6
+Date: 12-9-2019 10:04am
+Template: newsletter
+URL: newsletter/issue-6.html
+save_as: newsletter/issue-6.html
+
+Welcome to the 6th edition of this newsletter.
+
+## Around the site
+Hello Subscriber
+`
+	var sendTests = []struct {
+		to       mail.Address
+		markdown string
+		Err      assert.ErrorAssertionFunc
+	}{
+		{toAddress, "", assert.Error},
+		{toAddress, markdownText, assert.NoError},
+	}
+	for _, test := range sendTests {
+		var sent string
+		ts.mock.AddHook(ts.T(), func(email string) {
+			sent = email
+		})
+		err := ts.client.SendMarkdownEmail(test.to.String(), testSubject, test.markdown)
+		if ts.client.IsOffline() {
+			ts.NoError(err)
+		} else {
+			test.Err(ts.T(), err)
+			if err == nil {
+				ts.Eventually(func() bool {
+					return sent != ""
+				}, 1*time.Second, 10*time.Millisecond)
+				ts.Contains(sent, "Hello Subscriber")
+			}
+		}
+		test.to.Address = ""
+		err = ts.client.SendMarkdownEmail(test.to.String(), testSubject, test.markdown)
 		if ts.client.IsOffline() {
 			ts.NoError(err)
 		} else {
