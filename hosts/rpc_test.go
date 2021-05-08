@@ -33,7 +33,7 @@ func TestRPCHost(t *testing.T) {
 	}, 1*time.Second, 10*time.Millisecond)
 	u, _ := tcore.TestUser(t, a, "", false)
 	req := &system.UserAccountRequest{}
-	req.Id = &system.UserAccountRequest_UserId{UserId: u.ID.String()}
+	req.User = &system.UserAccountRequest_UserId{UserId: u.ID.String()}
 	sc := systemClient(t, h)
 	res, err := sc.GetUserAccount(context.Background(), req)
 	assert.NoError(t, err)

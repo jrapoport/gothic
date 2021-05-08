@@ -4,7 +4,7 @@ Hi The_real_mr_flibble,
 
 You received this message because there was a request to change the email address you use to access your Gothic account.
 
-Please click the button below to confirm and change your email to: bar@example.com http://test.example.com:3000/change/email/#/1234567890asdfghjklqwertyuiopzxcvbnm=
+Please click the button below to confirm and change your email to: bar@example.com https://test.example.com:3000/change/email/#/1234567890asdfghjklqwertyuiopzxcvbnm=
 
 Once confirmed, your login email will change to the new address. If you did not request this change, no further action is required. You can safely ignore this message.
 
