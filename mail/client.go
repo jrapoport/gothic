@@ -269,7 +269,7 @@ func (m *Client) Send(to, logo, subject, html, plain string) error {
 }
 
 // Send can be used to send one-off templated emails to users.
-func (m *Client) sendEmail(t template.Template) error {
+func (m *Client) sendTemplate(t template.Template) error {
 	if m.IsOffline() {
 		m.log.Warn("mail client is offline")
 		return nil
@@ -289,6 +289,82 @@ func (m *Client) sendEmail(t template.Template) error {
 	return m.Send(t.To(), t.Logo(), t.Subject(), html, plain)
 }
 
+type Type int
+
+const (
+	HTML Type = iota
+	Markdown
+	Template
+)
+
+type Content struct {
+	Type      Type
+	Body      string
+	Plaintext string
+}
+
+func (m *Client) SendEmailContent(to, subject string, content Content) error {
+	if m.IsOffline() {
+		m.log.Warn("mail client is offline")
+		return nil
+	}
+	if content.Body == "" {
+		return errors.New("content body required")
+	}
+	var err error
+	switch content.Type {
+	case Template:
+		err = m.SendTemplateEmail(to, subject, content.Body)
+	case Markdown:
+		err = m.SendMarkdownEmail(to, subject, content.Body)
+	case HTML:
+		fallthrough
+	default:
+		err = m.Send(to, m.config.Logo, subject, content.Body, content.Plaintext)
+	}
+	return err
+}
+
+// SendTemplateEmail sends an generic email based on a body template
+func (m *Client) SendTemplateEmail(to, subject, body string) error {
+	if m.IsOffline() {
+		m.log.Warn("mail client is offline")
+		return nil
+	}
+	toAddr, err := parseAddress(to)
+	if err != nil {
+		return err
+	}
+	if body == "" {
+		return errors.New("body template required")
+	}
+	c := config.MailTemplate{
+		Subject: subject,
+	}
+	e := template.NewEmail(c, toAddr, body)
+	return m.sendTemplate(e)
+}
+
+// SendMarkdownEmail sends an markdown email
+func (m *Client) SendMarkdownEmail(to, subject, markdown string) error {
+	if m.IsOffline() {
+		m.log.Warn("mail client is offline")
+		return nil
+	}
+	toAddr, err := parseAddress(to)
+	if err != nil {
+		return err
+	}
+	if markdown == "" {
+		return errors.New("email markdown required")
+	}
+	c := config.MailTemplate{
+		Subject: subject,
+	}
+	e := template.NewMarkdownMail(c, toAddr, markdown)
+	return m.sendTemplate(e)
+}
+
 // SendChangeEmail sends an email change request
 func (m *Client) SendChangeEmail(to, newAddress, token, referrerURL string) error {
 	if m.IsOffline() {
@@ -303,7 +379,7 @@ func (m *Client) SendChangeEmail(to, newAddress, token, referrerURL string) erro
 		return err
 	}
 	e := template.NewChangeEmail(m.config.ConfirmUser, toAddr, newAddress, token, referrerURL)
-	return m.sendEmail(e)
+	return m.sendTemplate(e)
 }
 
 // SendConfirmUser sends a mail confirmation.
@@ -320,7 +396,7 @@ func (m *Client) SendConfirmUser(to, token, referrerURL string) error {
 		return err
 	}
 	e := template.NewConfirmUser(m.config.ConfirmUser, toAddr, token, referrerURL)
-	return m.sendEmail(e)
+	return m.sendTemplate(e)
 }
 
 // SendResetPassword sends an invite mail to a new user
@@ -337,7 +413,7 @@ func (m *Client) SendResetPassword(to, token, referrerURL string) error {
 		return err
 	}
 	e := template.NewResetPassword(m.config.ResetPassword, toAddr, token, referrerURL)
-	return m.sendEmail(e)
+	return m.sendTemplate(e)
 }
 
 // SendInviteUser sends an invite mail to a new user
@@ -358,7 +434,7 @@ func (m *Client) SendInviteUser(from, to, token, referrerURL string) error {
 		return err
 	}
 	e := template.NewInviteUser(m.config.InviteUser, fromAddr, toAddr, token, referrerURL)
-	return m.sendEmail(e)
+	return m.sendTemplate(e)
 }
 
 // SendSignupCode sends an invite mail to a new user
@@ -379,7 +455,7 @@ func (m *Client) SendSignupCode(from, to, token, referrerURL string) error {
 		return err
 	}
 	e := template.NewSignupCode(m.config.SignupCode, fromAddr, toAddr, token, referrerURL)
-	return m.sendEmail(e)
+	return m.sendTemplate(e)
 }
 
 func (m *Client) defaultSubject() string {

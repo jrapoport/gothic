@@ -1,6 +1,6 @@
 FROM golang:1.15-alpine as build-stage
 
-RUN apk update && apk add --no-cache make git
+RUN apk add --no-cache make git
 
 WORKDIR /gothic
 
