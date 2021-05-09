@@ -23,6 +23,7 @@ services:
     #https://stackoverflow.com/questions/55559386/how-to-fix-mbind-operation-not-permitted-in-mysql-error-log
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
+    restart: unless-stopped
 
   pg:
     container_name: postgres
@@ -41,6 +42,7 @@ services:
       default:
         aliases:
           - pg_db
+    restart: unless-stopped
 
 volumes:
   db_volume: { }
