@@ -24,10 +24,13 @@ const smtpHost = "127.0.0.1"
 type SMTPMock struct {
 	smtp  guerrilla.Daemon
 	hooks sync.Map
+	mu    sync.Mutex
 }
 
 // AddHook adds a mock hook.
 func (m *SMTPMock) AddHook(t *testing.T, hook func(email string)) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	key := utils.RandomUsername()
 	m.hooks.Store(key, hook)
 	t.Cleanup(func() {
@@ -80,9 +83,9 @@ func MockSMTP(t *testing.T, c *config.Config) (*config.Config, *SMTPMock) {
 			return backends.ProcessWith(
 				func(e *mail.Envelope, task backends.SelectTask) (backends.Result, error) {
 					if task == backends.TaskSaveMail {
+						mock.mu.Lock()
+						defer mock.mu.Unlock()
 						mock.hooks.Range(func(_, value interface{}) bool {
-							mu.Lock()
-							defer mu.Unlock()
 							hook := value.(func(string))
 							hook(e.Data.String())
 							return true

@@ -34,14 +34,8 @@ func NewCallback(c config.Webhooks, e events.Event, msg types.Map) (*Callback, e
 	if err != nil {
 		return nil, err
 	}
-	payload, err := msg.JSON()
-	if err != nil {
-		return nil, err
-	}
-	sum, err := checksum(payload)
-	if err != nil {
-		return nil, err
-	}
+	payload := msg.JSON()
+	sum := checksum(payload)
 	claims := jwt.NewWebhookClaims(sum)
 	return &Callback{
 		event:   e,
@@ -67,11 +61,8 @@ func (c Callback) RequestBody() *bytes.Buffer {
 	return bytes.NewBuffer(c.payload)
 }
 
-func checksum(data []byte) (string, error) {
+func checksum(data []byte) string {
 	sha := sha256.New()
-	_, err := sha.Write(data)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(sha.Sum(nil)), nil
+	sha.Write(data)
+	return hex.EncodeToString(sha.Sum(nil))
 }

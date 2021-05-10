@@ -1,6 +1,9 @@
 package email_test
 
 import (
+	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -59,9 +62,37 @@ func TestEmailServer_ConfirmChangeEmail(t *testing.T) {
 	}
 	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
 	assert.Error(t, err)
+	// malformed token 1
+	tok, err := jwt.NewSignedData(srv.Config().JWT, types.Map{})
+	require.NoError(t, err)
+	req = &email.Request{
+		Token: tok,
+	}
+	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
+	assert.Error(t, err)
+	// malformed token 2
+	tok, err = jwt.NewSignedData(srv.Config().JWT, types.Map{
+		key.Token: "bad",
+	})
+	require.NoError(t, err)
+	req = &email.Request{
+		Token: tok,
+	}
+	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
+	assert.Error(t, err)
+	// malformed token 3
+	tok, err = jwt.NewSignedData(srv.Config().JWT, types.Map{
+		key.Token: "bad",
+		key.Email: tutils.RandomEmail(),
+	})
+	require.NoError(t, err)
+	req = &email.Request{
+		Token: tok,
+	}
+	_, err = thttp.DoRequest(t, web, http.MethodPost, confirm, nil, req)
+	assert.Error(t, err)
 	// first get the change token
 	u, bt := tcore.TestUser(t, srv.API, "", false)
-	var tok string
 	smtp.AddHook(t, func(email string) {
 		tok = tconf.GetEmailToken(template.ChangeEmailAction, email)
 	})
@@ -101,7 +132,7 @@ func TestEmailServer_SendChangeEmail(t *testing.T) {
 	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, change, bad, nil, nil)
 	assert.Error(t, err)
 	// user not found
-	bad = thttp.UserToken(t, j, false, false)
+	bad = thttp.UserToken(t, j, true, false)
 	_, err = thttp.DoAuthRequest(t, web, http.MethodPost, change, bad, nil, nil)
 	assert.Error(t, err)
 	// invalid req

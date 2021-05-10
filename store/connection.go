@@ -106,6 +106,19 @@ func (conn *Connection) DBName() string {
 	return conn.Migrator().CurrentDatabase()
 }
 
+// Has returns true if the store contains the object, otherwise false.
+// If an error besides not found occurs, false and the error are returned.
+func (conn *Connection) Has(v interface{}, c ...interface{}) (bool, error) {
+	return Has(conn.DB, v, c...)
+}
+
+// HasLast returns true if the store contains the object, otherwise false.
+// If an error besides not found occurs, false and the error are returned.
+func (conn *Connection) HasLast(v interface{}, c ...interface{}) (bool, error) {
+	return HasLast(conn.DB, v, c...)
+}
+
+/*
 // TableNames returns the table names for the models.
 func (conn *Connection) TableNames() ([]string, error) {
 	database := conn.DBName()
@@ -174,32 +187,5 @@ func (conn *Connection) DropAll() error {
 		}
 		return nil
 	})
-}
-
-// Has returns true if the store contains the object, otherwise false.
-// If an error besides not found occurs, false and the error are returned.
-func (conn *Connection) Has(v interface{}, c ...interface{}) (bool, error) {
-	return Has(conn.DB, v, c...)
-}
-
-// HasLast returns true if the store contains the object, otherwise false.
-// If an error besides not found occurs, false and the error are returned.
-func (conn *Connection) HasLast(v interface{}, c ...interface{}) (bool, error) {
-	return HasLast(conn.DB, v, c...)
-}
-
-/*
-func (conn *Connection) withContext(ctx context.Context, l log.Logger) *Connection {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx = context.SetValue(ctx, interface{}(types.LoggerKey), l)
-	conn.DB = conn.DB.WithContext(ctx)
-	return conn
-}
-
-// Log gets the log was used to initialize the database context.
-func (conn *Connection) Log() log.Logger {
-	return conn.DB.Statement.Context.Value(types.LoggerKey).(log.Logger)
 }
 */

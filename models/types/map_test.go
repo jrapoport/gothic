@@ -66,9 +66,8 @@ func TestData(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, result4.Name, tests[1].Name)
 	test1["age"] = 19
-	b, err := test1.JSON()
-	assert.NoError(t, err)
-	jsonMap := map[string]interface{}{"Attributes": string(b)}
+	bytes := test1.JSON()
+	jsonMap := map[string]interface{}{"Attributes": string(bytes)}
 	err = db.Where(&Tests{Name: "data-1"}).Assign(jsonMap).FirstOrCreate(&Tests{}).Error
 	assert.NoError(t, err)
 	var result5 Tests

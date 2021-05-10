@@ -31,7 +31,6 @@ func TestNewCallback(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, events.Signup, cb.event)
 	assert.Equal(t, testCallback, cb.RequestURL())
-	b, err := data.JSON()
 	assert.NoError(t, err)
-	assert.JSONEq(t, string(b), cb.RequestBody().String())
+	assert.JSONEq(t, data.String(), cb.RequestBody().String())
 }

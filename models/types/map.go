@@ -45,14 +45,14 @@ func (m Map) Get(k string) string {
 }
 
 // JSON returns a json representation of the map
-func (m Map) JSON() ([]byte, error) {
-	return json.Marshal(m)
+func (m Map) JSON() []byte {
+	bytes, _ := json.Marshal(m)
+	return bytes
 }
 
 // Value satisfies the driver.Valuer interface
 func (m Map) Value() (driver.Value, error) {
-	data, _ := m.JSON()
-	return driver.Value(string(data)), nil
+	return driver.Value(string(m.JSON())), nil
 }
 
 // Scan satisfies the sql.Scanner interface
@@ -94,8 +94,7 @@ func (Map) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
 
 // String satisfies the fmt.Stringer interface.
 func (m Map) String() string {
-	b, _ := m.JSON()
-	return string(b)
+	return string(m.JSON())
 }
 
 // DataFromMap returns a generic map as a Map.

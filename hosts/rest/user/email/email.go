@@ -50,69 +50,18 @@ func (s *emailServer) addRoutes(r *rest.Router) {
 	r.Route(Email, func(rt *rest.Router) {
 		rt.Post(Confirm, s.ConfirmChangeEmail)
 		rt.Authenticated().Confirmed().Route(rest.Root, func(cr *rest.Router) {
-			cr.Post(rest.Root, s.UnMaskEmail)
+			// cr.Post(rest.Root, s.UnMaskEmail)
 			cr.Post(Change, s.SendChangeEmail)
 		})
 	})
 }
 
-func (s *emailServer) UnMaskEmail(w http.ResponseWriter, r *http.Request) {
-	panic("implement me")
-}
-
-func (s *emailServer) ConfirmChangeEmail(w http.ResponseWriter, r *http.Request) {
+func (s *emailServer) SendChangeEmail(w http.ResponseWriter, r *http.Request) {
+	// we can safely ignore this error since this route is
+	// protected we've already checked for a valid user id
+	uid, _ := rest.GetUserID(r)
 	req := new(Request)
 	err := rest.UnmarshalRequest(r, req)
-	if err != nil {
-		s.ResponseCode(w, http.StatusBadRequest, err)
-		return
-	}
-	if req.Token == "" {
-		err = errors.New("token not found")
-		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	data, err := jwt.ParseData(s.Config().JWT, req.Token)
-	if err != nil {
-		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	ct, ok := data[key.Token].(string)
-	if !ok || ct == "" {
-		err = errors.New("confirmation token not found")
-		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	email, ok := data[key.Email].(string)
-	if !ok || ct == "" {
-		err = errors.New("email not found")
-		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
-		return
-	}
-	s.Debugf("change password: %v", req)
-	ctx := rest.FromRequest(r)
-	u, err := s.API.ConfirmChangeEmail(ctx, ct, email)
-	if err != nil {
-		s.ResponseError(w, err)
-		return
-	}
-	bt, err := s.GrantBearerToken(ctx, u)
-	if err != nil {
-		s.AuthError(w, err)
-		return
-	}
-	s.Debugf("password changed: %s", bt.UserID)
-	s.AuthResponse(w, r, bt.Token, bt)
-}
-
-func (s *emailServer) SendChangeEmail(w http.ResponseWriter, r *http.Request) {
-	uid, err := rest.GetUserID(r)
-	if err != nil {
-		s.ResponseCode(w, http.StatusBadRequest, err)
-		return
-	}
-	req := new(Request)
-	err = rest.UnmarshalRequest(r, req)
 	if err != nil {
 		s.ResponseCode(w, http.StatusBadRequest, err)
 		return
@@ -145,3 +94,54 @@ func (s *emailServer) SendChangeEmail(w http.ResponseWriter, r *http.Request) {
 	}
 	s.AuthError(w, err)
 }
+
+func (s *emailServer) ConfirmChangeEmail(w http.ResponseWriter, r *http.Request) {
+	req := new(Request)
+	err := rest.UnmarshalRequest(r, req)
+	if err != nil {
+		s.ResponseCode(w, http.StatusBadRequest, err)
+		return
+	}
+	if req.Token == "" {
+		err = errors.New("token not found")
+		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	data, err := jwt.ParseData(s.Config().JWT, req.Token)
+	if err != nil {
+		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	ct, ok := data[key.Token].(string)
+	if !ok || ct == "" {
+		err = errors.New("confirmation token not found")
+		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	email, ok := data[key.Email].(string)
+	if !ok || email == "" {
+		err = errors.New("email not found")
+		s.ResponseCode(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	s.Debugf("change password: %v", req)
+	ctx := rest.FromRequest(r)
+	u, err := s.API.ConfirmChangeEmail(ctx, ct, email)
+	if err != nil {
+		s.ResponseError(w, err)
+		return
+	}
+	bt, err := s.GrantBearerToken(ctx, u)
+	if err != nil {
+		s.AuthError(w, err)
+		return
+	}
+	s.Debugf("password changed: %s", bt.UserID)
+	s.AuthResponse(w, r, bt.Token, bt)
+}
+
+/*
+func (s *emailServer) UnMaskEmail(w http.ResponseWriter, _ *http.Request) {
+	s.ResponseCode(w, http.StatusOK, nil)
+}
+*/
