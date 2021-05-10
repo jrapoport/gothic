@@ -13,15 +13,9 @@ import (
 
 // LogStartup lof the service start
 func LogStartup(conn *store.Connection, service string) error {
-	name, err := os.Hostname()
-	if err != nil {
-		return err
-	}
-	ip, err := utils.OutboundIP()
-	if err != nil {
-		return err
-	}
-	_, err = CreateLogEntry(nil, conn, auditlog.Startup, user.SystemID, types.Map{
+	name, _ := os.Hostname()
+	ip, _ := utils.OutboundIP()
+	_, err := CreateLogEntry(nil, conn, auditlog.Startup, user.SystemID, types.Map{
 		key.Service:   service,
 		key.Hostname:  name,
 		key.IPAddress: ip.String(),
@@ -31,15 +25,9 @@ func LogStartup(conn *store.Connection, service string) error {
 
 // LogShutdown lof the service shutdown
 func LogShutdown(conn *store.Connection, service string) error {
-	name, err := os.Hostname()
-	if err != nil {
-		return err
-	}
-	ip, err := utils.OutboundIP()
-	if err != nil {
-		return err
-	}
-	_, err = CreateLogEntry(nil, conn, auditlog.Shutdown, user.SystemID, types.Map{
+	name, _ := os.Hostname()
+	ip, _ := utils.OutboundIP()
+	_, err := CreateLogEntry(nil, conn, auditlog.Shutdown, user.SystemID, types.Map{
 		key.Service:   service,
 		key.Hostname:  name,
 		key.IPAddress: ip.String(),

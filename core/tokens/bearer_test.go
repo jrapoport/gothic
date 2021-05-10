@@ -3,11 +3,22 @@ package tokens
 import (
 	"testing"
 
+	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/models/user"
+	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestNewBearerToken(t *testing.T) {
+	c := tconf.Config(t)
+	_, err := NewBearerToken(nil)
+	assert.Error(t, err)
+	bad := jwt.NewToken(c.JWT, nil)
+	_, err = NewBearerToken(bad)
+	assert.Error(t, err)
+}
 
 func TestGrantBearerToken(t *testing.T) {
 	t.Parallel()

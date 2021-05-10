@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/log"
 )
 
 // Root is the base route
@@ -39,10 +38,12 @@ func (r *Router) UseDefaults() {
 	})
 }
 
+/* unused for now
 // Mount attaches another http.Handler along ./pattern/*
 func (r *Router) Mount(pattern string, h http.Handler) {
 	r.chi.Mount(pattern, h)
 }
+*/
 
 // Route mounts a sub-Router along a `pattern`` string.
 func (r *Router) Route(pattern string, fn func(*Router)) {
@@ -51,10 +52,12 @@ func (r *Router) Route(pattern string, fn func(*Router)) {
 	})
 }
 
+/* unused for now
 // Handler adds routes for `pattern` that matches all HTTP methods.
 func (r *Router) Handler(pattern string, fn http.HandlerFunc) {
 	r.chi.HandleFunc(pattern, fn)
 }
+*/
 
 // Get HTTP-method routing along `pattern`
 func (r *Router) Get(pattern string, fn http.HandlerFunc) {
@@ -92,6 +95,7 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.chi.ServeHTTP(w, req)
 }
 
+/* unused for now
 // UseLogger sets the logger to use for the Router stack.
 func (r *Router) UseLogger(log log.Logger) {
 	r.Use(func(next http.Handler) http.Handler {
@@ -101,6 +105,7 @@ func (r *Router) UseLogger(log log.Logger) {
 		})
 	})
 }
+*/
 
 // RateLimit adds inline middlewares to rate limit endpoint handlers.
 func (r *Router) RateLimit() *Router {

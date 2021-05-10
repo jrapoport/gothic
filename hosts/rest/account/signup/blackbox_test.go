@@ -33,13 +33,11 @@ func testCase(t *testing.T, srv *rest.Host, web *httptest.Server) (url.Values, *
 		"tasty":       "salad",
 		key.IPAddress: addr.Host,
 	}
-	d, err := data.JSON()
-	require.NoError(t, err)
 	v := url.Values{}
 	v.Set(key.Email, em)
 	v.Set(key.Username, un)
 	v.Set(key.Password, testPass)
-	v.Set(key.Data, string(d))
+	v.Set(key.Data, data.String())
 	if srv.Config().MaskEmails {
 		em = utils.MaskEmail(em)
 	}

@@ -26,13 +26,11 @@ func createUserTest(t *testing.T) (url.Values, *rest.UserResponse) {
 		"foo":   "bar",
 		"tasty": "salad",
 	}
-	d, err := data.JSON()
-	require.NoError(t, err)
 	v := url.Values{}
 	v.Set(key.Email, em)
 	v.Set(key.Username, un)
 	v.Set(key.Password, testPass)
-	v.Set(key.Data, string(d))
+	v.Set(key.Data, data.String())
 	ur := &rest.UserResponse{
 		Role:     user.RoleUser.String(),
 		Email:    em,

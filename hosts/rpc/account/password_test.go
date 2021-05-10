@@ -1,6 +1,7 @@
 package account
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -39,7 +40,10 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 	// success
 	var tok string
 	act := template.ResetPasswordAction
+	var mu sync.Mutex
 	smtp.AddHook(t, func(email string) {
+		mu.Lock()
+		defer mu.Unlock()
 		tok = tconf.GetEmailToken(act, email)
 	})
 	u := testUser(t, srv)
@@ -49,6 +53,10 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 	assert.Eventually(t, func() bool {
 		return tok != ""
 	}, 1*time.Second, 10*time.Millisecond)
+	_, err = srv.API.BanUser(ctx, u.ID)
+	require.NoError(t, err)
+	_, err = srv.SendResetPassword(ctx, req)
+	assert.Error(t, err)
 }
 
 func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
@@ -96,8 +104,14 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	// invalid req
 	_, err := srv.ConfirmResetPassword(ctx, nil)
 	assert.Error(t, err)
-	// empty token
+	// empty password
 	req := &account.ConfirmPasswordRequest{}
+	_, err = srv.ConfirmResetPassword(ctx, req)
+	assert.Error(t, err)
+	// empty token
+	req = &account.ConfirmPasswordRequest{
+		Password: "bad",
+	}
 	_, err = srv.ConfirmResetPassword(ctx, req)
 	assert.Error(t, err)
 	// bad token

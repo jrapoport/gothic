@@ -74,7 +74,7 @@ func (ts *ConnectionTestSuite) SetupSuite() {
 		conn, err := Dial(c, nil)
 		ts.NoError(err)
 		ts.NotNil(conn)
-		err = conn.DropAll()
+		err = conn.dropAll()
 		ts.NoError(err)
 		return conn
 	}
@@ -160,9 +160,7 @@ func (ts *ConnectionTestSuite) TestData() {
 	ts.NoError(err)
 	ts.Equal(result4.Name, users[1].Name)
 	user1Attrs["age"] = 19
-	b, err := user1Attrs.JSON()
-	ts.NoError(err)
-	jsonMap := map[string]interface{}{"Attributes": string(b)}
+	jsonMap := map[string]interface{}{"Attributes": user1Attrs.String()}
 	err = ts.conn.Where(&UserWithData{Name: "data-1"}).Assign(jsonMap).FirstOrCreate(&UserWithData{}).Error
 	ts.NoError(err)
 	var result5 UserWithData
@@ -231,68 +229,6 @@ func (ts *ConnectionTestSuite) Test_1_Has() {
 	ts.False(has)
 }
 
-func (ts *ConnectionTestSuite) Test_2_TableNames() {
-	conn := ts.conn
-	names, err := conn.TableNames()
-	ts.NoError(err)
-	ts.ElementsMatch([]string{
-		"test_migrations",
-		"test_model_as",
-		"test_model_bs",
-	}, names)
-}
-
-func (ts *ConnectionTestSuite) Test_3_TruncateAll() {
-	conn := ts.conn
-	models := []interface{}{
-		&ModelA{},
-		&ModelB{},
-	}
-	for _, model := range models {
-		err := conn.Create(model).Error
-		ts.NoError(err)
-		var cma int64
-		err = conn.Model(model).Count(&cma).Error
-		ts.NoError(err)
-		ts.Equal(int64(1), cma)
-	}
-	err := conn.TruncateAll()
-	ts.NoError(err)
-	for _, model := range models {
-		var cma int64
-		err = conn.Model(model).Count(&cma).Error
-		ts.NoError(err)
-		ts.Equal(int64(0), cma)
-	}
-}
-
-func (ts *ConnectionTestSuite) Test_4_DropAll() {
-	conn := ts.conn
-	err := conn.DropAll()
-	ts.NoError(err)
-	has := conn.Migrator().HasTable(ModelA{})
-	ts.Require().False(has)
-	has = conn.Migrator().HasTable(ModelB{})
-	ts.Require().False(has)
-}
-
-/*
-func (ts *ConnectionTestSuite) Test_5_DropDatabase() {
-	conn := ts.conn
-	name := conn.Migrator().CurrentDatabase()
-	ts.NotEmpty(name)
-	err := conn.DropDatabase()
-	ts.NoError(err)
-	names, err := conn.TableNames()
-	ts.NoError(err)
-	ts.Empty(names)
-	if conn.Name() != conf.SQLite {
-		name = conn.Migrator().CurrentDatabase()
-		ts.Empty(name)
-	}
-}
-*/
-
 func TestDial(t *testing.T) {
 	t.Parallel()
 	// bad url
@@ -339,3 +275,110 @@ func TestDial(t *testing.T) {
 		test.Err(t, err, test.c)
 	}
 }
+
+// tableNames returns the table names for the models for testing.
+func (conn *Connection) tableNames() ([]string, error) {
+	database := conn.DBName()
+	var tx *gorm.DB
+	switch conn.Name() {
+	case drivers.SQLite:
+		tx = conn.Table("sqlite_master").
+			Select("tbl_name").
+			Where("type = ?", "table").
+			Where("tbl_name NOT LIKE ?", "sqlite_%")
+	case drivers.Postgres:
+		database = "public"
+		fallthrough
+	default:
+		tx = conn.Table("information_schema.tables").
+			Select("table_name").
+			Where("table_type = ?", "BASE TABLE").
+			Where("table_schema = ?", database)
+	}
+	var names []string
+	err := tx.Scan(&names).Error
+	if err != nil {
+		return nil, err
+	}
+	return names, nil
+}
+
+// dropAll drops all tables in the database for testing.
+func (conn *Connection) dropAll() error {
+	return conn.Transaction(func(tx *Connection) error {
+		names, err := tx.tableNames()
+		if err != nil {
+			return err
+		}
+		for _, name := range names {
+			raw := "DROP TABLE " + name
+			if err = tx.Exec(raw).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+/*
+func (ts *ConnectionTestSuite) Test_2_TableNames() {
+	conn := ts.conn
+	names, err := conn.TableNames()
+	ts.NoError(err)
+	ts.ElementsMatch([]string{
+		"test_migrations",
+		"test_model_as",
+		"test_model_bs",
+	}, names)
+}
+
+func (ts *ConnectionTestSuite) Test_3_TruncateAll() {
+	conn := ts.conn
+	models := []interface{}{
+		&ModelA{},
+		&ModelB{},
+	}
+	for _, model := range models {
+		err := conn.Create(model).Error
+		ts.NoError(err)
+		var cma int64
+		err = conn.Model(model).Count(&cma).Error
+		ts.NoError(err)
+		ts.Equal(int64(1), cma)
+	}
+	err := conn.TruncateAll()
+	ts.NoError(err)
+	for _, model := range models {
+		var cma int64
+		err = conn.Model(model).Count(&cma).Error
+		ts.NoError(err)
+		ts.Equal(int64(0), cma)
+	}
+}
+
+func (ts *ConnectionTestSuite) Test_4_DropAll() {
+	conn := ts.conn
+	err := conn.DropAll()
+	ts.NoError(err)
+	has := conn.Migrator().HasTable(ModelA{})
+	ts.Require().False(has)
+	has = conn.Migrator().HasTable(ModelB{})
+	ts.Require().False(has)
+}
+
+
+func (ts *ConnectionTestSuite) Test_5_DropDatabase() {
+	conn := ts.conn
+	name := conn.Migrator().CurrentDatabase()
+	ts.NotEmpty(name)
+	err := conn.DropDatabase()
+	ts.NoError(err)
+	names, err := conn.TableNames()
+	ts.NoError(err)
+	ts.Empty(names)
+	if conn.Name() != conf.SQLite {
+		name = conn.Migrator().CurrentDatabase()
+		ts.Empty(name)
+	}
+}
+*/

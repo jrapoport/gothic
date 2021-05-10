@@ -48,9 +48,6 @@ func (a *API) Login(ctx context.Context, email, pw string) (*user.User, error) {
 
 func (a *API) externalLogin(ctx context.Context, conn *store.Connection,
 	p provider.Name, accountID, email string, data, raw types.Map) (*user.User, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	var u *user.User
 	err := conn.Transaction(func(tx *store.Connection) (err error) {
 		la, err := accounts.GetAccount(tx, p, accountID)
@@ -86,9 +83,6 @@ func (a *API) externalLogin(ctx context.Context, conn *store.Connection,
 
 func (a *API) userLogin(ctx context.Context, conn *store.Connection,
 	p provider.Name, email, pw string) (*user.User, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	var u *user.User
 	err := conn.Transaction(func(tx *store.Connection) (err error) {
 		u, err = login.UserLogin(tx, p, email, pw)

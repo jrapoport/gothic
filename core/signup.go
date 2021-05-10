@@ -77,9 +77,6 @@ func (a *API) Signup(ctx context.Context, email, username, pw string, data types
 
 func (a *API) externalSignup(ctx context.Context, conn *store.Connection,
 	p provider.Name, accountID, email string, data, raw types.Map) (*user.User, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	var u *user.User
 	err := conn.Transaction(func(tx *store.Connection) (err error) {
 		pw := utils.SecureToken()
@@ -118,9 +115,6 @@ func (a *API) validateUsername(conn *store.Connection, username string) (string,
 
 func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 	p provider.Name, email, username, pw string, data types.Map) (*user.User, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	err := a.signupEnabled(p)
 	if err != nil {
 		err = fmt.Errorf("signup: %w", err)
@@ -149,18 +143,10 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 		data = a.useDefaultColor(data)
 		meta := types.Map{key.IPAddress: ip}
 		u, err = users.CreateUser(tx, p, email, username, pw, data, meta)
-		if err != nil && a.config.IsDebug() && utils.IsDebugPIN(code) {
-			u, err = users.GetUserWithEmail(tx, email)
-			if err != nil {
-				return err
-			}
-			if a.config.Signup.AutoConfirm {
-				return nil
-			}
-			u.Status = user.Restricted
-			u.ConfirmedAt = nil
-			return tx.Save(u).Error
-		} else if err != nil {
+		if a.debugSignup(tx, email, code) {
+			return nil
+		}
+		if err != nil {
 			return err
 		}
 		err = a.useSignupCode(tx, u, code)
