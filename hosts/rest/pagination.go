@@ -111,7 +111,7 @@ func PaginateResponse(w http.ResponseWriter, r *http.Request, page *store.Pagina
 	w.Header().Add(PageTotal, strconv.FormatUint(page.Total, 10))
 	w.Header().Add(PageSize, strconv.Itoa(page.Length))
 	u := &url.URL{}
-	u.Scheme = "http"
+	u.Scheme = r.URL.Scheme
 	if r.TLS != nil {
 		u.Scheme = "https"
 	}
