@@ -69,7 +69,7 @@ func migrateIndexes(tx *gorm.DB, dst interface{}, indexes []string) error {
 				return err
 			}
 		}
-		if tx.Name() == string(drivers.SQLite) {
+		if tx.Name() == drivers.SQLite {
 			err = tx.Migrator().DropIndex(dst, idx)
 			if err != nil {
 				return err

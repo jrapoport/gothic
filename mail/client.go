@@ -303,7 +303,7 @@ type Content struct {
 	Plaintext string
 }
 
-func (m *Client) SendEmailContent(to, subject string, content Content) error {
+func (m *Client) SendEmail(to, subject string, content Content) error {
 	if m.IsOffline() {
 		m.log.Warn("mail client is offline")
 		return nil

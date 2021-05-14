@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func (s *systemServer) SendEmailNotification(ctx context.Context, req *system.EmailRequest) (*system.EmailResponse, error) {
+func (s *systemServer) SendEmail(ctx context.Context, req *system.EmailRequest) (*system.EmailResponse, error) {
 	uid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, s.RPCError(codes.InvalidArgument, err)
@@ -34,7 +34,7 @@ func (s *systemServer) SendEmailNotification(ctx context.Context, req *system.Em
 		content.Plaintext = req.GetPlaintext()
 	}
 	rtx := rpc.RequestContext(ctx)
-	sent, err := s.API.SendEmailNotification(rtx, uid, sub, content)
+	sent, err := s.API.SendEmail(rtx, uid, sub, content)
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}

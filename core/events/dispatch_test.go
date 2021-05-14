@@ -56,6 +56,12 @@ func TestDispatch_Listen(t *testing.T) {
 			}
 		}()
 	})
+	d := testDispatch(t)
+	bad := d.Listen(Unknown)
+	assert.Nil(t, bad)
+	d.closed = 1
+	bad = d.Listen(Logout)
+	assert.Nil(t, bad)
 }
 
 func testListen(t *testing.T, lis func(d *Dispatch, evt Event, cb Callback)) {

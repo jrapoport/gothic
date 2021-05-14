@@ -1,10 +1,10 @@
 package config
 
 import (
-	"github.com/jrapoport/gothic/log"
 	"testing"
 	"time"
 
+	"github.com/jrapoport/gothic/log"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -76,7 +76,7 @@ func (plan *Plan) Run(db *gorm.DB, sorted bool) error {
 	if err != nil {
 		return err
 	}
-	if db.Name() == string(drivers.SQLite) {
+	if db.Name() == drivers.SQLite {
 		// SQLite is the worst. Basically if we have a foreign key,
 		// the indexes will get prefixed properly when the migrator
 		// runs, but then re-added if the table is also an fk in a

@@ -2,7 +2,6 @@ package system
 
 import (
 	"context"
-	"github.com/jrapoport/gothic/mail"
 	"strings"
 	"sync"
 	"testing"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/api/grpc/rpc/system"
+	"github.com/jrapoport/gothic/mail"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
@@ -45,24 +45,24 @@ outros:
 `
 )
 
-func TestSystemServer_SendEmailNotification(t *testing.T) {
+func TestSystemServer_SendEmail(t *testing.T) {
 	var testPlain = "test_plain_notification"
 	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
 	// no id or email
 	req := &system.EmailRequest{}
-	_, err := srv.SendEmailNotification(ctx, req)
+	_, err := srv.SendEmail(ctx, req)
 	assert.Error(t, err)
 	// bad id
 	req = &system.EmailRequest{UserId: "1"}
-	_, err = srv.SendEmailNotification(ctx, req)
+	_, err = srv.SendEmail(ctx, req)
 	assert.Error(t, err)
 	// offline
 	req = &system.EmailRequest{
 		UserId: uuid.New().String(),
 	}
-	res, err := srv.SendEmailNotification(ctx, req)
+	res, err := srv.SendEmail(ctx, req)
 	assert.NoError(t, err)
 	require.NotNil(t, res)
 	assert.False(t, res.Sent)
@@ -75,7 +75,7 @@ func TestSystemServer_SendEmailNotification(t *testing.T) {
 	req = &system.EmailRequest{
 		UserId: uuid.New().String(),
 	}
-	_, err = srv.SendEmailNotification(ctx, req)
+	_, err = srv.SendEmail(ctx, req)
 	assert.Error(t, err)
 	// create a user
 	u, _ := tcore.TestUser(t, srv.API, "", false)
@@ -83,7 +83,7 @@ func TestSystemServer_SendEmailNotification(t *testing.T) {
 	req = &system.EmailRequest{
 		UserId: u.ID.String(),
 	}
-	_, err = srv.SendEmailNotification(ctx, req)
+	_, err = srv.SendEmail(ctx, req)
 	assert.Error(t, err)
 	// success
 	tests := map[string]struct {
@@ -117,7 +117,7 @@ func TestSystemServer_SendEmailNotification(t *testing.T) {
 			case mail.Template:
 				req.Content = &system.EmailRequest_Body{Body: test.content}
 			}
-			res, err = srv.SendEmailNotification(ctx, req)
+			res, err = srv.SendEmail(ctx, req)
 			assert.NoError(t, err)
 			require.NotNil(t, res)
 			assert.True(t, res.Sent)

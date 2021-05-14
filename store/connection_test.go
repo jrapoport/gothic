@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"database/sql/driver"
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/log"
 	"github.com/jrapoport/gothic/models/types"
@@ -16,6 +15,7 @@ import (
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/data-dog/go-sqlmock.v2"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )

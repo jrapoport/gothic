@@ -12,7 +12,7 @@ service System {
   // user
   rpc GetUserAccount (UserAccountRequest) returns (UserAccountResponse) {
   }
-  rpc SendEmailNotification (EmailRequest) returns (EmailResponse) {
+  rpc SendEmail (EmailRequest) returns (EmailResponse) {
   }
   // linked
   rpc LinkAccount (LinkAccountRequest) returns (google.protobuf.Empty) {

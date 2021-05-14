@@ -294,7 +294,7 @@ func (ts *ClientTestSuite) TestKeepalive() {
 		name string
 		fn   testFunc
 	}{
-		{"SendEmailContent", ts.testSendEmailContent},
+		{"SendEmail", ts.testSendEmailContent},
 		{"SendTemplateEmail", ts.testSendTemplateEmail},
 		{"SendMarkdownEmail", ts.testSendMarkdownEmail},
 		{"SendChangeEmail", ts.testSendChangeEmail},
@@ -391,7 +391,7 @@ Hello Subscriber
 		ts.mock.AddHook(ts.T(), func(email string) {
 			sent = email
 		})
-		err = ts.client.SendEmailContent(test.to.String(), testSubject, test.content)
+		err = ts.client.SendEmail(test.to.String(), testSubject, test.content)
 		if ts.client.IsOffline() {
 			ts.NoError(err)
 		} else {
@@ -404,7 +404,7 @@ Hello Subscriber
 			}
 		}
 		test.to.Address = ""
-		err = ts.client.SendEmailContent(test.to.String(), testSubject, test.content)
+		err = ts.client.SendEmail(test.to.String(), testSubject, test.content)
 		if ts.client.IsOffline() {
 			ts.NoError(err)
 		} else {
