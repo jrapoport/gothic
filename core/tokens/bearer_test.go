@@ -1,6 +1,7 @@
 package tokens
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/jrapoport/gothic/core/tokens/jwt"
@@ -38,6 +39,9 @@ func TestGrantBearerToken(t *testing.T) {
 	require.NotNil(t, bt.RefreshToken)
 	assert.NotEmpty(t, bt.RefreshToken.String())
 	assert.Equal(t, u.ID, bt.RefreshToken.UserID)
+	conn.Error = errors.New("force error")
+	_, err = GrantBearerToken(conn, c.JWT, u)
+	assert.Error(t, err)
 }
 
 func TestRefreshBearerToken(t *testing.T) {
@@ -59,6 +63,9 @@ func TestRefreshBearerToken(t *testing.T) {
 	assert.Equal(t, u.ID, bt.RefreshToken.UserID)
 	// mismatched user
 	u = testUser(t, conn, c)
+	_, err = RefreshBearerToken(conn, c.JWT, u, bt.RefreshToken.String())
+	assert.Error(t, err)
+	conn.Error = errors.New("force error")
 	_, err = RefreshBearerToken(conn, c.JWT, u, bt.RefreshToken.String())
 	assert.Error(t, err)
 }

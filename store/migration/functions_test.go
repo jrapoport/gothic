@@ -1,6 +1,8 @@
 package migration
 
 import (
+	"errors"
+	"regexp"
 	"testing"
 
 	"github.com/jrapoport/gothic/test/tdb"
@@ -16,6 +18,21 @@ func TestNewMigrateFunc(t *testing.T) {
 	assert.NoError(t, err)
 	has := db.Migrator().HasTable(m)
 	assert.True(t, has)
+}
+
+func TestNewMigrateFunc_Error(t *testing.T) {
+	t.Parallel()
+	db, mock := tdb.MockDB(t)
+	create := "CREATE TABLE `model_as` (`id` bigint unsigned AUTO_INCREMENT," +
+		"`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL," +
+		"`deleted_at` datetime(3) NULL,`value` longtext,PRIMARY KEY (`id`)," +
+		"INDEX idx_model_as_deleted_at (`deleted_at`))"
+	mock.ExpectExec(regexp.QuoteMeta(create)).
+		WillReturnError(errors.New("mock error"))
+	m := ModelA{}
+	fn := NewMigrateFunc(m)
+	err := fn(db)
+	assert.Error(t, err)
 }
 
 func TestNewMigrateWithIndexes(t *testing.T) {
@@ -49,19 +66,25 @@ func TestNewMigrateWithIndexes(t *testing.T) {
 		has = db.Migrator().HasIndex(m, tableIdx)
 		assert.True(t, has)
 	}
+	err = migrateIndexes(db, nil, indexes)
+	assert.Error(t, err)
 }
 
 func TestNewRollbackFunc(t *testing.T) {
 	t.Parallel()
 	db := tdb.DB(t)
-	tc := &ModelA{}
-	err := db.AutoMigrate(tc)
+	m := &ModelA{}
+	err := db.AutoMigrate(m)
 	assert.NoError(t, err)
-	has := db.Migrator().HasTable(tc)
+	has := db.Migrator().HasTable(m)
 	assert.True(t, has)
-	rb := NewRollbackFunc(tc)
+	rb := NewRollbackFunc(m)
 	err = rb(db)
 	assert.NoError(t, err)
-	has = db.Migrator().HasTable(tc)
+	has = db.Migrator().HasTable(m)
 	assert.False(t, has)
+	// table name error
+	rb = NewRollbackFunc(nil)
+	err = rb(db)
+	assert.Error(t, err)
 }

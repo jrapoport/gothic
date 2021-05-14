@@ -13,9 +13,12 @@ import (
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/test/tconf"
+	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/data-dog/go-sqlmock.v2"
 )
 
 const (
@@ -33,6 +36,20 @@ func createAPI(t *testing.T) *API {
 	a.config.Signup.Username = false
 	a.config.Recaptcha.Key = ""
 	return a
+}
+
+func mockAPI(t *testing.T) (*API, sqlmock.Sqlmock) {
+	c := tconf.TempDB(t)
+	a, err := NewAPI(c)
+	require.NoError(t, err)
+	require.NotNil(t, a)
+	conn, mock := tconn.MockConn(t)
+	a.conn = conn
+	defer func() {
+		err = mock.ExpectationsWereMet()
+		assert.NoError(t, err)
+	}()
+	return a, mock
 }
 
 // apiWithTempDB creates a new API with a temp db for tests.

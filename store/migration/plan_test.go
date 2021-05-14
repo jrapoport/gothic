@@ -47,4 +47,20 @@ func TestPlan_Run(t *testing.T) {
 	p.AddMigrations([]*Migration{migA, migB})
 	err = p.Run(db, true)
 	assert.Error(t, err)
+	p.Clear()
+	assert.Len(t, p.migs, 0)
+}
+
+func TestPlan_Run_Errors(t *testing.T) {
+	db := tdb.DB(t)
+	ma := ModelA{}
+	migA := NewMigration("A", ma)
+	require.NotNil(t, migA)
+	p := NewPlan()
+	err := p.Run(db, false)
+	assert.NoError(t, err)
+	p.AddMigration(migA)
+	p.migs[0].model = nil
+	err = p.Run(db, false)
+	assert.Error(t, err)
 }

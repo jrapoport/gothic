@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type SystemClient interface {
 	// user
 	GetUserAccount(ctx context.Context, in *UserAccountRequest, opts ...grpc.CallOption) (*UserAccountResponse, error)
-	SendEmailNotification(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*EmailResponse, error)
+	SendEmail(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*EmailResponse, error)
 	// linked
 	LinkAccount(ctx context.Context, in *LinkAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetLinkedAccounts(ctx context.Context, in *LinkedAccountsRequest, opts ...grpc.CallOption) (*LinkedAccountsResponse, error)
@@ -44,9 +44,9 @@ func (c *systemClient) GetUserAccount(ctx context.Context, in *UserAccountReques
 	return out, nil
 }
 
-func (c *systemClient) SendEmailNotification(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*EmailResponse, error) {
+func (c *systemClient) SendEmail(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*EmailResponse, error) {
 	out := new(EmailResponse)
-	err := c.cc.Invoke(ctx, "/gothic.api.System/SendEmailNotification", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.System/SendEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *systemClient) GetLinkedAccounts(ctx context.Context, in *LinkedAccounts
 type SystemServer interface {
 	// user
 	GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error)
-	SendEmailNotification(context.Context, *EmailRequest) (*EmailResponse, error)
+	SendEmail(context.Context, *EmailRequest) (*EmailResponse, error)
 	// linked
 	LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error)
 	GetLinkedAccounts(context.Context, *LinkedAccountsRequest) (*LinkedAccountsResponse, error)
@@ -91,8 +91,8 @@ type UnimplementedSystemServer struct {
 func (UnimplementedSystemServer) GetUserAccount(context.Context, *UserAccountRequest) (*UserAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserAccount not implemented")
 }
-func (UnimplementedSystemServer) SendEmailNotification(context.Context, *EmailRequest) (*EmailResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendEmailNotification not implemented")
+func (UnimplementedSystemServer) SendEmail(context.Context, *EmailRequest) (*EmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmail not implemented")
 }
 func (UnimplementedSystemServer) LinkAccount(context.Context, *LinkAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LinkAccount not implemented")
@@ -131,20 +131,20 @@ func _System_GetUserAccount_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _System_SendEmailNotification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _System_SendEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SystemServer).SendEmailNotification(ctx, in)
+		return srv.(SystemServer).SendEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gothic.api.System/SendEmailNotification",
+		FullMethod: "/gothic.api.System/SendEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SystemServer).SendEmailNotification(ctx, req.(*EmailRequest))
+		return srv.(SystemServer).SendEmail(ctx, req.(*EmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -197,8 +197,8 @@ var System_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _System_GetUserAccount_Handler,
 		},
 		{
-			MethodName: "SendEmailNotification",
-			Handler:    _System_SendEmailNotification_Handler,
+			MethodName: "SendEmail",
+			Handler:    _System_SendEmail_Handler,
 		},
 		{
 			MethodName: "LinkAccount",

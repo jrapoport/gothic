@@ -303,7 +303,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 		Type: mail.HTML,
 	}
 	// offline
-	sent, err := a.SendEmailNotification(ctx, uuid.Nil, "", content)
+	sent, err := a.SendEmail(ctx, uuid.Nil, "", content)
 	assert.NoError(t, err)
 	assert.False(t, sent)
 	var mock *tconf.SMTPMock
@@ -314,20 +314,20 @@ func TestAPI_NotifyUser(t *testing.T) {
 	err = a.OpenMail()
 	require.NoError(t, err)
 	// bad user 1
-	sent, err = a.SendEmailNotification(ctx, uuid.Nil, "", content)
+	sent, err = a.SendEmail(ctx, uuid.Nil, "", content)
 	assert.Error(t, err)
 	assert.False(t, sent)
 	// bad user 2
-	sent, err = a.SendEmailNotification(ctx, uuid.New(), "", content)
+	sent, err = a.SendEmail(ctx, uuid.New(), "", content)
 	assert.Error(t, err)
 	assert.False(t, sent)
 	// not confirmed
-	sent, err = a.SendEmailNotification(ctx, u.ID, "", content)
+	sent, err = a.SendEmail(ctx, u.ID, "", content)
 	assert.Error(t, err)
 	assert.False(t, sent)
 	confirmUser(t, a, u)
 	// bad body
-	sent, err = a.SendEmailNotification(ctx, u.ID, "", content)
+	sent, err = a.SendEmail(ctx, u.ID, "", content)
 	assert.Error(t, err)
 	assert.False(t, sent)
 	// html
@@ -339,7 +339,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 		res = email
 	})
 	content.Body = testHTML
-	sent, err = a.SendEmailNotification(ctx, u.ID, testSubject, content)
+	sent, err = a.SendEmail(ctx, u.ID, testSubject, content)
 	assert.NoError(t, err)
 	assert.True(t, sent)
 	assert.Eventually(t, func() bool {
@@ -357,7 +357,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 		defer mu.Unlock()
 		res = email
 	})
-	sent, err = a.SendEmailNotification(ctx, u.ID, testSubject, content)
+	sent, err = a.SendEmail(ctx, u.ID, testSubject, content)
 	assert.NoError(t, err)
 	assert.True(t, sent)
 	assert.Eventually(t, func() bool {
@@ -370,7 +370,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 		return true
 	}, 1*time.Second, 10*time.Millisecond)
 	// both
-	sent, err = a.SendEmailNotification(ctx, u.ID, testSubject, content)
+	sent, err = a.SendEmail(ctx, u.ID, testSubject, content)
 	assert.NoError(t, err)
 	assert.True(t, sent)
 	assert.Eventually(t, func() bool {
@@ -386,7 +386,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 		return true
 	}, 1*time.Second, 10*time.Millisecond)
 	// default subject
-	sent, err = a.SendEmailNotification(ctx, u.ID, "", content)
+	sent, err = a.SendEmail(ctx, u.ID, "", content)
 	assert.NoError(t, err)
 	assert.True(t, sent)
 	assert.Eventually(t, func() bool {
@@ -407,7 +407,7 @@ func TestAPI_NotifyUser(t *testing.T) {
 	// banned user
 	_, err = a.BanUser(ctx, u.ID)
 	require.NoError(t, err)
-	sent, err = a.SendEmailNotification(ctx, u.ID, testSubject, content)
+	sent, err = a.SendEmail(ctx, u.ID, testSubject, content)
 	assert.Error(t, err)
 	assert.False(t, sent)
 }

@@ -1,6 +1,8 @@
 package auditlog
 
 import (
+	"testing"
+
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
@@ -9,7 +11,6 @@ import (
 	"github.com/jrapoport/gothic/test/tconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func auditConn(t *testing.T) *store.Connection {

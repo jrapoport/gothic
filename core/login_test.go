@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	"github.com/stretchr/testify/require"
 	"sync"
 	"testing"
 	"time"
@@ -62,6 +64,11 @@ func TestAPI_Login(t *testing.T) {
 		_, err := a.Login(ctx, test.email, test.pw)
 		test.Err(t, err)
 	}
+	// force error
+	a.conn.Error = errors.New("test failure")
+	_, err := a.Login(nil, u.Email, testPass)
+	assert.Error(t, err)
+	a.conn.Error = nil
 }
 
 func TestAPI_Login_Disabled(t *testing.T) {
@@ -191,4 +198,20 @@ func testLoginEvent(t *testing.T, a *API, lis []events.Event, l listenerTestFunc
 	assert.Equal(t, events.Logout, data[key.Event].(events.Event))
 	assert.Equal(t, testIP, data[key.IPAddress].(string))
 	assert.Equal(t, u.ID, data[key.UserID].(uuid.UUID))
+}
+
+func TestAPI_Logout(t *testing.T) {
+	t.Parallel()
+	a := loginAPI(t)
+	u := testUser(t, a)
+	u = confirmUser(t, a, u)
+	ctx := testContext(a)
+	_, err := a.Login(ctx, u.Email, testPass)
+	require.NoError(t, err)
+	err = a.Logout(nil, u.ID)
+	assert.NoError(t, err)
+	a.conn.Error = errors.New("test failure")
+	err = a.Logout(nil, uuid.New())
+	assert.Error(t, err)
+	a.conn.Error = nil
 }

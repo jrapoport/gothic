@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/data-dog/go-sqlmock.v2"
 	"gorm.io/driver/mysql"
 )
 
@@ -35,6 +35,7 @@ func mockDB(t *testing.T, c *config.Config) (context.Context, *config.Config) {
 	require.NoError(t, err)
 	require.NotNil(t, db)
 	cfg := mysql.Config{
+		DriverName:                drivers.MySQL,
 		Conn:                      db,
 		SkipInitializeWithVersion: true,
 	}

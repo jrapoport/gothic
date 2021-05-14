@@ -1,9 +1,9 @@
 package types
 
 import (
-	"github.com/jrapoport/gothic/store/drivers"
 	"testing"
 
+	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/jrapoport/gothic/test/tdb"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/datatypes"
