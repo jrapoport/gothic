@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/accounts"
 	"github.com/jrapoport/gothic/models/account"

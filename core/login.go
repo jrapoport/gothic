@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/jrapoport/gothic/core/accounts"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jrapoport/gothic/core/accounts"
 	"github.com/jrapoport/gothic/core/audit"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/core/events"

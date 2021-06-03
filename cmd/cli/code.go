@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/jrapoport/gothic/hosts/rpc"
-	"google.golang.org/grpc/metadata"
 	"os"
 	"strconv"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc/metadata"
 )
 
 var codeCmd = &cobra.Command{
