@@ -10,19 +10,21 @@ import (
 
 const (
 	jwtSecret = "i-am-a-secret"
-	jwtKey    = "./testdata/test-key.pem"
 	jwtAlgo   = "HS384"
 	jwtIss    = "foo"
 	jwtAud    = "bar"
 	jwtExp    = 100 * time.Minute
+	jwtPrvKey = "./testdata/test-key.pem"
+	jwtPubKey = "./testdata/test-key.pem.pub"
+	jwtBadKey = "./testdata/test-key.bad"
 )
 
 func TestJWT(t *testing.T) {
 	runTests(t, func(t *testing.T, test testCase, c *Config) {
 		j := c.JWT
 		assert.Equal(t, jwtSecret+test.mark, j.Secret)
-		assert.Equal(t, jwtKey+test.mark, j.PrivateKey)
-		assert.Equal(t, jwtKey+test.mark, j.PublicKey)
+		assert.Equal(t, jwtPrvKey+test.mark, j.PEM.PrivateKey)
+		assert.Equal(t, jwtPrvKey+test.mark, j.PEM.PublicKey)
 		assert.Equal(t, jwtAlgo+test.mark, j.Algorithm)
 		assert.Equal(t, jwtIss+test.mark, j.Issuer)
 		assert.Equal(t, jwtAud+test.mark, j.Audience)
@@ -40,8 +42,8 @@ func TestJWT_Env(t *testing.T) {
 			assert.NoError(t, err)
 			j := c.JWT
 			assert.Equal(t, jwtSecret, j.Secret)
-			assert.Equal(t, jwtKey, j.PrivateKey)
-			assert.Equal(t, jwtKey, j.PublicKey)
+			assert.Equal(t, jwtPrvKey, j.PEM.PrivateKey)
+			assert.Equal(t, jwtPrvKey, j.PEM.PublicKey)
 			assert.Equal(t, jwtAlgo, j.Algorithm)
 			assert.Equal(t, jwtIss, j.Issuer)
 			assert.Equal(t, jwtAud, j.Audience)
@@ -63,8 +65,8 @@ func TestJWT_Defaults(t *testing.T) {
 func TestJWT_Normalization(t *testing.T) {
 	j := JWT{}
 	j.Secret = jwtSecret
-	j.PrivateKey = jwtKey
-	j.PublicKey = jwtKey
+	j.PEM.PrivateKey = jwtPrvKey
+	j.PEM.PublicKey = jwtPrvKey
 	j.normalize(Service{
 		Name:    service,
 		SiteURL: siteURL,
@@ -82,17 +84,57 @@ func TestJWT_CheckRequired(t *testing.T) {
 		{"", "", "", assert.Error},
 		{"secret", "", "", assert.NoError},
 		{"", "bad", "", assert.Error},
-		{"", jwtKey, "", assert.NoError},
-		{"", "", jwtKey, assert.Error},
-		{"", jwtKey, "bad", assert.Error},
-		{"", jwtKey, jwtKey, assert.NoError},
+		{"", jwtPrvKey, "", assert.NoError},
+		{"", "", jwtPrvKey, assert.Error},
+		{"", jwtPrvKey, "bad", assert.Error},
+		{"", jwtPrvKey, jwtPrvKey, assert.NoError},
 	}
 	for _, test := range reqTests {
 		j := JWT{}
 		j.Secret = test.secret
-		j.PrivateKey = test.private
-		j.PublicKey = test.public
+		j.PEM.PrivateKey = test.private
+		j.PEM.PublicKey = test.public
 		err := j.CheckRequired()
 		test.Err(t, err)
+	}
+}
+
+func TestJWT_Keys(t *testing.T) {
+	const noKey = "./does-not-exist"
+	keyTests := []struct {
+		config JWT
+		Nil    assert.ValueAssertionFunc
+	}{
+		{
+			JWT{Secret: jwtSecret},
+			assert.NotNil,
+		},
+		{
+			JWT{PEM: PEM{PrivateKey: jwtPrvKey}},
+			assert.NotNil,
+		},
+		{
+			JWT{PEM: PEM{
+				PrivateKey: jwtPrvKey,
+				PublicKey:  jwtPubKey,
+			}},
+			assert.NotNil,
+		},
+		{
+			JWT{PEM: PEM{PrivateKey: noKey}},
+			assert.Nil,
+		},
+		{
+			JWT{PEM: PEM{PrivateKey: jwtBadKey}},
+			assert.Nil,
+		},
+	}
+	for _, test := range keyTests {
+		assert.Nil(t, test.config.sk)
+		assert.Nil(t, test.config.pk)
+		test.Nil(t, test.config.PrivateKey())
+		test.Nil(t, test.config.sk)
+		test.Nil(t, test.config.PublicKey())
+		test.Nil(t, test.config.pk)
 	}
 }

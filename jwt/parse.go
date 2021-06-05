@@ -35,7 +35,7 @@ func ParseData(c config.JWT, token string) (types.Map, error) {
 
 func parse(c config.JWT, token string) (jwt.Token, error) {
 	alg := jwa.SignatureAlgorithm(c.Algorithm)
-	key := publicKey(c)
+	key := c.PublicKey()
 	opts := []jwt.ParseOption{
 		jwt.WithValidate(true),
 		jwt.WithVerify(alg, key),

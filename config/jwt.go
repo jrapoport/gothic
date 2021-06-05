@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jrapoport/gothic/utils"
+	"github.com/lestrrat-go/jwx/jwk"
+	"io/ioutil"
 	"strings"
 	"time"
 
@@ -24,6 +26,8 @@ type JWT struct {
 	// Scope is an optional comma separated list of permission
 	// scopes for the token (default: n/a)
 	Scope string `json:"scope"`
+	sk    jwk.Key
+	pk    jwk.Key
 }
 
 type PEM struct {
@@ -41,18 +45,61 @@ func (j *JWT) normalize(srv Service, def JWT) {
 }
 
 func (j *JWT) CheckRequired() error {
-	if j.Secret == "" && j.PrivateKey == "" {
+	if j.Secret == "" && j.PEM.PrivateKey == "" {
 		return errors.New("jwt secret or private key is required")
 	} else if j.Secret != "" {
 		return nil
 	}
-	if j.PrivateKey != "" && !utils.PathExists(j.PrivateKey) {
-		err := fmt.Errorf("jwt private key not found: %s", j.PrivateKey)
+	if j.PEM.PrivateKey != "" && !utils.PathExists(j.PEM.PrivateKey) {
+		err := fmt.Errorf("jwt private key not found: %s", j.PEM.PrivateKey)
 		return err
 	}
-	if j.PublicKey != "" && !utils.PathExists(j.PublicKey) {
-		err := fmt.Errorf("jwt public key not found: %s", j.PublicKey)
+	if j.PEM.PublicKey != "" && !utils.PathExists(j.PEM.PublicKey) {
+		err := fmt.Errorf("jwt public key not found: %s", j.PEM.PublicKey)
 		return err
 	}
 	return nil
+}
+
+func (j *JWT) PrivateKey() jwk.Key {
+	if j.sk != nil {
+		return j.sk
+	}
+	if j.Secret != "" {
+		sec := []byte(j.Secret)
+		j.sk, _ = jwk.New(sec)
+	} else {
+		j.sk, _ = pemKey(j.PEM.PrivateKey)
+	}
+	return j.sk
+}
+
+func (j *JWT) PublicKey() jwk.Key {
+	if j.pk != nil {
+		return j.pk
+	}
+	if j.Secret != "" {
+		sec := []byte(j.Secret)
+		j.pk, _ = jwk.New(sec)
+	} else {
+		pem := j.PEM.PublicKey
+		if pem == "" {
+			const publicKeyExt = ".pub"
+			pem = j.PEM.PrivateKey + publicKeyExt
+		}
+		j.pk, _ = pemKey(pem)
+	}
+	return j.pk
+}
+
+func pemKey(pem string) (jwk.Key, error) {
+	raw, err := ioutil.ReadFile(pem)
+	if err != nil {
+		return nil, err
+	}
+	key, err := jwk.ParseKey(raw, jwk.WithPEM(true))
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
 }
