@@ -50,35 +50,38 @@ func (c UserClaims) UserID() uuid.UUID {
 
 // Provider returns the provider name
 func (c UserClaims) Provider() provider.Name {
-	name, ok := c.Get(ProviderKey)
+	v, ok := c.Get(ProviderKey)
 	if !ok {
 		return provider.Unknown
 	}
-	return provider.Name(name.(string))
+	name, _ := v.(string)
+	return provider.Name(name)
 }
 
 // Admin returns true if admin
 func (c UserClaims) Admin() bool {
-	v, _ := c.Get(AdminKey)
-	return v.(bool)
+	return c.getBool(AdminKey)
 }
 
 // Restricted returns true if restricted
 func (c UserClaims) Restricted() bool {
-	v, _ := c.Get(RestrictedKey)
-	return v.(bool)
+	return c.getBool(RestrictedKey)
 }
 
 // Confirmed returns true if confirmed
 func (c UserClaims) Confirmed() bool {
-	v, _ := c.Get(ConfirmedKey)
-	return v.(bool)
+	return c.getBool(ConfirmedKey)
 }
 
 // Verified returns true if verified
 func (c UserClaims) Verified() bool {
-	v, _ := c.Get(VerifiedKey)
-	return v.(bool)
+	return c.getBool(VerifiedKey)
+}
+
+func (c UserClaims) getBool(key string) bool {
+	v, _ := c.Get(key)
+	b, _ := v.(bool)
+	return b
 }
 
 // ParseUserClaims parses and returns a set of UserClaims form a token.
