@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httptracer"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/opentracing/opentracing-go"
 )
 

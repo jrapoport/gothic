@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rest"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/segmentio/encoding/json"
