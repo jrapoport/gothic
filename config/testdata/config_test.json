@@ -16,7 +16,9 @@
     "algorithm": "HS384.json",
     "issuer": "foo.json",
     "audience": "bar.json",
-    "expiration": "1h40m0s"
+    "expiration": "1h40m0s",
+    "privatekey":"./testdata/test-key.pem.json",
+    "publickey":"./testdata/test-key.pem.json"
   },
   "recaptcha": {
     "key": "RECAPTCHA-KEY.json",

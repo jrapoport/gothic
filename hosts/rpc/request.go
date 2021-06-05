@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	core_ctx "github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 )

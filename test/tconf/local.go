@@ -1,6 +1,7 @@
 package tconf
 
 import (
+	"github.com/jrapoport/gothic/utils"
 	"os"
 	"path/filepath"
 	"testing"
@@ -36,7 +37,7 @@ func mysqldDB(t *testing.T, c *config.Config) *config.Config {
 func sqliteDB(t *testing.T, c *config.Config) *config.Config {
 	path := c.DB.DSN
 	dir, file := filepath.Split(path)
-	if !tutils.PathExists(t, dir) {
+	if !utils.PathExists(dir) {
 		root := tutils.ProjectRoot(t)
 		path = filepath.Join(root, dir)
 		// make sure the path exists

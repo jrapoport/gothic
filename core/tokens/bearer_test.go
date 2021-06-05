@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tconn"

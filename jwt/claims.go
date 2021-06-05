@@ -1,10 +1,17 @@
 package jwt
 
-import "github.com/lestrrat-go/jwx/jwt"
+import (
+	"strings"
+
+	"github.com/lestrrat-go/jwx/jwt"
+)
+
+const ScopeKey = "scope"
 
 // Claims interface for jwt.
 type Claims interface {
 	jwt.Token
+	Scope() []string
 	parseToken(*Token)
 }
 
@@ -27,6 +34,19 @@ func (c *StandardClaims) SetSubject(sub string) {
 	// we can safely ignore an error here
 	// because the it is strongly typed
 	_ = c.Set(jwt.SubjectKey, sub)
+}
+
+// Scope returns the scope(s) for the token
+func (c *StandardClaims) Scope() []string {
+	s, ok := c.Get(ScopeKey)
+	if !ok {
+		return []string{}
+	}
+	scopes, ok := s.(string)
+	if !ok {
+		return []string{}
+	}
+	return strings.Split(scopes, " ")
 }
 
 // ParseToken handles the parsed values coming back from a token

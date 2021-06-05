@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/modules/invite"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/mail/template"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/test/tconf"

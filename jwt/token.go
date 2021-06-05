@@ -7,15 +7,15 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/lestrrat-go/jwx/jwa"
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
 // Token is a struct to hold extended jwt token.
-// TODO: support public/private keys etc.
 type Token struct {
 	jwt.Token
 	method jwa.SignatureAlgorithm
-	secret []byte
+	secret jwk.Key
 }
 
 // NewToken returns a new jwt token for the claims.
@@ -38,9 +38,13 @@ func NewToken(c config.JWT, claims Claims) *Token {
 		exp := iat.Add(c.Expiration).Truncate(time.Microsecond)
 		_ = tok.Set(jwt.ExpirationKey, exp)
 	}
+	if c.Scope != "" {
+		scope := strings.Split(c.Scope, ",")
+		_ = tok.Set(ScopeKey, strings.Join(scope, " "))
+	}
 	algo := jwa.SignatureAlgorithm(c.Algorithm)
-	sec := []byte(c.Secret)
-	return &Token{tok, algo, sec}
+	key := privateKey(c)
+	return &Token{tok, algo, key}
 }
 
 // Bearer signs the claims and returns the result as a string.

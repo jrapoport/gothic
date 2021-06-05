@@ -37,3 +37,12 @@ func ExecutableName() string {
 	name := filepath.Base(path)
 	return strings.TrimSuffix(name, filepath.Ext(name))
 }
+
+// PathExists returns true if the path exists.
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil || os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
