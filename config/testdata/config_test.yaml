@@ -19,6 +19,8 @@ jwt:
   issuer: "foo.yaml"
   audience: "bar.yaml"
   expiration: 100m0s
+  privatekey: "./testdata/test-key.pem.yaml"
+  publickey: "./testdata/test-key.pem.yaml"
 
 recaptcha:
   key: "RECAPTCHA-KEY.yaml"

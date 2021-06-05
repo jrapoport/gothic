@@ -9,7 +9,7 @@ import (
 
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core/events"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/models/types"
 )
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 )
 
 // HTTP Headers

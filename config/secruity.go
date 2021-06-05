@@ -4,10 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 	"time"
-
-	"github.com/imdario/mergo"
 )
 
 // Security config
@@ -55,34 +52,6 @@ func (s *Security) normalize(srv Service) error {
 func (s *Security) CheckRequired() error {
 	if s.RootPassword == "" {
 		return errors.New("root password is required")
-	}
-	return nil
-}
-
-// JWT holds all the JWT related configuration.
-type JWT struct {
-	Secret    string `json:"secret"`
-	Algorithm string `json:"algorithm"`
-	// Issuer is the the entity that issued the token (default: Config.Service)
-	Issuer string `json:"issuer"`
-	// Audience is an optional comma separated list of resource
-	// servers that should accept the token (default: n/a)
-	Audience   string        `json:"audience"`
-	Expiration time.Duration `json:"expiration"`
-}
-
-func (j *JWT) normalize(srv Service, def JWT) {
-	if def.Issuer == "" {
-		def.Issuer = strings.ToLower(srv.Name)
-	}
-	// no error is possible here since we
-	// control the struct entirely
-	_ = mergo.Merge(j, def)
-}
-
-func (j *JWT) CheckRequired() error {
-	if j.Secret == "" {
-		return errors.New("jwt secret is required")
 	}
 	return nil
 }

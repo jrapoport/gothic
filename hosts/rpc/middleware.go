@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/jrapoport/gothic/config"
-	"github.com/jrapoport/gothic/core/tokens/jwt"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

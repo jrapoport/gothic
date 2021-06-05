@@ -1,9 +1,6 @@
 package email_test
 
 import (
-	"github.com/jrapoport/gothic/core/tokens/jwt"
-	"github.com/jrapoport/gothic/models/types"
-	"github.com/jrapoport/gothic/models/types/key"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,7 +8,10 @@ import (
 
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/hosts/rest/user/email"
+	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/mail/template"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/test/tconf"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/thttp"

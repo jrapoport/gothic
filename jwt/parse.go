@@ -12,10 +12,33 @@ import (
 
 // ParseClaims parses a set of jwt claims from a token.
 func ParseClaims(c config.JWT, token string, claims Claims) error {
+	tok, err := parse(c, token)
+	if err != nil {
+		return err
+	}
+	sub := tok.Subject()
+	if sub == "" {
+		return errors.New("invalid subject")
+	}
+	claims.parseToken(&Token{Token: tok})
+	return nil
+}
+
+// ParseData parses a Map from a token.
+func ParseData(c config.JWT, token string) (types.Map, error) {
+	tok, err := parse(c, token)
+	if err != nil {
+		return nil, err
+	}
+	return tok.PrivateClaims(), nil
+}
+
+func parse(c config.JWT, token string) (jwt.Token, error) {
 	alg := jwa.SignatureAlgorithm(c.Algorithm)
+	key := publicKey(c)
 	opts := []jwt.ParseOption{
 		jwt.WithValidate(true),
-		jwt.WithVerify(alg, []byte(c.Secret)),
+		jwt.WithVerify(alg, key),
 	}
 	if c.Issuer != "" {
 		opt := jwt.WithIssuer(c.Issuer)
@@ -30,29 +53,7 @@ func ParseClaims(c config.JWT, token string, claims Claims) error {
 	}
 	tok, err := jwt.Parse([]byte(token), opts...)
 	if err != nil {
-		return err
-	}
-	sub := tok.Subject()
-	if sub == "" {
-		return errors.New("invalid subject")
-	}
-	claims.parseToken(&Token{Token: tok})
-	return nil
-}
-
-// ParseData parses a Map from a token.
-func ParseData(c config.JWT, token string) (types.Map, error) {
-	alg := jwa.SignatureAlgorithm(c.Algorithm)
-	iss := c.Issuer
-	sec := []byte(c.Secret)
-	opts := []jwt.ParseOption{
-		jwt.WithIssuer(iss),
-		jwt.WithValidate(true),
-		jwt.WithVerify(alg, sec),
-	}
-	tok, err := jwt.Parse([]byte(token), opts...)
-	if err != nil {
 		return nil, err
 	}
-	return tok.PrivateClaims(), nil
+	return tok, nil
 }
