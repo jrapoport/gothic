@@ -43,7 +43,7 @@ func NewToken(c config.JWT, claims Claims) *Token {
 		_ = tok.Set(ScopeKey, strings.Join(scope, " "))
 	}
 	algo := jwa.SignatureAlgorithm(c.Algorithm)
-	key := privateKey(c)
+	key := c.PrivateKey()
 	return &Token{tok, algo, key}
 }
 
