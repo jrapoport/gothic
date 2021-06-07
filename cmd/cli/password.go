@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/jrapoport/gothic/cmd/cli/root"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
@@ -12,27 +13,27 @@ import (
 
 // this command requires direct DB access
 var passwordCmd = &cobra.Command{
-	Use:  "password [old] [new]",
+	Use:  "password [OLD PASSWORD] [NEW PASSWORD]",
 	Long: "password changes the root password",
 	RunE: passwordRunE,
 	Args: cobra.ExactArgs(2),
 }
 
 func init() {
-	AddRootCommand(passwordCmd)
+	root.AddCommand(passwordCmd)
 }
 
-func passwordRunE(cmd *cobra.Command, args []string) error {
+func passwordRunE(_ *cobra.Command, args []string) error {
 	var (
 		oldPassword = args[0]
 		newPassword = args[1]
 	)
-	c := rootConfig()
-	err := c.DB.CheckRequired()
+	cfg := root.Config()
+	err := cfg.DB.CheckRequired()
 	if err != nil {
 		return err
 	}
-	conn, err := store.Dial(c, nil)
+	conn, err := store.Dial(cfg, nil)
 	if err != nil {
 		return err
 	}

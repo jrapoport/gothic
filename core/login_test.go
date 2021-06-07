@@ -2,7 +2,6 @@ package core
 
 import (
 	"errors"
-	"github.com/stretchr/testify/require"
 	"sync"
 	"testing"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func loginAPI(t *testing.T) *API {

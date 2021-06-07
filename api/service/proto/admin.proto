@@ -25,6 +25,12 @@ service Admin {
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
   }
 
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
+  }
+
+  rpc ChangeUserRole (ChangeUserRoleRequest) returns (ChangeUserRoleResponse) {
+  }
+
   rpc SearchAuditLogs (SearchRequest) returns (AuditLogsResult) {
   }
 
@@ -80,7 +86,33 @@ message CreateUserRequest {
 
 message CreateUserResponse {
   string role = 1;
-  string email = 2;
+  string user_id = 2;
+  string email = 3;
+}
+
+message DeleteUserRequest {
+  oneof user {
+    string user_id = 1;
+    string email = 2;
+  }
+  bool hard = 3;
+}
+
+message DeleteUserResponse {
+  string user_id = 1;
+}
+
+message ChangeUserRoleRequest {
+  oneof user {
+    string user_id = 1;
+    string email = 2;
+  }
+  string role = 3;
+}
+
+message ChangeUserRoleResponse {
+  string user_id = 1;
+  string role = 2;
 }
 
 message AuditLog {

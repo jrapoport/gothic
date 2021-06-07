@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/models/user"
@@ -21,8 +22,10 @@ func NewServer(s *core.Server) *Server {
 
 // ValidateAdmin re-checks that a token belongs to an active admin user
 func (s *Server) ValidateAdmin(ctx context.Context) (user.Role, error) {
-	aid, err := GetUserID(ctx)
-	if err != nil {
+	rtx := RequestContext(ctx)
+	aid := rtx.AdminID()
+	if !rtx.IsAdmin() || aid == user.SystemID {
+		err := errors.New("admin user id not found")
 		return user.InvalidRole, err
 	}
 	role, err := s.API.ValidateAdmin(aid)

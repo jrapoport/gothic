@@ -222,20 +222,24 @@ func TestDeleteUser(t *testing.T) {
 	conn, c := tconn.TempConn(t)
 	u := testUser(t, conn, c.Provider())
 	require.False(t, u.DeletedAt.Valid)
-	err := DeleteUser(conn, u)
+	// success
+	err := DeleteUser(conn, u, false)
 	assert.NoError(t, err)
 	require.True(t, u.DeletedAt.Valid)
 	_, err = GetUser(conn, u.ID)
 	assert.Error(t, err)
-	err = DeleteUser(conn, user.NewSystemUser())
+	// ignored
+	err = DeleteUser(conn, user.NewSystemUser(), false)
 	assert.NoError(t, err)
-	err = DeleteUser(conn, nil)
+	// ignored
+	err = DeleteUser(conn, nil, false)
 	assert.NoError(t, err)
+	// ignore banned
 	u = testUser(t, conn, c.Provider())
 	require.False(t, u.DeletedAt.Valid)
 	err = BanUser(conn, u)
 	require.NoError(t, err)
-	err = DeleteUser(conn, u)
+	err = DeleteUser(conn, u, false)
 	assert.NoError(t, err)
 	require.False(t, u.DeletedAt.Valid)
 	u, err = GetUser(conn, u.ID)
@@ -245,4 +249,16 @@ func TestDeleteUser(t *testing.T) {
 	taken, err := IsEmailTaken(conn, u.Email)
 	require.NoError(t, err)
 	assert.True(t, taken)
+	// hard delete
+	u = testUser(t, conn, c.Provider())
+	require.False(t, u.DeletedAt.Valid)
+	err = DeleteUser(conn, u, true)
+	assert.NoError(t, err)
+	var count int64
+	err = conn.Unscoped().
+		Model(user.User{}).
+		Where("id = ?", u.ID).
+		Count(&count).Error
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), count)
 }

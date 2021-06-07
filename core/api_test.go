@@ -91,6 +91,12 @@ func testContext(a *API) context.Context {
 	return ctx
 }
 
+func rootContext(a *API) context.Context {
+	ctx := testContext(a)
+	ctx.SetAdminID(user.SuperAdminID)
+	return ctx
+}
+
 func testUser(t *testing.T, a *API) *user.User {
 	p := a.Provider()
 	email := tutils.RandomEmail()

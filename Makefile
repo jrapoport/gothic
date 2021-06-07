@@ -43,17 +43,17 @@ DEBUG_TAGS := -tags "debug"
 RELEASE_TAGS := -tags "osusergo,netgo,release"
 BUILD_TAGS := $(DEBUG_TAGS) -tags "sqlite_json"
 
-VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)
-ifeq (, $(VERSION_NUM))
-	VERSION_NUM := 0.0.1
-endif
+#VERSION_NUM := $(shell git describe --abbrev=0 --tags 2> /dev/null)
+#ifeq (, $(VERSION_NUM))
+	VERSION_NUM := 0.5.0
+#endif
 # BUILD_MN := $(shell git log -1 --format=%cd --date=format:'%m')
 # BUILD_YR := $(shell git log -1 --format=%cd --date=format:'%y%d')
 # BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(BUILD_MN) + 64)) $(BUILD_YR))
 BUILD_NUM := $(shell printf '%b%s' \\$(shell printf %o $(shell expr $(shell date +%m) + 64)) $(shell date +%y%d))
 VER_PKG := $(PKG)/config
 # make sure this is = and not := so it gets expanded properly
-VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}'
+VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}' -X '${VER_PKG}.ExeName=${EXE}'
 
 TEST_FLAGS :=-failfast $(TEST_FLAGS)
 COVERAGE_FILE=coverage.txt

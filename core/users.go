@@ -97,27 +97,6 @@ func (a *API) ChangePassword(ctx context.Context, userID uuid.UUID, old, pw stri
 	return u, nil
 }
 
-// ChangeRole changes a user role.
-func (a *API) ChangeRole(ctx context.Context, userID uuid.UUID, r user.Role) (*user.User, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	a.log.Debugf("change user to %s: %s", r.String(), userID)
-	var u *user.User
-	err := a.conn.Transaction(func(tx *store.Connection) (err error) {
-		u, err = users.GetUser(tx, userID)
-		if err != nil {
-			return err
-		}
-		return a.changeRole(ctx, tx, u, r)
-	})
-	if err != nil {
-		return nil, a.logError(err)
-	}
-	a.log.Debugf("changed user to %s: %s", r.String(), userID)
-	return u, nil
-}
-
 func (a *API) changeRole(ctx context.Context, conn *store.Connection, u *user.User, r user.Role) error {
 	if u == nil || u.IsLocked() {
 		err := errors.New("invalid user")
@@ -316,34 +295,6 @@ func (a *API) BanUser(ctx context.Context, userID uuid.UUID) (*user.User, error)
 	}
 	a.log.Debugf("banned user: %s", userID)
 	return u, nil
-}
-
-// DeleteUser deletes a user.
-func (a *API) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	if userID == uuid.Nil {
-		err := errors.New("user id required")
-		return a.logError(err)
-	}
-	a.log.Debugf("delete user: %s", userID)
-	err := a.conn.Transaction(func(tx *store.Connection) error {
-		u, err := users.GetUser(tx, userID)
-		if err != nil {
-			return err
-		}
-		err = users.DeleteUser(tx, u)
-		if err != nil {
-			return err
-		}
-		return audit.LogDeleted(ctx, tx, userID)
-	})
-	if err != nil {
-		return a.logError(err)
-	}
-	a.log.Debugf("deleted user: %s", userID)
-	return nil
 }
 
 // LinkAccount links an external account

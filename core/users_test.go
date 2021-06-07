@@ -37,6 +37,8 @@ func TestAPI_GetUser(t *testing.T) {
 	assert.Error(t, err)
 	_, err = a.GetUser(uuid.New())
 	assert.Error(t, err)
+	_, err = a.GetUser(user.SuperAdminID)
+	assert.Error(t, err)
 }
 
 func TestAPI_GetAuthenticatedUser(t *testing.T) {
@@ -58,6 +60,8 @@ func TestAPI_GetAuthenticatedUser(t *testing.T) {
 	err = a.conn.Delete(bt.RefreshToken).Error
 	assert.NoError(t, err)
 	_, err = a.GetAuthenticatedUser(u.ID)
+	assert.Error(t, err)
+	_, err = a.GetUser(user.SuperAdminID)
 	assert.Error(t, err)
 }
 
@@ -163,9 +167,12 @@ func TestSearchUsers(t *testing.T) {
 		tests = testCreateUsers(t, a)
 	})
 	// find all no page
+	list, err := a.SearchUsers(nil, nil, nil)
+	assert.NoError(t, err)
+	assert.Len(t, list, len(tests))
 	ctx := context.Background()
 	ctx.SetSort(store.Descending)
-	list, err := a.SearchUsers(ctx, nil, nil)
+	list, err = a.SearchUsers(ctx, nil, nil)
 	assert.NoError(t, err)
 	assert.Len(t, list, len(tests))
 	for _, idx := range []int{0, 5, 10, 20} {
@@ -406,44 +413,6 @@ func TestAPI_ChangePassword(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestAPI_CmdChangeUserRole(t *testing.T) {
-	t.Parallel()
-	a := apiWithTempDB(t)
-	ctx := testContext(a)
-	u := testUser(t, a)
-	_, err := a.ChangeRole(nil, uuid.Nil, user.RoleAdmin)
-	assert.Error(t, err)
-	_, err = a.ChangeRole(ctx, uuid.New(), user.RoleAdmin)
-	assert.Error(t, err)
-	// promote
-	u, err = a.ChangeRole(ctx, u.ID, user.RoleAdmin)
-	assert.NoError(t, err)
-	assert.True(t, u.IsAdmin())
-	// re-promote
-	u, err = a.ChangeRole(ctx, u.ID, user.RoleAdmin)
-	assert.NoError(t, err)
-	assert.True(t, u.IsAdmin())
-	// super-promote
-	_, err = a.ChangeRole(ctx, u.ID, user.RoleSuper)
-	assert.Error(t, err)
-	// sneak promote
-	u.Role = user.RoleSuper
-	err = a.conn.Save(u).Error
-	assert.NoError(t, err)
-	u, err = a.ChangeRole(ctx, u.ID, user.RoleAdmin)
-	assert.NoError(t, err)
-	assert.True(t, u.IsAdmin())
-	// demote
-	u, err = a.ChangeRole(ctx, u.ID, user.RoleUser)
-	assert.NoError(t, err)
-	assert.False(t, u.IsAdmin())
-	banUser(t, a, u)
-	_, err = a.ChangeRole(ctx, u.ID, user.RoleAdmin)
-	assert.Error(t, err)
-	_, err = a.ChangeRole(ctx, u.ID, user.RoleUser)
-	assert.Error(t, err)
-}
-
 func TestAPI_ConfirmUser(t *testing.T) {
 	t.Parallel()
 	a := apiWithTempDB(t)
@@ -589,25 +558,6 @@ func TestAPI_BanUser(t *testing.T) {
 	assert.True(t, u.IsBanned())
 }
 
-func TestAPI_DeleteUser(t *testing.T) {
-	t.Parallel()
-	a := apiWithTempDB(t)
-	u := testUser(t, a)
-	assert.True(t, u.Valid())
-	assert.False(t, u.DeletedAt.Valid)
-	// no user id
-	err := a.DeleteUser(nil, uuid.Nil)
-	assert.Error(t, err)
-	// bad user id
-	err = a.DeleteUser(nil, uuid.New())
-	assert.Error(t, err)
-	// delete user
-	err = a.DeleteUser(nil, u.ID)
-	assert.NoError(t, err)
-	_, err = a.GetUser(u.ID)
-	assert.Error(t, err)
-}
-
 func TestAPI_LinkAccount(t *testing.T) {
 	t.Parallel()
 	var (
@@ -621,10 +571,10 @@ func TestAPI_LinkAccount(t *testing.T) {
 	)
 	a := apiWithTempDB(t)
 	u := testUser(t, a)
-	ctx := context.Background()
 	// errors
-	err := a.LinkAccount(ctx, uuid.Nil, nil)
+	err := a.LinkAccount(nil, uuid.Nil, nil)
 	assert.Error(t, err)
+	ctx := context.Background()
 	bad := account.NewAccount(p, aid, email, data)
 	err = a.LinkAccount(ctx, uuid.Nil, bad)
 	assert.Error(t, err)

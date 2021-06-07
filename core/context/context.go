@@ -2,7 +2,6 @@ package context
 
 import (
 	"context"
-
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/models/types/provider"
 	"github.com/jrapoport/gothic/store"
@@ -23,6 +22,8 @@ type Context interface {
 
 	AdminID() uuid.UUID
 	SetAdminID(uuid.UUID)
+
+	IsAdmin() bool
 
 	Code() string
 	SetCode(string)
@@ -53,8 +54,8 @@ var _ Context = (*apiContext)(nil)
 type ipKey struct{}
 
 func (ctx apiContext) IPAddress() string {
-	e, _ := ctx.Value(ipKey{}).(string)
-	return e
+	v, _ := ctx.Value(ipKey{}).(string)
+	return v
 }
 
 func (ctx *apiContext) SetIPAddress(ip string) {
@@ -67,8 +68,8 @@ func (ctx *apiContext) SetIPAddress(ip string) {
 type providerKey struct{}
 
 func (ctx apiContext) Provider() provider.Name {
-	e, _ := ctx.Value(providerKey{}).(provider.Name)
-	return e
+	v, _ := ctx.Value(providerKey{}).(provider.Name)
+	return v
 }
 
 func (ctx *apiContext) SetProvider(s provider.Name) {
@@ -81,8 +82,8 @@ func (ctx *apiContext) SetProvider(s provider.Name) {
 type uidKey struct{}
 
 func (ctx apiContext) UserID() uuid.UUID {
-	e, _ := ctx.Value(uidKey{}).(uuid.UUID)
-	return e
+	v, _ := ctx.Value(uidKey{}).(uuid.UUID)
+	return v
 }
 
 func (ctx *apiContext) SetUserID(uid uuid.UUID) {
@@ -95,8 +96,8 @@ func (ctx *apiContext) SetUserID(uid uuid.UUID) {
 type aidKey struct{}
 
 func (ctx apiContext) AdminID() uuid.UUID {
-	e, _ := ctx.Value(aidKey{}).(uuid.UUID)
-	return e
+	v, _ := ctx.Value(aidKey{}).(uuid.UUID)
+	return v
 }
 
 func (ctx *apiContext) SetAdminID(uid uuid.UUID) {
@@ -106,11 +107,15 @@ func (ctx *apiContext) SetAdminID(uid uuid.UUID) {
 	ctx.setValue(aidKey{}, uid)
 }
 
+func (ctx apiContext) IsAdmin() bool {
+	return ctx.AdminID() != uuid.Nil
+}
+
 type codeKey struct{}
 
 func (ctx apiContext) Code() string {
-	tok, _ := ctx.Value(codeKey{}).(string)
-	return tok
+	v, _ := ctx.Value(codeKey{}).(string)
+	return v
 }
 
 func (ctx *apiContext) SetCode(code string) {
@@ -123,8 +128,8 @@ func (ctx *apiContext) SetCode(code string) {
 type recaptchaKey struct{}
 
 func (ctx apiContext) ReCaptcha() string {
-	tok, _ := ctx.Value(recaptchaKey{}).(string)
-	return tok
+	v, _ := ctx.Value(recaptchaKey{}).(string)
+	return v
 }
 
 func (ctx *apiContext) SetReCaptcha(tok string) {
@@ -137,8 +142,8 @@ func (ctx *apiContext) SetReCaptcha(tok string) {
 type sortKey struct{}
 
 func (ctx apiContext) Sort() store.Sort {
-	s, _ := ctx.Value(sortKey{}).(store.Sort)
-	return s
+	v, _ := ctx.Value(sortKey{}).(store.Sort)
+	return v
 }
 
 func (ctx *apiContext) SetSort(s store.Sort) {

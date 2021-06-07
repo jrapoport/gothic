@@ -91,7 +91,7 @@ func SetupTestLogs(t *testing.T, c *config.Config, uid, bid uuid.UUID) []TestCas
 	return tests
 }
 
-type AuditServerTestSuite struct {
+type AdminAuditServerTestSuite struct {
 	suite.Suite
 	srv   *adminServer
 	conn  *store.Connection
@@ -101,11 +101,11 @@ type AuditServerTestSuite struct {
 
 func TestAuditLogs(t *testing.T) {
 	t.Parallel()
-	ts := &AuditServerTestSuite{}
+	ts := &AdminAuditServerTestSuite{}
 	suite.Run(t, ts)
 }
 
-func (ts *AuditServerTestSuite) SetupSuite() {
+func (ts *AdminAuditServerTestSuite) SetupSuite() {
 	s, _ := tsrv.RPCServer(ts.T(), false)
 	ts.srv = newAdminServer(s)
 	conn, err := store.Dial(ts.srv.Config(), nil)
@@ -115,9 +115,9 @@ func (ts *AuditServerTestSuite) SetupSuite() {
 		testUID, testBook)
 }
 
-func (ts *AuditServerTestSuite) searchAuditLogs(s store.Sort, f store.Filters, p *Page) (*admin.AuditLogsResult, error) {
+func (ts *AdminAuditServerTestSuite) searchAuditLogs(s store.Sort, f store.Filters, p *Page) (*admin.AuditLogsResult, error) {
 	var err error
-	ctx := context.Background()
+	ctx := rootContext(ts.srv.Config())
 	srt := api.Sort(s)
 	req := &api.SearchRequest{}
 	req.Sort = &srt
@@ -132,7 +132,7 @@ func (ts *AuditServerTestSuite) searchAuditLogs(s store.Sort, f store.Filters, p
 	return ts.srv.SearchAuditLogs(ctx, req)
 }
 
-func (ts *AuditServerTestSuite) TestSearchFilters() {
+func (ts *AdminAuditServerTestSuite) TestSearchFilters() {
 	tests := []struct {
 		filters store.Filters
 		comp    func(test *admin.AuditLog)
@@ -199,7 +199,7 @@ func (ts *AuditServerTestSuite) TestSearchFilters() {
 	}
 }
 
-func (ts *AuditServerTestSuite) TestSearchSort() {
+func (ts *AdminAuditServerTestSuite) TestSearchSort() {
 	// search Ascending
 	filters := store.Filters{
 		"dr_suess": "thing1",
@@ -236,7 +236,7 @@ func (ts *AuditServerTestSuite) TestSearchSort() {
 	ts.Equal(testIdx, descIdx)
 }
 
-func (ts *AuditServerTestSuite) TestPaging() {
+func (ts *AdminAuditServerTestSuite) TestPaging() {
 	res, err := ts.searchAuditLogs(store.Ascending, nil, nil)
 	ts.Require().NoError(err)
 	ts.Require().NotNil(res)
@@ -272,7 +272,7 @@ func (ts *AuditServerTestSuite) TestPaging() {
 	}
 }
 
-func (ts *AuditServerTestSuite) TestErrors() {
+func (ts *AdminAuditServerTestSuite) TestErrors() {
 	// invalid req
 	_, err := ts.srv.SearchAuditLogs(nil, nil)
 	ts.Error(err)
@@ -282,23 +282,3 @@ func (ts *AuditServerTestSuite) TestErrors() {
 	}, nil)
 	ts.Error(err)
 }
-
-/*
-func (ts *AuditServerTestSuite) TestErrors() {
-	// invalid req
-	r := thttp.Request(ts.T(), http.MethodGet, Audit, "", nil, []byte("\n"))
-	w := httptest.NewRecorder()
-	ts.srv.SearchAuditLogs(w, r)
-	ts.NotEqual(http.StatusOK, w.Code)
-	// bad paging (we handle this now)
-	r = thttp.Request(ts.T(), http.MethodGet, Audit, "", url.Values{
-		key.Page: []string{"\n"},
-	}, nil)
-	w = httptest.NewRecorder()
-	ts.srv.SearchAuditLogs(w, r)
-	ts.Equal(http.StatusOK, w.Code)
-}
-
-
-
-*/

@@ -30,6 +30,7 @@ require (
 	github.com/lestrrat-go/test-mysqld v0.0.0-20190527004737-6c91be710371
 	github.com/lib/pq v1.10.2
 	github.com/lucasb-eyer/go-colorful v1.2.0
+	github.com/manifoldco/promptui v0.8.0
 	github.com/markbates/goth v1.67.1
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mattn/go-sqlite3 v1.14.7

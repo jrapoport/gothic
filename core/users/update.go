@@ -148,7 +148,7 @@ func BanUser(conn *store.Connection, u *user.User) error {
 }
 
 // DeleteUser deletes a user.
-func DeleteUser(conn *store.Connection, u *user.User) error {
+func DeleteUser(conn *store.Connection, u *user.User, hard bool) error {
 	if u == nil || !u.Valid() {
 		return nil
 	}
@@ -157,5 +157,9 @@ func DeleteUser(conn *store.Connection, u *user.User) error {
 	if u.IsBanned() {
 		return nil
 	}
-	return conn.Delete(u).Error
+	db := conn.DB
+	if hard {
+		db = db.Unscoped()
+	}
+	return db.Delete(u).Error
 }
