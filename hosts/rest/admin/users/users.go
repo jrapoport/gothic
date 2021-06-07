@@ -130,9 +130,10 @@ func (s *usersServer) AdminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		s.ResponseCode(w, http.StatusUnauthorized, err)
 		return
 	}
+	hard := rest.URLParam(r, key.Hard) == "true"
 	ctx := rest.FromRequest(r)
 	s.Debugf("delete user %", uid.String())
-	err = s.API.AdminDeleteUser(ctx, uid)
+	err = s.API.DeleteUser(ctx, uid, hard)
 	if err != nil {
 		s.ResponseError(w, err)
 		return
@@ -156,7 +157,7 @@ func (s *usersServer) AdminPromoteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := rest.FromRequest(r)
 	s.Debugf("promote user %", uid.String())
-	u, err := s.API.AdminPromoteUser(ctx, uid)
+	u, err := s.API.PromoteUser(ctx, uid)
 	if err != nil {
 		s.ResponseError(w, err)
 		return

@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
-	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/models/code"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -18,17 +17,7 @@ func (s *adminServer) CreateSignupCodes(ctx context.Context,
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
-	rtx := rpc.RequestContext(ctx)
-	root := rpc.GetRootPassword(ctx)
-	if root != "" {
-		sa, err := s.API.GetSuperAdmin(root)
-		if err != nil {
-			return nil, s.RPCError(codes.PermissionDenied, err)
-		}
-		rtx.SetProvider(sa.Provider)
-		rtx.SetAdminID(sa.ID)
-	}
-	_, err := s.API.ValidateAdmin(rtx.AdminID())
+	rtx, err := s.adminRequestContext(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)
 	}
@@ -49,10 +38,14 @@ func (s *adminServer) CreateSignupCodes(ctx context.Context,
 	return res, nil
 }
 
-func (s *adminServer) CheckSignupCode(_ context.Context,
+func (s *adminServer) CheckSignupCode(ctx context.Context,
 	req *admin.CheckSignupCodeRequest) (*admin.SignupCodeResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
+	}
+	_, err := s.adminRequestContext(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
 	}
 	cd := req.GetCode()
 	s.Debugf("check signup code: %s", cd)
@@ -79,14 +72,17 @@ func (s *adminServer) CheckSignupCode(_ context.Context,
 	return res, nil
 }
 
-func (s *adminServer) DeleteSignupCode(_ context.Context,
-	req *admin.DeleteSignupCodeRequest) (*emptypb.Empty, error) {
+func (s *adminServer) DeleteSignupCode(ctx context.Context, req *admin.DeleteSignupCodeRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
+	_, err := s.adminRequestContext(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
 	cd := req.GetCode()
 	s.Debugf("delete signup code: %s", cd)
-	err := s.API.DeleteSignupCode(cd)
+	err = s.API.DeleteSignupCode(cd)
 	if err != nil {
 		return nil, s.RPCError(codes.Internal, err)
 	}

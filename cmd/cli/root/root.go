@@ -1,8 +1,11 @@
-package main
+package root
 
 import (
+	"fmt"
+
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -14,13 +17,13 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:               utils.ExecutableName(),
-	Short:             "control plane for gothic",
 	Version:           config.BuildVersion(),
 	RunE:              rootRunE,
 	PersistentPreRunE: initConfig,
 }
 
 func init() {
+	rootCmd.Short = fmt.Sprintf("control plane for %s", config.BuildName())
 	pf := rootCmd.PersistentFlags()
 	pf.StringVarP(&configFile, "config", "c", "", "the config file to use")
 	pf.StringVar(&rootPassword, "root", "", "the root password to use for super admin access")
@@ -31,37 +34,33 @@ func initConfig(cmd *cobra.Command, _ []string) (err error) {
 	if err != nil {
 		return err
 	}
-	if cmd.Use == migrateCmd.Use || cmd.Use == utils.ExecutableName() {
-		return nil
-	}
 	cfg.DB.AutoMigrate = false
 	cfg.Signup.Default.Username = true
 	cfg.Validation.PasswordRegex = ""
 	if rootPassword != "" {
 		cfg.RootPassword = rootPassword
 	}
-	return cfg.Security.CheckRequired()
+	return nil
 }
 
 func rootRunE(cmd *cobra.Command, _ []string) error {
 	return cmd.Help()
 }
 
-func rootConfig() *config.Config {
-	return cfg
-}
-
-// ExecuteRoot executes the main cmd
-func ExecuteRoot() error {
-	return rootCmd.Execute()
-}
-
-func AddRootCommand(cmd *cobra.Command) {
+func AddCommand(cmd *cobra.Command) {
 	rootCmd.AddCommand(cmd)
 }
 
-/*
-func confirmAction(format string, a ...interface{}) (bool, error) {
+// Execute executes the main cmd
+func Execute() error {
+	return rootCmd.Execute()
+}
+
+func Config() *config.Config {
+	return cfg
+}
+
+func ConfirmAction(format string, a ...interface{}) bool {
 	p := fmt.Sprintf(format, a...)
 	p = fmt.Sprintf("%s? [Yes/No]", p)
 	prompt := promptui.Select{
@@ -69,9 +68,8 @@ func confirmAction(format string, a ...interface{}) (bool, error) {
 		Items: []string{"Yes", "No"},
 	}
 	_, result, err := prompt.Run()
-	if err != nil {
-		return false, err
+	if err != nil || result != "Yes" {
+		return false
 	}
-	return result == "Yes", nil
+	return true
 }
-*/

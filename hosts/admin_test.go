@@ -1,6 +1,8 @@
 package hosts
 
 import (
+	"github.com/jrapoport/gothic/hosts/rpc"
+	"google.golang.org/grpc/metadata"
 	"testing"
 	"time"
 
@@ -22,7 +24,7 @@ func configClient(t *testing.T, h core.Hosted) admin.AdminClient {
 
 func TestAdminHost(t *testing.T) {
 	t.Parallel()
-	a, _, _ := tcore.API(t, false)
+	a, c, _ := tcore.API(t, false)
 	// create an rcp-web host
 	h := NewAdminHost(a, "127.0.0.1:0")
 	require.NotNil(t, h)
@@ -33,7 +35,8 @@ func TestAdminHost(t *testing.T) {
 	}, 1*time.Second, 10*time.Millisecond)
 	test := a.Settings()
 	// unauthenticated call
-	ctx := context.Background()
+	ctx := metadata.NewOutgoingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, c.RootPassword))
 	ac := configClient(t, h)
 	res, err := ac.Settings(ctx, &admin.SettingsRequest{})
 	assert.NoError(t, err)

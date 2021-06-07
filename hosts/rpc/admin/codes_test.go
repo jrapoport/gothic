@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func TestSignupServer_CreateSignupCodes(t *testing.T) {
+func TestAdminServer_CreateSignupCodes(t *testing.T) {
 	t.Parallel()
 	const testLen = 10
 	s, _ := tsrv.RPCServer(t, false)
@@ -45,7 +45,7 @@ func TestSignupServer_CreateSignupCodes(t *testing.T) {
 	assert.Len(t, res.GetCodes(), testLen)
 }
 
-func TestSignupServer_CheckSignupCode(t *testing.T) {
+func TestAdminServer_CheckSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newAdminServer(s)
@@ -90,7 +90,7 @@ func TestSignupServer_CheckSignupCode(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestSignupServer_DeleteSignupCode(t *testing.T) {
+func TestAdminServer_DeleteSignupCode(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RPCServer(t, false)
 	srv := newAdminServer(s)

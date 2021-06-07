@@ -13,14 +13,22 @@ import (
 	"github.com/jrapoport/gothic/store"
 )
 
-// AdminCreateUser creates a new user
-func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, data types.Map, admin bool) (*user.User, error) {
+//////////////////////////////////
+//////////////////////////////////
+// NOTE:
+// APIs in this file require admin
+// or super admin user permissions
+//
+//
+
+// CreateUser creates a new user
+// NOTE: This API requires admin user permissions
+func (a *API) CreateUser(ctx context.Context, email, username, pw string, data types.Map, admin bool) (*user.User, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	aid := ctx.AdminID()
-	if aid == uuid.Nil {
-		err := errors.New("admin user id required")
+	if !ctx.IsAdmin() {
+		err := errors.New("admin user required")
 		return nil, a.logError(err)
 	}
 	email, err := a.ValidateEmail(email)
@@ -34,6 +42,7 @@ func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, d
 		if err != nil {
 			return err
 		}
+		aid := ctx.AdminID()
 		role, err := a.validateAdmin(tx, aid)
 		if err != nil {
 			return err
@@ -62,14 +71,77 @@ func (a *API) AdminCreateUser(ctx context.Context, email, username, pw string, d
 	return u, nil
 }
 
-// AdminPromoteUser promotes a user to an admin
-func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.User, error) {
+// ChangeRole changes a user's role
+// NOTE: This API requires admin user permissions
+func (a *API) ChangeRole(ctx context.Context, userID uuid.UUID, role user.Role) (*user.User, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	aid := ctx.AdminID()
-	if aid == uuid.Nil {
-		err := errors.New("admin user id required")
+	if !ctx.IsAdmin() {
+		err := errors.New("admin user required")
+		return nil, a.logError(err)
+	}
+	if userID == uuid.Nil || userID == user.SystemID || userID == user.SuperAdminID {
+		err := errors.New("user id required")
+		return nil, a.logError(err)
+	}
+	if role == user.InvalidRole || role == user.RoleSuper {
+		err := fmt.Errorf("invalid role change: %s", role.String())
+		return nil, a.logError(err)
+	}
+	a.log.Debugf("change user %s to %s", userID, role.String())
+	var u *user.User
+	err := a.conn.Transaction(func(tx *store.Connection) error {
+		aid := ctx.AdminID()
+		adminRole, err := a.validateAdmin(tx, aid)
+		if err != nil {
+			return err
+		}
+		u, err = users.GetUser(tx, userID)
+		if err != nil {
+			return err
+		}
+		if u.Role == role {
+			return nil
+		}
+		switch u.Role {
+		case user.RoleUser:
+			// only super admins can promote other admins
+			if role == user.RoleAdmin && adminRole < user.RoleSuper {
+				err = fmt.Errorf("super admin required: %s", aid)
+				return err
+			}
+			break
+		case user.RoleAdmin:
+			// only super admins can demote other admins
+			if role == user.RoleUser && adminRole < user.RoleSuper {
+				err = fmt.Errorf("super admin required: %s", aid)
+				return err
+			}
+			break
+		case user.RoleSuper:
+			fallthrough
+		default:
+			err = fmt.Errorf("%s user role change forbidden", u.Role.String())
+			return err
+		}
+		return a.changeRole(ctx, tx, u, role)
+	})
+	if err != nil {
+		return nil, a.logError(err)
+	}
+	a.log.Debugf("changed user %s to %s", userID, role.String())
+	return u, nil
+}
+
+// PromoteUser promotes a user to an admin
+// NOTE: This API requires admin user permissions
+func (a *API) PromoteUser(ctx context.Context, userID uuid.UUID) (*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if !ctx.IsAdmin() {
+		err := errors.New("admin user required")
 		return nil, a.logError(err)
 	}
 	if userID == uuid.Nil {
@@ -79,6 +151,7 @@ func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.Use
 	a.log.Debugf("promote user to admin: %s", userID)
 	var u *user.User
 	err := a.conn.Transaction(func(tx *store.Connection) error {
+		aid := ctx.AdminID()
 		role, err := a.validateAdmin(tx, aid)
 		if err != nil {
 			return err
@@ -100,14 +173,14 @@ func (a *API) AdminPromoteUser(ctx context.Context, userID uuid.UUID) (*user.Use
 	return u, nil
 }
 
-// AdminDeleteUser deletes a user.
-func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
+// DeleteUser deletes a user
+// NOTE: This API requires admin user permissions
+func (a *API) DeleteUser(ctx context.Context, userID uuid.UUID, hard bool) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	aid := ctx.AdminID()
-	if aid == uuid.Nil {
-		err := errors.New("context user id required")
+	if !ctx.IsAdmin() {
+		err := errors.New("admin user required")
 		return a.logError(err)
 	}
 	if userID == uuid.Nil {
@@ -116,7 +189,7 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 	}
 	a.log.Debugf("delete user: %s", userID)
 	err := a.conn.Transaction(func(tx *store.Connection) error {
-		role, err := a.validateAdmin(tx, aid)
+		role, err := a.validateAdmin(tx, ctx.AdminID())
 		if err != nil {
 			return err
 		}
@@ -128,7 +201,7 @@ func (a *API) AdminDeleteUser(ctx context.Context, userID uuid.UUID) error {
 			err = fmt.Errorf("super admin required to delete admin: %s", userID)
 			return err
 		}
-		err = users.DeleteUser(tx, u)
+		err = users.DeleteUser(tx, u, hard)
 		if err != nil {
 			return err
 		}

@@ -9,16 +9,18 @@ import (
 )
 
 // Settings returns the settings for a server.
-func (s *adminServer) Settings(_ context.Context, _ *admin.SettingsRequest) (*admin.SettingsResponse, error) {
+func (s *adminServer) Settings(ctx context.Context, _ *admin.SettingsRequest) (*admin.SettingsResponse, error) {
+	_, err := s.adminRequestContext(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
 	set := s.API.Settings()
-	b, err := json.Marshal(set)
-	if err != nil {
-		return nil, s.RPCError(codes.Internal, err)
-	}
+	// we can safely ignore this error
+	// bc we tightly control the type
+	b, _ := json.Marshal(set)
 	res := admin.SettingsResponse{}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		return nil, s.RPCError(codes.Internal, err)
-	}
+	// we can safely ignore this error
+	// bc we tightly control the type
+	_ = json.Unmarshal(b, &res)
 	return &res, nil
 }

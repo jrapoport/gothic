@@ -6,15 +6,14 @@ import (
 	"strconv"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
+	"github.com/jrapoport/gothic/cmd/cli/root"
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/metadata"
 )
 
 var codeCmd = &cobra.Command{
-	Use:  "code [count]",
+	Use:  "code [COUNT]",
 	Long: "generate new signup codes ",
 	RunE: codeRunE,
 	Args: cobra.MaximumNArgs(1),
@@ -29,7 +28,6 @@ func init() {
 	fs := codeCmd.Flags()
 	fs.IntVarP(&codeUses, "max-uses", "m", 1, "maximum times a code can be used")
 	fs.StringVarP(&codeOutput, "out", "o", "", "output csv to file path")
-	AddRootCommand(codeCmd)
 }
 
 func codeRunE(_ *cobra.Command, args []string) error {
@@ -44,22 +42,18 @@ func codeRunE(_ *cobra.Command, args []string) error {
 	if count <= 0 {
 		count = 1
 	}
-	c := rootConfig()
-	conn, err := clientConn(c.AdminAddress)
+	client, err := root.NewAdminClient()
 	if err != nil {
 		return err
 	}
 	defer func() {
-		conn.Close()
+		client.Close()
 	}()
-	client := admin.NewAdminClient(conn)
-	pw := c.RootPassword
-	ctx := metadata.NewOutgoingContext(context.Background(),
-		metadata.Pairs(rpc.RootPassword, pw))
-	res, err := client.CreateSignupCodes(ctx, &admin.CreateSignupCodesRequest{
+	req := &admin.CreateSignupCodesRequest{
 		Uses:  int64(codeUses),
 		Count: int64(count),
-	})
+	}
+	res, err := client.CreateSignupCodes(context.Background(), req)
 	if err != nil {
 		return err
 	}
