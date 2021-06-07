@@ -1,4 +1,6 @@
-FROM golang:1.15-alpine as build-stage
+FROM golang:alpine as build-stage
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
 
 RUN apk add --no-cache make git
 
