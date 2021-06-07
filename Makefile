@@ -63,6 +63,8 @@ ifeq ($(COVERAGE),1)
 	TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
 endif
 
+COMPOSE_FILE:=docker-compose.yaml
+
 $(GO_LINT):
 	$(GO_GET) $(GO_LINT_REPO)
 
@@ -138,19 +140,23 @@ image: ## Build the Docker image
 	docker build .
 
 gothic:  ## Start gothic
-	docker-compose -f docker-compose.yaml up -d gothic
+	docker compose -f $(COMPOSE_FILE) up -d gothic
 
 envoy: ## Start envoy
-	docker-compose -f docker-compose.yaml up -d envoy
+	docker compose -f $(COMPOSE_FILE) up -d envoy
 
+mysql: COMPOSE_FILE?=docker-compose-dev.yaml
 mysql: ## Start mysql
-	docker-compose -f docker-compose-dev.yaml up -d mysql
+	docker compose -f $(COMPOSE_FILE) up -d mysql
 
+pg: COMPOSE_FILE?=docker-compose-dev.yaml
 pg: ## Start postgres
-	docker-compose -f docker-compose-dev.yaml up -d pg
+	docker compose -f $(COMPOSE_FILE) up -d pg
 
 db: mysql ## Start mysql db
 
+sim: COMPOSE_FILE:=docker-compose.yaml -f docker-compose-dev.yaml
+sim: COMPOSE_ENV:=./env/sim.env
 sim: db envoy gothic
 
 .PHONY: help fmt vet lint audit static tidy deps rpc test build \

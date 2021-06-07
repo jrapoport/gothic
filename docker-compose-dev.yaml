@@ -2,6 +2,10 @@ version: "3.8"
 
 services:
 
+  gothic:
+    depends_on:
+      - mysql
+
   mysql:
     image: mysql:latest
     command: --init-file /data/application/init.sql
