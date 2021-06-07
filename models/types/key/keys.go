@@ -23,6 +23,7 @@ const (
 	Fields             = "fields"
 	Filters            = "filters"
 	FirstName          = "first_name"
+	Hard               = "hard"
 	Hostname           = "hostname"
 	ID                 = "id"
 	IPAddress          = "ip_address"

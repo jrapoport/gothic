@@ -31,7 +31,7 @@ func (s *usersServer) AdminCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Debugf("create user %s: %v", uid.String(), req)
 	ctx := rest.FromRequest(r)
-	u, err := s.API.AdminCreateUser(ctx, req.Email, req.Username, req.Password, req.Data, req.Admin)
+	u, err := s.API.CreateUser(ctx, req.Email, req.Username, req.Password, req.Data, req.Admin)
 	if err != nil {
 		s.ResponseError(w, err)
 		return

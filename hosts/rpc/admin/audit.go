@@ -17,9 +17,12 @@ func (s *adminServer) SearchAuditLogs(ctx context.Context,
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
+	rtx, err := s.adminRequestContext(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
 	filters := req.Filters.AsMap()
 	page := rpc.PaginateRequest(req)
-	rtx := rpc.RequestContext(ctx)
 	s.Debugf("search audit logs: %v", req)
 	logs, err := s.API.SearchAuditLogs(rtx, filters, page)
 	if err != nil {

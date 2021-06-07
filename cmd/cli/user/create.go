@@ -1,18 +1,17 @@
-package main
+package user
 
 import (
 	"fmt"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
+	"github.com/jrapoport/gothic/cmd/cli/root"
 	"github.com/jrapoport/gothic/core/context"
-	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/utils"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/metadata"
 )
 
 var createCmd = &cobra.Command{
-	Use:  "create [email] [password]",
+	Use:  "create [EMAIL] [PASSWORD]",
 	RunE: createUserRunE,
 	Args: cobra.ExactArgs(2),
 }
@@ -30,40 +29,36 @@ func init() {
 	fs.StringVar(&username, "username", randUsername, "username for the user")
 	fs.BoolVar(&confirm, "confirm", true, "autoconfirm the user")
 	fs.BoolVarP(&adminRole, "admin", "a", false, "create admin user")
-	AddRootCommand(createCmd)
 }
 
 func createUserRunE(_ *cobra.Command, args []string) error {
 	email := args[0]
 	password := args[1]
-	c := rootConfig()
-	c.Signup.AutoConfirm = confirm
-	conn, err := clientConn(c.AdminAddress)
+	cfg := root.Config()
+	cfg.Signup.AutoConfirm = confirm
+	client, err := root.NewAdminClient()
 	if err != nil {
 		return err
 	}
 	defer func() {
-		conn.Close()
+		client.Close()
 	}()
 	if username == randUsername ||
-		c.Signup.Username && username == "" ||
-		c.Signup.Default.Username && username == "" {
+		cfg.Signup.Username && username == "" ||
+		cfg.Signup.Default.Username && username == "" {
 		username = utils.RandomUsername()
 	}
-	client := admin.NewAdminClient(conn)
-	pw := c.RootPassword
-	ctx := metadata.NewOutgoingContext(context.Background(),
-		metadata.Pairs(rpc.RootPassword, pw))
-	res, err := client.CreateUser(ctx, &admin.CreateUserRequest{
+	req := &admin.CreateUserRequest{
 		Email:    email,
 		Password: password,
 		Admin:    adminRole,
 		Username: &username,
-	})
+	}
+	res, err := client.CreateUser(context.Background(), req)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("created %s %s\n",
-		res.GetRole(), res.GetEmail())
+	fmt.Printf("created %s: %s (%s)\n",
+		res.GetRole(), res.GetUserId(), res.GetEmail())
 	return nil
 }

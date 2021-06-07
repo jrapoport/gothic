@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/jrapoport/gothic/cmd/cli/root"
 	"github.com/jrapoport/gothic/store"
 	"github.com/spf13/cobra"
 )
@@ -14,17 +15,17 @@ var migrateCmd = &cobra.Command{
 	RunE: migrateRunE,
 }
 
-func init() {
-	AddRootCommand(migrateCmd)
-}
-
-func migrateRunE(cmd *cobra.Command, _ []string) error {
-	c := rootConfig()
-	err := c.DB.CheckRequired()
+func migrateRunE(*cobra.Command, []string) error {
+	cfg := root.Config()
+	err := cfg.DB.CheckRequired()
 	if err != nil {
 		return err
 	}
-	conn, err := store.Dial(c, nil)
+	yes := root.ConfirmAction("Start DB migration")
+	if !yes {
+		return nil
+	}
+	conn, err := store.Dial(cfg, nil)
 	if err != nil {
 		return err
 	}

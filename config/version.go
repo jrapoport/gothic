@@ -7,6 +7,8 @@ var (
 	Version string
 	// Build is the build number
 	Build string
+	// ExeName is the exe name
+	ExeName string
 )
 
 var ver string
@@ -18,6 +20,10 @@ func init() {
 // BuildVersion the build version string
 func BuildVersion() string {
 	return ver
+}
+
+func BuildName() string {
+	return ExeName
 }
 
 func version() string {
