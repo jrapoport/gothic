@@ -19,10 +19,6 @@ services:
       - '3306'
     ports:
       - "3306:3306"
-    networks:
-      default:
-        aliases:
-          - mysql_db
     #https://stackoverflow.com/questions/55559386/how-to-fix-mbind-operation-not-permitted-in-mysql-error-log
     cap_add:
       - SYS_NICE  # CAP_SYS_NICE
@@ -40,10 +36,6 @@ services:
       - '5432'
     ports:
       - "5432:5432"
-    networks:
-      default:
-        aliases:
-          - pg_db
     restart: unless-stopped
 
 volumes:
