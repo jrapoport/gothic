@@ -21,10 +21,6 @@ services:
       - "7722:7722"
       - "7727:7727"
       - "7729:7729"
-    networks:
-      default:
-        aliases:
-          - host.docker.internal
     restart: unless-stopped
 
   envoy:
@@ -38,8 +34,6 @@ services:
     ports:
       - "8001:8080"
       - "9901:9901"
-    networks:
-      default: { }
     restart: unless-stopped
     # make this work on linux
     # extra_hosts:
