@@ -100,9 +100,10 @@ deps: tidy ## Install dependencies
 	$(GO_MOD) download
 
 rpcw:: PROTO_FILES = \
+	./api/service/proto/account.proto \
+	./api/service/proto/health.proto \
 	./api/service/proto/response.proto \
-	./api/service/proto/user.proto \
-	./api/service/proto/account.proto
+	./api/service/proto/user.proto
 
 test: ## Run tests
 ifeq (, $(shell which docker))
