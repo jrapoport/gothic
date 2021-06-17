@@ -2,7 +2,7 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jrapoport/gothic/test?style=flat-square)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jrapoport/gothic?style=flat-square&)](https://goreportcard.com/report/github.com/jrapoport/gothic)
-[![Codecov branch](https://img.shields.io/codecov/c/github/jrapoport/gothic/master?style=flat-square&token=YYRUCM2BMV)](https://codecov.io/gh/jrapoport/gothic)
+[![Codecov](https://img.shields.io/codecov/c/github/jrapoport/gothic?style=flat-square)](https://codecov.io/gh/jrapoport/gothic)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/jrapoport/gothic?style=flat-square)
 [![GitHub](https://img.shields.io/github/license/jrapoport/gothic?style=flat-square)](https://github.com/jrapoport/gothic/blob/master/LICENSE)
 
