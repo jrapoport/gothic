@@ -11,7 +11,7 @@ import (
 
 // UserResponse contains an http user response.
 type UserResponse struct {
-	UserID   string          `json:"user_id,omitempty"`
+	UserID   string          `json:"user_id"`
 	Role     string          `json:"role"`
 	Email    string          `json:"email,omitempty"`
 	Username string          `json:"username,omitempty"`
