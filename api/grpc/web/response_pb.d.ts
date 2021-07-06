@@ -5,6 +5,9 @@ import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/t
 
 
 export class UserResponse extends jspb.Message {
+  getUserId(): string;
+  setUserId(value: string): UserResponse;
+
   getRole(): string;
   setRole(value: string): UserResponse;
 
@@ -24,6 +27,8 @@ export class UserResponse extends jspb.Message {
   hasToken(): boolean;
   clearToken(): UserResponse;
 
+  getTokenCase(): UserResponse.TokenCase;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserResponse.AsObject;
   static toObject(includeInstance: boolean, msg: UserResponse): UserResponse.AsObject;
@@ -34,11 +39,17 @@ export class UserResponse extends jspb.Message {
 
 export namespace UserResponse {
   export type AsObject = {
+    userId: string,
     role: string,
     email: string,
     username: string,
     data?: google_protobuf_struct_pb.Struct.AsObject,
     token?: BearerResponse.AsObject,
+  }
+
+  export enum TokenCase { 
+    _TOKEN_NOT_SET = 0,
+    TOKEN = 6,
   }
 }
 

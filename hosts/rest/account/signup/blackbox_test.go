@@ -55,6 +55,8 @@ func assertResponse(t *testing.T, h *rest.Host, test *rest.UserResponse, res str
 	assert.NotNil(t, ur.Token)
 	assert.NotEmpty(t, ur.Token.Access)
 	ur.Token = nil
+	assert.NotEmpty(t, ur.UserID)
+	ur.UserID = ""
 	assert.Equal(t, test, ur)
 }
 

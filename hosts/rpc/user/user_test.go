@@ -54,6 +54,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	test.Email = utils.MaskEmail(u.Email)
 	res, err = srv.GetUser(ctx, req)
 	assert.NoError(t, err)
+	assert.Equal(t, u.ID.String(), res.UserId)
 	assert.Equal(t, test.Email, res.Email)
 	assert.Equal(t, test.Username, res.Username)
 	assert.Equal(t, test.Data.AsMap(), res.Data.AsMap())

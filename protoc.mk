@@ -20,7 +20,7 @@ GRPC_PLUGIN_CSHARP := $(PLUGIN_BIN)/grpc_csharp_plugin
 GRPC_PREFIX_OPT = $(if $(GRPC_PREFIX), --go_opt=module=$(GRPC_PREFIX) --go-grpc_opt=module=$(GRPC_PREFIX),)
 GRPC_RELATIVE_OPT = $(if $(GRPC_RELATIVE), --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative,)
 
-PROTOC = $(shell which protoc)
+PROTOC = PATH="${GO_BIN}:${PATH}" $(shell which protoc)
 PROTO_WILDCARD ?= "*.proto"
 PROTO_FIND = find $(BASE_DIR) -type f \( -iname $(PROTO_WILDCARD) ! -iname "_*" \)
 ifneq (BASE_DIR,.)
@@ -30,12 +30,12 @@ PROTO_FILES = $(shell $(PROTO_FIND))
 PROTO_INCLUDES = -I=$(BASE_DIR)
 
 PROTOC_GO := $(GO_BIN)/protoc-gen-go
-PROTOC_REPO_GO := google.golang.org/protobuf/cmd/protoc-gen-go
+PROTOC_REPO_GO := google.golang.org/protobuf/cmd/protoc-gen-go@latest
 $(PROTOC_GO):
 	$(GO_GET) $(PROTOC_GO)
 
 PROTOC_GRPC := $(GO_BIN)/protoc-gen-go-grpc
-PROTOC_REPO_GRPC := google.golang.org/grpc/cmd/protoc-gen-go-grpc
+PROTOC_REPO_GRPC := google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 $(PROTOC_GRPC):
 	$(GO_GET) $(PROTOC_REPO_GRPC)
 

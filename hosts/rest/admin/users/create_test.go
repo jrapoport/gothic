@@ -65,6 +65,8 @@ func TestUsersServer_AdminCreateUser(t *testing.T) {
 	res = createUser(tok)
 	assert.Equal(t, http.StatusOK, res.Code)
 	ur := userResponse(t, res.Body.String())
+	assert.NotEmpty(t, ur.UserID)
+	ur.UserID = ""
 	assert.Equal(t, test, ur)
 	r := thttp.Request(t, http.MethodPost, Users, tok, nil, nil)
 	r, err := rest.ParseClaims(r, srv.Config().JWT, tok)

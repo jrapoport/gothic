@@ -19,6 +19,7 @@ func NewUserResponse(u *user.User) (*UserResponse, error) {
 		return nil, err
 	}
 	return &UserResponse{
+		UserId:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: u.Username,

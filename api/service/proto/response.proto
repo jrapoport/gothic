@@ -8,11 +8,12 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 message UserResponse {
-  string role = 1;
-  string email = 2;
-  string username = 3;
-  google.protobuf.Struct data = 4;
-  BearerResponse token = 5;
+  string user_id = 1;
+  string role = 2;
+  string email = 3;
+  string username = 4;
+  google.protobuf.Struct data = 5;
+  optional BearerResponse token = 6;
 }
 
 message BearerResponse {
