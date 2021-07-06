@@ -11,20 +11,23 @@
 Gothic is a user registration and authentication microservice written in Go. It's based on OAuth2 and JWT and will
 handle user signup, authentication and custom user data.
 
-## All NEW!
+## WHY?
 
-This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete. It
-started off as a fork, but doesn't share a single line of code anymore.
+Gothic is a free production-ready authentication server.
 
-The basic idea was to support most of the existing functionality of GoTrue while modernizing it and expanding support
-for additional external providers and functionality. At a certain point it just made more sense to start over from
-scratch with the goal of feature parity (more or less).
+It is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete.
 
-GroTrue relied on its own custom implementations for oauth, mail templates, smtp, jwt, etc. These have all been replaced
-with more mature external libraries. Details below.
+`GoTrue` only supports `REST` + `mysql`, and is outdated. `Auth0` is prohibitively expensive for small startups, 
+garage projects, & consumer applications.
+
+It is written to get you up and running quickly without having to spend months coding the exact same thing for the 
+umpteenth time —  without sacrificing functionality, or a professional look & feel.
 
 **UPDATE**  
-The REST API is now complete w.r.t. GoTrue's functionality (except for SAML — which was intentionally left out).
+* REST API is now complete w.r.t. GoTrue's functionality (except for SAML — which was intentionally left out).
+  
+
+* gRPC API is now (95%) complete w.r.t. GoTrue's functionality.
 
 ## WIP
 
@@ -1401,6 +1404,16 @@ Response:
 
 ## Project History
 
+This project is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete. It
+started off as a fork, but doesn't share a single line of code anymore.
+
+The basic idea was to support most of the existing functionality of GoTrue while modernizing it and expanding support
+for additional external providers and functionality. At a certain point it just made more sense to start over from
+scratch with the goal of feature parity (more or less).
+
+GroTrue relied on its own custom implementations for oauth, mail templates, smtp, jwt, etc. These have all been replaced
+with more mature external libraries.
+
 The original purpose was to adopt newer, more developer friendly technologies like
 [Gorm](https://gorm.io/), [gRPC](https://grpc.io/), and [gRPC Web](https://github.com/grpc/grpc-web); newer versions of
 critical libraries for things like [JWT](https://github.com/lestrrat-go/jwx)
@@ -1411,8 +1424,8 @@ These changes allow for advances like self-contained database migration, expande
 PostgreSQL), and gRPC support. Broadly speaking, they are intended to make it easier to modify and use the microservice
 outside of Netlify tool chain, and in a more active development environment.
 
-Since this project shares no code with GoTrue and is only conceptually similar at this point, I might truncate the
-commit history for clarity in the future.
+Since this project shares no code with GoTrue and is only conceptually similar at this point, I truncated the
+commit history for clarity.
 
 While the Netlify team did a good job with GoTrue, their use in production means they cannot easily adopt these kinds of
 significant changes. In many cases, they will likely never make them given the impacts to their tooling, deployment, and

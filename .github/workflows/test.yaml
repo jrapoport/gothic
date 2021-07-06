@@ -1,8 +1,16 @@
 on:
   push:
+    branches:
+      - master
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    branches:
+      - master
+
 name: test
+
+env:
+  GO111MODULE: on
+
 jobs:
   test:
     strategy:
@@ -23,6 +31,12 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Cache go modules
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
       - name: Install dependencies
         run: make deps
       - name: Lint and test
