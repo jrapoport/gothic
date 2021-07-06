@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/jrapoport/gothic/core/events"
 	"time"
 
 	"github.com/jrapoport/gothic/log"
@@ -88,7 +89,9 @@ var authorizationDefaults = Authorization{
 func defaultProviders() Providers {
 	list := Providers{}
 	for name := range provider.External {
-		list[name] = Provider{}
+		list[name] = Provider{
+			Scopes: []string{},
+		}
 	}
 	return list
 }
@@ -122,9 +125,14 @@ var webhooksDefaults = Webhooks{
 	MaxRetries: webhookMaxRetry,
 	Timeout:    webhookTimeout,
 	JWT:        jwtDefaults,
+	Events:     []events.Event{},
 }
 
 var loggerDefaults = Logger{
 	Level:     logLevel,
 	Timestamp: logTimeFormat,
+	Fields:    []string{},
+	Tracer: Tracer{
+		Tags: []string{},
+	},
 }
