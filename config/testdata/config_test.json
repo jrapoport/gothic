@@ -1,0 +1,147 @@
+{
+  "service": "example.json",
+  "site_url": "http://example.com.json",
+  "site_logo": "http://example.com/logo.png.json",
+  "host": "example.com.json",
+  "rest": "example.com.json:80",
+  "rpc": "example.com.json:90",
+  "rpcweb": "example.com.json:100",
+  "health": "example.com.json:110",
+  "mask_emails": false,
+  "rate_limit": "1h40m0s",
+  "request_id": "foobar.json",
+  "jwt": {
+    "secret": "i-am-a-secret.json",
+    "algorithm": "HS384.json",
+    "issuer": "foo.json",
+    "audience": "bar.json",
+    "expiration": "1h40m0s"
+  },
+  "recaptcha": {
+    "key": "RECAPTCHA-KEY.json",
+    "login": false
+  },
+  "validation": {
+    "username_regex": "[A-Za-z]{3}[0-9][A-Z]{2}[!@#$%^\u0026*].json",
+    "password_regex": "FOO[A-Z]{10}[0-9]{2}.json"
+  },
+  "cookies": {
+    "duration": "1h40m0s"
+  },
+  "db": {
+    "namespace": "foo.json",
+    "driver": "mysql",
+    "dsn": "root@tcp(0.0.0.0:3306)/test?parseTime=true&foo=a.json",
+    "max_retries": 99,
+    "automigrate": true
+  },
+  "mail": {
+    "host": "smtp.example.com.json",
+    "port": 25,
+    "username": "peaches.json",
+    "password": "secret-password!.json",
+    "authentication": "cram-md5.json",
+    "encryption": "tls.json",
+    "keepalive": false,
+    "expiration": "1h40m0s",
+    "send_limit": "1h40m0s",
+    "spam_protection": false,
+    "name": "FooBar Co.json",
+    "link": "http://mail.example.com.json",
+    "logo": "http://mail.example.com/logo.png.json",
+    "from": "foo \u003cfoo@example.com.json\u003e",
+    "theme": "flat.json",
+    "layout": "./templates/mail.tmpl.json",
+    "change_email": {
+      "link_format": "/:action/:token/link.json",
+      "subject": "Email Subject.json",
+      "template": "./templates/mail.tmpl.json",
+      "referral_url": "http://referral.example.com.json"
+    },
+    "confirm_user": {
+      "link_format": "/:action/:token/link.json",
+      "subject": "Email Subject.json",
+      "template": "./templates/mail.tmpl.json",
+      "referral_url": "http://referral.example.com.json"
+    },
+    "invite_user": {
+      "link_format": "/:action/:token/link.json",
+      "subject": "Email Subject.json",
+      "template": "./templates/mail.tmpl.json",
+      "referral_url": "http://referral.example.com.json"
+    },
+    "reset_password": {
+      "link_format": "/:action/:token/link.json",
+      "subject": "Email Subject.json",
+      "template": "./templates/mail.tmpl.json",
+      "referral_url": "http://referral.example.com.json"
+    },
+    "signupcode": {
+      "link_format": "/:action/:token/link.json",
+      "subject": "Email Subject.json",
+      "template": "./templates/mail.tmpl.json",
+      "referral_url": "http://referral.example.com.json"
+    }
+  },
+  "signup": {
+    "disabled": true,
+    "autoconfirm": true,
+    "code": true,
+    "invites": "user",
+    "username": false,
+    "default": {
+      "username": false,
+      "color": false
+    }
+  },
+  "provider_internal": false,
+  "provider_redirect_url": "http://example.com/redirect.json",
+  "provider": {
+    "google": {
+      "client_key": "foo.json",
+      "secret": "i-am-a-secret.json",
+      "callback_url": "http://example.com/callback.json",
+      "scopes": [
+        "login",
+        "confirmed"
+      ]
+    },
+    "gitlab": {
+      "client_key": "foo.json",
+      "secret": "i-am-a-secret.json",
+      "callback_url": "http://example.com/callback.json",
+      "scopes": [
+        "login.json",
+        "confirmed.json"
+      ]
+    }
+  },
+  "webhook": {
+    "url": "http://webhook.example.com/hook.json",
+    "secret": "i-am-a-webhook-secret.json",
+    "events": [
+      "login",
+      "confirmed"
+    ],
+    "max_retries": 99,
+    "timeout": "1h40m0s"
+  },
+  "log": {
+    "colors": false,
+    "file": "./logs/debug.log.json",
+    "level": "debug.json",
+    "timestamp": "Mon, 02 Jan 2006 15:04:05 -0700.json",
+    "fields": [
+      "priority=1.json",
+      "source=peaches.json"
+    ],
+    "tracer": {
+      "enabled": true,
+      "address": "example.com:9000.json",
+      "tags": [
+        "tag1=foo.json",
+        "tag2=bar.json"
+      ]
+    }
+  }
+}
