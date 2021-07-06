@@ -67,6 +67,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	j := srv.Config().JWT
 	u, _ := testUser(t, srv, false)
 	test := &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: u.Username,
@@ -193,6 +194,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	err := mergo.Map(&u.Data, req.Data)
 	assert.NoError(t, err)
 	test := &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: req.Username,
@@ -271,6 +273,7 @@ func TestUserServer_PromoteUser(t *testing.T) {
 	j := srv.Config().JWT
 	u, _ := testUser(t, srv, false)
 	test := &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     user.RoleAdmin.String(),
 		Email:    u.Email,
 		Username: u.Username,

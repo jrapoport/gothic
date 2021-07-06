@@ -117,9 +117,10 @@ proto.gothic.api.UserResponse.prototype.toObject = function(opt_includeInstance)
  */
 proto.gothic.api.UserResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    role: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    email: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    username: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    role: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    username: jspb.Message.getFieldWithDefault(msg, 4, ""),
     data: (f = msg.getData()) && google_protobuf_struct_pb.Struct.toObject(includeInstance, f),
     token: (f = msg.getToken()) && proto.gothic.api.BearerResponse.toObject(includeInstance, f)
   };
@@ -160,22 +161,26 @@ proto.gothic.api.UserResponse.deserializeBinaryFromReader = function(msg, reader
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setRole(value);
+      msg.setUserId(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setEmail(value);
+      msg.setRole(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUsername(value);
+      msg.setEmail(value);
       break;
     case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUsername(value);
+      break;
+    case 5:
       var value = new google_protobuf_struct_pb.Struct;
       reader.readMessage(value,google_protobuf_struct_pb.Struct.deserializeBinaryFromReader);
       msg.setData(value);
       break;
-    case 5:
+    case 6:
       var value = new proto.gothic.api.BearerResponse;
       reader.readMessage(value,proto.gothic.api.BearerResponse.deserializeBinaryFromReader);
       msg.setToken(value);
@@ -209,31 +214,38 @@ proto.gothic.api.UserResponse.prototype.serializeBinary = function() {
  */
 proto.gothic.api.UserResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getRole();
+  f = message.getUserId();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getEmail();
+  f = message.getRole();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
-  f = message.getUsername();
+  f = message.getEmail();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
+  f = message.getUsername();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
   f = message.getData();
   if (f != null) {
     writer.writeMessage(
-      4,
+      5,
       f,
       google_protobuf_struct_pb.Struct.serializeBinaryToWriter
     );
@@ -241,7 +253,7 @@ proto.gothic.api.UserResponse.serializeBinaryToWriter = function(message, writer
   f = message.getToken();
   if (f != null) {
     writer.writeMessage(
-      5,
+      6,
       f,
       proto.gothic.api.BearerResponse.serializeBinaryToWriter
     );
@@ -250,10 +262,10 @@ proto.gothic.api.UserResponse.serializeBinaryToWriter = function(message, writer
 
 
 /**
- * optional string role = 1;
+ * optional string user_id = 1;
  * @return {string}
  */
-proto.gothic.api.UserResponse.prototype.getRole = function() {
+proto.gothic.api.UserResponse.prototype.getUserId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -262,16 +274,16 @@ proto.gothic.api.UserResponse.prototype.getRole = function() {
  * @param {string} value
  * @return {!proto.gothic.api.UserResponse} returns this
  */
-proto.gothic.api.UserResponse.prototype.setRole = function(value) {
+proto.gothic.api.UserResponse.prototype.setUserId = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional string email = 2;
+ * optional string role = 2;
  * @return {string}
  */
-proto.gothic.api.UserResponse.prototype.getEmail = function() {
+proto.gothic.api.UserResponse.prototype.getRole = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -280,16 +292,16 @@ proto.gothic.api.UserResponse.prototype.getEmail = function() {
  * @param {string} value
  * @return {!proto.gothic.api.UserResponse} returns this
  */
-proto.gothic.api.UserResponse.prototype.setEmail = function(value) {
+proto.gothic.api.UserResponse.prototype.setRole = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
 /**
- * optional string username = 3;
+ * optional string email = 3;
  * @return {string}
  */
-proto.gothic.api.UserResponse.prototype.getUsername = function() {
+proto.gothic.api.UserResponse.prototype.getEmail = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
@@ -298,18 +310,36 @@ proto.gothic.api.UserResponse.prototype.getUsername = function() {
  * @param {string} value
  * @return {!proto.gothic.api.UserResponse} returns this
  */
-proto.gothic.api.UserResponse.prototype.setUsername = function(value) {
+proto.gothic.api.UserResponse.prototype.setEmail = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
 /**
- * optional google.protobuf.Struct data = 4;
+ * optional string username = 4;
+ * @return {string}
+ */
+proto.gothic.api.UserResponse.prototype.getUsername = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.gothic.api.UserResponse} returns this
+ */
+proto.gothic.api.UserResponse.prototype.setUsername = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional google.protobuf.Struct data = 5;
  * @return {?proto.google.protobuf.Struct}
  */
 proto.gothic.api.UserResponse.prototype.getData = function() {
   return /** @type{?proto.google.protobuf.Struct} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_struct_pb.Struct, 4));
+    jspb.Message.getWrapperField(this, google_protobuf_struct_pb.Struct, 5));
 };
 
 
@@ -318,7 +348,7 @@ proto.gothic.api.UserResponse.prototype.getData = function() {
  * @return {!proto.gothic.api.UserResponse} returns this
 */
 proto.gothic.api.UserResponse.prototype.setData = function(value) {
-  return jspb.Message.setWrapperField(this, 4, value);
+  return jspb.Message.setWrapperField(this, 5, value);
 };
 
 
@@ -336,17 +366,17 @@ proto.gothic.api.UserResponse.prototype.clearData = function() {
  * @return {boolean}
  */
 proto.gothic.api.UserResponse.prototype.hasData = function() {
-  return jspb.Message.getField(this, 4) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional BearerResponse token = 5;
+ * optional BearerResponse token = 6;
  * @return {?proto.gothic.api.BearerResponse}
  */
 proto.gothic.api.UserResponse.prototype.getToken = function() {
   return /** @type{?proto.gothic.api.BearerResponse} */ (
-    jspb.Message.getWrapperField(this, proto.gothic.api.BearerResponse, 5));
+    jspb.Message.getWrapperField(this, proto.gothic.api.BearerResponse, 6));
 };
 
 
@@ -355,7 +385,7 @@ proto.gothic.api.UserResponse.prototype.getToken = function() {
  * @return {!proto.gothic.api.UserResponse} returns this
 */
 proto.gothic.api.UserResponse.prototype.setToken = function(value) {
-  return jspb.Message.setWrapperField(this, 5, value);
+  return jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -373,7 +403,7 @@ proto.gothic.api.UserResponse.prototype.clearToken = function() {
  * @return {boolean}
  */
 proto.gothic.api.UserResponse.prototype.hasToken = function() {
-  return jspb.Message.getField(this, 5) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 

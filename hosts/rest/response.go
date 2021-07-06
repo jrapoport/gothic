@@ -11,6 +11,7 @@ import (
 
 // UserResponse contains an http user response.
 type UserResponse struct {
+	UserID   string          `json:"user_id,omitempty"`
 	Role     string          `json:"role"`
 	Email    string          `json:"email,omitempty"`
 	Username string          `json:"username,omitempty"`
@@ -21,6 +22,7 @@ type UserResponse struct {
 // NewUserResponse returns a UserResponse for the supplied user.
 func NewUserResponse(u *user.User) *UserResponse {
 	return &UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: u.Username,

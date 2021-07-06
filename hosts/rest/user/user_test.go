@@ -68,6 +68,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	// unmasked
 	u, tok := testUser(t, srv)
 	test := &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: u.Username,
@@ -123,6 +124,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	err := mergo.Map(&u.Data, req.Data)
 	assert.NoError(t, err)
 	test := &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    u.Email,
 		Username: req.Username,
@@ -144,6 +146,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 	err = mergo.Map(&u.Data, req.Data)
 	assert.NoError(t, err)
 	test = &rest.UserResponse{
+		UserID:   u.ID.String(),
 		Role:     u.Role.String(),
 		Email:    utils.MaskEmail(u.Email),
 		Username: req.Username,
