@@ -13,14 +13,14 @@ handle user signup, authentication and custom user data.
 
 ## WHY?
 
-Gothic is a free production-ready authentication server.
+`Gothic` is a free production-ready authentication server.
 
 It is a complete rewrite of [Netlify's GoTrue](https://github.com/netlify/gotrue) and is ~85-90% complete.
 
 `GoTrue` only supports `REST` + `mysql`, and is outdated. `Auth0` is prohibitively expensive for small startups, 
 garage projects, & consumer applications.
 
-It is written to get you up and running quickly without having to spend months coding the exact same thing for the 
+`Gothic` is designed to get you up and running quickly without having to spend months coding the exact same thing for the 
 umpteenth time —  without sacrificing functionality, or a professional look & feel.
 
 **UPDATE**  

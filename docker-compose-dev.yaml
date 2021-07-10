@@ -11,7 +11,7 @@ services:
     command: --init-file /data/application/init.sql
     volumes:
       - ./dev.sql:/data/application/init.sql
-      - db_volume:/var/lib/mysql
+      - ./build/db:/var/lib/mysql
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - CLIENT_MULTI_STATEMENTS=true
