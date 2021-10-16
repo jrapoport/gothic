@@ -11,7 +11,7 @@ require (
 	github.com/flashmob/go-guerrilla v1.6.1
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/cors v1.2.0
-	github.com/go-chi/httprate v0.5.1
+	github.com/go-chi/httprate v0.5.2
 	github.com/go-chi/httptracer v0.3.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
 	github.com/go-playground/form/v4 v4.2.0
@@ -36,7 +36,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/orlangure/gnomock v0.18.0
 	github.com/puerkitobio/purell v1.1.1
-	github.com/segmentio/encoding v0.2.21
+	github.com/segmentio/encoding v0.2.22
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
@@ -56,8 +56,8 @@ require (
 	gorm.io/driver/mysql v1.1.2
 	gorm.io/driver/postgres v1.1.2
 	gorm.io/driver/sqlite v1.1.6
-	gorm.io/driver/sqlserver v1.0.9
-	gorm.io/gorm v1.21.15
+	gorm.io/driver/sqlserver v1.1.0
+	gorm.io/gorm v1.21.16
 )
 
 require (
@@ -73,7 +73,7 @@ require (
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/aokoli/goutils v1.0.1 // indirect
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef // indirect
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58 // indirect
 	github.com/containerd/containerd v1.5.5 // indirect
@@ -128,7 +128,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
-	github.com/segmentio/asm v1.0.1 // indirect
+	github.com/segmentio/asm v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect

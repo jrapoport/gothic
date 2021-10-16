@@ -13,56 +13,56 @@ export class AccountClient {
   signup(
     request: account_pb.SignupRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.UserResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   sendConfirmUser(
     request: account_pb.SendConfirmRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   confirmUser(
     request: account_pb.ConfirmUserRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.BearerResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 
   login(
     request: account_pb.LoginRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.UserResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   logout(
     request: account_pb.LogoutRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   sendResetPassword(
     request: account_pb.ResetPasswordRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   confirmResetPassword(
     request: account_pb.ConfirmPasswordRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.BearerResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 
   refreshBearerToken(
     request: account_pb.RefreshTokenRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.BearerResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 

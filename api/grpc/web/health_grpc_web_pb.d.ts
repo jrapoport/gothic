@@ -12,7 +12,7 @@ export class HealthClient {
   healthCheck(
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: health_pb.HealthCheckResponse) => void
   ): grpcWeb.ClientReadableStream<health_pb.HealthCheckResponse>;
 

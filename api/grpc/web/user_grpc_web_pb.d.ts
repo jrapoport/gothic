@@ -13,28 +13,28 @@ export class UserClient {
   getUser(
     request: user_pb.UserRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.UserResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   updateUser(
     request: user_pb.UpdateUserRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.UserResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.UserResponse>;
 
   sendConfirmUser(
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   changePassword(
     request: user_pb.ChangePasswordRequest,
     metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.Error,
+    callback: (err: grpcWeb.RpcError,
                response: response_pb.BearerResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 
