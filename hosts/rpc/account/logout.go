@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *accountServer) Logout(ctx context.Context,
+func (s *server) Logout(ctx context.Context,
 	_ *account.LogoutRequest) (*emptypb.Empty, error) {
 	rtx := rpc.RequestContext(ctx)
 	uid := rtx.UserID()

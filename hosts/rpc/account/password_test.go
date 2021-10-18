@@ -20,7 +20,7 @@ import (
 func TestAccountServer_SendResetPassword(t *testing.T) {
 	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	ctx := context.Background()
 	// invalid req
 	_, err := srv.SendResetPassword(ctx, nil)
@@ -61,7 +61,7 @@ func TestAccountServer_SendResetPassword(t *testing.T) {
 
 func TestAccountServer_SendResetPassword_RateLimit(t *testing.T) {
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	ctx := context.Background()
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	srv.Config().Signup.AutoConfirm = true
@@ -97,7 +97,7 @@ func TestAccountServer_ConfirmResetPassword(t *testing.T) {
 	t.Parallel()
 	const newPass = "sxjAm7QJ4?3dH!aN8T3F5P!oNnpXbaRy#gtx#8jG"
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	srv.Config().Signup.AutoConfirm = false
 	srv.Config().Mail.SendLimit = 0
 	ctx := context.Background()

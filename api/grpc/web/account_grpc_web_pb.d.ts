@@ -59,13 +59,6 @@ export class AccountClient {
                response: response_pb.BearerResponse) => void
   ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
 
-  refreshBearerToken(
-    request: account_pb.RefreshTokenRequest,
-    metadata: grpcWeb.Metadata | undefined,
-    callback: (err: grpcWeb.RpcError,
-               response: response_pb.BearerResponse) => void
-  ): grpcWeb.ClientReadableStream<response_pb.BearerResponse>;
-
 }
 
 export class AccountPromiseClient {
@@ -105,11 +98,6 @@ export class AccountPromiseClient {
 
   confirmResetPassword(
     request: account_pb.ConfirmPasswordRequest,
-    metadata?: grpcWeb.Metadata
-  ): Promise<response_pb.BearerResponse>;
-
-  refreshBearerToken(
-    request: account_pb.RefreshTokenRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<response_pb.BearerResponse>;
 

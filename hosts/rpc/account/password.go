@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *accountServer) SendResetPassword(ctx context.Context,
+func (s *server) SendResetPassword(ctx context.Context,
 	req *account.ResetPasswordRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		err := errors.New("request not found")
@@ -43,7 +43,7 @@ func (s *accountServer) SendResetPassword(ctx context.Context,
 	return &emptypb.Empty{}, nil
 }
 
-func (s *accountServer) ConfirmResetPassword(ctx context.Context,
+func (s *server) ConfirmResetPassword(ctx context.Context,
 	req *account.ConfirmPasswordRequest) (*api.BearerResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")

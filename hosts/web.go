@@ -14,8 +14,8 @@ const rpcWebName = "rpc-web"
 func NewRPCWebHost(a *core.API, address string) core.Hosted {
 	return rpc.NewHost(a, rpcWebName, address,
 		[]rpc.RegisterServer{
+			account.RegisterServer,
 			health.RegisterServer,
 			user.RegisterServer,
-			account.RegisterServer,
 		}, rpc.Authentication())
 }

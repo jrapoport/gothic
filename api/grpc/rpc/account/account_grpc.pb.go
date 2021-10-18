@@ -27,7 +27,6 @@ type AccountClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SendResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ConfirmResetPassword(ctx context.Context, in *ConfirmPasswordRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error)
-	RefreshBearerToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error)
 }
 
 type accountClient struct {
@@ -101,15 +100,6 @@ func (c *accountClient) ConfirmResetPassword(ctx context.Context, in *ConfirmPas
 	return out, nil
 }
 
-func (c *accountClient) RefreshBearerToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*rpc.BearerResponse, error) {
-	out := new(rpc.BearerResponse)
-	err := c.cc.Invoke(ctx, "/gothic.api.Account/RefreshBearerToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AccountServer is the server API for Account service.
 // All implementations must embed UnimplementedAccountServer
 // for forward compatibility
@@ -121,7 +111,6 @@ type AccountServer interface {
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	SendResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error)
 	ConfirmResetPassword(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error)
-	RefreshBearerToken(context.Context, *RefreshTokenRequest) (*rpc.BearerResponse, error)
 	mustEmbedUnimplementedAccountServer()
 }
 
@@ -149,9 +138,6 @@ func (UnimplementedAccountServer) SendResetPassword(context.Context, *ResetPassw
 }
 func (UnimplementedAccountServer) ConfirmResetPassword(context.Context, *ConfirmPasswordRequest) (*rpc.BearerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfirmResetPassword not implemented")
-}
-func (UnimplementedAccountServer) RefreshBearerToken(context.Context, *RefreshTokenRequest) (*rpc.BearerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshBearerToken not implemented")
 }
 func (UnimplementedAccountServer) mustEmbedUnimplementedAccountServer() {}
 
@@ -292,24 +278,6 @@ func _Account_ConfirmResetPassword_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Account_RefreshBearerToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefreshTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AccountServer).RefreshBearerToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gothic.api.Account/RefreshBearerToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServer).RefreshBearerToken(ctx, req.(*RefreshTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Account_ServiceDesc is the grpc.ServiceDesc for Account service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -344,10 +312,6 @@ var Account_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConfirmResetPassword",
 			Handler:    _Account_ConfirmResetPassword_Handler,
-		},
-		{
-			MethodName: "RefreshBearerToken",
-			Handler:    _Account_RefreshBearerToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -29,9 +29,6 @@ service Account {
 
   rpc ConfirmResetPassword (ConfirmPasswordRequest) returns (gothic.api.BearerResponse) {
   }
-
-  rpc RefreshBearerToken (RefreshTokenRequest) returns (gothic.api.BearerResponse) {
-  }
 }
 
 message SignupRequest {
@@ -66,6 +63,3 @@ message ConfirmPasswordRequest{
   string token = 2;
 }
 
-message RefreshTokenRequest{
-  string token = 1;
-}

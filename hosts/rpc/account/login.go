@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func (s *accountServer) Login(ctx context.Context,
+func (s *server) Login(ctx context.Context,
 	req *account.LoginRequest) (*api.UserResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")

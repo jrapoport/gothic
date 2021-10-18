@@ -33,11 +33,11 @@ message UserAccountResponse{
   string provider = 2;
   string role = 3;
   enum Status {
-    Banned = 0;
-    Locked = 1;
-    Restricted = 2;
-    Active = 3;
-    Verified = 4;
+    BANNED = 0;
+    LOCKED = 1;
+    RESTRICTED = 2;
+    ACTIVE = 3;
+    VERIFIED = 4;
   }
   Status status = 4;
   string email = 5;
@@ -66,11 +66,11 @@ message EmailResponse {
 }
 
 enum LinkedType {
-  None = 0;
-  Auth = 1;
-  Payment = 2;
-  Wallet = 4;
-  Any = 0xfffffff;
+  NONE = 0;
+  AUTH = 1;
+  PAYMENT = 2;
+  WALLET = 4;
+  ANY = 0xfffffff;
 }
 
 message LinkedAccount {

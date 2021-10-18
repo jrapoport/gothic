@@ -1,4 +1,4 @@
-package account
+package auth
 
 import (
 	"testing"
@@ -19,12 +19,12 @@ import (
 
 const testPass = "SXJAm7qJ4?3dH!aN8T3f5p!oNnpXbaRy#Gtx#8jG"
 
-func testServer(t *testing.T) *accountServer {
+func testServer(t *testing.T) *server {
 	srv, _ := tsrv.RPCServer(t, false)
-	return newAccountServer(srv)
+	return newServer(srv)
 }
 
-func testUser(t *testing.T, srv *accountServer) *user.User {
+func testUser(t *testing.T, srv *server) *user.User {
 	em := tutils.RandomEmail()
 	ctx := rpc.RequestContext(nil)
 	ctx.SetProvider(srv.Provider())
@@ -34,7 +34,7 @@ func testUser(t *testing.T, srv *accountServer) *user.User {
 	return u
 }
 
-func testAuthCtx(t *testing.T, srv *accountServer, u *user.User) context.Context {
+func testAuthCtx(t *testing.T, srv *server, u *user.User) context.Context {
 	bt, err := srv.GrantBearerToken(context.Background(), u)
 	require.NoError(t, err)
 	claims, err := jwt.ParseUserClaims(srv.Config().JWT, bt.Token)
@@ -44,7 +44,7 @@ func testAuthCtx(t *testing.T, srv *accountServer, u *user.User) context.Context
 	return context.WithContext(rpc.WithClaims(ctx, claims))
 }
 
-func assertUserResponse(t *testing.T, srv *accountServer, test *rpc.UserResponse, res *api.UserResponse) {
+func assertUserResponse(t *testing.T, srv *server, test *rpc.UserResponse, res *api.UserResponse) {
 	assert.Equal(t, test.Username, res.Username)
 	assert.Equal(t, test.Role, res.Role)
 	em := test.Email

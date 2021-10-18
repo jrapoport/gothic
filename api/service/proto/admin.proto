@@ -52,15 +52,15 @@ message CheckSignupCodeRequest {
 }
 
 enum CodeFormat {
-  Invite = 0;
+  INVITE = 0;
   PIN = 1;
 }
 
 enum CodeType {
-  Infinite = 0;
-  Single = 1;
-  Multi = 2;
-  Timed = 3;
+  INFINITE = 0;
+  SINGLE = 1;
+  MULTI = 2;
+  TIMED = 3;
 }
 
 message SignupCodeResponse {
@@ -118,10 +118,10 @@ message ChangeUserRoleResponse {
 message AuditLog {
   uint64 id = 1;
   enum Type {
-    System = 0;
-    Account = 1;
-    Token = 2;
-    User = 3;
+    SYSTEM = 0;
+    ACCOUNT = 1;
+    TOKEN = 2;
+    USER = 3;
   }
   Type type = 2;
   string action = 3;
