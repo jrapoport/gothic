@@ -30,6 +30,7 @@ type JWT struct {
 	pk    jwk.Key
 }
 
+// PEM holds the public / private keypair for jwt (if set)
 type PEM struct {
 	PrivateKey string `json:"privatekey"`
 	PublicKey  string `json:"publickey"`
@@ -44,6 +45,7 @@ func (j *JWT) normalize(srv Service, def JWT) {
 	_ = mergo.Merge(j, def)
 }
 
+// CheckRequired returns error if the required jwt config settings are not found
 func (j *JWT) CheckRequired() error {
 	if j.Secret == "" && j.PEM.PrivateKey == "" {
 		return errors.New("jwt secret or private key is required")
@@ -61,6 +63,7 @@ func (j *JWT) CheckRequired() error {
 	return nil
 }
 
+// PrivateKey returns the jwt private key (if set)
 func (j *JWT) PrivateKey() jwk.Key {
 	if j.sk != nil {
 		return j.sk
@@ -74,6 +77,7 @@ func (j *JWT) PrivateKey() jwk.Key {
 	return j.sk
 }
 
+// PublicKey returns the jwt public key (if set)
 func (j *JWT) PublicKey() jwk.Key {
 	if j.pk != nil {
 		return j.pk

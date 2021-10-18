@@ -289,20 +289,24 @@ func (m *Client) sendTemplate(t template.Template) error {
 	return m.Send(t.To(), t.Logo(), t.Subject(), html, plain)
 }
 
+// Type is the email content type
 type Type int
 
+// valid email content types
 const (
 	HTML Type = iota
 	Markdown
 	Template
 )
 
+// Content is the content & its type for the email
 type Content struct {
 	Type      Type
 	Body      string
 	Plaintext string
 }
 
+// SendEmail sends an email
 func (m *Client) SendEmail(to, subject string, content Content) error {
 	if m.IsOffline() {
 		m.log.Warn("mail client is offline")

@@ -42,6 +42,7 @@ func RequestContext(ctx context.Context) core_ctx.Context {
 	return rtx
 }
 
+// GetRootPassword returns the root password from the context metadata
 func GetRootPassword(ctx context.Context) string {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

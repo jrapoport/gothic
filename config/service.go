@@ -31,6 +31,7 @@ func (s *Service) normalize() error {
 	return nil
 }
 
+// CheckRequired returns error if the required settings are not found.
 func (s *Service) CheckRequired() error {
 	if s.SiteURL == "" {
 		return errors.New("site url is required")

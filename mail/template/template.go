@@ -67,6 +67,7 @@ func (e *MailTemplate) Configure(c config.MailTemplate, to mail.Address, token, 
 	e.link = linkURL
 }
 
+// NewEmail returns a new configured email template
 func NewEmail(c config.MailTemplate, to mail.Address, body string) *MailTemplate {
 	e := new(MailTemplate)
 	e.bodyTemplate = body

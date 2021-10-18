@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAccountServer_RefreshBearerToken(t *testing.T) {
+func TestAuthServer_RefreshBearerToken(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()

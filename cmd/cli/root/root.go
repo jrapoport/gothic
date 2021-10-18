@@ -47,6 +47,7 @@ func rootRunE(cmd *cobra.Command, _ []string) error {
 	return cmd.Help()
 }
 
+// AddCommand adds a cmd to the root command
 func AddCommand(cmd *cobra.Command) {
 	rootCmd.AddCommand(cmd)
 }
@@ -56,10 +57,12 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
+// Config returns the config the root cmd was initialized with
 func Config() *config.Config {
 	return cfg
 }
 
+// ConfirmAction prompts the user to confirm a command before executing it
 func ConfirmAction(format string, a ...interface{}) bool {
 	p := fmt.Sprintf(format, a...)
 	p = fmt.Sprintf("%s? [Yes/No]", p)

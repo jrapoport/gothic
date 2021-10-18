@@ -25,6 +25,7 @@ func (d *Database) normalize(srv Service) (err error) {
 	return
 }
 
+// CheckRequired makes sure both the driver and dsn are set in the config.
 func (d *Database) CheckRequired() error {
 	if d.Driver == "" {
 		return errors.New("database driver required")
