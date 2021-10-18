@@ -49,6 +49,7 @@ func (s *Security) normalize(srv Service) error {
 	return nil
 }
 
+// CheckRequired returns error if the required settings are not found.
 func (s *Security) CheckRequired() error {
 	if s.RootPassword == "" {
 		return errors.New("root password is required")

@@ -6,6 +6,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
+// ScopeKey is the jwt key for the scope field
 const ScopeKey = "scope"
 
 // Claims interface for jwt.

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package gothic.api;
+
+option go_package = "github.com/jrapoport/gothic/api/grpc/rpc/auth";
+
+import "response.proto";
+
+service Auth {
+  rpc RefreshBearerToken (RefreshTokenRequest) returns (gothic.api.BearerResponse) {
+  }
+}
+
+message RefreshTokenRequest{
+  string token = 1;
+}

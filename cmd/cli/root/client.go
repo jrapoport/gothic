@@ -10,15 +10,18 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// AdminClient is a grpc client for the admin service.
 type AdminClient struct {
 	admin.AdminClient
 	conn *grpc.ClientConn
 }
 
+// Close closes the client connection.
 func (client AdminClient) Close() error {
 	return client.conn.Close()
 }
 
+// NewAdminClient returns a new grpc client for the admin service.
 func NewAdminClient() (*AdminClient, error) {
 	c := Config()
 	if c.AdminAddress == "" {

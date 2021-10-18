@@ -1,10 +1,10 @@
-package account
+package auth
 
 import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jrapoport/gothic/api/grpc/rpc/account"
+	"github.com/jrapoport/gothic/api/grpc/rpc/auth"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/jwt"
 	"github.com/jrapoport/gothic/test/tcore"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAccountServer_RefreshBearerToken(t *testing.T) {
+func TestAuthServer_RefreshBearerToken(t *testing.T) {
 	t.Parallel()
 	srv := testServer(t)
 	ctx := context.Background()
@@ -20,7 +20,7 @@ func TestAccountServer_RefreshBearerToken(t *testing.T) {
 	_, err := srv.RefreshBearerToken(ctx, nil)
 	assert.Error(t, err)
 	// empty email
-	req := &account.RefreshTokenRequest{}
+	req := &auth.RefreshTokenRequest{}
 	_, err = srv.RefreshBearerToken(ctx, req)
 	assert.Error(t, err)
 	// bad email
@@ -30,7 +30,7 @@ func TestAccountServer_RefreshBearerToken(t *testing.T) {
 	u, _ := tcore.TestUser(t, srv.API, "", false)
 	bt, err := srv.GrantBearerToken(context.Background(), u)
 	require.NoError(t, err)
-	req = &account.RefreshTokenRequest{
+	req = &auth.RefreshTokenRequest{
 		Token: bt.RefreshToken.Token,
 	}
 	res, err := srv.RefreshBearerToken(ctx, req)

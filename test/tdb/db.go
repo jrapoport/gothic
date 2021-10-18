@@ -21,6 +21,7 @@ func DB(t *testing.T) *gorm.DB {
 	return db
 }
 
+// MockDB returns a mocked db instance
 func MockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 	msql, mock, err := sqlmock.New()
 	require.NoError(t, err)

@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *accountServer) SendConfirmUser(ctx context.Context,
+func (s *server) SendConfirmUser(ctx context.Context,
 	req *account.SendConfirmRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		err := errors.New("request not found")
@@ -42,7 +42,7 @@ func (s *accountServer) SendConfirmUser(ctx context.Context,
 	return &emptypb.Empty{}, nil
 }
 
-func (s *accountServer) ConfirmUser(ctx context.Context,
+func (s *server) ConfirmUser(ctx context.Context,
 	req *account.ConfirmUserRequest) (*api.BearerResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")

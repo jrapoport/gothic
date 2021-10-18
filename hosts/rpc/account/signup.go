@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func (s *accountServer) Signup(ctx context.Context,
+func (s *server) Signup(ctx context.Context,
 	req *account.SignupRequest) (*api.UserResponse, error) {
 	if req == nil {
 		err := errors.New("request not found")

@@ -22,6 +22,7 @@ func BuildVersion() string {
 	return ver
 }
 
+// BuildName is the build name of the executable
 func BuildName() string {
 	return ExeName
 }

@@ -7,8 +7,8 @@ option go_package = "github.com/jrapoport/gothic/api/grpc/rpc;api";
 import "google/protobuf/struct.proto";
 
 enum Sort {
-  Ascending = 0;
-  Descending = 1;
+  ASCENDING = 0;
+  DESCENDING = 1;
 }
 
 message SearchRequest {

@@ -87,13 +87,13 @@ func (s *Server) ResponseError(w http.ResponseWriter, err error) {
 	s.ResponseCode(w, code, err)
 }
 
-// AuthResponse will log the error but hide it so we don't leak information
+// AuthResponse will log the error but hide it, so we don't leak information
 func (s *Server) AuthResponse(w http.ResponseWriter, r *http.Request, tok string, v interface{}) {
 	UseCookie(w, r, tok, s.Config().Cookies.Duration)
 	s.Response(w, v)
 }
 
-// AuthError will log the error but hide it so we don't leak information
+// AuthError will log the error but hide it, so we don't leak information
 func (s *Server) AuthError(w http.ResponseWriter, err error) {
 	ClearCookie(w)
 	s.ResponseCode(w, http.StatusOK, err)

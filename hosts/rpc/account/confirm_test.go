@@ -20,7 +20,7 @@ import (
 func TestAccountServer_SendConfirmUser(t *testing.T) {
 	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	srv.Config().Signup.AutoConfirm = false
 	srv.Config().Mail.SendLimit = 0
 	ctx := context.Background()
@@ -57,7 +57,7 @@ func TestAccountServer_SendConfirmUser(t *testing.T) {
 func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
 	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	srv.Config().Signup.AutoConfirm = false
 	srv.Config().Mail.SendLimit = 5 * time.Minute
 	ctx := context.Background()
@@ -89,7 +89,7 @@ func TestAccountServer_SendConfirmUser_RateLimit(t *testing.T) {
 func TestAccountServer_ConfirmUser(t *testing.T) {
 	t.Parallel()
 	s, smtp := tsrv.RPCServer(t, true)
-	srv := newAccountServer(s)
+	srv := newServer(s)
 	srv.Config().Signup.AutoConfirm = false
 	srv.Config().Mail.SendLimit = 0
 	ctx := context.Background()
