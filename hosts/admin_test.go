@@ -1,19 +1,19 @@
 package hosts
 
 import (
-	"github.com/jrapoport/gothic/hosts/rpc"
-	"google.golang.org/grpc/metadata"
 	"testing"
 	"time"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
+	"github.com/jrapoport/gothic/hosts/rpc"
 	"github.com/jrapoport/gothic/test/tcore"
 	"github.com/jrapoport/gothic/test/tsrv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func configClient(t *testing.T, h core.Hosted) admin.AdminClient {

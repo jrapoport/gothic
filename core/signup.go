@@ -141,7 +141,7 @@ func (a *API) userSignup(ctx context.Context, conn *store.Connection,
 			return err
 		}
 		data = a.useDefaultColor(data)
-		meta := types.Map{key.IPAddress: ip}
+		meta := a.defaultMetadata(ctx)
 		u, err = users.CreateUser(tx, p, email, username, pw, data, meta)
 		if a.debugSignup(tx, email, code) {
 			return nil
@@ -242,4 +242,10 @@ func (a *API) useSignupCode(tx *store.Connection, u *user.User, code string) err
 		return err
 	}
 	return sc.UseCode(tx, u)
+}
+
+func (a *API) defaultMetadata(ctx context.Context) types.Map {
+	return types.Map{
+		key.IPAddress: ctx.IPAddress(),
+	}
 }

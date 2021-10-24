@@ -93,7 +93,7 @@ func SetupTestLogs(t *testing.T, c *config.Config, uid, bid uuid.UUID) []TestCas
 
 type AdminAuditServerTestSuite struct {
 	suite.Suite
-	srv   *adminServer
+	srv   *server
 	conn  *store.Connection
 	tests []TestCase
 	uid   uuid.UUID

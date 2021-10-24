@@ -9,7 +9,7 @@ import (
 )
 
 // Settings returns the settings for a server.
-func (s *adminServer) Settings(ctx context.Context, _ *admin.SettingsRequest) (*admin.SettingsResponse, error) {
+func (s *server) Settings(ctx context.Context, _ *admin.SettingsRequest) (*admin.SettingsResponse, error) {
 	_, err := s.adminRequestContext(ctx)
 	if err != nil {
 		return nil, s.RPCError(codes.PermissionDenied, err)

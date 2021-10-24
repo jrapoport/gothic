@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/jrapoport/gothic/models/types/key"
 	"testing"
 
 	"github.com/google/uuid"
@@ -155,6 +156,79 @@ func TestAdminServer_ChangeUserRole(t *testing.T) {
 	req.Role = user.RoleAdmin.String()
 	_, err = srv.ChangeUserRole(ctx, req)
 	assert.Error(t, err)
+}
+
+func TestAdminServer_UpdateUserMetadata(t *testing.T) {
+	const (
+		testKey   = "test-key"
+		testValue = "test-value"
+		testIP    = "127.0.0.1"
+	)
+	var testMeta = types.Map{
+		testKey:       testValue,
+		key.IPAddress: testIP,
+	}
+	t.Parallel()
+	s, _ := tsrv.RPCServer(t, false)
+	srv := newAdminServer(s)
+	ctx := rootContext(srv.Config())
+	// nil request
+	_, err := srv.UpdateUserMetadata(ctx, nil)
+	assert.Error(t, err)
+	// no params
+	meta, _ := structpb.NewStruct(testMeta)
+	req := &admin.UpdateUserMetadataRequest{
+		Metadata: meta,
+	}
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// no root password
+	req.User = &admin.UpdateUserMetadataRequest_UserId{UserId: uuid.Nil.String()}
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// bad root password
+	ctx = metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, "bad"))
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// nil user id
+	root := s.Config().RootPassword
+	ctx = metadata.NewIncomingContext(context.Background(),
+		metadata.Pairs(rpc.RootPassword, root))
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// invalid email
+	req.User = &admin.UpdateUserMetadataRequest_Email{Email: uuid.Nil.String()}
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// bad user id
+	req.User = &admin.UpdateUserMetadataRequest_UserId{UserId: uuid.New().String()}
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// bad email
+	req.User = &admin.UpdateUserMetadataRequest_Email{Email: tutils.RandomEmail()}
+	_, err = srv.UpdateUserMetadata(ctx, req)
+	assert.Error(t, err)
+	// success id
+	u, _ := tcore.TestUser(t, srv.API, "", false)
+	req.User = &admin.UpdateUserMetadataRequest_UserId{UserId: u.ID.String()}
+	res, err := srv.UpdateUserMetadata(ctx, req)
+	assert.NoError(t, err)
+	require.NotNil(t, res)
+	assert.Equal(t, u.ID.String(), res.GetUserId())
+	m := res.GetMetadata().AsMap()
+	assert.Equal(t, testValue, m[testKey])
+	assert.NotEqual(t, testIP, m[key.IPAddress])
+	// success email
+	u, _ = tcore.TestUser(t, srv.API, "", false)
+	req.User = &admin.UpdateUserMetadataRequest_Email{Email: u.Email}
+	res, err = srv.UpdateUserMetadata(ctx, req)
+	assert.NoError(t, err)
+	require.NotNil(t, res)
+	assert.Equal(t, u.ID.String(), res.GetUserId())
+	m = res.GetMetadata().AsMap()
+	assert.Equal(t, testValue, m[testKey])
+	assert.NotEqual(t, testIP, m[key.IPAddress])
 }
 
 func TestAdminServer_DeleteUser(t *testing.T) {

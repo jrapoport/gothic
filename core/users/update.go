@@ -37,6 +37,32 @@ func Update(conn *store.Connection, u *user.User, username *string, data types.M
 	return true, nil
 }
 
+// UpdateMetadata updates a user's metadata
+func UpdateMetadata(conn *store.Connection, u *user.User, meta types.Map) (bool, error) {
+	// don't check if the user is active since we should
+	// be able to operate on banned users, etc.
+	if u == nil {
+		return false, errors.New("invalid user")
+	}
+	if meta == nil || len(meta) <= 0 {
+		return false, nil
+	}
+	for k := range meta {
+		if _, ok := key.Reserved[k]; ok {
+			delete(meta, k)
+		}
+	}
+	err := mergo.Merge(&u.Metadata, meta, mergo.WithOverride)
+	if err != nil {
+		return false, err
+	}
+	err = conn.Model(u).Select(key.Metadata).Updates(u).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // ConfirmUser confirms a user.
 func ConfirmUser(conn *store.Connection, u *user.User, t time.Time) error {
 	if u == nil || u.IsLocked() {

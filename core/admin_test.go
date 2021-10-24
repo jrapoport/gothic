@@ -5,6 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/core/users"
+	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/test/tutils"
 	"github.com/jrapoport/gothic/utils"
@@ -160,6 +162,68 @@ func TestAPI_PromoteUser(t *testing.T) {
 	assert.True(t, pu.IsAdmin())
 	_, err = a.PromoteUser(ctx, u.ID)
 	assert.NoError(t, err)
+}
+
+func TestAPI_UpdateUserMetadata(t *testing.T) {
+	const (
+		testKey   = "test-key"
+		testValue = "test-value"
+	)
+	var testMeta = types.Map{
+		testKey:       testValue,
+		key.IPAddress: "foo",
+	}
+	t.Parallel()
+	a := apiWithTempDB(t)
+	ctx := rootContext(a)
+	a.config.Signup.Username = true
+	a.config.Signup.Default.Username = false
+	_, err := a.UpdateUserMetadata(nil, uuid.Nil, nil)
+	assert.Error(t, err)
+	ctx.SetAdminID(uuid.New())
+	_, err = a.UpdateUserMetadata(ctx, uuid.Nil, nil)
+	assert.Error(t, err)
+	_, err = a.UpdateUserMetadata(ctx, uuid.New(), nil)
+	assert.Error(t, err)
+	_, err = a.UpdateUserMetadata(ctx, uuid.New(), testMeta)
+	assert.Error(t, err)
+	adm := testUser(t, a)
+	adm = confirmUser(t, a, adm)
+	ctx.SetAdminID(adm.ID)
+	_, err = a.UpdateUserMetadata(ctx, uuid.New(), testMeta)
+	assert.Error(t, err)
+	_, err = a.GrantBearerToken(ctx, adm)
+	require.NoError(t, err)
+	_, err = a.UpdateUserMetadata(ctx, uuid.New(), testMeta)
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleAdmin)
+	require.NoError(t, err)
+	_, err = a.UpdateUserMetadata(ctx, uuid.New(), testMeta)
+	assert.Error(t, err)
+	u := testUser(t, a)
+	assert.False(t, u.IsAdmin())
+	assert.Equal(t, testIP, u.Metadata[key.IPAddress])
+	u, err = a.UpdateUserMetadata(ctx, u.ID, testMeta)
+	assert.NoError(t, err)
+	require.NotNil(t, u)
+	assert.Equal(t, testValue, u.Metadata[testKey])
+	assert.Equal(t, testIP, u.Metadata[key.IPAddress])
+	err = users.ChangeRole(a.conn, u, user.RoleAdmin)
+	require.NoError(t, err)
+	_, err = a.UpdateUserMetadata(ctx, u.ID, testMeta)
+	assert.Error(t, err)
+	err = users.ChangeRole(a.conn, adm, user.RoleSuper)
+	require.NoError(t, err)
+	u, err = a.UpdateUserMetadata(ctx, u.ID, testMeta)
+	assert.NoError(t, err)
+	require.NotNil(t, u)
+	assert.Equal(t, testValue, u.Metadata[testKey])
+	assert.Equal(t, testIP, u.Metadata[key.IPAddress])
+	err = a.conn.DB.Migrator().DropColumn(new(user.User), "Metadata")
+	require.NoError(t, err)
+	_, err = a.UpdateUserMetadata(ctx, u.ID, testMeta)
+	assert.Error(t, err)
+
 }
 
 func TestAPI_DeleteUser(t *testing.T) {

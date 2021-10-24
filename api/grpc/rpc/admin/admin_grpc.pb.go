@@ -25,6 +25,7 @@ type AdminClient interface {
 	DeleteSignupCode(ctx context.Context, in *DeleteSignupCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	UpdateUserMetadata(ctx context.Context, in *UpdateUserMetadataRequest, opts ...grpc.CallOption) (*UpdateUserMetadataResponse, error)
 	ChangeUserRole(ctx context.Context, in *ChangeUserRoleRequest, opts ...grpc.CallOption) (*ChangeUserRoleResponse, error)
 	SearchAuditLogs(ctx context.Context, in *rpc.SearchRequest, opts ...grpc.CallOption) (*AuditLogsResult, error)
 	Settings(ctx context.Context, in *SettingsRequest, opts ...grpc.CallOption) (*SettingsResponse, error)
@@ -83,6 +84,15 @@ func (c *adminClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opt
 	return out, nil
 }
 
+func (c *adminClient) UpdateUserMetadata(ctx context.Context, in *UpdateUserMetadataRequest, opts ...grpc.CallOption) (*UpdateUserMetadataResponse, error) {
+	out := new(UpdateUserMetadataResponse)
+	err := c.cc.Invoke(ctx, "/gothic.api.Admin/UpdateUserMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminClient) ChangeUserRole(ctx context.Context, in *ChangeUserRoleRequest, opts ...grpc.CallOption) (*ChangeUserRoleResponse, error) {
 	out := new(ChangeUserRoleResponse)
 	err := c.cc.Invoke(ctx, "/gothic.api.Admin/ChangeUserRole", in, out, opts...)
@@ -119,6 +129,7 @@ type AdminServer interface {
 	DeleteSignupCode(context.Context, *DeleteSignupCodeRequest) (*emptypb.Empty, error)
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	UpdateUserMetadata(context.Context, *UpdateUserMetadataRequest) (*UpdateUserMetadataResponse, error)
 	ChangeUserRole(context.Context, *ChangeUserRoleRequest) (*ChangeUserRoleResponse, error)
 	SearchAuditLogs(context.Context, *rpc.SearchRequest) (*AuditLogsResult, error)
 	Settings(context.Context, *SettingsRequest) (*SettingsResponse, error)
@@ -143,6 +154,9 @@ func (UnimplementedAdminServer) CreateUser(context.Context, *CreateUserRequest) 
 }
 func (UnimplementedAdminServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedAdminServer) UpdateUserMetadata(context.Context, *UpdateUserMetadataRequest) (*UpdateUserMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserMetadata not implemented")
 }
 func (UnimplementedAdminServer) ChangeUserRole(context.Context, *ChangeUserRoleRequest) (*ChangeUserRoleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeUserRole not implemented")
@@ -256,6 +270,24 @@ func _Admin_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_UpdateUserMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserMetadataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).UpdateUserMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gothic.api.Admin/UpdateUserMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).UpdateUserMetadata(ctx, req.(*UpdateUserMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Admin_ChangeUserRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangeUserRoleRequest)
 	if err := dec(in); err != nil {
@@ -336,6 +368,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _Admin_DeleteUser_Handler,
+		},
+		{
+			MethodName: "UpdateUserMetadata",
+			Handler:    _Admin_UpdateUserMetadata_Handler,
 		},
 		{
 			MethodName: "ChangeUserRole",
