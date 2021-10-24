@@ -2,7 +2,7 @@ module github.com/jrapoport/gothic
 
 go 1.17
 
-// replace github.com/containerd/containerd v1.5.5 => github.com/containerd/containerd v1.5.7
+replace github.com/containerd/containerd v1.5.5 => github.com/containerd/containerd v1.5.7
 
 require (
 	github.com/badoux/checkmail v1.2.1

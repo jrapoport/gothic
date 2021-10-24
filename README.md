@@ -1433,3 +1433,8 @@ production systems — which makes perfect sense for their situation.
 
 I'd like to thank Netlify team for their hard work on the original version of this microservice.
 
+
+## TODO
+* Merge rest user metadata update into update user
+* Create a grpc admin call to update a user incl. metadata
+* Add admin get user calls which return the user metadata in the response
