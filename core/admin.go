@@ -173,6 +173,56 @@ func (a *API) PromoteUser(ctx context.Context, userID uuid.UUID) (*user.User, er
 	return u, nil
 }
 
+// UpdateUserMetadata updates a user's metadata (changes to reserved keys will be ignored).
+// NOTE: This API requires admin user permissions.
+func (a *API) UpdateUserMetadata(ctx context.Context, userID uuid.UUID, meta types.Map) (*user.User, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if !ctx.IsAdmin() {
+		err := errors.New("admin user required")
+		return nil, a.logError(err)
+	}
+	if userID == uuid.Nil || userID == user.SystemID || userID == user.SuperAdminID {
+		err := errors.New("user id required")
+		return nil, a.logError(err)
+	}
+	if meta == nil || len(meta) <= 0 {
+		err := errors.New("user metadata required")
+		return nil, a.logError(err)
+	}
+	a.log.Debugf("update user  %s metadata: %v", userID, meta)
+	var u *user.User
+	err := a.conn.Transaction(func(tx *store.Connection) (err error) {
+		role, err := a.validateAdmin(tx, ctx.AdminID())
+		if err != nil {
+			return err
+		}
+		u, err = users.GetUser(tx, userID)
+		if err != nil {
+			return err
+		}
+		// don't check if the user is active since we should
+		// be able to operate on banned users, etc.
+		if u.IsAdmin() && role != user.RoleSuper {
+			err = fmt.Errorf("super admin required to alter admin: %s", userID)
+			return err
+		}
+		ok, err := users.UpdateMetadata(tx, u, meta)
+		if err != nil {
+			return err
+		}
+		if ok {
+			err = audit.LogUserUpdated(ctx, tx, u.ID)
+		}
+		return err
+	})
+	if err != nil {
+		return nil, a.logError(err)
+	}
+	return u, nil
+}
+
 // DeleteUser deletes a user
 // NOTE: This API requires admin user permissions
 func (a *API) DeleteUser(ctx context.Context, userID uuid.UUID, hard bool) error {
@@ -225,6 +275,7 @@ func (a *API) validateAdmin(tx *store.Connection, aid uuid.UUID) (user.Role, err
 	}
 	adm, err := users.GetAuthenticatedUser(tx, aid)
 	if err != nil {
+		err = fmt.Errorf("admin required: %w", err)
 		return user.InvalidRole, err
 	}
 	if !adm.IsAdmin() {

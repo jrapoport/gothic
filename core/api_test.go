@@ -10,6 +10,7 @@ import (
 	"github.com/jrapoport/gothic/core/events"
 	"github.com/jrapoport/gothic/core/users"
 	"github.com/jrapoport/gothic/models/types"
+	"github.com/jrapoport/gothic/models/types/key"
 	"github.com/jrapoport/gothic/models/user"
 	"github.com/jrapoport/gothic/store"
 	"github.com/jrapoport/gothic/test/tconf"
@@ -101,7 +102,9 @@ func testUser(t *testing.T, a *API) *user.User {
 	p := a.Provider()
 	email := tutils.RandomEmail()
 	un := utils.RandomUsername()
-	u, err := users.CreateUser(a.conn, p, email, un, testPass, nil, nil)
+	u, err := users.CreateUser(a.conn, p, email, un, testPass, nil, types.Map{
+		key.IPAddress: testIP,
+	})
 	require.NoError(t, err)
 	require.NotNil(t, u)
 	return u

@@ -31,6 +31,7 @@ const (
 	JWT                = "jwt"
 	LastName           = "last_name"
 	LastUsed           = "last_used"
+	Metadata           = "metadata"
 	Name               = "name"
 	Nickname           = "nickname"
 	Page               = "page"
@@ -54,3 +55,7 @@ const (
 	Uses               = "uses"
 	Valid              = "valid"
 )
+
+var Reserved = map[string]struct{}{
+	IPAddress: {},
+}

@@ -12,7 +12,7 @@ import (
 )
 
 // CreateSignupCodes returns the settings for a server.
-func (s *adminServer) CreateSignupCodes(ctx context.Context,
+func (s *server) CreateSignupCodes(ctx context.Context,
 	req *admin.CreateSignupCodesRequest) (*admin.SignupCodesResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
@@ -38,7 +38,7 @@ func (s *adminServer) CreateSignupCodes(ctx context.Context,
 	return res, nil
 }
 
-func (s *adminServer) CheckSignupCode(ctx context.Context,
+func (s *server) CheckSignupCode(ctx context.Context,
 	req *admin.CheckSignupCodeRequest) (*admin.SignupCodeResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
@@ -72,7 +72,7 @@ func (s *adminServer) CheckSignupCode(ctx context.Context,
 	return res, nil
 }
 
-func (s *adminServer) DeleteSignupCode(ctx context.Context, req *admin.DeleteSignupCodeRequest) (*emptypb.Empty, error) {
+func (s *server) DeleteSignupCode(ctx context.Context, req *admin.DeleteSignupCodeRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}

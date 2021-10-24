@@ -1,13 +1,12 @@
 package hosts
 
 import (
-	"github.com/jrapoport/gothic/api/grpc/rpc/auth"
-	"github.com/jrapoport/gothic/api/grpc/rpc/health"
-	"google.golang.org/protobuf/types/known/emptypb"
 	"testing"
 	"time"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/account"
+	"github.com/jrapoport/gothic/api/grpc/rpc/auth"
+	"github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/api/grpc/rpc/user"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
@@ -16,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func accountClient(t *testing.T, h core.Hosted) account.AccountClient {

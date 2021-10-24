@@ -123,7 +123,7 @@ func TestUserServer_GetUser(t *testing.T) {
 	assert.NotEqual(t, http.StatusOK, res.Code)
 }
 
-func TestUserServer_UpdateUser(t *testing.T) {
+func TestUserServer_AdminUpdateUser(t *testing.T) {
 	t.Parallel()
 	s, _ := tsrv.RESTServer(t, false)
 	srv := newUserServer(s)
@@ -153,7 +153,7 @@ func TestUserServer_UpdateUser(t *testing.T) {
 			r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, ctx))
 		}
 		w := httptest.NewRecorder()
-		srv.UpdateUser(w, r)
+		srv.AdminUpdateUser(w, r)
 		return w
 	}
 	// no user id slug
@@ -327,4 +327,75 @@ func TestUserServer_PromoteUser(t *testing.T) {
 	// user not found
 	res = promoteUser(tok, true, uuid.New())
 	assert.NotEqual(t, http.StatusOK, res.Code)
+}
+
+func TestUserServer_AdminUpdateUserMetadata(t *testing.T) {
+	t.Parallel()
+	s, _ := tsrv.RESTServer(t, false)
+	srv := newUserServer(s)
+	srv.Config().Signup.AutoConfirm = true
+	srv.Config().MaskEmails = false
+	srv.Config().Signup.Default.Color = false
+	j := srv.Config().JWT
+	u, _ := testUser(t, srv, false)
+	uri := Users + rest.Root + u.ID.String()
+	updateUserMetadata := func(tok string, body interface{}, useCtx bool, testID uuid.UUID) *httptest.ResponseRecorder {
+		r := thttp.Request(t, http.MethodPut, uri, tok, nil, body)
+		if tok != "" {
+			var err error
+			r, err = rest.ParseClaims(r, srv.Config().JWT, tok)
+			require.NoError(t, err)
+		}
+		uid := u.ID
+		if testID != uuid.Nil {
+			uid = testID
+		}
+		if useCtx {
+			ctx := chi.NewRouteContext()
+			ctx.URLParams = chi.RouteParams{
+				Keys:   []string{key.UserID},
+				Values: []string{uid.String()},
+			}
+			r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, ctx))
+		}
+		w := httptest.NewRecorder()
+		srv.AdminUpdateUserMetadata(w, r)
+		return w
+	}
+	// no user id slug
+	tok := thttp.UserToken(t, j, false, false)
+	res := updateUserMetadata(tok, nil, false, uuid.Nil)
+	assert.NotEqual(t, http.StatusOK, res.Code)
+	// no admin id
+	res = updateUserMetadata("", nil, true, uuid.Nil)
+	assert.NotEqual(t, http.StatusOK, res.Code)
+	// admin not found
+	tok = thttp.UserToken(t, j, false, false)
+	res = updateUserMetadata(tok, nil, true, uuid.Nil)
+	assert.NotEqual(t, http.StatusOK, res.Code)
+	// not admin
+	_, tok = testUser(t, srv, false)
+	res = updateUserMetadata(tok, nil, true, uuid.Nil)
+	assert.NotEqual(t, http.StatusOK, res.Code)
+	req := &Request{
+		Metadata: types.Map{
+			"foo":         "bar",
+			key.IPAddress: "salad",
+		},
+	}
+	// admin
+	_, tok = testUser(t, srv, true)
+	// bad req
+	res = updateUserMetadata(tok, []byte("\n"), true, uuid.Nil)
+	assert.NotEqual(t, http.StatusOK, res.Code)
+	res = updateUserMetadata(tok, req, true, uuid.Nil)
+	assert.Equal(t, http.StatusOK, res.Code)
+	meta := types.Map{}
+	err := json.Unmarshal([]byte(res.Body.String()), &meta)
+	require.NoError(t, err)
+	test := types.Map{
+		"foo":         "bar",
+		key.IPAddress: "",
+	}
+	assert.Equal(t, test, meta)
 }

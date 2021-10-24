@@ -12,7 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (s *adminServer) SearchAuditLogs(ctx context.Context,
+func (s *server) SearchAuditLogs(ctx context.Context,
 	req *api.SearchRequest) (*admin.AuditLogsResult, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)

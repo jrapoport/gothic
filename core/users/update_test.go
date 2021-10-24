@@ -65,6 +65,57 @@ func TestUpdate(t *testing.T) {
 	assert.False(t, ok)
 }
 
+func TestUpdateMetadata(t *testing.T) {
+	t.Parallel()
+	const (
+		name1  = "peaches"
+		name2  = "foobar"
+		ipAddr = "127.0.0.1"
+	)
+	conn, c := tconn.TempConn(t)
+	u := testUser(t, conn, c.Provider())
+	_, err := UpdateMetadata(conn, u, types.Map{
+		key.FirstName: name1,
+	})
+	assert.NoError(t, err)
+	err = ConfirmUser(conn, u, time.Now())
+	require.NoError(t, err)
+	ok, err := UpdateMetadata(conn, u, types.Map{
+		key.FirstName: name1,
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, name1, u.Metadata[key.FirstName])
+	ok, err = UpdateMetadata(conn, u, types.Map{
+		key.FirstName: name2,
+		key.LastName:  name1,
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, name2, u.Metadata[key.FirstName])
+	assert.Equal(t, name1, u.Metadata[key.LastName])
+	ok, err = UpdateMetadata(conn, u, nil)
+	assert.NoError(t, err)
+	assert.False(t, ok)
+	banUser(t, conn, u)
+	ok, err = UpdateMetadata(conn, u, types.Map{
+		key.FirstName: name1,
+		key.LastName:  name2,
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, name1, u.Metadata[key.FirstName])
+	assert.Equal(t, name2, u.Metadata[key.LastName])
+	ok, err = UpdateMetadata(conn, u, types.Map{
+		key.FirstName: name2,
+		key.IPAddress: name1, // reserved
+	})
+	assert.NoError(t, err)
+	assert.True(t, ok)
+	assert.Equal(t, name2, u.Metadata[key.FirstName])
+	assert.Equal(t, ipAddr, u.Metadata[key.IPAddress])
+}
+
 func TestConfirmUser(t *testing.T) {
 	t.Parallel()
 	conn, c := tconn.TempConn(t)

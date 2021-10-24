@@ -28,6 +28,9 @@ service Admin {
   rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
   }
 
+  rpc UpdateUserMetadata (UpdateUserMetadataRequest) returns (UpdateUserMetadataResponse) {
+  }
+
   rpc ChangeUserRole (ChangeUserRoleRequest) returns (ChangeUserRoleResponse) {
   }
 
@@ -100,6 +103,19 @@ message DeleteUserRequest {
 
 message DeleteUserResponse {
   string user_id = 1;
+}
+
+message UpdateUserMetadataRequest {
+  oneof user {
+    string user_id = 1;
+    string email = 2;
+  }
+  google.protobuf.Struct metadata = 3;
+}
+
+message UpdateUserMetadataResponse {
+  string user_id = 1;
+  google.protobuf.Struct metadata = 2;
 }
 
 message ChangeUserRoleRequest {

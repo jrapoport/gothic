@@ -45,7 +45,7 @@ func (c *userClient) GetUser(ctx context.Context, in *UserRequest, opts ...grpc.
 
 func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*rpc.UserResponse, error) {
 	out := new(rpc.UserResponse)
-	err := c.cc.Invoke(ctx, "/gothic.api.User/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gothic.api.User/AdminUpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (UnimplementedUserServer) GetUser(context.Context, *UserRequest) (*rpc.User
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserRequest) (*rpc.UserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUpdateUser not implemented")
 }
 func (UnimplementedUserServer) SendConfirmUser(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendConfirmUser not implemented")
@@ -138,7 +138,7 @@ func _User_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gothic.api.User/UpdateUser",
+		FullMethod: "/gothic.api.User/AdminUpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).UpdateUser(ctx, req.(*UpdateUserRequest))
@@ -194,7 +194,7 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_GetUser_Handler,
 		},
 		{
-			MethodName: "UpdateUser",
+			MethodName: "AdminUpdateUser",
 			Handler:    _User_UpdateUser_Handler,
 		},
 		{

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/google/uuid"
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
@@ -11,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func (s *adminServer) CreateUser(ctx context.Context, req *admin.CreateUserRequest) (*admin.CreateUserResponse, error) {
+func (s *server) CreateUser(ctx context.Context, req *admin.CreateUserRequest) (*admin.CreateUserResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -46,7 +47,7 @@ func (s *adminServer) CreateUser(ctx context.Context, req *admin.CreateUserReque
 	return res, nil
 }
 
-func (s *adminServer) ChangeUserRole(ctx context.Context, req *admin.ChangeUserRoleRequest) (*admin.ChangeUserRoleResponse, error) {
+func (s *server) ChangeUserRole(ctx context.Context, req *admin.ChangeUserRoleRequest) (*admin.ChangeUserRoleResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}
@@ -98,7 +99,54 @@ func (s *adminServer) ChangeUserRole(ctx context.Context, req *admin.ChangeUserR
 	return res, nil
 }
 
-func (s *adminServer) DeleteUser(ctx context.Context, req *admin.DeleteUserRequest) (*admin.DeleteUserResponse, error) {
+func (s *server) UpdateUserMetadata(ctx context.Context, req *admin.UpdateUserMetadataRequest) (*admin.UpdateUserMetadataResponse, error) {
+	if req == nil {
+		return nil, s.RPCError(codes.InvalidArgument, nil)
+	}
+	if req.GetUserId() == "" && req.GetEmail() == "" {
+		err := errors.New("user id or email is required")
+		return nil, s.RPCError(codes.InvalidArgument, err)
+	}
+	rtx, err := s.adminRequestContext(ctx)
+	if err != nil {
+		return nil, s.RPCError(codes.PermissionDenied, err)
+	}
+	var uid uuid.UUID
+	switch req.GetUser().(type) {
+	case *admin.UpdateUserMetadataRequest_UserId:
+		userID := req.GetUserId()
+		id, err := uuid.Parse(userID)
+		if err != nil || id == uuid.Nil {
+			err = fmt.Errorf("invalid user id '%s': %w", userID, err)
+			return nil, s.RPCError(codes.InvalidArgument, err)
+		}
+		uid = id
+	case *admin.UpdateUserMetadataRequest_Email:
+		email := req.GetEmail()
+		u, err := s.API.GetUserWithEmail(email)
+		if err != nil {
+			err = fmt.Errorf("user not found '%s': %w", email, err)
+			return nil, s.RPCError(codes.InvalidArgument, err)
+		}
+		uid = u.ID
+	}
+	u, err := s.API.UpdateUserMetadata(rtx, uid, req.GetMetadata().AsMap())
+	if err != nil {
+		return nil, s.RPCError(codes.Internal, err)
+	}
+	meta, err := structpb.NewStruct(u.Metadata)
+	if err != nil {
+		return nil, s.RPCError(codes.Internal, err)
+	}
+	res := &admin.UpdateUserMetadataResponse{
+		UserId:   u.ID.String(),
+		Metadata: meta,
+	}
+	s.Debugf("updated user %s metadata: %v", uid, res)
+	return res, nil
+}
+
+func (s *server) DeleteUser(ctx context.Context, req *admin.DeleteUserRequest) (*admin.DeleteUserResponse, error) {
 	if req == nil {
 		return nil, s.RPCError(codes.InvalidArgument, nil)
 	}

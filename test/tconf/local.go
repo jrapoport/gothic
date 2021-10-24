@@ -1,7 +1,6 @@
 package tconf
 
 import (
-	"github.com/jrapoport/gothic/utils"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,6 +8,7 @@ import (
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/store/drivers"
 	"github.com/jrapoport/gothic/test/tutils"
+	"github.com/jrapoport/gothic/utils"
 	mysqld "github.com/lestrrat-go/test-mysqld"
 	"github.com/stretchr/testify/require"
 )
