@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
 
   envoy:
-    image: grpcweb/envoy:latest
+    image: envoyproxy/envoy:v1.20-latest
     command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml ${ENVOY_FLAGS:-}
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml

@@ -63,7 +63,11 @@ ifeq ($(COVERAGE),1)
 	TEST_FLAGS := $(TEST_FLAGS) $(COVERAGE_FLAGS)
 endif
 
-COMPOSE_FILE:=docker-compose.yaml
+DOCKER_FLAGS := DOCKER_BUILDKIT=0
+DOCKER := $(DOCKER_FLAGS) docker
+DOCKER_COMPOSE := $(DOCKER_FLAGS) docker-compose # $(DOCKER) compose
+COMPOSE_FILE?=docker-compose.yaml
+COMPDEV_FILE:=docker-compose-dev.yaml
 
 $(GO_LINT):
 	$(GO_GET) $(GO_LINT_REPO)
@@ -139,25 +143,25 @@ clean: ## Clean
 all: lint vet test release ## Lint, vet, test, & release
 
 image: ## Build the Docker image
-	docker build .
+	$(DOCKER) build .
 
 gothic:  ## Start gothic
-	docker compose -f $(COMPOSE_FILE) up -d gothic
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d gothic
 
 envoy: ## Start envoy
-	docker compose -f $(COMPOSE_FILE) up -d envoy
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d envoy
 
-mysql: COMPOSE_FILE?=docker-compose-dev.yaml
+mysql: COMPOSE_FILE+= -f $(COMPDEV_FILE)
 mysql: ## Start mysql
-	docker compose -f $(COMPOSE_FILE) up -d mysql
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d mysql
 
-pg: COMPOSE_FILE?=docker-compose-dev.yaml
+pg: COMPOSE_FILE+= -f $(COMPDEV_FILE)
 pg: ## Start postgres
-	docker compose -f $(COMPOSE_FILE) up -d pg
+	$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d pg
 
 db: mysql ## Start mysql db
 
-sim: COMPOSE_FILE:=docker-compose.yaml -f docker-compose-dev.yaml
+sim: COMPOSE_FILE+= -f $(COMPDEV_FILE)
 sim: COMPOSE_ENV:=./env/sim.env
 sim: db envoy gothic
 

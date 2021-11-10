@@ -44,7 +44,7 @@ type User struct {
 	Status      Status            `json:"status"`
 	Email       string            `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
 	Username    string            `json:"username" gorm:"type:varchar(255)"`
-	Password    []byte            `json:"-" gorm:"type:binary(60)"`
+	Password    []byte            `json:"-" gorm:"type:varchar(60)"`
 	Data        types.Map         `json:"data"`
 	Metadata    types.Map         `json:"metadata"`
 	SignupCode  *uint             `json:"signup_code"`
