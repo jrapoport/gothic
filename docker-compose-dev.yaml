@@ -7,6 +7,7 @@ services:
       - mysql
 
   mysql:
+    platform: linux/x86_64
     image: mysql:latest
     command: --init-file /data/application/init.sql
     volumes:
@@ -25,6 +26,7 @@ services:
     restart: unless-stopped
 
   pg:
+    platform: linux/x86_64
     image: postgres:latest
     volumes:
       - db_volume:/var/lib/postgresql/data/
