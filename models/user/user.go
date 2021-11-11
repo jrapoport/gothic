@@ -40,7 +40,7 @@ const (
 type User struct {
 	ID          uuid.UUID         `json:"id" gorm:"primaryKey;type:char(36)"`
 	Provider    provider.Name     `json:"provider" gorm:"type:varchar(255)"`
-	Role        Role              `json:"role" gorm:"type:varchar(36)"`
+	Role        Role              `json:"role"`
 	Status      Status            `json:"status"`
 	Email       string            `json:"email" gorm:"uniqueIndex;type:varchar(320)"`
 	Username    string            `json:"username" gorm:"type:varchar(255)"`
