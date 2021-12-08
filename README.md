@@ -24,6 +24,9 @@ garage projects, & consumer applications.
 umpteenth time —  without sacrificing functionality, or a professional look & feel.
 
 **UPDATE**  
+* Docker containers now build and compose correctly on Apple Silicon (arm64).
+
+
 * REST API is now complete w.r.t. GoTrue's functionality (except for SAML — which was intentionally left out).
   
 
