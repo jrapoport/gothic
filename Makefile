@@ -11,9 +11,9 @@ DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
 OUT_DIR := $(DEBUG_DIR)
 IN_EXE = $(CMD_DIR)/exe
-OUT_EXE = -o $(OUT_DIR)/$(EXE)
+OUT_EXE = $(OUT_DIR)/$(EXE)
 IN_CLI = $(CMD_DIR)/cli
-OUT_CLI = -o $(OUT_DIR)/$(CLI)
+OUT_CLI = $(OUT_DIR)/$(CLI)
 
 GO := go
 GO_PATH := $(shell $(GO) env GOPATH)
@@ -123,8 +123,8 @@ cover: test ## Run tests w/ coverage
 	$(RM) $(COVERAGE_FILE)
 
 build: ## Debug build
-	$(GO_BUILD) $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)
-	$(GO_BUILD) $(OUT_CLI) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_CLI)
+	$(GO_BUILD) -o $(OUT_EXE) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_EXE)
+	$(GO_BUILD) -o $(OUT_CLI) $(BUILD_TAGS) -ldflags="$(LD_FLAGS) $(VER_FLAGS)" $(IN_CLI)
 
 release: BUILD_TAGS := $(RELEASE_TAGS)
 release: OUT_DIR := $(RELEASE_DIR)
@@ -132,10 +132,9 @@ release: LD_FLAGS := -s -w
 release: CGO_ENABLED=0
 release: build ## Production build
 
-install: OUT_EXE :=
-install: OUT_CLI :=
-install: GO_BUILD = $(GOINSTALL)
 install: release ## Install gothic
+	mv $(OUT_EXE) $(GO_BIN)/$(EXE)
+	mv $(OUT_CLI) $(GO_BIN)/$(CLI)
 
 clean: ## Clean
 	$(RM) -r $(BUILD_DIR)
