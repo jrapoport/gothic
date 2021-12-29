@@ -71,6 +71,35 @@ handful of configuration options to get started.
 
 For a full list of configuration options please see the [Configuration](#configuration) section below.
 
+### Using Gadmin
+
+Gadmin is the Gothic control plane.
+
+#### Building Gadmin 
+
+```sh
+$ make
+# or 
+$ make build
+```
+
+To build a `RELEASE` (a.k.a. production) version of Gadmin use `make release`
+
+GAdmin requires the address of your Gothic rpc admin server & your root password. The address and password can be 
+supplied in a [configuration file](#configuration) by setting a path to the file with `-c` (or `--config`) command line 
+switch. Alternatively you can set the server address with the `-s` (`--server`) switch and the root password using the 
+`--root` switch.
+
+#### Generating a signup code with Gadmin
+
+First make sure that Gothic is up and running and that its admin server is accessible.
+
+```sh
+$ ./build/release/gadmin -s [ADMIN_SERVER_ADDRESS] --root [ROOT_PASSWORD] code
+> created 1 codes
+> 123456
+```
+
 ### Using gRPC-Web
 
 First start your instance of `gothic`, or use the container:

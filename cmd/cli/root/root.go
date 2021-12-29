@@ -12,6 +12,7 @@ import (
 var (
 	configFile   string
 	rootPassword string
+	adminAddress string
 	cfg          *config.Config
 )
 
@@ -26,13 +27,15 @@ func init() {
 	rootCmd.Short = fmt.Sprintf("control plane for %s", config.BuildName())
 	pf := rootCmd.PersistentFlags()
 	pf.StringVarP(&configFile, "config", "c", "", "the config file to use")
+	pf.StringVarP(&adminAddress, "server", "s", "", "the address of the rpc admin server")
 	pf.StringVar(&rootPassword, "root", "", "the root password to use for super admin access")
 }
 
 func initConfig(cmd *cobra.Command, _ []string) (err error) {
 	cfg, err = config.LoadConfig(configFile, config.SkipRequired())
 	if err != nil {
-		return err
+		err = fmt.Errorf("config file error %w", err)
+		return
 	}
 	cfg.DB.AutoMigrate = false
 	cfg.Signup.Default.Username = true
@@ -40,7 +43,14 @@ func initConfig(cmd *cobra.Command, _ []string) (err error) {
 	if rootPassword != "" {
 		cfg.RootPassword = rootPassword
 	}
-	return nil
+	if adminAddress != "" {
+		cfg.AdminAddress = adminAddress
+	}
+	if cfg.AdminAddress == "" {
+		err = fmt.Errorf("admin server address required")
+		return
+	}
+	return
 }
 
 func rootRunE(cmd *cobra.Command, _ []string) error {
