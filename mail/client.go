@@ -294,7 +294,8 @@ type Type int
 
 // valid email content types
 const (
-	HTML Type = iota
+	PlainText Type = iota
+	HTML
 	Markdown
 	Template
 )
@@ -312,24 +313,28 @@ func (m *Client) SendEmail(to, subject string, content Content) error {
 		m.log.Warn("mail client is offline")
 		return nil
 	}
-	if content.Body == "" {
-		return errors.New("content body required")
-	}
 	var err error
 	switch content.Type {
 	case Template:
+		if content.Body == "" {
+			return errors.New("content body required")
+		}
 		err = m.SendTemplateEmail(to, subject, content.Body)
 	case Markdown:
+		if content.Body == "" {
+			return errors.New("content body required")
+		}
 		err = m.SendMarkdownEmail(to, subject, content.Body)
-	case HTML:
-		fallthrough
 	default:
+		if content.Body == "" && content.Plaintext == "" {
+			return errors.New("content body or plaintext required")
+		}
 		err = m.Send(to, m.config.Logo, subject, content.Body, content.Plaintext)
 	}
 	return err
 }
 
-// SendTemplateEmail sends an generic email based on a body template
+// SendTemplateEmail sends a generic email based on a body template
 func (m *Client) SendTemplateEmail(to, subject, body string) error {
 	if m.IsOffline() {
 		m.log.Warn("mail client is offline")
