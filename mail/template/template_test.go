@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/mail"
 	"path"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -74,7 +75,12 @@ func assertEqualContent(t *testing.T, path string, content string, msgAndArgs ..
 		msgFormat := fmt.Sprintf("error when running ioutil.ReadFile(%q): %s", path, err)
 		return assert.Fail(t, msgFormat, msgAndArgs...)
 	}
-	return assert.Equal(t, content, string(data), msgAndArgs)
+	expected := string(data)
+	// this is a kind of a gross hack but w/e
+	rex := regexp.MustCompile(`Copyright.*Gothic`)
+	content = rex.ReplaceAllString(content, "")
+	expected = rex.ReplaceAllString(expected, "")
+	return assert.Equal(t, content, expected, msgAndArgs)
 }
 
 func testTemplateLoad(t *testing.T, newTemplate func(sub string, test testCase) Template) {
