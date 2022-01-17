@@ -14,9 +14,9 @@ import (
 
 // Main is the application main
 func Main(c *config.Config) error {
-	if c.IsDebug() {
-		utils.PrettyPrint(c)
-	}
+
+	c.Log().Debug(utils.PrettyString(c))
+
 	signalsToCatch := []os.Signal{
 		os.Interrupt,
 		os.Kill,

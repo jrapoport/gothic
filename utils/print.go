@@ -10,10 +10,15 @@ import (
 	"github.com/segmentio/encoding/json"
 )
 
+// PrettyString formats the contents of the obj as a pretty string
+func PrettyString(data interface{}) string {
+	b, _ := json.MarshalIndent(data, "", "\t")
+	return string(b)
+}
+
 // PrettyPrint the contents of the obj
 func PrettyPrint(data interface{}) {
-	b, _ := json.MarshalIndent(data, "", "\t")
-	fmt.Printf("%s \n", string(b))
+	fmt.Printf("%s \n", PrettyString(data))
 }
 
 // PrintGrid prints a slice of strings as a grid

@@ -9,6 +9,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestPrettyString(t *testing.T) {
+	t.Parallel()
+	type Foo struct {
+		Value  string
+		Number int
+	}
+	f := Foo{
+		Value:  "test",
+		Number: 42,
+	}
+	s := PrettyString(f)
+	assert.Equal(t, "{\n\t\"Value\": \"test\",\n\t\"Number\": 42\n}", s)
+}
+
 func TestPrettyPrint(t *testing.T) {
 	t.Parallel()
 	type Foo struct {
