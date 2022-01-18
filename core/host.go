@@ -84,7 +84,7 @@ func (s *Host) Start(start ServeFunc) {
 
 // ListenAndServe listens on a port and serves.
 func (s *Host) ListenAndServe() error {
-	if s.start == nil || s.addr == "" {
+	if s.start == nil || s.addr == "" || s.addr == "off" {
 		return nil
 	}
 	started := sync.WaitGroup{}
