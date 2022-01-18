@@ -43,7 +43,7 @@ var _ Hosted = (*Host)(nil)
 // NewHost creates a new Host.
 func NewHost(a *API, name, address string) *Host {
 	s := *NewServer(a, name)
-	if address == "" {
+	if address == "" || address == "off" {
 		s.Warnf("%s host is disabled", name)
 	}
 	return &Host{

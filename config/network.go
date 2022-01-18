@@ -12,19 +12,19 @@ type Network struct {
 	// Host is default adapter to listen on.
 	// default: localhost
 	Host string `json:"host"`
-	// HealthAddress is the address for the health check server.
+	// HealthAddress is the address for the health check server or "off" to disable.
 	// default: [Host]:7720
 	HealthAddress string `json:"health_address" yaml:"health_address" mapstructure:"health_address"`
-	// RPCAddress is the address for the gRPC server.
+	// RPCAddress is the address for the gRPC server or "off" to disable.
 	// default: [Host]:7721
 	RPCAddress string `json:"rpc_address" yaml:"rpc_address" mapstructure:"rpc_address"`
-	// AdminAddress is the address for the admin server.
+	// AdminAddress is the address for the admin server or "off" to disable.
 	// default: [Host]:7722
 	AdminAddress string `json:"admin_address" yaml:"admin_address" mapstructure:"admin_address"`
-	// HTTP is the address for the HTTP server.
+	// HTTP is the address for the HTTP server or "off" to disable.
 	// default: [Host]:7727
 	RESTAddress string `json:"rest_address" yaml:"rest_address" mapstructure:"rest_address"`
-	// RPCWebAddress is the address for the gRPC-Web server.
+	// RPCWebAddress is the address for the gRPC-Web server or "off" to disable.
 	// default: [Host]:7729
 	RPCWebAddress string `json:"rpcweb_address" yaml:"rpcweb_address" mapstructure:"rpcweb_address"`
 
