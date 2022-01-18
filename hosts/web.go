@@ -17,7 +17,7 @@ func NewRPCWebHost(a *core.API, address string) core.Hosted {
 		[]rpc.RegisterServer{
 			account.RegisterServer,
 			auth.RegisterServer,
-			health.RegisterServer,
 			user.RegisterServer,
+			health.RegisterServer,
 		}, rpc.Authentication())
 }

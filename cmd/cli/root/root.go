@@ -13,6 +13,7 @@ var (
 	configFile   string
 	rootPassword string
 	adminAddress string
+	adminCert    string
 	cfg          *config.Config
 )
 
@@ -28,6 +29,7 @@ func init() {
 	pf := rootCmd.PersistentFlags()
 	pf.StringVarP(&configFile, "config", "c", "", "the config file to use")
 	pf.StringVarP(&adminAddress, "server", "s", "", "the address of the rpc admin server")
+	pf.StringVarP(&adminCert, "cert", "x", "", "the tls cert of the rpc admin server")
 	pf.StringVar(&rootPassword, "root", "", "the root password to use for super admin access")
 }
 

@@ -9,7 +9,7 @@ CMD_DIR := ./cmd
 BUILD_DIR := build
 DEBUG_DIR := $(BUILD_DIR)/debug
 RELEASE_DIR := $(BUILD_DIR)/release
-OUT_DIR := $(DEBUG_DIR)
+OUT_DIR = $(DEBUG_DIR)
 IN_EXE = $(CMD_DIR)/exe
 OUT_EXE = $(OUT_DIR)/$(EXE)
 IN_CLI = $(CMD_DIR)/cli
@@ -132,6 +132,7 @@ release: LD_FLAGS := -s -w
 release: CGO_ENABLED=0
 release: build ## Production build
 
+install: OUT_DIR := $(RELEASE_DIR)
 install: release ## Install gothic
 	mv $(OUT_EXE) $(GO_BIN)/$(EXE)
 	mv $(OUT_CLI) $(GO_BIN)/$(CLI)

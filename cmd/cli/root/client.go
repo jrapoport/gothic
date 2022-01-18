@@ -3,6 +3,9 @@ package root
 import (
 	"context"
 	"errors"
+	"fmt"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/admin"
 	"github.com/jrapoport/gothic/hosts/rpc"
@@ -40,11 +43,17 @@ func NewAdminClient() (*AdminClient, error) {
 
 // newConnection returns an rpc client connection
 func newConnection(address, pw string) (*grpc.ClientConn, error) {
-	//md := metadata.Pairs(rpc.RootPassword, pw)
+	cred := insecure.NewCredentials()
+	if adminCert != "" {
+		// Create the client TLS credentials
+		var err error
+		cred, err = credentials.NewClientTLSFromFile(adminCert, "")
+		if err != nil {
+			return nil, fmt.Errorf("could not load admin tls cert: %s", err)
+		}
+	}
 	opts := []grpc.DialOption{
-		// NOTE: currently assumes your rpc servers are secured by topology and not tls
-		grpc.WithInsecure(),
-		//grpc.WithDefaultCallOptions(grpc.Header(&md)),
+		grpc.WithTransportCredentials(cred),
 		grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{},
 			cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 			ctx = metadata.AppendToOutgoingContext(ctx, rpc.RootPassword, pw)
