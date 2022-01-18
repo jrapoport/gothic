@@ -242,11 +242,11 @@ var file_user_proto_goTypes = []interface{}{
 var file_user_proto_depIdxs = []int32{
 	3, // 0: gothic.api.UpdateUserRequest.data:type_name -> google.protobuf.Struct
 	0, // 1: gothic.api.User.GetUser:input_type -> gothic.api.UserRequest
-	1, // 2: gothic.api.User.AdminUpdateUser:input_type -> gothic.api.UpdateUserRequest
+	1, // 2: gothic.api.User.UpdateUser:input_type -> gothic.api.UpdateUserRequest
 	4, // 3: gothic.api.User.SendConfirmUser:input_type -> google.protobuf.Empty
 	2, // 4: gothic.api.User.ChangePassword:input_type -> gothic.api.ChangePasswordRequest
 	5, // 5: gothic.api.User.GetUser:output_type -> gothic.api.UserResponse
-	5, // 6: gothic.api.User.AdminUpdateUser:output_type -> gothic.api.UserResponse
+	5, // 6: gothic.api.User.UpdateUser:output_type -> gothic.api.UserResponse
 	4, // 7: gothic.api.User.SendConfirmUser:output_type -> google.protobuf.Empty
 	6, // 8: gothic.api.User.ChangePassword:output_type -> gothic.api.BearerResponse
 	5, // [5:9] is the sub-list for method output_type
