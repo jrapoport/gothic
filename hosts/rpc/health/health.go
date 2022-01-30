@@ -3,18 +3,17 @@ package health
 import (
 	"context"
 
-	"github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/hosts/rpc"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type healthServer struct {
-	health.UnimplementedHealthServer
+	//healthpb.UnimplementedHealthServer
 	*rpc.Server
 }
 
-var _ health.HealthServer = (*healthServer)(nil)
+var _ healthpb.HealthServer = (*healthServer)(nil)
 
 func newHealthServer(srv *rpc.Server) *healthServer {
 	hs := &healthServer{Server: srv}
@@ -24,19 +23,22 @@ func newHealthServer(srv *rpc.Server) *healthServer {
 
 // RegisterServer registers a new health server.
 func RegisterServer(s *grpc.Server, e *rpc.Server) {
-	health.RegisterHealthServer(s, newHealthServer(e))
+	healthpb.RegisterHealthServer(s, newHealthServer(e))
 }
 
 func (s *healthServer) AuthFuncOverride(ctx context.Context, _ string) (context.Context, error) {
 	return ctx, nil
 }
 
-// HealthCheck performs a health check.
-func (s *healthServer) HealthCheck(_ context.Context, _ *emptypb.Empty) (*health.HealthCheckResponse, error) {
-	hc := s.API.HealthCheck()
-	return &health.HealthCheckResponse{
-		Name:    hc.Name,
-		Version: hc.Version,
-		Status:  hc.Status,
+// Check performs a health check.
+func (s *healthServer) Check(_ context.Context, _ *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{
+		Status: healthpb.HealthCheckResponse_SERVING,
 	}, nil
+}
+
+// Watch is ignored for now
+func (s *healthServer) Watch(_ *healthpb.HealthCheckRequest, _ healthpb.Health_WatchServer) error {
+	//TODO implement me
+	panic("not implemented")
 }
