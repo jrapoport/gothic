@@ -9,7 +9,7 @@ import (
 )
 
 type healthServer struct {
-	//healthpb.UnimplementedHealthServer
+	healthpb.UnimplementedHealthServer
 	*rpc.Server
 }
 

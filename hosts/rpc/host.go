@@ -38,10 +38,14 @@ func NewHost(a *core.API, name string, address string, reg []RegisterServer, opt
 	l := grpcLogger(h.Config().Level)
 	unary := []grpc.UnaryServerInterceptor{
 		grpc_logrus.UnaryServerInterceptor(l, grpc_logrus.WithDecider(func(fullMethodName string, err error) bool {
-			if fullMethodName == "/health.Health/HealthCheck" {
+			switch fullMethodName {
+			case "/grpc.health.v1.Health/Check":
 				return false
+			case "/grpc.health.v1.Health/Watch":
+				return false
+			default:
+				return true
 			}
-			return true
 		})),
 		grpc_recovery.UnaryServerInterceptor(),
 		// ratelimit.UnaryServerInterceptor(),
