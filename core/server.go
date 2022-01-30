@@ -13,8 +13,8 @@ type Server struct {
 
 // NewServer returns a new server.
 func NewServer(a *API, name string) *Server {
-	log := a.log.WithName("server-" + name)
-	return &Server{a, log}
+	l := a.log.WithName("server-" + name)
+	return &Server{a, l}
 }
 
 // Clone clones the server.

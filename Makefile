@@ -106,7 +106,6 @@ deps: tidy ## Install dependencies
 rpcw:: PROTO_FILES = \
 	./api/service/proto/account.proto \
 	./api/service/proto/auth.proto \
-	./api/service/proto/health.proto \
 	./api/service/proto/response.proto \
 	./api/service/proto/user.proto
 

@@ -6,7 +6,6 @@ import (
 
 	"github.com/jrapoport/gothic/api/grpc/rpc/account"
 	"github.com/jrapoport/gothic/api/grpc/rpc/auth"
-	"github.com/jrapoport/gothic/api/grpc/rpc/health"
 	"github.com/jrapoport/gothic/api/grpc/rpc/user"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/core/context"
@@ -15,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func accountClient(t *testing.T, h core.Hosted) account.AccountClient {
@@ -30,10 +29,10 @@ func authClient(t *testing.T, h core.Hosted) auth.AuthClient {
 	}).(auth.AuthClient)
 }
 
-func healthClient(t *testing.T, h core.Hosted) health.HealthClient {
+func healthClient(t *testing.T, h core.Hosted) healthpb.HealthClient {
 	return tsrv.RPCClient(t, h.Address(), func(cc grpc.ClientConnInterface) interface{} {
-		return health.NewHealthClient(cc)
-	}).(health.HealthClient)
+		return healthpb.NewHealthClient(cc)
+	}).(healthpb.HealthClient)
 }
 
 func userClient(t *testing.T, h core.Hosted) user.UserClient {
@@ -79,9 +78,9 @@ func TestRPCWebHost(t *testing.T) {
 	assert.Equal(t, test.Email, res.Email)
 	// rpc health check
 	hc := healthClient(t, h)
-	chk, err := hc.HealthCheck(ctx, &emptypb.Empty{})
+	chk, err := hc.Check(ctx, &healthpb.HealthCheckRequest{})
 	assert.NoError(t, err)
-	assert.Equal(t, a.HealthCheck().Name, chk.Name)
+	assert.Equal(t, healthpb.HealthCheckResponse_SERVING, chk.Status)
 	// token refresh
 	tc := authClient(t, h)
 	bt, err := tc.RefreshBearerToken(ctx, &auth.RefreshTokenRequest{
