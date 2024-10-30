@@ -54,7 +54,7 @@ VER_PKG := $(PKG)/config
 # make sure this is = and not := so it gets expanded properly
 VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}' -X '${VER_PKG}.ExeName=${EXE}'
 
-TEST_FLAGS :=-failfast $(TEST_FLAGS)
+TEST_FLAGS :=-failfast -count=1 $(TEST_FLAGS)
 COVERAGE_FILE=coverage.txt
 COVERAGE_FLAGS=-race -covermode=atomic -coverpkg=./... -coverprofile=$(COVERAGE_FILE)
 COVERAGE=0
