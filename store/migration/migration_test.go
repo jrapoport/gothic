@@ -44,4 +44,6 @@ func TestMigration_Run(t *testing.T) {
 	assert.True(t, has)
 	has = db.Migrator().HasIndex(mb, tableIdx)
 	assert.True(t, has)
+	has = db.Migrator().HasIndex(mb, ModelBIndex)
+	assert.False(t, has)
 }

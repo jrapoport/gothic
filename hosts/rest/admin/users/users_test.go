@@ -5,9 +5,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"dario.cat/mergo"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/models/types"

@@ -98,7 +98,7 @@ static: $(GO_STATIC) ## Run static analysis
 	$(GO_STATIC) ./...
 
 tidy: ## Tidy module
-	$(GO_MOD) tidy -compat=1.17
+	$(GO_MOD) tidy
 
 deps: tidy ## Install dependencies
 	$(GO_MOD) download

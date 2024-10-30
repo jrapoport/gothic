@@ -1,6 +1,6 @@
 # 🦇 &nbsp;Gothic
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jrapoport/gothic/test?style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jrapoport/gothic/test.yaml?branch=master&style=flat-square)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jrapoport/gothic?style=flat-square&)](https://goreportcard.com/report/github.com/jrapoport/gothic)
 [![Codecov](https://img.shields.io/codecov/c/github/jrapoport/gothic?style=flat-square)](https://codecov.io/gh/jrapoport/gothic)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/jrapoport/gothic?style=flat-square)

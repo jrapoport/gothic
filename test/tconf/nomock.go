@@ -12,9 +12,10 @@ import (
 	"github.com/orlangure/gnomock/preset/postgres"
 	"github.com/stretchr/testify/require"
 
-	_ "github.com/go-sql-driver/mysql" // mysql driver
-	_ "github.com/lib/pq"              // postgres driver
-	_ "github.com/mattn/go-sqlite3"    // sqlite driver
+	_ "github.com/go-sql-driver/mysql"  // mysql driver
+	_ "github.com/lib/pq"               // postgres driver
+	_ "github.com/mattn/go-sqlite3"     // sqlite driver
+	_ "github.com/microsoft/go-mssqldb" // mssql driver
 )
 
 const (

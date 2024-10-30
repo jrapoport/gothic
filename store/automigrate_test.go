@@ -10,21 +10,21 @@ import (
 )
 
 func TestAddAutoMigration(t *testing.T) {
-	type ModA struct {
+	type ModelA struct {
 		gorm.Model
 		Value string
 	}
-	type ModB struct {
+	type ModelB struct {
 		gorm.Model
 		Value string `gorm:"index:idx_value"`
 	}
 	// ModelBIndex is the name of the index for ModelB
 	const (
 		BIndex   = "idx_value"
-		tableIdx = "idx_test_mod_bs_value"
+		tableIdx = "idx_test_model_bs_value"
 	)
-	var ma ModA
-	var mb ModB
+	var ma ModelA
+	var mb ModelB
 	t.Cleanup(func() {
 		plan.Clear()
 	})

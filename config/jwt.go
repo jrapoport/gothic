@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 )
 
 // JWT holds all the JWT related configuration.
@@ -18,7 +18,7 @@ type JWT struct {
 	PEM        `yaml:",inline" mapstructure:",squash"`
 	Algorithm  string        `json:"algorithm"`
 	Expiration time.Duration `json:"expiration"`
-	// Issuer is the the entity that issued the token (default: Config.Service)
+	// Issuer is the entity that issued the token (default: Config.Service)
 	Issuer string `json:"issuer"`
 	// Audience is an optional comma separated list of resource
 	// servers that should accept the token (default: n/a)

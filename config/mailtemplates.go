@@ -7,7 +7,7 @@ import (
 
 // MailTemplates config
 type MailTemplates struct {
-	// Theme is the theme to use when formatting emails.
+	// Theme is theme to use when formatting emails.
 	// Options are "default", "flat", "" = default
 	Theme string `json:"theme"`
 	// MailTemplate is a path to a configuration file with additional customization.
