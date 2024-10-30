@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/hosts/rest"
 	rest_user "github.com/jrapoport/gothic/hosts/rest/user"

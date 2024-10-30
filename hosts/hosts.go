@@ -2,9 +2,9 @@ package hosts
 
 import (
 	"fmt"
+	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"sync"
 
-	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/jrapoport/gothic/config"
 	"github.com/jrapoport/gothic/core"
 	"github.com/jrapoport/gothic/hosts/health"
@@ -27,6 +27,7 @@ func init() {
 func Start(a *core.API, c *config.Config) error {
 	hm.mu.Lock()
 	defer hm.mu.Unlock()
+	grpcLogLevel(c.Level)
 	hosts := []struct {
 		name   string
 		addr   *string
@@ -54,8 +55,6 @@ func Start(a *core.API, c *config.Config) error {
 		*h.addr = s.Address()
 	}
 	hm.running = true
-	l := grpcLogger(c.Level)
-	grpc_logrus.ReplaceGrpcLogger(l)
 	return nil
 }
 
@@ -81,9 +80,9 @@ func Shutdown() error {
 	return err
 }
 
-func grpcLogger(level string) *logrus.Entry {
+func grpcLogLevel(level string) {
 	lvl, _ := logrus.ParseLevel(level)
 	l := logrus.New()
 	l.SetLevel(lvl)
-	return l.WithField("protocol", "grpc")
+	grpc_logrus.ReplaceGrpcLogger(l.WithField("protocol", "grpc"))
 }

@@ -26,7 +26,7 @@ func TestNewMigrateFunc_Error(t *testing.T) {
 	create := "CREATE TABLE `model_as` (`id` bigint unsigned AUTO_INCREMENT," +
 		"`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL," +
 		"`deleted_at` datetime(3) NULL,`value` longtext,PRIMARY KEY (`id`)," +
-		"INDEX idx_model_as_deleted_at (`deleted_at`))"
+		"INDEX `idx_model_as_deleted_at` (`deleted_at`))"
 	mock.ExpectExec(regexp.QuoteMeta(create)).
 		WillReturnError(errors.New("mock error"))
 	m := ModelA{}
@@ -88,3 +88,14 @@ func TestNewRollbackFunc(t *testing.T) {
 	err = rb(db)
 	assert.Error(t, err)
 }
+
+/*
+	fetchIndexes := func(tx *gorm.DB) []string {
+		var indexNames []string
+		query := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = '%s'", tableName)
+		if err := tx.Raw(query).Scan(&indexNames).Error; err != nil {
+			panic(err)
+		}
+		return indexNames
+	}
+*/

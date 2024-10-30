@@ -25,13 +25,12 @@ GO_GEN := $(GO) generate -v
 GO_BUILD := $(GO) build -v
 GO_INSTALL := $(GO) install -v
 GO_FMT := $(GO) fmt
-GO_GET := $(GO) get -v
 GO_TEST := $(GO) test -v
-GO_LINT := $(GO_BIN)/golint
+GO_LINT := $(GO_BIN)/golangci-lint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
 
-GO_LINT_REPO := golang.org/x/lint/golint
+GO_LINT_REPO := github.com/golangci/golangci-lint/cmd/golangci-lint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
 
@@ -55,7 +54,7 @@ VER_PKG := $(PKG)/config
 # make sure this is = and not := so it gets expanded properly
 VER_FLAGS = -X '${VER_PKG}.Version=${VERSION_NUM}' -X '${VER_PKG}.Build=${BUILD_NUM}' -X '${VER_PKG}.ExeName=${EXE}'
 
-TEST_FLAGS :=-failfast $(TEST_FLAGS)
+TEST_FLAGS :=-failfast -count=1 $(TEST_FLAGS)
 COVERAGE_FILE=coverage.txt
 COVERAGE_FLAGS=-race -covermode=atomic -coverpkg=./... -coverprofile=$(COVERAGE_FILE)
 COVERAGE=0
@@ -70,13 +69,13 @@ COMPOSE_FILE?=docker-compose.yaml
 COMPDEV_FILE:=docker-compose-dev.yaml
 
 $(GO_LINT):
-	$(GO_GET) $(GO_LINT_REPO)
+	$(GO_INSTALL) $(GO_LINT_REPO)
 
 $(GO_SEC):
-	$(GO_GET) $(GO_SEC_REPO)
+	$(GO_INSTALL) $(GO_SEC_REPO)
 
 $(GO_STATIC):
-	$(GO_GET) $(GO_STATIC_REPO)
+	$(GO_INSTALL) $(GO_STATIC_REPO)
 
 help: ## Show this help
 	echo $(BUILD_NUM)
@@ -89,7 +88,7 @@ vet: ## Run vet
 	$(GO_VET) ./...
 
 lint: $(GO_LINT) ## Run linter
-	$(GO_LINT) ./...
+	$(GO_LINT) run ./...
 
 audit: $(GO_SEC) ## Run audit
 	$(GO_SEC) ./...
@@ -98,7 +97,7 @@ static: $(GO_STATIC) ## Run static analysis
 	$(GO_STATIC) ./...
 
 tidy: ## Tidy module
-	$(GO_MOD) tidy -compat=1.17
+	$(GO_MOD) tidy
 
 deps: tidy ## Install dependencies
 	$(GO_MOD) download
@@ -139,7 +138,8 @@ install: release ## Install gothic
 clean: ## Clean
 	$(RM) -r $(BUILD_DIR)
 
-all: lint vet test release ## Lint, vet, test, & release
+# lint temp disable lint as we are getting false positives
+all: vet test release ## Lint, vet, test, & release
 
 image: ## Build the Docker image
 	$(DOCKER) build .

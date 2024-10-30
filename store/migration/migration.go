@@ -12,7 +12,7 @@ type Migration struct {
 	indexes []string
 }
 
-// Run returns the migration on the the db.
+// Run returns the migration on the db.
 func (m *Migration) Run(db *gorm.DB) error {
 	plan := NewPlan()
 	plan.AddMigration(m)

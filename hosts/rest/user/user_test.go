@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/hosts/rest"
 	"github.com/jrapoport/gothic/models/types"

@@ -6,6 +6,7 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/jrapoport/gothic/store/drivers"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // MigrateFunc is the func signature for migrating.
@@ -70,13 +71,17 @@ func migrateIndexes(tx *gorm.DB, dst interface{}, indexes []string) error {
 			}
 		}
 		if tx.Name() == drivers.SQLite {
-			err = tx.Migrator().DropIndex(dst, idx)
+			err = dropIndexIfExists(tx, idx)
 			if err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func dropIndexIfExists(tx *gorm.DB, name string) error {
+	return tx.Exec("DROP INDEX IF EXISTS ?", clause.Column{Name: name}).Error
 }
 
 // tableName returns the table name for the model

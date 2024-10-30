@@ -6,7 +6,7 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"github.com/jrapoport/gothic/core/tokens"
 	"github.com/jrapoport/gothic/models/token"
 	"github.com/jrapoport/gothic/models/types"

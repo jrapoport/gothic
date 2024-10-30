@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/puerkitobio/purell"
+	"github.com/PuerkitoBio/purell"
 	"github.com/segmentio/encoding/json"
 )
 

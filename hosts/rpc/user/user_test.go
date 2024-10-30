@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"dario.cat/mergo"
 	"github.com/google/uuid"
-	"github.com/imdario/mergo"
 	"github.com/jrapoport/gothic/api/grpc/rpc/user"
 	"github.com/jrapoport/gothic/core/context"
 	"github.com/jrapoport/gothic/hosts/rpc"

@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"github.com/imdario/mergo"
+	"dario.cat/mergo"
 	"github.com/jrapoport/gothic/models/account"
 	"github.com/jrapoport/gothic/models/types"
 	"github.com/jrapoport/gothic/models/types/key"
