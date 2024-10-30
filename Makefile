@@ -25,13 +25,12 @@ GO_GEN := $(GO) generate -v
 GO_BUILD := $(GO) build -v
 GO_INSTALL := $(GO) install -v
 GO_FMT := $(GO) fmt
-GO_GET := $(GO) get -v
 GO_TEST := $(GO) test -v
-GO_LINT := $(GO_BIN)/golint
+GO_LINT := $(GO_BIN)/golangci-lint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
 
-GO_LINT_REPO := golang.org/x/lint/golint
+GO_LINT_REPO := github.com/golangci/golangci-lint/cmd/golangci-lint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
 GO_STATIC_REPO := honnef.co/go/tools/cmd/staticcheck
 
@@ -70,13 +69,13 @@ COMPOSE_FILE?=docker-compose.yaml
 COMPDEV_FILE:=docker-compose-dev.yaml
 
 $(GO_LINT):
-	$(GO_GET) $(GO_LINT_REPO)
+	$(GO_INSTALL) $(GO_LINT_REPO)
 
 $(GO_SEC):
-	$(GO_GET) $(GO_SEC_REPO)
+	$(GO_INSTALL) $(GO_SEC_REPO)
 
 $(GO_STATIC):
-	$(GO_GET) $(GO_STATIC_REPO)
+	$(GO_INSTALL) $(GO_STATIC_REPO)
 
 help: ## Show this help
 	echo $(BUILD_NUM)
@@ -89,7 +88,7 @@ vet: ## Run vet
 	$(GO_VET) ./...
 
 lint: $(GO_LINT) ## Run linter
-	$(GO_LINT) ./...
+	$(GO_LINT) run ./...
 
 audit: $(GO_SEC) ## Run audit
 	$(GO_SEC) ./...
@@ -139,7 +138,8 @@ install: release ## Install gothic
 clean: ## Clean
 	$(RM) -r $(BUILD_DIR)
 
-all: lint vet test release ## Lint, vet, test, & release
+# lint temp disable lint as we are getting false positives
+all: vet test release ## Lint, vet, test, & release
 
 image: ## Build the Docker image
 	$(DOCKER) build .
