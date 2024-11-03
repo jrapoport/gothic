@@ -29,6 +29,7 @@ GO_TEST := $(GO) test -v
 GO_LINT := $(GO_BIN)/golangci-lint
 GO_SEC := $(GO_BIN)/gosec
 GO_STATIC := $(GO_BIN)/staticcheck
+GO_GET := $(GO) get
 
 GO_LINT_REPO := github.com/golangci/golangci-lint/cmd/golangci-lint
 GO_SEC_REPO := github.com/securego/gosec/cmd/gosec
@@ -101,6 +102,9 @@ tidy: ## Tidy module
 
 deps: tidy ## Install dependencies
 	$(GO_MOD) download
+
+update:
+	$(GO_GET) -u=patch all
 
 rpcw:: PROTO_FILES = \
 	./api/service/proto/account.proto \
