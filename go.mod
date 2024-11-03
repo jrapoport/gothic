@@ -69,8 +69,8 @@ require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.58.1 // indirect
 	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.58.1 // indirect
 	github.com/DataDog/datadog-go/v5 v5.5.0 // indirect
-	github.com/DataDog/go-libddwaf/v3 v3.4.0 // indirect
-	github.com/DataDog/go-sqllexer v0.0.14 // indirect
+	github.com/DataDog/go-libddwaf/v3 v3.5.1 // indirect
+	github.com/DataDog/go-sqllexer v0.0.16 // indirect
 	github.com/DataDog/go-tuf v1.1.0-0.5.2 // indirect
 	github.com/DataDog/sketches-go v1.4.6 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -136,9 +136,9 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/markbates/going v1.0.3 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mitchellh/reflectwalk v1.0.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
