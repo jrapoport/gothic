@@ -45,7 +45,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.16.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1
 	gopkg.in/DataDog/dd-trace-go.v1 v1.69.1
